@@ -1,0 +1,91 @@
+//
+//  KindKitView
+//
+
+import Foundation
+import KindKitCore
+import KindKitMath
+
+public enum WebViewRequest {
+    
+    case request(_ request: URLRequest)
+    case file(url: URL, readAccess: URL)
+    case html(string: String, baseUrl: URL?)
+    case data(data: Data, mimeType: String, encoding: String, baseUrl: URL)
+        
+}
+
+public enum WebViewState {
+    
+    case empty
+    case loading
+    case loaded(_ error: Error?)
+    
+}
+
+extension WebViewState : Equatable {
+    
+    public static func == (lhs: WebViewState, rhs: WebViewState) -> Bool {
+        switch (lhs, rhs) {
+        case (.empty, .empty): return true
+        case (.loading, .loading): return true
+        case (.loaded, .loaded): return true
+        default: return false
+        }
+    }
+    
+}
+
+public enum WebViewNavigationPolicy {
+
+    case cancel
+    case allow
+    
+}
+
+public protocol IWebView : IView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
+    
+    var width: DimensionBehaviour { set get }
+    
+    var height: DimensionBehaviour { set get }
+    
+    var enablePinchGesture: Bool { set get }
+    
+    var contentInset: InsetFloat { set get }
+    
+    var contentSize: SizeFloat { get }
+    
+    var request: WebViewRequest? { set get }
+    
+    var state: WebViewState { get }
+    
+    func evaluate< Result >(javaScript: String, success: @escaping (Result) -> Void, failure: @escaping (Error) -> Void)
+    
+    @discardableResult
+    func width(_ value: DimensionBehaviour) -> Self
+    
+    @discardableResult
+    func height(_ value: DimensionBehaviour) -> Self
+    
+    @discardableResult
+    func enablePinchGesture(_ value: Bool) -> Self
+    
+    @discardableResult
+    func contentInset(_ value: InsetFloat) -> Self
+    
+    @discardableResult
+    func request(_ value: WebViewRequest) -> Self
+    
+    @discardableResult
+    func onContentSize(_ value: (() -> Void)?) -> Self
+    
+    @discardableResult
+    func onBeginLoading(_ value: (() -> Void)?) -> Self
+    
+    @discardableResult
+    func onEndLoading(_ value: (() -> Void)?) -> Self
+    
+    @discardableResult
+    func onDecideNavigation(_ value: ((_ request: URLRequest) -> WebViewNavigationPolicy)?) -> Self
+
+}
