@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "KindKitCore",type: .static, targets: [ "KindKitCore" ]),
         .library(name: "KindKitDatabase", type: .static, targets: [ "KindKitDatabase" ]),
         .library(name: "KindKitDataSource", type: .static, targets: [ "KindKitDataSource" ]),
+        .library(name: "KindKitGraphics", type: .static, targets: [ "KindKitGraphics" ]),
         .library(name: "KindKitJson", type: .static, targets: [ "KindKitJson" ]),
         .library(name: "KindKitKeychain", type: .static, targets: [ "KindKitKeychain" ]),
         .library(name: "KindKitLog", type: .static, targets: [ "KindKitLog" ]),
@@ -49,6 +50,11 @@ let package = Package(
             path: "Sources/DataSource"
         ),
         .target(
+            name: "KindKitGraphics",
+            dependencies: [ .target(name: "KindKitView") ],
+            path: "Sources/Graphics"
+        ),
+        .target(
             name: "KindKitJson",
             dependencies: [ .target(name: "KindKitCore") ],
             path: "Sources/Json"
@@ -72,6 +78,11 @@ let package = Package(
             name: "KindKitMath",
             dependencies: [ .target(name: "KindKitCore") ],
             path: "Sources/Math"
+        ),
+        .testTarget(
+            name: "KindKitMath-Tests",
+            dependencies: [ .target(name: "KindKitMath") ],
+            path: "Sources/Math-Tests"
         ),
         .target(
             name: "KindKitModule",

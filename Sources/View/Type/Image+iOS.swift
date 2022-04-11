@@ -10,10 +10,11 @@ import KindKitMath
 import UIKit
 import ImageIO
 
-public struct Image {
+public struct Image : Equatable {
 
     public var native: UIImage
     public var size: SizeFloat
+    public var scale: Float
     
     @inlinable
     public init(
@@ -29,6 +30,7 @@ public struct Image {
             self.native = image
         }
         self.size = SizeFloat(image.size)
+        self.scale = Float(image.scale)
     }
     
     @inlinable
@@ -46,6 +48,7 @@ public struct Image {
             self.native = image
         }
         self.size = SizeFloat(image.size)
+        self.scale = Float(image.scale)
     }
     
     public init?(
@@ -55,6 +58,7 @@ public struct Image {
         guard let image = Self._create(data: data, renderingMode: renderingMode) else { return nil }
         self.native = image
         self.size = SizeFloat(image.size)
+        self.scale = Float(image.scale)
     }
     
     public init?(
@@ -65,6 +69,7 @@ public struct Image {
         guard let image = Self._create(data: data, renderingMode: renderingMode) else { return nil }
         self.native = image
         self.size = SizeFloat(image.size)
+        self.scale = Float(image.scale)
     }
     
     @inlinable
@@ -73,6 +78,7 @@ public struct Image {
     ) {
         self.native = uiImage
         self.size = SizeFloat(uiImage.size)
+        self.scale = Float(uiImage.scale)
     }
     
     @inlinable
@@ -90,6 +96,7 @@ public struct Image {
             self.native = image
         }
         self.size = SizeFloat(image.size)
+        self.scale = Float(image.scale)
     }
     
     @inlinable
@@ -97,7 +104,8 @@ public struct Image {
         _ cgImage: CGImage
     ) {
         self.native = UIImage(cgImage: cgImage)
-        self.size = SizeFloat(native.size)
+        self.size = SizeFloat(self.native.size)
+        self.scale = Float(self.native.scale)
     }
     
     public init?(size: SizeFloat, scale: Float? = nil, color: Color) {
@@ -116,6 +124,7 @@ public struct Image {
         }
         self.native = UIImage(cgImage: image)
         self.size = SizeFloat(width: Float(image.width), height: Float(image.height))
+        self.scale = realScale
     }
     
 }

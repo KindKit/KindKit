@@ -68,7 +68,7 @@ struct LayoutManager {
                 let frame = item.frame
                 let isLoaded = item.view.isLoaded
                 let isAppeared = item.view.isAppeared
-                let isVisible = bounds.isIntersects(rect: frame)
+                let isVisible = bounds.isIntersects(frame)
                 if isLoaded == true || isVisible == true {
                     item.view.native.frame = frame.cgRect
                     if isVisible == true && item.isNeedForceUpdate == true {

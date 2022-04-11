@@ -73,13 +73,13 @@ public extension ILayout {
     
     @inlinable
     func visible(items: [LayoutItem], for bounds: RectFloat) -> [LayoutItem] {
-        guard let firstIndex = items.firstIndex(where: { return bounds.isIntersects(rect: $0.frame) }) else { return [] }
+        guard let firstIndex = items.firstIndex(where: { return bounds.isIntersects($0.frame) }) else { return [] }
         var result: [LayoutItem] = [ items[firstIndex] ]
         let start = min(firstIndex + 1, items.count)
         let end = items.count
         for index in start ..< end {
             let item = items[index]
-            if bounds.isIntersects(rect: item.frame) == true {
+            if bounds.isIntersects(item.frame) == true {
                 result.append(item)
             } else {
                 break

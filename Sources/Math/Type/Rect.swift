@@ -7,7 +7,7 @@ import Foundation
 public typealias RectFloat = Rect< Float >
 public typealias RectDouble = Rect< Double >
 
-public struct Rect< ValueType: BinaryFloatingPoint > : Hashable {
+public struct Rect< ValueType: IScalar & Hashable > : Hashable {
     
     public var origin: Point< ValueType >
     public var size: Size< ValueType >
@@ -159,7 +159,7 @@ public extension Rect {
     
     @inlinable
     var isZero: Bool {
-        return self.origin.isZero == true && self.size.isZero == true
+        return self ~~ .zero
     }
     
     @inlinable
@@ -229,7 +229,7 @@ public extension Rect {
     
     @inlinable
     var integral: Self {
-        return Rect(x: self.x.rounded(.down), y: self.y.rounded(.down), width: self.width.rounded(.up), height: self.height.rounded(.up))
+        return Rect(x: self.x.roundDown, y: self.y.roundDown, width: self.width.roundUp, height: self.height.roundUp)
     }
 
 }
@@ -237,49 +237,49 @@ public extension Rect {
 public extension Rect {
     
     @inlinable
-    func isContains(point: Point< ValueType >) -> Bool {
+    func isContains(_ point: Point< ValueType >) -> Bool {
         guard self.x <= point.x && self.x + self.width >= point.x else { return false }
         guard self.y <= point.y && self.y + self.height >= point.y else { return false }
         return true
     }
 
     @inlinable
-    func isContains(rect: Self) -> Bool {
+    func isContains(_ rect: Self) -> Bool {
         guard self.x <= rect.x && self.x + self.width >= rect.x + rect.width else { return false }
         guard self.y <= rect.y && self.y + self.height >= rect.y + rect.height else { return false }
         return true
     }
 
     @inlinable
-    func isIntersects(rect: Self) -> Bool {
+    func isIntersects(_ rect: Self) -> Bool {
         guard self.x <= rect.x + rect.width && self.x + self.width >= rect.x else { return false }
         guard self.y <= rect.y + rect.height && self.y + self.height >= rect.y else { return false }
         return true
     }
     
     @inlinable
-    func isHorizontalIntersects(rect: Self) -> Bool {
+    func isHorizontalIntersects(_ rect: Self) -> Bool {
         guard self.x <= rect.x + rect.width && self.x + self.width >= rect.x else { return false }
         return true
     }
     
     @inlinable
-    func isVerticalIntersects(rect: Self) -> Bool {
+    func isVerticalIntersects(_ rect: Self) -> Bool {
         guard self.y <= rect.y + rect.height && self.y + self.height >= rect.y else { return false }
         return true
     }
 
     @inlinable
-    func offset(point: Point< ValueType >) -> Self {
+    func offset(_ point: Point< ValueType >) -> Self {
         return Rect(topLeft: self.origin - point, size: self.size)
     }
 
     @inlinable
-    func union(_ to: Self) -> Self {
-        let lx = Swift.min(self.x, to.x)
-        let ly = Swift.min(self.y, to.y)
-        let ux = Swift.max(self.x + self.width, to.x + to.width)
-        let uy = Swift.max(self.y + self.height, to.y + to.height)
+    func union(_ other: Self) -> Self {
+        let lx = Swift.min(self.x, other.x)
+        let ly = Swift.min(self.y, other.y)
+        let ux = Swift.max(self.x + self.width, other.x + other.width)
+        let uy = Swift.max(self.y + self.height, other.y + other.height)
         return Rect(x: lx, y: ly, width: ux - lx, height: uy - ly)
     }
     
@@ -423,6 +423,15 @@ public extension Rect {
     @inlinable
     static func /= (lhs: inout Self, rhs: Self) {
         lhs = lhs / rhs
+    }
+    
+}
+
+extension Rect : INearEqutable {
+    
+    @inlinable
+    public static func ~~ (lhs: Self, rhs: Self) -> Bool {
+        return lhs.origin ~~ rhs.origin && lhs.size ~~ rhs.size
     }
     
 }

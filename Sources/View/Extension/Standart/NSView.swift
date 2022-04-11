@@ -6,7 +6,7 @@
 
 import AppKit
 
-extension NSView {
+public extension NSView {
     
     func set(border: ViewBorder) {
         switch border {

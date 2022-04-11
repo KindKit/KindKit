@@ -235,7 +235,7 @@ public final class ListLayout : ILayout {
         let end = self._items.count
         for index in start ..< end {
             let item = self._items[index]
-            if bounds.isIntersects(rect: item.frame) == true {
+            if bounds.isIntersects(item.frame) == true {
                 result.append(item)
             } else {
                 break
@@ -297,7 +297,7 @@ private extension ListLayout {
         if let firstVisible = self._firstVisible {
             var newFirstIndex = firstVisible
             let firstItem = self._items[firstVisible]
-            let isFirstVisible = bounds.isIntersects(rect: firstItem.frame)
+            let isFirstVisible = bounds.isIntersects(firstItem.frame)
             let isBefore: Bool
             let isAfter: Bool
             switch self.direction {
@@ -312,7 +312,7 @@ private extension ListLayout {
                 var isFounded = isFirstVisible
                 for index in (0 ..< firstVisible + 1).reversed() {
                     let item = self._items[index]
-                    if bounds.isIntersects(rect: item.frame) == true {
+                    if bounds.isIntersects(item.frame) == true {
                         newFirstIndex = index
                         isFounded = true
                     } else if isFounded == true {
@@ -322,7 +322,7 @@ private extension ListLayout {
             } else if isAfter == true {
                 for index in firstVisible ..< self._items.count {
                     let item = self._items[index]
-                    if bounds.isIntersects(rect: item.frame) == true {
+                    if bounds.isIntersects(item.frame) == true {
                         newFirstIndex = index
                         break
                     }
@@ -333,7 +333,7 @@ private extension ListLayout {
         }
         for index in 0 ..< self._items.count {
             let item = self._items[index]
-            if bounds.isIntersects(rect: item.frame) == true {
+            if bounds.isIntersects(item.frame) == true {
                 self._firstVisible = index
                 return index
             }

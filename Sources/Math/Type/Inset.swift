@@ -7,7 +7,7 @@ import Foundation
 public typealias InsetFloat = Inset< Float >
 public typealias InsetDouble = Inset< Double >
 
-public struct Inset< ValueType: BinaryFloatingPoint > : Hashable {
+public struct Inset< ValueType: IScalar & Hashable > : Hashable {
     
     public var top: ValueType
     public var left: ValueType
@@ -45,7 +45,7 @@ public extension Inset {
     
     @inlinable
     var isZero: Bool {
-        return self.top.isZero == true && self.left.isZero == true && self.right.isZero == true && self.bottom.isZero == true
+        return self ~~ .zero
     }
     
     @inlinable
@@ -105,6 +105,15 @@ public extension Inset {
     @inlinable
     static func /= (lhs: inout Self, rhs: Self) {
         lhs = lhs / rhs
+    }
+    
+}
+
+extension Inset : INearEqutable {
+    
+    @inlinable
+    public static func ~~ (lhs: Self, rhs: Self) -> Bool {
+        return lhs.top ~~ rhs.top && lhs.left ~~ rhs.left && lhs.right ~~ rhs.right && lhs.bottom ~~ rhs.bottom
     }
     
 }

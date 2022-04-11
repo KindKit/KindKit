@@ -6,10 +6,10 @@
 
 import UIKit
 
-extension UIColor {
+public extension UIColor {
     
     @inlinable
-    public var isOpaque: Bool {
+    var isOpaque: Bool {
         get {
             var r: CGFloat = 0
             var g: CGFloat = 0

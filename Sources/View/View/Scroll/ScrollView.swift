@@ -510,7 +510,7 @@ public class ScrollView< Layout : ILayout > : IScrollView {
         let contentInset = self.contentInset
         let beginContentOffset = self.contentOffset
         let endContentOffset = PointFloat(x: -contentInset.left, y: -contentInset.top)
-        let deltaContentOffset = abs(beginContentOffset.distance(to: endContentOffset))
+        let deltaContentOffset = beginContentOffset.distance(endContentOffset).real.abs
         if animated == true && deltaContentOffset > 0 {
             let velocity = max(self.bounds.width, self.bounds.height) * 5
             Animation.default.run(

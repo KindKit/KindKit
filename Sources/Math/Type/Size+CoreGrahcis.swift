@@ -10,7 +10,10 @@ public extension Size {
     
     @inlinable
     var cgSize: CGSize {
-        return CGSize(width: CGFloat(self.width), height: CGFloat(self.height))
+        return CGSize(
+            width: self.width.cgFloat,
+            height: self.height.cgFloat
+        )
     }
     
     @inlinable

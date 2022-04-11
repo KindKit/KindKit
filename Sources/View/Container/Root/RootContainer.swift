@@ -86,7 +86,7 @@ public class RootContainer : IRootContainer {
     
     public init(
         statusBarView: IStatusBarView? = nil,
-        overlayContainer: IRootContentContainer?,
+        overlayContainer: IRootContentContainer? = nil,
         contentContainer: IRootContentContainer
     ) {
         self.isPresented = false

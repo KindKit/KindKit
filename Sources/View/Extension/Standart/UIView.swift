@@ -7,7 +7,7 @@
 import UIKit
 import KindKitCore
 
-extension UIView {
+public extension UIView {
     
     func update(locked: Bool) {
         self.isUserInteractionEnabled = locked == false

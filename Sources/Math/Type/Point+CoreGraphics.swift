@@ -10,7 +10,10 @@ public extension Point {
     
     @inlinable
     var cgPoint: CGPoint {
-        return CGPoint(x: CGFloat(self.x), y: CGFloat(self.y))
+        return CGPoint(
+            x: self.x.cgFloat,
+            y: self.y.cgFloat
+        )
     }
     
     @inlinable

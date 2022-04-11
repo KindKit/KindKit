@@ -7,7 +7,6 @@ import KindKitCore
 
 public protocol IModule : AnyObject {
     
-    var features: [IModuleFeature] { get }
     var callToActions: [IModuleCallToAction] { get }
     
 }

@@ -11,10 +11,10 @@ public extension Inset {
     @inlinable
     var uiEdgeInsets: UIEdgeInsets {
         return UIEdgeInsets(
-            top: CGFloat(self.top),
-            left: CGFloat(self.left),
-            bottom: CGFloat(self.bottom),
-            right: CGFloat(self.right)
+            top: self.top.cgFloat,
+            left: self.left.cgFloat,
+            bottom: self.bottom.cgFloat,
+            right: self.right.cgFloat
         )
     }
     

@@ -7,7 +7,7 @@
 import UIKit
 import KindKitCore
 
-extension UIScreen {
+public extension UIScreen {
     
     var animationVelocity: Float {
         switch UIDevice.current.userInterfaceIdiom {

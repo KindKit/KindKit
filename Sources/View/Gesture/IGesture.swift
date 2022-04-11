@@ -49,7 +49,7 @@ public extension IGesture {
     func contains(in view: IView) -> Bool {
         let bounds = RectFloat(view.native.bounds)
         let location = PointFloat(self.native.location(in: view.native))
-        return bounds.isContains(point: location)
+        return bounds.isContains(location)
     }
     
 }

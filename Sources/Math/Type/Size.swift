@@ -7,7 +7,7 @@ import Foundation
 public typealias SizeFloat = Size< Float >
 public typealias SizeDouble = Size< Double >
 
-public struct Size< ValueType: BinaryFloatingPoint > : Hashable {
+public struct Size< ValueType: IScalar & Hashable > : Hashable {
     
     public var width: ValueType
     public var height: ValueType
@@ -46,7 +46,7 @@ public extension Size {
     
     @inlinable
     var isZero: Bool {
-        return self.width.isZero == true && self.height.isZero == true
+        return self ~~ .zero
     }
     
     @inlinable
@@ -133,7 +133,17 @@ public extension Size {
     }
     
     @inlinable
+    static func + (lhs: Self, rhs: ValueType) -> Self {
+        return Size(width: lhs.width + rhs, height: lhs.height + rhs)
+    }
+    
+    @inlinable
     static func += (lhs: inout Self, rhs: Self) {
+        lhs = lhs + rhs
+    }
+    
+    @inlinable
+    static func += (lhs: inout Self, rhs: ValueType) {
         lhs = lhs + rhs
     }
     
@@ -143,7 +153,17 @@ public extension Size {
     }
     
     @inlinable
+    static func - (lhs: Self, rhs: ValueType) -> Self {
+        return Size(width: lhs.width - rhs, height: lhs.height - rhs)
+    }
+    
+    @inlinable
     static func -= (lhs: inout Self, rhs: Self) {
+        lhs = lhs - rhs
+    }
+    
+    @inlinable
+    static func -= (lhs: inout Self, rhs: ValueType) {
         lhs = lhs - rhs
     }
     
@@ -153,7 +173,17 @@ public extension Size {
     }
     
     @inlinable
+    static func * (lhs: Self, rhs: ValueType) -> Self {
+        return Size(width: lhs.width * rhs, height: lhs.height * rhs)
+    }
+    
+    @inlinable
     static func *= (lhs: inout Self, rhs: Self) {
+        lhs = lhs * rhs
+    }
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: ValueType) {
         lhs = lhs * rhs
     }
     
@@ -163,8 +193,27 @@ public extension Size {
     }
     
     @inlinable
+    static func / (lhs: Self, rhs: ValueType) -> Self {
+        return Size(width: lhs.width / rhs, height: lhs.height / rhs)
+    }
+    
+    @inlinable
     static func /= (lhs: inout Self, rhs: Self) {
         lhs = lhs / rhs
+    }
+    
+    @inlinable
+    static func /= (lhs: inout Self, rhs: ValueType) {
+        lhs = lhs / rhs
+    }
+    
+}
+
+extension Size : INearEqutable {
+    
+    @inlinable
+    public static func ~~ (lhs: Self, rhs: Self) -> Bool {
+        return lhs.width ~~ rhs.width && lhs.height ~~ rhs.height
     }
     
 }

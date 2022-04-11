@@ -10,7 +10,10 @@ public extension Rect {
     
     @inlinable
     var cgRect: CGRect {
-        return CGRect(origin: self.origin.cgPoint, size: self.size.cgSize)
+        return CGRect(
+            origin: self.origin.cgPoint,
+            size: self.size.cgSize
+        )
     }
     
     @inlinable
