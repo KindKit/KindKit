@@ -51,10 +51,10 @@ public extension Line2 {
     
     @inlinable
     func perpendicular(_ point: Point< ValueType >) -> Point< ValueType > {
-        let n = -self.direction.dot(point - self.origin)
+        let n = self.direction.dot(point - self.origin)
         let d = self.direction.dot(self.direction)
         let b = (n / d)
-        return point + b * self.direction
+        return self.origin + b * self.direction
     }
     
     @inlinable

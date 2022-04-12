@@ -9,15 +9,18 @@ import KindKitView
 
 public extension GraphicsGuide {
     
-    class Grid {
+    class Grid : IGraphicsGuide {
         
+        public var isEnabled: Bool
         public var gridSize: PointFloat
         public var snapSize: PointFloat
         
         public init(
+            isEnabled: Bool = true,
             gridSize: PointFloat,
             snapSize: PointFloat
         ) {
+            self.isEnabled = isEnabled
             self.gridSize = gridSize
             self.snapSize = snapSize
         }
@@ -29,6 +32,7 @@ public extension GraphicsGuide {
 extension GraphicsGuide.Grid : IGraphicsCoordinateGuide {
     
     public func guide(_ coordinate: PointFloat) -> PointFloat? {
+        guard self.isEnabled == true else { return nil }
         let nx = coordinate.x.abs
         let ny = coordinate.y.abs
         let bx = (nx / self.gridSize.x).roundNearest

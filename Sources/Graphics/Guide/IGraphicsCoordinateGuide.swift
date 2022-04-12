@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public protocol IGraphicsCoordinateGuide : AnyObject {
+public protocol IGraphicsCoordinateGuide : IGraphicsGuide {
     
     func guide(_ coordinate: PointFloat) -> PointFloat?
 

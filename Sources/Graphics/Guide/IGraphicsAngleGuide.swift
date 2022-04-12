@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public protocol IGraphicsAngleGuide : AnyObject {
+public protocol IGraphicsAngleGuide : IGraphicsGuide {
     
     func guide(_ value: AngleFloat) -> AngleFloat?
 
