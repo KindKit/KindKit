@@ -26,6 +26,7 @@ let package = Package(
         .library(name: "KindKitQrCode", type: .static, targets: [ "KindKitQrCode" ]),
         .library(name: "KindKitRemoteImageView", type: .static, targets: [ "KindKitRemoteImageView" ]),
         .library(name: "KindKitShell", type: .static, targets: [ "KindKitShell" ]),
+        .library(name: "KindKitUndoRedo", type: .static, targets: [ "KindKitUndoRedo" ]),
         .library(name: "KindKitView", type: .static, targets: [ "KindKitView" ]),
         .library(name: "KindKitXml", type: .static, targets: [ "KindKitXml" ])
     ],
@@ -113,6 +114,11 @@ let package = Package(
             name: "KindKitShell",
             dependencies: [ .target(name: "KindKitCore") ],
             path: "Sources/Shell"
+        ),
+        .target(
+            name: "KindKitUndoRedo",
+            dependencies: [ .target(name: "KindKitCore"), .target(name: "KindKitObserver") ],
+            path: "Sources/UndoRedo"
         ),
         .target(
             name: "KindKitView",

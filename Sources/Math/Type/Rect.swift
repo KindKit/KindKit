@@ -86,7 +86,7 @@ public struct Rect< ValueType: IScalar & Hashable > : Hashable {
     
     @inlinable
     public init(center: Point< ValueType >, size: Size< ValueType >) {
-        self.origin = Point(x: center.x - size.width / 2, y: center.y - size.height)
+        self.origin = Point(x: center.x - size.width / 2, y: center.y - size.height / 2)
         self.size = size
     }
     
