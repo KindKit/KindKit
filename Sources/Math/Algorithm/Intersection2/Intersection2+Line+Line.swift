@@ -49,7 +49,7 @@ public extension Intersection2 {
             let s1 = oddp2 / dp
             let s2 = oddp1 / dp
             return .point(.init(
-                range: Range(uncheckedBounds: (s1, s2)),
+                range: RangeType(lower: s1, upper: s2),
                 point: line1.origin + s1 * line1.direction
             ))
         }

@@ -101,7 +101,7 @@ public extension UndoRedo {
     
     func endScope(cancel: Bool = false) {
         guard self.isTracking == true else { return }
-        if self._scope!.isValid == true {
+        if self._scope!.isValid == true && cancel == false {
             self._undoStack.append(self._scope!)
             if self._redoStack.isEmpty == false {
                 for scope in self._redoStack {

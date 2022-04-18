@@ -49,15 +49,15 @@ public extension Intersection2 {
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Intersection2.find(
-                Range(uncheckedBounds: (-cf1.extend, cf1.extend)),
-                Range(uncheckedBounds: (t - cf2.extend, t + cf2.extend))
+                RangeType(lower: -cf1.extend, upper: cf1.extend),
+                RangeType(lower: t - cf2.extend, upper: t + cf2.extend)
             )
             switch i {
             case .none: return false
             case .one, .two: return true
             }
         case .point(let data):
-            if data.range.lowerBound.abs <= cf1.extend && data.range.upperBound.abs <= cf2.extend {
+            if data.range.lower.abs <= cf1.extend && data.range.upper.abs <= cf2.extend {
                 return true
             }
             return false
@@ -76,8 +76,8 @@ public extension Intersection2 {
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Intersection2.find(
-                Range(uncheckedBounds: (-cf1.extend, cf1.extend)),
-                Range(uncheckedBounds: (t - cf2.extend, t + cf2.extend))
+                RangeType(lower: -cf1.extend, upper: cf1.extend),
+                RangeType(lower: t - cf2.extend, upper: t + cf2.extend)
             )
             switch i {
             case .none: return .none
@@ -87,7 +87,7 @@ public extension Intersection2 {
                 return .two(cf1.center + value1 * cf1.direction, cf1.center + value2 * cf1.direction)
             }
         case .point(let data):
-            if data.range.lowerBound.abs <= cf1.extend && data.range.upperBound.abs <= cf2.extend {
+            if data.range.lower.abs <= cf1.extend && data.range.upper.abs <= cf2.extend {
                 return .one(data.point)
             }
             return .none
