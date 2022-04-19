@@ -58,6 +58,11 @@ public extension Percent {
         return self ~~ .one
     }
     
+    @inlinable
+    var reversed: Self {
+        return .one - self
+    }
+    
 }
 
 public extension Percent {
