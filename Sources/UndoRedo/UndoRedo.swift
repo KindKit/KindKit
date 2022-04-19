@@ -56,14 +56,14 @@ public extension UndoRedo {
         guard self.canUndo == true else { return }
         let scope = self._undoStack.removeLast()
         self._redoStack.append(scope)
-        for state in scope.created {
-            self.delegate.delete(context: state)
-        }
         for state in scope.deleted {
             self.delegate.create(context: state)
         }
-        for state in scope.updated {
+        for state in scope.updated.reversed() {
             self.delegate.update(context: state.old)
+        }
+        for state in scope.created {
+            self.delegate.delete(context: state)
         }
         self._notifyRefresh()
     }
@@ -72,14 +72,14 @@ public extension UndoRedo {
         guard self.canRedo == true else { return }
         let scope = self._redoStack.removeLast()
         self._undoStack.append(scope)
-        for state in scope.deleted {
-            self.delegate.delete(context: state)
-        }
         for state in scope.created {
             self.delegate.create(context: state)
         }
         for state in scope.updated {
             self.delegate.update(context: state.new)
+        }
+        for state in scope.deleted {
+            self.delegate.delete(context: state)
         }
         self._notifyRefresh()
     }
