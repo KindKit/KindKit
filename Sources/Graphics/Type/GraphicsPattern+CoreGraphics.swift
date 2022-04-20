@@ -17,6 +17,8 @@ public extension GraphicsPattern {
             guard let info = info else { return }
             let image = Unmanaged< UIImage >.fromOpaque(info).takeUnretainedValue()
             if let cgImage = image.cgImage {
+                context.scaleBy(x: 1, y: -1)
+                context.translateBy(x: 0, y: CGFloat(-image.size.height))
                 context.draw(cgImage, in: CGRect(origin: .zero, size: image.size))
             }
         }, releaseInfo: nil)

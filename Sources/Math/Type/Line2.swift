@@ -65,3 +65,33 @@ public extension Line2 {
     }
     
 }
+
+public extension Line2 {
+    
+    @inlinable
+    static func + (lhs: Self, rhs: Point< ValueType >) -> Self {
+        return Line2(
+            origin: lhs.origin + rhs,
+            direction: lhs.direction
+        )
+    }
+    
+    @inlinable
+    static func += (lhs: inout Self, rhs: Point< ValueType >) {
+        lhs = lhs + rhs
+    }
+    
+    @inlinable
+    static func - (lhs: Self, rhs: Point< ValueType >) -> Self {
+        return Line2(
+            origin: lhs.origin - rhs,
+            direction: lhs.direction
+        )
+    }
+    
+    @inlinable
+    static func -= (lhs: inout Self, rhs: Point< ValueType >) {
+        lhs = lhs - rhs
+    }
+    
+}
