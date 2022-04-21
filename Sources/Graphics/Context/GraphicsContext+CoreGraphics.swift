@@ -22,7 +22,7 @@ public struct GraphicsContext {
 
 public extension GraphicsContext {
     
-    enum ImageAlignment {
+    enum Positioning {
         case topLeft
         case top
         case topRight
@@ -115,6 +115,7 @@ public extension GraphicsContext {
         circles: [CircleFloat],
         mode: GraphicsDrawMode
     ) {
+        guard circles.isEmpty == false else { return }
         self._instance.saveGState()
         self._instance.beginPath()
         for index in circles.indices {
@@ -126,7 +127,9 @@ public extension GraphicsContext {
                 height: CGFloat(circle.radius * 2)
             ))
         }
-        self._draw(mode: mode)
+        if self._instance.isPathEmpty == false {
+            self._draw(mode: mode)
+        }
         self._instance.restoreGState()
     }
     
@@ -144,6 +147,7 @@ public extension GraphicsContext {
     func draw(
         segments: [Segment2Float]
     ) {
+        guard segments.isEmpty == false else { return }
         self._instance.saveGState()
         self._instance.beginPath()
         for segment in segments {
@@ -158,10 +162,17 @@ public extension GraphicsContext {
         polyline: Polyline2Float,
         mode: GraphicsDrawMode
     ) {
+        guard polyline.corners.isEmpty == false else { return }
         self._instance.saveGState()
         self._instance.beginPath()
-        self._instance.addPath(polyline.cgPath)
-        self._draw(mode: mode)
+        self._instance.move(to: polyline.corners[0].cgPoint)
+        for point in polyline.corners[1 ..< polyline.corners.endIndex] {
+            self._instance.addLine(to: point.cgPoint)
+        }
+        self._instance.closePath()
+        if self._instance.isPathEmpty == false {
+            self._draw(mode: mode)
+        }
         self._instance.restoreGState()
     }
     
@@ -169,10 +180,20 @@ public extension GraphicsContext {
         polygon: Polygon2Float,
         mode: GraphicsDrawMode
     ) {
+        guard polygon.countours.isEmpty == false else { return }
         self._instance.saveGState()
         self._instance.beginPath()
-        self._instance.addPath(polygon.cgPath)
-        self._draw(mode: mode)
+        for countour in polygon.countours {
+            guard countour.corners.isEmpty == false else { continue }
+            self._instance.move(to: countour.corners[0].cgPoint)
+            for point in countour.corners[1 ..< countour.corners.endIndex] {
+                self._instance.addLine(to: point.cgPoint)
+            }
+            self._instance.closePath()
+        }
+        if self._instance.isPathEmpty == false {
+            self._draw(mode: mode)
+        }
         self._instance.restoreGState()
     }
     
@@ -180,22 +201,33 @@ public extension GraphicsContext {
         path: Path2Float,
         mode: GraphicsDrawMode
     ) {
+        guard path.elements.isEmpty == false else { return }
         self._instance.saveGState()
         self._instance.beginPath()
-        self._instance.addPath(path.cgPath)
-        self._draw(mode: mode)
+        for element in path.elements {
+            switch element {
+            case .move(let to): self._instance.move(to: to.cgPoint)
+            case .line(let to): self._instance.addLine(to: to.cgPoint)
+            case .quad(let to, let control): self._instance.addQuadCurve(to: to.cgPoint, control: control.cgPoint)
+            case .cubic(let to, let control1, let control2): self._instance.addCurve(to: to.cgPoint, control1: control1.cgPoint, control2: control2.cgPoint)
+            case .close: self._instance.closePath()
+            }
+        }
+        if self._instance.isPathEmpty == false {
+            self._draw(mode: mode)
+        }
         self._instance.restoreGState()
     }
     
     func draw(
         image: Image,
-        alignment: ImageAlignment
+        positioning: GraphicsContext.Positioning
     ) {
         guard let cgImage = image.native.cgImage else { return }
         let w = image.size.width.cgFloat
         let h = image.size.height.cgFloat
         let rect: CGRect
-        switch alignment {
+        switch positioning {
         case .topLeft:rect = CGRect(x: 0, y: 0, width: w, height: h)
         case .top: rect = CGRect(x: -(w / 2), y: 0, width: w, height: h)
         case .topRight: rect = CGRect( x: w, y: 0, width: w, height: h)
@@ -209,6 +241,15 @@ public extension GraphicsContext {
         self._instance.saveGState()
         self._instance.scaleBy(x: 1, y: -1)
         self._instance.draw(cgImage, in: rect)
+        self._instance.restoreGState()
+    }
+    
+    func draw(
+        text: NSAttributedString,
+        rect: RectFloat
+    ) {
+        self._instance.saveGState()
+        text.draw(with: rect.cgRect, options: [ .usesLineFragmentOrigin, .usesFontLeading ], context: nil)
         self._instance.restoreGState()
     }
 
