@@ -52,6 +52,26 @@ class TestIntersection2: XCTestCase {
         }
     }
     
+    func testPossiblyLineToBox() {
+        let l = Line2Float(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
+        let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
+        
+        let result = Intersection2.possibly(l, b)
+        if result == false {
+            XCTFail()
+        }
+    }
+    
+    func testFindLineToBox() {
+        let l = Line2Float(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
+        let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
+        
+        let result = Intersection2.find(l, b)
+        if result != .two(Point(x: 0, y: 1), Point(x: 2, y: 1)) {
+            XCTFail()
+        }
+    }
+    
     func testPossiblySegmentToSegment() {
         let s1 = Segment2Float(start: Point(x: 0, y: 2), end: Point(x: 4, y: 2))
         let s2 = Segment2Float(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
