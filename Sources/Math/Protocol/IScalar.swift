@@ -12,6 +12,8 @@ public protocol IScalar : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral
     static var epsilon: Self { get }
     static var infinity: Self { get }
     static var pi: Self { get }
+    static var leastNormalMagnitude: Self { get }
+    static var greatestFiniteMagnitude: Self { get }
     
     var isInfinite: Bool { get }
     
