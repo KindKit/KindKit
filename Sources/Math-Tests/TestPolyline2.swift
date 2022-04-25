@@ -105,4 +105,17 @@ class TestPolyline2: XCTestCase {
         }
     }
     
+    func testCenter2() {
+        let p = Polyline2Float(corners: [
+            PointFloat(x: 0, y: 0),
+            PointFloat(x: 20, y: 0),
+            PointFloat(x: 20, y: 10),
+            PointFloat(x: 0, y: 10)
+        ])
+        let center = p.center()
+        if center != PointFloat(x: 10, y: 5) {
+            XCTFail()
+        }
+    }
+
 }
