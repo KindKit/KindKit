@@ -142,9 +142,9 @@ extension CubicCurve2 : ICurve2 {
     }
     
     public func point(at location: Percent< ValueType >) -> Point< ValueType > {
-        if location ~~ .zero {
+        if location <= .zero {
             return self.start
-        } else if location ~~ .one {
+        } else if location >= .one {
             return self.end
         }
         let il = 1 - location.value
@@ -159,7 +159,7 @@ extension CubicCurve2 : ICurve2 {
     
     public func normal(at location: Percent< ValueType >) -> Point< ValueType > {
         var d = self.derivative(at: location)
-        if d ~~ .zero && (location ~~ .zero || location ~~ .one) {
+        if d ~~ .zero && (location <= .zero || location >= .one) {
             if location ~~ .zero {
                 d = self.control2 - self.start
             } else {
@@ -201,7 +201,7 @@ extension CubicCurve2 : ICurve2 {
     }
     
     public func cut(start: Percent< ValueType >, end: Percent< ValueType >) -> Self {
-        guard start !~ .zero || end !~ .one else { return self }
+        guard start > .zero || end < .one else { return self }
         let k = (end.value - start.value) / 3.0
         let s = self.point(at: start)
         let e = self.point(at: end)

@@ -1,5 +1,5 @@
 //
-//  KindKitCore
+//  KindKitMath
 //
 
 import Foundation
@@ -9,15 +9,10 @@ public typealias PercentDouble = Percent< Double >
 
 public struct Percent< ValueType : IScalar & Hashable > : Hashable {
     
-    public var value: ValueType {
-        set(value) { self._value = value.clamp(0, 1) }
-        get { return self._value }
-    }
-    
-    private var _value: ValueType
+    public var value: ValueType
     
     public init(_ value: ValueType) {
-        self._value = value.clamp(0, 1)
+        self.value = value
     }
     
 }
@@ -61,6 +56,11 @@ public extension Percent {
     @inlinable
     var invert: Self {
         return .one - self
+    }
+    
+    @inlinable
+    var normalized: Self {
+        return Percent(self.value.clamp(0, 1))
     }
     
 }

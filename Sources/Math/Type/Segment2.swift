@@ -119,9 +119,9 @@ extension Segment2 : ICurve2 {
     
     @inlinable
     public func point(at location: Percent< ValueType >) -> Point< ValueType > {
-        if location ~~ .zero {
+        if location <= .zero {
             return self.start
-        } else if location ~~ .one {
+        } else if location >= .one {
             return self.end
         }
         return self.start.lerp(self.end, progress: location.value)
