@@ -12,7 +12,7 @@ public protocol IUndoRedoPermanentContext : IUndoRedoContext {
     
 }
 
-public protocol IUndoRedoMutatingPermanentContext : IUndoRedoPermanentContext, IUndoRedoMutatingContext {
+public protocol IUndoRedoMutatingPermanentContext : IUndoRedoPermanentContext {
     
     mutating func set(_ key: String, value: Any?)
     

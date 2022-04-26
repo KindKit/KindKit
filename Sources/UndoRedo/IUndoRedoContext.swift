@@ -7,15 +7,10 @@ import Foundation
 public protocol IUndoRedoContext {
     
     var command: String { get }
+    var object: String { get }
     var keys: [String] { get }
 
     func cleanup()
-    
-}
-
-public protocol IUndoRedoMutatingContext : IUndoRedoContext {
-    
-    var command: String { set get }
     
 }
 

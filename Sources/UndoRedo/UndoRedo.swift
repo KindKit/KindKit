@@ -56,15 +56,7 @@ public extension UndoRedo {
         guard self.canUndo == true else { return }
         let scope = self._undoStack.removeLast()
         self._redoStack.append(scope)
-        for state in scope.deleted {
-            self.delegate.create(context: state)
-        }
-        for state in scope.updated.reversed() {
-            self.delegate.update(context: state.old)
-        }
-        for state in scope.created {
-            self.delegate.delete(context: state)
-        }
+        scope.undo(self.delegate)
         self._notifyRefresh()
     }
     
@@ -72,15 +64,7 @@ public extension UndoRedo {
         guard self.canRedo == true else { return }
         let scope = self._redoStack.removeLast()
         self._undoStack.append(scope)
-        for state in scope.created {
-            self.delegate.create(context: state)
-        }
-        for state in scope.updated {
-            self.delegate.update(context: state.new)
-        }
-        for state in scope.deleted {
-            self.delegate.delete(context: state)
-        }
+        scope.redo(self.delegate)
         self._notifyRefresh()
     }
     
@@ -100,9 +84,9 @@ public extension UndoRedo {
     }
     
     func endScope(cancel: Bool = false) {
-        guard self.isTracking == true else { return }
-        if self._scope!.isValid == true && cancel == false {
-            self._undoStack.append(self._scope!)
+        guard let scope = self._scope else { return }
+        if scope.isValid == true && cancel == false {
+            self._undoStack.append(scope)
             if self._redoStack.isEmpty == false {
                 for scope in self._redoStack {
                     scope.cleanup()
@@ -124,19 +108,37 @@ public extension UndoRedo {
         }
     }
     
-    func track< CommandType: RawRepresentable >(create command: CommandType, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) where CommandType.RawValue == String {
-        guard self._scope != nil else { return }
-        self._scope!.create(command.rawValue, closure)
+    func track<
+        CommandType: RawRepresentable
+    >(
+        create command: CommandType,
+        object: String,
+        _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
+    ) where CommandType.RawValue == String {
+        guard let scope = self._scope else { return }
+        scope.create(command.rawValue, object, closure)
     }
     
-    func track< CommandType: RawRepresentable >(update command: CommandType, _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void) where CommandType.RawValue == String {
-        guard self._scope != nil else { return }
-        self._scope!.update(command.rawValue, closure)
+    func track<
+        CommandType: RawRepresentable
+    >(
+        update command: CommandType,
+        object: String,
+        _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void
+    ) where CommandType.RawValue == String {
+        guard let scope = self._scope else { return }
+        scope.update(command.rawValue, object, closure)
     }
     
-    func track< CommandType: RawRepresentable >(delete command: CommandType, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) where CommandType.RawValue == String {
-        guard self._scope != nil else { return }
-        self._scope!.delete(command.rawValue, closure)
+    func track<
+        CommandType: RawRepresentable
+    >(
+        delete command: CommandType,
+        object: String,
+        _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
+    ) where CommandType.RawValue == String {
+        guard let scope = self._scope else { return }
+        scope.delete(command.rawValue, object, closure)
     }
     
 }

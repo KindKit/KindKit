@@ -16,7 +16,7 @@ public protocol IUndoRedoTransformContext : IUndoRedoContext {
     
 }
 
-public protocol IUndoRedoMutatingTransformContext : IUndoRedoTransformContext, IUndoRedoMutatingContext {
+public protocol IUndoRedoMutatingTransformContext : IUndoRedoTransformContext {
     
     mutating func set(_ key: String, new: Any?, old: Any?)
     

@@ -1,83 +1,76 @@
 //
-//  FloorPlanDescription
+//  KindKitUndoRedo
 //
 
 import Foundation
 
 extension UndoRedo {
     
-    struct Scope {
+    class Scope : IUndoRedoScope {
         
-        private(set) var created: [IUndoRedoMutatingPermanentContext]
-        private(set) var updated: [IUndoRedoMutatingTransformContext]
-        private(set) var deleted: [IUndoRedoMutatingPermanentContext]
+        var isValid: Bool {
+            return self._states.isEmpty == false
+        }
+        private var _states: [IUndoRedoState]
 
         init() {
-            self.created = []
-            self.updated = []
-            self.deleted = []
+            self._states = []
         }
         
-    }
-    
-}
-
-extension UndoRedo.Scope {
-    
-    var isValid: Bool {
-        return self.created.isEmpty == false || self.updated.isEmpty == false || self.deleted.isEmpty == false
-    }
-    
-    func cleanup() {
-        for context in self.created {
-            context.cleanup()
+        func create(_ command: String, _ object: String, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) {
+            let appended: Bool
+            if let state = self._states.last {
+                appended = state.create(command, object, closure)
+            } else {
+                appended = false
+            }
+            if appended == false {
+                self._states.append(UndoRedo.State.Create(command, object, closure))
+            }
         }
-        for context in self.updated {
-            context.cleanup()
-        }
-        for context in self.deleted {
-            context.cleanup()
-        }
-    }
         
-}
-
-extension UndoRedo.Scope {
-    
-    mutating func create(_ command: String, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) {
-        if let index = self.created.firstIndex(where: { $0.command == command }) {
-            var context = self.created[index]
-            closure(&context)
-            self.created[index] = context
-        } else {
-            var context: IUndoRedoMutatingPermanentContext = UndoRedo.Context.Permanent(command: command)
-            closure(&context)
-            self.created.append(context)
+        func update(_ command: String, _ object: String, _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void) {
+            let appended: Bool
+            if let state = self._states.last {
+                appended = state.update(command, object, closure)
+            } else {
+                appended = false
+            }
+            if appended == false {
+                self._states.append(UndoRedo.State.Update(command, object, closure))
+            }
         }
-    }
-    
-    mutating func update(_ command: String, _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void) {
-        if let index = self.updated.firstIndex(where: { $0.command == command }) {
-            var context = self.updated[index]
-            closure(&context)
-            self.updated[index] = context
-        } else {
-            var context: IUndoRedoMutatingTransformContext = UndoRedo.Context.Transform(command: command)
-            closure(&context)
-            self.updated.append(context)
+        
+        func delete(_ command: String, _ object: String, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) {
+            let appended: Bool
+            if let state = self._states.last {
+                appended = state.delete(command, object, closure)
+            } else {
+                appended = false
+            }
+            if appended == false {
+                self._states.append(UndoRedo.State.Delete(command, object, closure))
+            }
         }
-    }
-    
-    mutating func delete(_ command: String, _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void) {
-        if let index = self.deleted.firstIndex(where: { $0.command == command }) {
-            var context = self.deleted[index]
-            closure(&context)
-            self.deleted[index] = context
-        } else {
-            var context: IUndoRedoMutatingPermanentContext = UndoRedo.Context.Permanent(command: command)
-            closure(&context)
-            self.deleted.append(context)
+        
+        func undo(_ delegate: IUndoRedoDelegate) {
+            for state in self._states.reversed() {
+                state.undo(delegate)
+            }
         }
+        
+        func redo(_ delegate: IUndoRedoDelegate) {
+            for state in self._states {
+                state.redo(delegate)
+            }
+        }
+        
+        func cleanup() {
+            for state in self._states {
+                state.cleanup()
+            }
+        }
+        
     }
     
 }

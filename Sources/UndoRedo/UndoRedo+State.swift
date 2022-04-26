@@ -6,7 +6,7 @@ import Foundation
 
 extension UndoRedo {
     
-    struct Context {
+    struct State {
     }
     
 }

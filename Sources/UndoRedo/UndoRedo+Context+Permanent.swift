@@ -1,5 +1,5 @@
 //
-//  FloorPlanDescription
+//  KindKitUndoRedo
 //
 
 import Foundation
@@ -9,6 +9,7 @@ extension UndoRedo.Context {
     struct Permanent : IUndoRedoMutatingPermanentContext {
         
         var command: String
+        var object: String
         var keys: [String] {
             return Array(self._data.keys)
         }
@@ -16,10 +17,12 @@ extension UndoRedo.Context {
         private var _data: [String : Any]
         
         init(
-            command: String,
-            data: [String : Any] = [:]
+            _ command: String,
+            _ object: String,
+            _ data: [String : Any] = [:]
         ) {
             self.command = command
+            self.object = object
             self._data = data
         }
         
