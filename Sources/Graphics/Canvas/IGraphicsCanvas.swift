@@ -29,14 +29,14 @@ public protocol IGraphicsCanvas : AnyObject {
     func endPanGesture(_ gesture: GraphicsCanvasGesture, location: PointFloat)
     
     func shouldPinchGesture() -> Bool
-    func beginPinchGesture(scale: Float)
-    func changePinchGesture(scale: Float)
-    func endPinchGesture(scale: Float)
+    func beginPinchGesture(location: PointFloat, scale: Float)
+    func changePinchGesture(location: PointFloat, scale: Float)
+    func endPinchGesture(location: PointFloat, scale: Float)
     
     func shouldRotationGesture() -> Bool
-    func beginRotationGesture(angle: AngleFloat)
-    func changeRotationGesture(angle: AngleFloat)
-    func endRotationGesture(angle: AngleFloat)
+    func beginRotationGesture(location: PointFloat, angle: AngleFloat)
+    func changeRotationGesture(location: PointFloat, angle: AngleFloat)
+    func endRotationGesture(location: PointFloat, angle: AngleFloat)
     
 }
 

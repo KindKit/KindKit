@@ -45,7 +45,11 @@ final class NativeGraphicsView : UIView {
     private var _panGestures: [GraphicsCanvasGesture : UIPanGestureRecognizer]
     private var _previousPanLocation: [GraphicsCanvasGesture : CGPoint]
     private var _pinchGesture: UIPinchGestureRecognizer!
+    private var _previousPinchLocation: CGPoint?
+    private var _previousPinchScale: CGFloat?
     private var _rotationGesture: UIRotationGestureRecognizer!
+    private var _previousRotationLocation: CGPoint?
+    private var _previousRotationAngle: CGFloat?
     private var _simultaneouslyGestures: [UIGestureRecognizer]
     
     init(canvas: IGraphicsCanvas) {
@@ -84,11 +88,11 @@ final class NativeGraphicsView : UIView {
             }
         }
         
-        self._pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(self._handlePinchGesture(_:)))
+        self._pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(self._handlePinchGesture))
         self.addGestureRecognizer(self._pinchGesture)
         self._simultaneouslyGestures.append(self._pinchGesture)
         
-        self._rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self._handleRotationGesture(_:)))
+        self._rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self._handleRotationGesture))
         self.addGestureRecognizer(self._rotationGesture)
         self._simultaneouslyGestures.append(self._rotationGesture)
     }
@@ -178,25 +182,63 @@ private extension NativeGraphicsView {
     }
     
     @objc
-    func _handlePinchGesture(_ gesture: UIPinchGestureRecognizer) {
-        let scale = Float(gesture.scale)
-        switch gesture.state {
+    func _handlePinchGesture() {
+        switch self._pinchGesture.state {
         case .possible: break
-        case .began: self._canvas.beginPinchGesture(scale: scale)
-        case .changed: self._canvas.changePinchGesture(scale: scale)
-        case .ended, .cancelled, .failed: self._canvas.endPinchGesture(scale: scale)
+        case .began:
+            let location = self._pinchGesture.location(in: self)
+            let scale = self._pinchGesture.scale
+            self._previousPinchLocation = location
+            self._previousPinchScale = scale
+            self._canvas.beginPinchGesture(location: PointFloat(location), scale: Float(scale))
+        case .changed:
+            if self._pinchGesture.numberOfTouches != 2 {
+                self._pinchGesture.isEnabled = false
+            } else {
+                let location = self._pinchGesture.location(in: self)
+                let scale = self._pinchGesture.scale
+                self._previousPinchLocation = location
+                self._previousPinchScale = scale
+                self._canvas.changePinchGesture(location: PointFloat(location), scale: Float(scale))
+            }
+        case .ended, .cancelled, .failed:
+            if let location = self._previousPinchLocation, let scale = self._previousPinchScale {
+                self._previousPinchLocation = nil
+                self._previousPinchScale = nil
+                self._canvas.endPinchGesture(location: PointFloat(location), scale: Float(scale))
+            }
+            self._pinchGesture.isEnabled = true
         @unknown default: break
         }
     }
     
     @objc
-    func _handleRotationGesture(_ gesture: UIRotationGestureRecognizer) {
-        let angle = AngleFloat(radians: Float(gesture.rotation))
-        switch gesture.state {
+    func _handleRotationGesture() {
+        switch self._rotationGesture.state {
         case .possible: break
-        case .began: self._canvas.beginRotationGesture(angle: angle)
-        case .changed: self._canvas.changeRotationGesture(angle: angle)
-        case .ended, .cancelled, .failed: self._canvas.endRotationGesture(angle: angle)
+        case .began:
+            let location = self._rotationGesture.location(in: self)
+            let angle = self._rotationGesture.rotation
+            self._previousRotationLocation = location
+            self._previousRotationAngle = angle
+            self._canvas.beginRotationGesture(location: PointFloat(location), angle: AngleFloat(radians: Float(angle)))
+        case .changed:
+            if self._rotationGesture.numberOfTouches != 2 {
+                self._rotationGesture.isEnabled = false
+            } else {
+                let location = self._rotationGesture.location(in: self)
+                let angle = self._rotationGesture.rotation
+                self._previousRotationLocation = location
+                self._previousRotationAngle = angle
+                self._canvas.changeRotationGesture(location: PointFloat(location), angle: AngleFloat(radians: Float(angle)))
+            }
+        case .ended, .cancelled, .failed:
+            if let location = self._previousRotationLocation, let angle = self._previousRotationAngle {
+                self._previousRotationLocation = nil
+                self._previousRotationAngle = nil
+                self._canvas.endRotationGesture(location: PointFloat(location), angle: AngleFloat(radians: Float(angle)))
+            }
+            self._rotationGesture.isEnabled = true
         @unknown default: break
         }
     }
