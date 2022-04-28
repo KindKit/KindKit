@@ -28,15 +28,30 @@ public struct GraphicsTransform : Hashable {
 public extension GraphicsTransform {
     
     @inlinable
+    var isTranslated: Bool {
+        return self.translation.isZero == false
+    }
+    
+    @inlinable
+    var isRotated: Bool {
+        return self.rotation !~ .degrees0
+    }
+    
+    @inlinable
+    var isScaled: Bool {
+        return self.scale.isOne == false
+    }
+    
+    @inlinable
     var matrix: Matrix3Float {
         var result = Matrix3Float.identity
-        if self.scale.isOne == false {
+        if self.isScaled == true {
             result = Matrix3Float(scale: self.scale) * result
         }
-        if self.rotation !~ .degrees0 {
+        if self.isRotated == true {
             result = Matrix3Float(rotation: self.rotation) * result
         }
-        if self.translation.isZero == false {
+        if self.isTranslated == true {
             result = Matrix3Float(translation: self.translation) * result
         }
         return result
