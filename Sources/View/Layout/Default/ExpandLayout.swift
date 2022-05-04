@@ -90,7 +90,7 @@ public class ExpandLayout< ContentView: IView, DetailView: IView > : ILayout {
             duration: duration,
             ease: ease,
             processing: { [unowned self] progress in
-                self._state = .changing(progress: 1 - progress)
+                self._state = .changing(progress: progress.invert)
                 self.updateIfNeeded()
             },
             completion: { [unowned self] in
@@ -170,7 +170,7 @@ public class ExpandLayout< ContentView: IView, DetailView: IView > : ILayout {
             )
             let collapseDetailHeight: Float = 0
             let expandDetailHeight = (detailSize.height + self.detailInset.horizontal)
-            let detailHeight = collapseDetailHeight.lerp(expandDetailHeight, progress: progress)
+            let detailHeight = collapseDetailHeight.lerp(expandDetailHeight, progress: progress.value)
             return SizeFloat(
                 width: max(contentSize.width + self.contentInset.vertical, detailSize.width + self.detailInset.vertical),
                 height: (contentSize.height + self.contentInset.horizontal) + detailHeight
@@ -194,7 +194,7 @@ public class ExpandLayout< ContentView: IView, DetailView: IView > : ILayout {
             let contentSize = self.contentItem.size(available: available.inset(self.contentInset)).inset(-self.contentInset)
             let expandDetailSize = self.detailItem.size(available: available.inset(self.detailInset)).inset(-self.detailInset)
             let collapseDetailSize = SizeFloat(width: expandDetailSize.width, height: 0)
-            let detailSize = collapseDetailSize.lerp(expandDetailSize, progress: progress)
+            let detailSize = collapseDetailSize.lerp(expandDetailSize, progress: progress.value)
             return SizeFloat(
                 width: max(contentSize.width, detailSize.width),
                 height: contentSize.height + detailSize.height
@@ -217,7 +217,7 @@ private extension ExpandLayout {
     enum State {
         case collapsed
         case expanded
-        case changing(progress: Float)
+        case changing(progress: PercentFloat)
     }
     
 }

@@ -53,7 +53,7 @@ public protocol IPageBarView : IBarView {
     
     func beginTransition()
     
-    func transition(to view: IBarItemView, progress: Float)
+    func transition(to view: IBarItemView, progress: PercentFloat)
     
     func finishTransition(to view: IBarItemView)
     

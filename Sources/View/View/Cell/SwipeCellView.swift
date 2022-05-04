@@ -231,13 +231,13 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._layout.state = .leading(progress: 1)
+                        self._layout.state = .leading(progress: .one)
                         self._onShowLeading?()
                         completion?()
                     }
                 )
             } else {
-                self._layout.state = .leading(progress: 1)
+                self._layout.state = .leading(progress: .one)
                 self._onShowLeading?()
                 completion?()
             }
@@ -261,7 +261,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
-                        self._layout.state = .leading(progress: 1 - progress)
+                        self._layout.state = .leading(progress: progress.invert)
                         self._layout.updateIfNeeded()
                     },
                     completion: { [weak self] in
@@ -297,13 +297,13 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._layout.state = .trailing(progress: 1)
+                        self._layout.state = .trailing(progress: .one)
                         self._onShowTrailing?()
                         completion?()
                     }
                 )
             } else {
-                self._layout.state = .trailing(progress: 1)
+                self._layout.state = .trailing(progress: .one)
                 self._onShowTrailing?()
                 completion?()
             }
@@ -327,7 +327,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
-                        self._layout.state = .trailing(progress: 1 - progress)
+                        self._layout.state = .trailing(progress: progress.invert)
                         self._layout.updateIfNeeded()
                     },
                     completion: { [weak self] in
@@ -589,8 +589,8 @@ private extension SwipeCellView {
                         width: self.leadingSize,
                         height: bounds.size.height
                     )
-                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress)
-                    leadingItem.frame = leadingBeginFrame.lerp(leadingEndedFrame, progress: progress)
+                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    leadingItem.frame = leadingBeginFrame.lerp(leadingEndedFrame, progress: progress.value)
                 } else {
                     self.contentItem.frame = bounds
                 }
@@ -615,8 +615,8 @@ private extension SwipeCellView {
                         width: self.trailingSize,
                         height: bounds.size.height
                     )
-                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress)
-                    trailingItem.frame = trailingBeginFrame.lerp(trailingEndedFrame, progress: progress)
+                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    trailingItem.frame = trailingBeginFrame.lerp(trailingEndedFrame, progress: progress.value)
                 } else {
                     self.contentItem.frame = bounds
                 }
@@ -661,8 +661,8 @@ private extension SwipeCellView.Layout {
     
     enum State {
         case idle
-        case leading(progress: Float)
-        case trailing(progress: Float)
+        case leading(progress: PercentFloat)
+        case trailing(progress: PercentFloat)
     }
     
 }
@@ -716,11 +716,11 @@ private extension SwipeCellView {
         case .idle:
             if deltaLocation.x > 0 && self.leadingView != nil {
                 let delta = min(deltaLocation.x, self.leadingSize)
-                let progress = delta / self.leadingSize
+                let progress = Percent(delta / self.leadingSize)
                 self._layout.state = .leading(progress: progress)
             } else if deltaLocation.x < 0 && self.trailingView != nil {
                 let delta = min(-deltaLocation.x, self.trailingSize)
-                let progress = delta / self.trailingSize
+                let progress = Percent(delta / self.trailingSize)
                 self._layout.state = .trailing(progress: progress)
             } else {
                 self._layout.state = beginState
@@ -728,16 +728,16 @@ private extension SwipeCellView {
         case .leading:
             if deltaLocation.x < 0 {
                 let delta = min(-deltaLocation.x, self.leadingSize)
-                let progress = delta / self.leadingSize
-                self._layout.state = .leading(progress: 1 - progress)
+                let progress = Percent(delta / self.leadingSize)
+                self._layout.state = .leading(progress: progress.invert)
             } else {
                 self._layout.state = beginState
             }
         case .trailing:
             if deltaLocation.x > 0 {
                 let delta = min(deltaLocation.x, self.trailingSize)
-                let progress = delta / self.trailingSize
-                self._layout.state = .trailing(progress: 1 - progress)
+                let progress = Percent(delta / self.trailingSize)
+                self._layout.state = .trailing(progress: progress.invert)
             } else {
                 self._layout.state = beginState
             }
@@ -763,7 +763,7 @@ private extension SwipeCellView {
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
-                            self._layout.state = .leading(progress: 1)
+                            self._layout.state = .leading(progress: .one)
                             self._resetInteractiveAnimation()
                             self._onShowLeading?()
                         }
@@ -774,7 +774,7 @@ private extension SwipeCellView {
                         elapsed: TimeInterval((self.leadingSize - delta) / self.animationVelocity),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._layout.state = .leading(progress: 1 - progress)
+                            self._layout.state = .leading(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
                         completion: { [weak self] in
@@ -797,7 +797,7 @@ private extension SwipeCellView {
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
-                            self._layout.state = .trailing(progress: 1)
+                            self._layout.state = .trailing(progress: .one)
                             self._resetInteractiveAnimation()
                             self._onShowTrailing?()
                         }
@@ -808,7 +808,7 @@ private extension SwipeCellView {
                         elapsed: TimeInterval((self.trailingSize - delta) / self.animationVelocity),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._layout.state = .trailing(progress: 1 - progress)
+                            self._layout.state = .trailing(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
                         completion: { [weak self] in
@@ -831,7 +831,7 @@ private extension SwipeCellView {
                         elapsed: TimeInterval(delta / self.animationVelocity),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._layout.state = .leading(progress: 1 - progress)
+                            self._layout.state = .leading(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
                         completion: { [weak self] in
@@ -852,7 +852,7 @@ private extension SwipeCellView {
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
-                            self._layout.state = .leading(progress: 1)
+                            self._layout.state = .leading(progress: .one)
                             self._resetInteractiveAnimation()
                         }
                     )
@@ -870,7 +870,7 @@ private extension SwipeCellView {
                         elapsed: TimeInterval(delta / self.animationVelocity),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._layout.state = .trailing(progress: 1 - progress)
+                            self._layout.state = .trailing(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
                         completion: { [weak self] in
@@ -891,7 +891,7 @@ private extension SwipeCellView {
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
-                            self._layout.state = .trailing(progress: 1)
+                            self._layout.state = .trailing(progress: .one)
                             self._resetInteractiveAnimation()
                         }
                     )

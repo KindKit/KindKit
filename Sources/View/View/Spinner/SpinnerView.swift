@@ -27,7 +27,7 @@ public class SpinnerView : ISpinnerView {
             self.setNeedForceLayout()
         }
     }
-    public var size: DimensionBehaviour {
+    public var size: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -96,9 +96,7 @@ public class SpinnerView : ISpinnerView {
     private var _onInvisible: (() -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
-        size: DimensionBehaviour,
+        size: StaticSizeBehaviour,
         activityColor: Color,
         scaleFactor: Float = 1,
         isAnimating: Bool = false,
@@ -120,7 +118,7 @@ public class SpinnerView : ISpinnerView {
         self.shadow = shadow
         self.alpha = alpha
         self.isHidden = isHidden
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     
@@ -134,9 +132,10 @@ public class SpinnerView : ISpinnerView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return SizeFloat(
-            width: self.size.value(available.width) ?? 0,
-            height: self.size.value(available.height) ?? 0
+        return StaticSizeBehaviour.apply(
+            available: available,
+            width: self.size,
+            height: self.size
         )
     }
     
@@ -166,7 +165,7 @@ public class SpinnerView : ISpinnerView {
     }
     
     @discardableResult
-    public func size(_ value: DimensionBehaviour) -> Self {
+    public func size(_ value: StaticSizeBehaviour) -> Self {
         self.size = value
         return self
     }

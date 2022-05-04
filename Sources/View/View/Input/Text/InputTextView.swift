@@ -39,13 +39,13 @@ public class InputTextView : IInputTextView {
         guard self.isLoaded == true else { return false }
         return self._view.isFirstResponder
     }
-    public var width: DimensionBehaviour {
+    public var width: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour {
+    public var height: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -161,10 +161,8 @@ public class InputTextView : IInputTextView {
     private var _onEndEditing: (() -> Void)?
 
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
-        width: DimensionBehaviour,
-        height: DimensionBehaviour,
+        width: StaticSizeBehaviour,
+        height: StaticSizeBehaviour,
         text: String,
         textFont: Font,
         textColor: Color,
@@ -197,7 +195,7 @@ public class InputTextView : IInputTextView {
         self.alpha = alpha
         self.isHidden = isHidden
         self._text = text
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     
@@ -211,7 +209,11 @@ public class InputTextView : IInputTextView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return available.apply(width: self.width, height: self.height)
+        return StaticSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -254,13 +256,13 @@ public class InputTextView : IInputTextView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour) -> Self {
+    public func width(_ value: StaticSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour) -> Self {
+    public func height(_ value: StaticSizeBehaviour) -> Self {
         self.height = value
         return self
     }

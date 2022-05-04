@@ -17,12 +17,12 @@ public class ScrollViewHidingBarExtension {
     
     public var direction: Direction
     public var state: State
-    public var visibility: Float {
+    public var visibility: PercentFloat {
         switch self.state {
-        case .showed: return 1
+        case .showed: return .one
         case .showing(let progress): return progress
-        case .hiding(let progress): return 1 - progress
-        case .hided: return 0
+        case .hiding(let progress): return progress.invert
+        case .hided: return .zero
         }
     }
     public var threshold: Float
@@ -70,8 +70,8 @@ public extension ScrollViewHidingBarExtension {
     
     enum State : Equatable {
         case showed
-        case showing(progress: Float)
-        case hiding(progress: Float)
+        case showing(progress: PercentFloat)
+        case hiding(progress: PercentFloat)
         case hided
     }
     
@@ -191,13 +191,13 @@ private extension ScrollViewHidingBarExtension {
                 )
             }
         case .showing(let baseProgress):
-            if baseProgress >= 0.5 || forceShow == true {
+            if baseProgress >= .half || forceShow == true {
                 self._animation = Animation.default.run(
-                    duration: TimeInterval((self.threshold * (1 - baseProgress)) / self.animationVelocity),
+                    duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
-                        self._set(state: .showing(progress: baseProgress + ((1 - baseProgress) * progress)))
+                        self._set(state: .showing(progress: baseProgress + (baseProgress.invert * progress)))
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
@@ -207,7 +207,7 @@ private extension ScrollViewHidingBarExtension {
                 )
             } else {
                 self._animation = Animation.default.run(
-                    duration: TimeInterval((self.threshold * baseProgress) / self.animationVelocity),
+                    duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -221,9 +221,9 @@ private extension ScrollViewHidingBarExtension {
                 )
             }
         case .hiding(let baseProgress):
-            if baseProgress <= 0.5 || forceShow == true {
+            if baseProgress <= .half || forceShow == true {
                 self._animation = Animation.default.run(
-                    duration: TimeInterval((self.threshold * baseProgress) / self.animationVelocity),
+                    duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -237,11 +237,11 @@ private extension ScrollViewHidingBarExtension {
                 )
             } else {
                 self._animation = Animation.default.run(
-                    duration: TimeInterval((self.threshold * (1 - baseProgress)) / self.animationVelocity),
+                    duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }
-                        self._set(state: .hiding(progress: baseProgress + ((1 - baseProgress) * progress)))
+                        self._set(state: .hiding(progress: baseProgress + (baseProgress.invert * progress)))
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
@@ -298,11 +298,11 @@ private extension ScrollViewHidingBarExtension {
             case .showing(let baseProgress):
                 if isShowed == true {
                     self._animation = Animation.default.run(
-                        duration: TimeInterval((self.threshold * (1 - baseProgress)) / self.animationVelocity),
+                        duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._set(state: .showing(progress: baseProgress + ((1 - baseProgress) * progress)))
+                            self._set(state: .showing(progress: baseProgress + (baseProgress.invert * progress)))
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
@@ -313,7 +313,7 @@ private extension ScrollViewHidingBarExtension {
                     )
                 } else {
                     self._animation = Animation.default.run(
-                        duration: TimeInterval((self.threshold * baseProgress) / self.animationVelocity),
+                        duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
@@ -330,7 +330,7 @@ private extension ScrollViewHidingBarExtension {
             case .hiding(let baseProgress):
                 if isShowed == true {
                     self._animation = Animation.default.run(
-                        duration: TimeInterval((self.threshold * baseProgress) / self.animationVelocity),
+                        duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
@@ -345,11 +345,11 @@ private extension ScrollViewHidingBarExtension {
                     )
                 } else {
                     self._animation = Animation.default.run(
-                        duration: TimeInterval((self.threshold * (1 - baseProgress)) / self.animationVelocity),
+                        duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
                         processing: { [weak self] progress in
                             guard let self = self else { return }
-                            self._set(state: .hiding(progress: baseProgress + ((1 - baseProgress) * progress)))
+                            self._set(state: .hiding(progress: baseProgress + (baseProgress.invert * progress)))
                         },
                         completion: { [weak self] in
                             guard let self = self else { return }
@@ -395,7 +395,7 @@ private extension ScrollViewHidingBarExtension {
                 if delta < -threshold {
                     return .hided
                 }
-                return .hiding(progress: -delta / threshold)
+                return .hiding(progress: Percent(-delta / threshold))
             }
             return .showed
         case .showing:
@@ -403,7 +403,7 @@ private extension ScrollViewHidingBarExtension {
                 if delta > threshold {
                     return .showed
                 }
-                return .showing(progress: delta / threshold)
+                return .showing(progress: Percent(delta / threshold))
             }
             return .hided
         case .hiding:
@@ -411,7 +411,7 @@ private extension ScrollViewHidingBarExtension {
                 if delta < -threshold {
                     return .hided
                 }
-                return .hiding(progress: -delta / threshold)
+                return .hiding(progress: Percent(-delta / threshold))
             }
             return .showed
         case .hided:
@@ -419,7 +419,7 @@ private extension ScrollViewHidingBarExtension {
                 if delta > threshold {
                     return .showed
                 }
-                return .showing(progress: delta / threshold)
+                return .showing(progress: Percent(delta / threshold))
             }
             return .hided
         }

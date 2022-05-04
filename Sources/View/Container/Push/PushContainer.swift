@@ -400,12 +400,12 @@ private extension PushContainer {
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation < 0 {
             let height = self._view.contentLayout.height(item: current)
-            let progress = -deltaLocation / height
+            let progress = Percent(-deltaLocation / height)
             self._view.contentLayout.state = .dismiss(push: current, progress: progress)
         } else if deltaLocation > 0 {
             let height = self._view.contentLayout.height(item: current)
-            let progress = deltaLocation / pow(height, 1.5)
-            self._view.contentLayout.state = .present(push: current, progress: 1 + progress)
+            let progress = Percent(deltaLocation / pow(height, 1.5))
+            self._view.contentLayout.state = .present(push: current, progress: .one + progress)
         } else {
             self._view.contentLayout.state = .idle(push: current)
         }
@@ -432,12 +432,12 @@ private extension PushContainer {
             )
         } else if deltaLocation > 0 {
             let height = self._view.contentLayout.height(item: current)
-            let baseProgress = deltaLocation / pow(height, 1.5)
+            let baseProgress = Percent(deltaLocation / pow(height, 1.5))
             Animation.default.run(
-                duration: TimeInterval((height * baseProgress) / self.animationVelocity),
+                duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .present(push: current, progress: 1 + (baseProgress - (baseProgress * progress)))
+                    self._view.contentLayout.state = .present(push: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -627,8 +627,8 @@ private extension PushContainer.Layout {
     enum State {
         case empty
         case idle(push: PushContainer.Item)
-        case present(push: PushContainer.Item, progress: Float)
-        case dismiss(push: PushContainer.Item, progress: Float)
+        case present(push: PushContainer.Item, progress: PercentFloat)
+        case dismiss(push: PushContainer.Item, progress: PercentFloat)
     }
     
 }

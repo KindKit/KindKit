@@ -285,7 +285,7 @@ private extension ModalContainer {
     func _present(modal: Item, animated: Bool, completion: (() -> Void)?) {
         self._current = modal
         if animated == true {
-            self._view.contentLayout.state = .present(modal: modal, progress: 0)
+            self._view.contentLayout.state = .present(modal: modal, progress: .zero)
             modal.container.prepareShow(interactive: false)
             Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
@@ -364,7 +364,7 @@ private extension ModalContainer {
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation > 0 {
-            let progress = deltaLocation / self._view.bounds.size.height
+            let progress = Percent(deltaLocation / self._view.bounds.size.height)
             self._view.contentLayout.state = .dismiss(modal: current, progress: progress)
         } else {
             self._view.contentLayout.state = .idle(modal: current)
@@ -392,12 +392,12 @@ private extension ModalContainer {
             )
         } else if deltaLocation > 0 {
             let height = self._view.bounds.size.height
-            let baseProgress = deltaLocation / pow(height, 1.5)
+            let baseProgress = Percent(deltaLocation / pow(height, 1.5))
             Animation.default.run(
-                duration: TimeInterval((height * baseProgress) / self.animationVelocity),
+                duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .present(modal: current, progress: 1 + (baseProgress - (baseProgress * progress)))
+                    self._view.contentLayout.state = .present(modal: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -539,7 +539,7 @@ private extension ModalContainer {
                     let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
                     let endRect = bounds.inset(inset)
                     modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    view.alpha = progress
+                    view.alpha = progress.value
                     item.frame = bounds
                 } else {
                     let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
@@ -557,7 +557,7 @@ private extension ModalContainer {
                     let beginRect = bounds.inset(inset)
                     let endRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
                     modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    view.alpha = 1 - progress
+                    view.alpha = progress.invert.value
                     item.frame = bounds
                 } else {
                     let beginRect = bounds
@@ -607,8 +607,8 @@ private extension ModalContainer.Layout {
     enum State {
         case empty
         case idle(modal: ModalContainer.Item)
-        case present(modal: ModalContainer.Item, progress: Float)
-        case dismiss(modal: ModalContainer.Item, progress: Float)
+        case present(modal: ModalContainer.Item, progress: PercentFloat)
+        case dismiss(modal: ModalContainer.Item, progress: PercentFloat)
     }
     
 }

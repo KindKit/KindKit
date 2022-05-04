@@ -168,7 +168,7 @@ public class PageBarView : BarView, IPageBarView {
         self._transitionSelectedView = self._selectedItemView
     }
     
-    public func transition(to view: IBarItemView, progress: Float) {
+    public func transition(to view: IBarItemView, progress: PercentFloat) {
         if let currentContentOffset = self._transitionContentOffset {
             if let targetContentOffset = self._contentView.contentOffset(with: view, horizontal: .center, vertical: .center) {
                 self._contentView.contentOffset(currentContentOffset.lerp(targetContentOffset, progress: progress), normalized: true)
@@ -207,7 +207,7 @@ private extension PageBarView {
         enum IndicatorState {
             case empty
             case alias(current: LayoutItem)
-            case transition(current: LayoutItem, next: LayoutItem, progress: Float)
+            case transition(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
         }
         
         unowned var delegate: ILayoutDelegate?

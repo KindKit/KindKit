@@ -34,7 +34,7 @@ public class AttributedTextView : IAttributedTextView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DimensionBehaviour? {
+    public var width: DynamicSizeBehaviour {
         didSet(oldValue) {
             guard self.width != oldValue else { return }
             guard self.isLoaded == true else { return }
@@ -43,7 +43,7 @@ public class AttributedTextView : IAttributedTextView {
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour? {
+    public var height: DynamicSizeBehaviour {
         didSet(oldValue) {
             guard self.height != oldValue else { return }
             guard self.isLoaded == true else { return }
@@ -140,8 +140,8 @@ public class AttributedTextView : IAttributedTextView {
     public init(
         reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
         reuseName: String? = nil,
-        width: DimensionBehaviour? = nil,
-        height: DimensionBehaviour? = nil,
+        width: DynamicSizeBehaviour = .fit,
+        height: DynamicSizeBehaviour = .fit,
         text: NSAttributedString,
         alignment: TextAlignment? = nil,
         lineBreak: TextLineBreak = .wordWrapping,
@@ -188,32 +188,14 @@ public class AttributedTextView : IAttributedTextView {
                 self._cacheSize = nil
             }
         }
-        let size: SizeFloat
-        if let width = self.width, let height = self.height {
-            size = available.apply(width: width, height: height)
-        } else if let width = self.width {
-            let availableSize = SizeFloat(
-                width: width.value(available.width) ?? 0,
-                height: available.height
-            )
-            let textSize = self.text.size(available: availableSize)
-            size = SizeFloat(
-                width: availableSize.width,
-                height: textSize.height
-            )
-        } else if let height = self.height {
-            let availableSize = SizeFloat(
-                width: available.width,
-                height: height.value(available.height) ?? 0
-            )
-            let textSize = self.text.size(available: availableSize)
-            size = SizeFloat(
-                width: textSize.width,
-                height: availableSize.height
-            )
-        } else {
-            size = self.text.size(available: available)
-        }
+        let size = DynamicSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height,
+            sizeWithWidth: { return self.text.size(available: Size(width: $0, height: .infinity)) },
+            sizeWithHeight: { return self.text.size(available: Size(width: .infinity, height: $0)) },
+            size: { return self.text.size(available: available) }
+        )
         self._cacheAvailable = available
         self._cacheSize = size
         return size
@@ -245,13 +227,13 @@ public class AttributedTextView : IAttributedTextView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour?) -> Self {
+    public func width(_ value: DynamicSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour?) -> Self {
+    public func height(_ value: DynamicSizeBehaviour) -> Self {
         self.height = value
         return self
     }

@@ -49,21 +49,11 @@ public struct GradientViewPoint {
     
 }
 
-public protocol IGradientView : IView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-    
-    var width: DimensionBehaviour? { set get }
-    
-    var height: DimensionBehaviour? { set get }
+public protocol IGradientView : IView, IViewStaticSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var aspectRatio: Float? { set get }
     
     var fill: GradientViewFill { set get }
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour?) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour?) -> Self
     
     @discardableResult
     func aspectRatio(_ value: Float?) -> Self

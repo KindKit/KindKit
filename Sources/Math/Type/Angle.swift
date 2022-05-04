@@ -47,6 +47,11 @@ public extension Angle {
     static var degrees270: Self {
         return Angle(radians: 3 * .pi / 2)
     }
+    
+    @inlinable
+    static var degrees360: Self {
+        return Angle(radians: .pi * 2)
+    }
 
 }
 

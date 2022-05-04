@@ -34,6 +34,18 @@ public class CustomView< Layout : ILayout > : ICustomView {
             self.setNeedForceLayout()
         }
     }
+    public var width: DynamicSizeBehaviour {
+        didSet {
+            guard self.isLoaded == true else { return }
+            self.setNeedForceLayout()
+        }
+    }
+    public var height: DynamicSizeBehaviour {
+        didSet {
+            guard self.isLoaded == true else { return }
+            self.setNeedForceLayout()
+        }
+    }
     public var gestures: [IGesture] {
         set(value) {
             self._gestures = value
@@ -137,6 +149,8 @@ public class CustomView< Layout : ILayout > : ICustomView {
     private var _onChangeStyle: ((_ userIteraction: Bool) -> Void)?
     
     public init(
+        width: DynamicSizeBehaviour = .fit,
+        height: DynamicSizeBehaviour = .fit,
         gestures: [IGesture] = [],
         contentLayout: Layout,
         shouldHighlighting: Bool = false,
@@ -150,6 +164,8 @@ public class CustomView< Layout : ILayout > : ICustomView {
         isHidden: Bool = false
     ) {
         self.isVisible = false
+        self.width = width
+        self.height = height
         self._gestures = gestures
         self.contentLayout = contentLayout
         self.shouldHighlighting = shouldHighlighting
@@ -176,7 +192,14 @@ public class CustomView< Layout : ILayout > : ICustomView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return self.contentLayout.size(available: available)
+        return DynamicSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height,
+            sizeWithWidth: { self.contentLayout.size(available: Size(width: $0, height: available.height)) },
+            sizeWithHeight: { self.contentLayout.size(available: Size(width: available.width, height: $0)) },
+            size: { self.contentLayout.size(available: available) }
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -233,6 +256,18 @@ public class CustomView< Layout : ILayout > : ICustomView {
                 self._view.remove(gesture: gesture)
             }
         }
+        return self
+    }
+    
+    @discardableResult
+    public func width(_ value: DynamicSizeBehaviour) -> Self {
+        self.width = value
+        return self
+    }
+    
+    @discardableResult
+    public func height(_ value: DynamicSizeBehaviour) -> Self {
+        self.height = value
         return self
     }
     

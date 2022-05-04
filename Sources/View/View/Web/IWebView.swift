@@ -43,11 +43,7 @@ public enum WebViewNavigationPolicy {
     
 }
 
-public protocol IWebView : IView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-    
-    var width: DimensionBehaviour { set get }
-    
-    var height: DimensionBehaviour { set get }
+public protocol IWebView : IView, IViewStaticSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var enablePinchGesture: Bool { set get }
     
@@ -60,12 +56,6 @@ public protocol IWebView : IView, IViewColorable, IViewBorderable, IViewCornerRa
     var state: WebViewState { get }
     
     func evaluate< Result >(javaScript: String, success: @escaping (Result) -> Void, failure: @escaping (Error) -> Void)
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
     
     @discardableResult
     func enablePinchGesture(_ value: Bool) -> Self

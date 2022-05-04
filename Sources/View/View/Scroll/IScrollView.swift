@@ -42,11 +42,7 @@ public protocol IScrollViewObserver : AnyObject {
     
 }
 
-public protocol IScrollView : IView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-    
-    var width: DimensionBehaviour? { set get }
-    
-    var height: DimensionBehaviour? { set get }
+public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var direction: ScrollViewDirection { set get }
     

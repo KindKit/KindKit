@@ -46,13 +46,13 @@ public class ScrollView< Layout : ILayout > : IScrollView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DimensionBehaviour? {
+    public var width: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour? {
+    public var height: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -188,8 +188,8 @@ public class ScrollView< Layout : ILayout > : IScrollView {
     private var _onScrollToTop: (() -> Void)?
     
     public init(
-        width: DimensionBehaviour? = .fill,
-        height: DimensionBehaviour? = .fill,
+        width: DynamicSizeBehaviour = .static(.fill),
+        height: DynamicSizeBehaviour = .static(.fill),
         direction: ScrollViewDirection = [ .vertical, .bounds ],
         indicatorDirection: ScrollViewDirection = [],
         visibleInset: InsetFloat = .zero,
@@ -230,8 +230,8 @@ public class ScrollView< Layout : ILayout > : IScrollView {
     
     @available(iOS 10.0, *)
     public init(
-        width: DimensionBehaviour? = .fill,
-        height: DimensionBehaviour? = .fill,
+        width: DynamicSizeBehaviour = .static(.fill),
+        height: DynamicSizeBehaviour = .static(.fill),
         direction: ScrollViewDirection = [ .vertical, .bounds ],
         indicatorDirection: ScrollViewDirection = [],
         visibleInset: InsetFloat = .zero,
@@ -282,22 +282,14 @@ public class ScrollView< Layout : ILayout > : IScrollView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        if let width = self.width, let height = self.height {
-            return available.apply(width: width, height: height)
-        } else {
-            if let widthBehaviour = self.width, let width = widthBehaviour.value(available.width) {
-                return self.contentLayout.size(available: SizeFloat(
-                    width: width,
-                    height: available.height
-                ))
-            } else if let heightBehaviour = self.height, let height = heightBehaviour.value(available.height) {
-                return self.contentLayout.size(available: SizeFloat(
-                    width: available.width,
-                    height: height
-                ))
-            }
-        }
-        return self.contentLayout.size(available: available)
+        return DynamicSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height,
+            sizeWithWidth: { self.contentLayout.size(available: Size(width: $0, height: available.height)) },
+            sizeWithHeight: { self.contentLayout.size(available: Size(width: available.width, height: $0)) },
+            size: { self.contentLayout.size(available: available) }
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -348,6 +340,18 @@ public class ScrollView< Layout : ILayout > : IScrollView {
     @discardableResult
     public func endRefresh() -> Self {
         self.isRefreshing = false
+        return self
+    }
+    
+    @discardableResult
+    public func width(_ value: DynamicSizeBehaviour) -> Self {
+        self.width = value
+        return self
+    }
+    
+    @discardableResult
+    public func height(_ value: DynamicSizeBehaviour) -> Self {
+        self.height = value
         return self
     }
     
@@ -517,7 +521,7 @@ public class ScrollView< Layout : ILayout > : IScrollView {
                 duration: TimeInterval(deltaContentOffset / velocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 processing: { [unowned self] progress in
-                    let contentOffset = beginContentOffset.lerp(endContentOffset, progress: progress)
+                    let contentOffset = beginContentOffset.lerp(endContentOffset, progress: progress.value)
                     self.contentOffset(contentOffset)
                 },
                 completion: { [unowned self] in
@@ -590,7 +594,17 @@ extension ScrollView : ScrollViewDelegate {
     }
     
     func _isDynamicSize() -> Bool {
-        return (self.width == nil) || (self.height == nil)
+        switch (self.width, self.height) {
+        case (.static, .static): return false
+        case (.static, .morph): return true
+        case (.static, .fit): return true
+        case (.morph, .static): return true
+        case (.morph, .morph): return true
+        case (.morph, .fit): return true
+        case (.fit, .static): return true
+        case (.fit, .morph): return true
+        case (.fit, .fit): return true
+        }
     }
     
 }

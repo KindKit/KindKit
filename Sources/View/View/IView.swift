@@ -16,6 +16,10 @@ public protocol IView : IBaseView {
     
     func loadIfNeeded()
     
+    func setNeedForceLayout()
+    func setNeedLayout()
+    func layoutIfNeeded()
+    
     func appear(to layout: ILayout)
     
     func visible()

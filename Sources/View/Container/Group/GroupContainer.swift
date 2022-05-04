@@ -620,8 +620,8 @@ private extension GroupContainer {
         enum State {
             case empty
             case idle(current: LayoutItem)
-            case forward(current: LayoutItem, next: LayoutItem, progress: Float)
-            case backward(current: LayoutItem, next: LayoutItem, progress: Float)
+            case forward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
+            case backward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
         }
         
         unowned var delegate: ILayoutDelegate?

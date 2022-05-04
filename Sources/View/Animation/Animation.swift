@@ -36,7 +36,7 @@ public class Animation {
         elapsed: TimeInterval = 0,
         ease: IAnimationEase = Ease.Linear(),
         preparing: (() -> Void)? = nil,
-        processing: @escaping (_ progress: Float) -> Void,
+        processing: @escaping (_ progress: PercentFloat) -> Void,
         completion: @escaping () -> Void
     ) -> IAnimationTask {
         let task = Task(
@@ -73,7 +73,7 @@ private extension Animation {
         var elapsed: TimeInterval
         var ease: IAnimationEase
         var preparing: (() -> Void)?
-        var processing: (_ progress: Float) -> Void
+        var processing: (_ progress: PercentFloat) -> Void
         var completion: () -> Void
         
         var isRunning: Bool
@@ -87,7 +87,7 @@ private extension Animation {
             elapsed: TimeInterval,
             ease: IAnimationEase,
             preparing: (() -> Void)?,
-            processing: @escaping (_ progress: Float) -> Void,
+            processing: @escaping (_ progress: PercentFloat) -> Void,
             completion: @escaping () -> Void
         ) {
             self.delay = delay
@@ -111,9 +111,8 @@ private extension Animation {
                     self.isRunning = true
                     self.preparing?()
                 }
-                let rawProgress = Float(min((self.elapsed - self.delay) / self.duration, 1))
-                let easeProgress = self.ease.perform(rawProgress)
-                self.processing(easeProgress)
+                let progress = Percent(Float((self.elapsed - self.delay) / self.duration)).normalized
+                self.processing(self.ease.perform(progress))
                 if self.elapsed >= self.duration && self.isCompletion == false {
                     self.isCompletion = true
                 }

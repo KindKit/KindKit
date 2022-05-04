@@ -27,13 +27,13 @@ public class ProgressView : IProgressView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DimensionBehaviour {
+    public var width: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour {
+    public var height: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -99,10 +99,8 @@ public class ProgressView : IProgressView {
     private var _onInvisible: (() -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
-        width: DimensionBehaviour = .fill,
-        height: DimensionBehaviour,
+        width: StaticSizeBehaviour = .fill,
+        height: StaticSizeBehaviour,
         progressColor: Color,
         trackColor: Color,
         progress: Float,
@@ -125,7 +123,7 @@ public class ProgressView : IProgressView {
         self.shadow = shadow
         self.alpha = alpha
         self.isHidden = isHidden
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     
@@ -139,7 +137,11 @@ public class ProgressView : IProgressView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return available.apply(width: self.width, height: self.height)
+        return StaticSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -168,13 +170,13 @@ public class ProgressView : IProgressView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour) -> Self {
+    public func width(_ value: StaticSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour) -> Self {
+    public func height(_ value: StaticSizeBehaviour) -> Self {
         self.height = value
         return self
     }

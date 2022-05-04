@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public protocol ICustomView : IView, IViewHighlightable, IViewLockable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
+public protocol ICustomView : IView, IViewDynamicSizeBehavioural, IViewHighlightable, IViewLockable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var gestures: [IGesture] { set get }
     

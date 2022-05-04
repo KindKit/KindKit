@@ -88,7 +88,6 @@ public class RemoteImageView : IRemoteImageView {
     private var _onError: ((_ error: Error) -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
         placeholderView: IImageView,
         progressView: IProgressView? = nil,
         errorView: IView? = nil,

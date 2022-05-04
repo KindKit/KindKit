@@ -87,6 +87,8 @@ public class BarView : IBarView {
     ) {
         self.separatorView = separatorView
         self._backgroundView = EmptyView(
+            width: .fill,
+            height: .fill,
             color: color,
             border: border,
             cornerRadius: cornerRadius,

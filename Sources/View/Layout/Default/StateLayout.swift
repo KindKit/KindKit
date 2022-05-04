@@ -18,7 +18,7 @@ public class StateLayout< State : Equatable & Hashable > : ILayout {
             switch self._internalState {
             case .idle(let state): return state
             case .animation(_, let from, let to, let progress):
-                if progress > 0.5 {
+                if progress > .half {
                     return to
                 }
                 return from
@@ -288,7 +288,7 @@ private extension StateLayout {
     
     enum InternalState : Equatable {
         case idle(state: State)
-        case animation(transition: Transition, from: State, to: State, progress: Float)
+        case animation(transition: Transition, from: State, to: State, progress: PercentFloat)
         
         func contains(state: State) -> Bool {
             switch self {

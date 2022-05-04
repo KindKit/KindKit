@@ -27,13 +27,13 @@ public class ImageView : IImageView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DimensionBehaviour? {
+    public var width: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour? {
+    public var height: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -109,8 +109,8 @@ public class ImageView : IImageView {
     public init(
         reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
         reuseName: String? = nil,
-        width: DimensionBehaviour? = nil,
-        height: DimensionBehaviour? = nil,
+        width: DynamicSizeBehaviour = .fit,
+        height: DynamicSizeBehaviour = .fit,
         aspectRatio: Float? = nil,
         image: Image,
         mode: ImageViewMode = .aspectFit,
@@ -149,77 +149,71 @@ public class ImageView : IImageView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        if let width = self.width, let height = self.height {
-            return available.apply(width: width, height: height, aspectRatio: self.aspectRatio)
-        } else if let widthBehaviour = self.width, let width = widthBehaviour.value(available.width) {
-            switch self.mode {
-            case .origin:
-                if let aspectRatio = self.aspectRatio {
-                    return SizeFloat(
-                        width: width,
-                        height: width / aspectRatio
-                    )
+        return DynamicSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.width,
+            sizeWithWidth: {
+                switch self.mode {
+                case .origin:
+                    if let aspectRatio = self.aspectRatio {
+                        return SizeFloat(width: $0, height: $0 / aspectRatio)
+                    }
+                    return image.size
+                case .aspectFit, .aspectFill:
+                    let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
+                    return SizeFloat(width: $0, height: $0 / aspectRatio)
                 }
-                return self.image.size
-            case .aspectFit, .aspectFill:
-                let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
-                return SizeFloat(
-                    width: width,
-                    height: width / aspectRatio
-                )
-            }
-        } else if let heightBehaviour = self.height, let height = heightBehaviour.value(available.height) {
-            switch self.mode {
-            case .origin:
-                if let aspectRatio = self.aspectRatio {
-                    return SizeFloat(
-                        width: height * aspectRatio,
-                        height: height
-                    )
+            },
+            sizeWithHeight: {
+                switch self.mode {
+                case .origin:
+                    if let aspectRatio = self.aspectRatio {
+                        return SizeFloat(width: $0 * aspectRatio, height: $0)
+                    }
+                    return image.size
+                case .aspectFit, .aspectFill:
+                    let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
+                    return SizeFloat(width: $0 * aspectRatio, height: $0)
                 }
-                return self.image.size
-            case .aspectFit, .aspectFill:
-                let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
-                return SizeFloat(
-                    width: height * aspectRatio,
-                    height: height
-                )
-            }
-        }
-        switch self.mode {
-        case .origin:
-            if let aspectRatio = self.aspectRatio {
-                if available.width.isInfinite == true && available.height.isInfinite == false {
-                    return SizeFloat(
-                        width: available.height * aspectRatio,
-                        height: available.height
-                    )
-                } else if available.width.isInfinite == false && available.height.isInfinite == true {
-                    return SizeFloat(
-                        width: available.width,
-                        height: available.width / aspectRatio
-                    )
+            },
+            size: {
+                switch self.mode {
+                case .origin:
+                    if let aspectRatio = self.aspectRatio {
+                        if available.width.isInfinite == true && available.height.isInfinite == false {
+                            return SizeFloat(
+                                width: available.height * aspectRatio,
+                                height: available.height
+                            )
+                        } else if available.width.isInfinite == false && available.height.isInfinite == true {
+                            return SizeFloat(
+                                width: available.width,
+                                height: available.width / aspectRatio
+                            )
+                        }
+                    }
+                    return self.image.size
+                case .aspectFit, .aspectFill:
+                    if available.isInfinite == true {
+                        return self.image.size
+                    } else if available.width.isInfinite == true {
+                        let aspectRatio = self.image.size.aspectRatio
+                        return SizeFloat(
+                            width: available.height * aspectRatio,
+                            height: available.height
+                        )
+                    } else if available.height.isInfinite == true {
+                        let aspectRatio = self.image.size.aspectRatio
+                        return SizeFloat(
+                            width: available.width,
+                            height: available.width / aspectRatio
+                        )
+                    }
+                    return self.image.size.aspectFit(available)
                 }
             }
-            return self.image.size
-        case .aspectFit, .aspectFill:
-            if available.isInfinite == true {
-                return self.image.size
-            } else if available.width.isInfinite == true {
-                let aspectRatio = self.image.size.aspectRatio
-                return SizeFloat(
-                    width: available.height * aspectRatio,
-                    height: available.height
-                )
-            } else if available.height.isInfinite == true {
-                let aspectRatio = self.image.size.aspectRatio
-                return SizeFloat(
-                    width: available.width,
-                    height: available.width / aspectRatio
-                )
-            }
-            return self.image.size.aspectFit(available)
-        }
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -248,13 +242,13 @@ public class ImageView : IImageView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour?) -> Self {
+    public func width(_ value: DynamicSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour?) -> Self {
+    public func height(_ value: DynamicSizeBehaviour) -> Self {
         self.height = value
         return self
     }

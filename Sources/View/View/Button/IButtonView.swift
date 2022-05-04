@@ -23,13 +23,9 @@ public enum ButtonViewImagePosition {
     case bottom
 }
 
-public protocol IButtonView : IView, IViewHighlightable, IViewLockable, IViewSelectable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
+public protocol IButtonView : IView, IViewDynamicSizeBehavioural, IViewHighlightable, IViewLockable, IViewSelectable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var inset: InsetFloat { set get }
-    
-    var width: DimensionBehaviour? { set get }
-    
-    var height: DimensionBehaviour? { set get }
     
     var alignment: ButtonViewAlignment { set get }
     
@@ -53,12 +49,6 @@ public protocol IButtonView : IView, IViewHighlightable, IViewLockable, IViewSel
     
     @discardableResult
     func inset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour?) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour?) -> Self
     
     @discardableResult
     func alignment(_ value: ButtonViewAlignment) -> Self

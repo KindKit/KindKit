@@ -12,11 +12,7 @@ public protocol IInputListViewItem : AnyObject {
     
 }
 
-public protocol IInputListView : IInputView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-
-    var width: DimensionBehaviour { set get }
-    
-    var height: DimensionBehaviour { set get }
+public protocol IInputListView : IInputView, IViewStaticSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var items: [IInputListViewItem] { set get }
     
@@ -39,12 +35,6 @@ public protocol IInputListView : IInputView, IViewColorable, IViewBorderable, IV
     var toolbar: IInputToolbarView? { set get }
     
     #endif
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
     
     @discardableResult
     func items(_ value: [IInputListViewItem]) -> Self

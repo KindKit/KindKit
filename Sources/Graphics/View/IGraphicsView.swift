@@ -9,19 +9,19 @@ import KindKitView
 
 public protocol IGraphicsView : IView, IViewLockable, IViewColorable, IViewAlphable {
     
-    var width: DimensionBehaviour { set get }
+    var width: StaticSizeBehaviour { set get }
     
-    var height: DimensionBehaviour { set get }
+    var height: StaticSizeBehaviour { set get }
     
     var canvas: IGraphicsCanvas { set get }
     
     func setNeedRedraw()
     
     @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
+    func width(_ value: StaticSizeBehaviour) -> Self
     
     @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
+    func height(_ value: StaticSizeBehaviour) -> Self
     
     @discardableResult
     func canvas(_ value: IGraphicsCanvas) -> Self

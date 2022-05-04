@@ -481,7 +481,7 @@ private extension StackContainer {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.contentLayout.state = .push(current: current.item, forward: forward.item, progress: 0)
+                        self._view.contentLayout.state = .push(current: current.item, forward: forward.item, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             forward.container.prepareShow(interactive: false)
@@ -613,7 +613,7 @@ private extension StackContainer {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.contentLayout.state = .pop(backward: backward.item, current: current.item, progress: 0)
+                        self._view.contentLayout.state = .pop(backward: backward.item, current: current.item, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             backward.container.prepareShow(interactive: false)
@@ -754,7 +754,7 @@ private extension StackContainer {
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = currentLocation - beginLocation
         let layoutSize = self._view.contentSize
-        let progress = max(0, deltaLocation.x / layoutSize.width)
+        let progress = Percent(max(0, deltaLocation.x / layoutSize.width))
         self._view.contentLayout.state = .pop(backward: backward.item, current: current.item, progress: progress)
         if self._interactiveGroupBottomBar == true {
             ContainerBarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: progress))
@@ -789,10 +789,10 @@ private extension StackContainer {
                 elapsed: TimeInterval((layoutSize.width - deltaLocation.x) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .pop(backward: backward.item, current: current.item, progress: 1 - progress)
+                    self._view.contentLayout.state = .pop(backward: backward.item, current: current.item, progress: progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                     if self._interactiveGroupBottomBar == true {
-                        ContainerBarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: 1 - progress))
+                        ContainerBarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: progress.invert))
                     }
                 },
                 completion: { [weak self] in
@@ -985,8 +985,8 @@ private extension StackContainer {
         enum State {
             case empty
             case idle(current: LayoutItem)
-            case push(current: LayoutItem, forward: LayoutItem, progress: Float)
-            case pop(backward: LayoutItem, current: LayoutItem, progress: Float)
+            case push(current: LayoutItem, forward: LayoutItem, progress: PercentFloat)
+            case pop(backward: LayoutItem, current: LayoutItem, progress: PercentFloat)
         }
         
         unowned var delegate: ILayoutDelegate?

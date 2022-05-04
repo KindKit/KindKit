@@ -6,11 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public protocol ISwitchView : IView, IViewLockable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-
-    var width: DimensionBehaviour { set get }
-    
-    var height: DimensionBehaviour { set get }
+public protocol ISwitchView : IView, IViewStaticSizeBehavioural, IViewLockable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var thumbColor: Color { set get }
     
@@ -19,12 +15,6 @@ public protocol ISwitchView : IView, IViewLockable, IViewColorable, IViewBordera
     var onColor: Color { set get }
     
     var value: Bool { set get }
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
     
     @discardableResult
     func thumbColor(_ value: Color) -> Self

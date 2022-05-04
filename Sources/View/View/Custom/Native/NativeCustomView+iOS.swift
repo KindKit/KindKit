@@ -89,7 +89,7 @@ final class NativeCustomView : UIView {
         
         self._safeLayout({
             let bounds = RectFloat(self.bounds)
-            self._layoutManager.layout(bounds:bounds)
+            self._layoutManager.layout(bounds: bounds)
             self._layoutManager.visible(bounds: bounds)
         })
     }

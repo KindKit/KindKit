@@ -35,13 +35,13 @@ public class ButtonView : IButtonView {
         set(value) { self._layout.inset = value }
         get { return self._layout.inset }
     }
-    public var width: DimensionBehaviour? {
+    public var width: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour? {
+    public var height: DynamicSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
@@ -130,8 +130,8 @@ public class ButtonView : IButtonView {
     
     public init(
         inset: InsetFloat = InsetFloat(horizontal: 4, vertical: 4),
-        width: DimensionBehaviour? = nil,
-        height: DimensionBehaviour? = nil,
+        width: DynamicSizeBehaviour = .fit,
+        height: DynamicSizeBehaviour = .fit,
         alignment: ButtonViewAlignment = .center,
         backgroundView: IView,
         spinnerPosition: ButtonViewSpinnerPosition = .fill,
@@ -191,26 +191,14 @@ public class ButtonView : IButtonView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        let size: SizeFloat
-        if let width = self.width, let height = self.height {
-            size = available.apply(width: width, height: height)
-        } else {
-            let viewSize = self._view.size(available: available)
-            if let widthBehaviour = self.width, let width = widthBehaviour.value(available.width) {
-                size = SizeFloat(
-                    width: width,
-                    height: viewSize.height
-                )
-            } else if let heightBehaviour = self.height, let height = heightBehaviour.value(available.height) {
-                size = SizeFloat(
-                    width: viewSize.width,
-                    height: height
-                )
-            } else {
-                size = viewSize
-            }
-        }
-        return size
+        return DynamicSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height,
+            sizeWithWidth: { return self._view.size(available: Size(width: $0, height: available.height)) },
+            sizeWithHeight: { return self._view.size(available: Size(width: available.width, height: $0)) },
+            size: { return self._view.size(available: available) }
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -244,13 +232,13 @@ public class ButtonView : IButtonView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour?) -> Self {
+    public func width(_ value: DynamicSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour?) -> Self {
+    public func height(_ value: DynamicSizeBehaviour) -> Self {
         self.height = value
         return self
     }

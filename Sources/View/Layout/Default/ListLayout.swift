@@ -140,7 +140,7 @@ public final class ListLayout : ILayout {
             self._operations.append(Helper.Operation(
                 type: .insert,
                 indices: Set< Int >(range: safeIndex ..< safeIndex + items.count),
-                progress: 0
+                progress: .zero
             ))
         } else {
             self.setNeedForceUpdate()
@@ -160,7 +160,7 @@ public final class ListLayout : ILayout {
             self._operations.append(Helper.Operation(
                 type: .delete,
                 indices: Set< Int >(range: range),
-                progress: 0
+                progress: .zero
             ))
         } else {
             self._items.removeSubrange(range)
@@ -177,7 +177,7 @@ public final class ListLayout : ILayout {
                 self._operations.append(Helper.Operation(
                     type: .delete,
                     indices: Set< Int >(indices),
-                    progress: 0
+                    progress: .zero
                 ))
             } else {
                 for index in indices.reversed() {

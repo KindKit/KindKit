@@ -237,12 +237,12 @@ public extension ListLayout.Helper {
         
         public var type: OperationType
         public var indices: Set< Int >
-        public var progress: Float
+        public var progress: PercentFloat
         
         public init(
             type: OperationType,
             indices: Set< Int >,
-            progress: Float
+            progress: PercentFloat
         ) {
             self.type = type
             self.indices = indices
@@ -307,8 +307,8 @@ private extension ListLayout.Helper.Operation {
     func _process(itemSize: SizeFloat, keyPath: WritableKeyPath< SizeFloat, Float >) -> SizeFloat {
         var result = itemSize
         switch self.type {
-        case .insert: result[keyPath: keyPath] = result[keyPath: keyPath] * self.progress
-        case .delete: result[keyPath: keyPath] = result[keyPath: keyPath] * (1 - self.progress)
+        case .insert: result[keyPath: keyPath] = result[keyPath: keyPath] * self.progress.value
+        case .delete: result[keyPath: keyPath] = result[keyPath: keyPath] * self.progress.invert.value
         }
         return result
     }

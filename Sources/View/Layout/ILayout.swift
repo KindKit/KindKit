@@ -68,6 +68,12 @@ public extension ILayout {
     }
     
     @inlinable
+    func update() {
+        self.delegate?.setNeedUpdate(self)
+        self.delegate?.updateIfNeeded(self)
+    }
+    
+    @inlinable
     func invalidate(item: LayoutItem) {
     }
     

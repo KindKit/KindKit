@@ -36,11 +36,11 @@ public extension Animation.Ease {
         }
 
         public func perform(_ x: Float) -> Float {
-            if x < 1/2 {
+            if x < 1 / 2 {
                 return 16 * x * x * x * x * x
             } else {
                 let f = ((2 * x) - 2)
-                return  1/2 * f * f * f * f * f + 1
+                return  1 / 2 * f * f * f * f * f + 1
             }
         }
 

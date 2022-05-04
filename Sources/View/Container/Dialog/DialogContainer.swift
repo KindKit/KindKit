@@ -276,7 +276,7 @@ private extension DialogContainer {
     func _present(dialog: Item, animated: Bool, completion: (() -> Void)?) {
         self._current = dialog
         self._view.contentLayout.dialogItem = dialog
-        self._view.contentLayout.state = .present(progress: 0)
+        self._view.contentLayout.state = .present(progress: .zero)
         if let dialogSize = self._view.contentLayout.dialogSize {
             dialog.container.prepareShow(interactive: false)
             if animated == true {
@@ -328,7 +328,7 @@ private extension DialogContainer {
     
     func _dismiss(dialog: Item, animated: Bool, completion: (() -> Void)?) {
         self._view.contentLayout.dialogItem = dialog
-        self._view.contentLayout.state = .dismiss(progress: 0)
+        self._view.contentLayout.state = .dismiss(progress: .zero)
         if let dialogSize = self._view.contentLayout.dialogSize {
             dialog.container.prepareHide(interactive: false)
             if animated == true {
@@ -408,7 +408,7 @@ private extension DialogContainer {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     if let view = viewAlphable {
-                        view.alpha(1 - progress)
+                        view.alpha(progress.invert.value)
                     }
                     self._view.contentLayout.state = .dismiss(progress: baseProgress + progress)
                     self._view.contentLayout.updateIfNeeded()
@@ -423,10 +423,10 @@ private extension DialogContainer {
             )
         } else {
             Animation.default.run(
-                duration: TimeInterval((size * abs(baseProgress)) / self.animationVelocity),
+                duration: TimeInterval((size * abs(baseProgress.value)) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .dismiss(progress: baseProgress * (1 - progress))
+                    self._view.contentLayout.state = .dismiss(progress: baseProgress * progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -585,20 +585,20 @@ private extension DialogContainer {
                     let endRect = self._idleRect(bounds: availableBounds, dialog: dialog, size: size)
                     dialog.item.frame = beginRect.lerp(endRect, progress: progress)
                     if let view = dialog.item.view as? IViewAlphable {
-                        view.alpha = progress
+                        view.alpha = progress.value
                     }
                     if let backgroundView = dialog.backgroundView {
-                        backgroundView.alpha = progress
+                        backgroundView.alpha = progress.value
                     }
                 case .dismiss(let progress):
                     let beginRect = self._idleRect(bounds: availableBounds, dialog: dialog, size: size)
                     let endRect = self._dismissRect(bounds: availableBounds, dialog: dialog, size: size)
                     dialog.item.frame = beginRect.lerp(endRect, progress: progress)
                     if let view = dialog.item.view as? IViewAlphable {
-                        view.alpha = 1 - progress
+                        view.alpha = progress.invert.value
                     }
                     if let backgroundView = dialog.backgroundView {
-                        backgroundView.alpha = 1 - progress
+                        backgroundView.alpha = progress.invert.value
                     }
                 }
             }
@@ -631,8 +631,8 @@ private extension DialogContainer.Layout {
     
     enum State {
         case idle
-        case present(progress: Float)
-        case dismiss(progress: Float)
+        case present(progress: PercentFloat)
+        case dismiss(progress: PercentFloat)
     }
     
     @inline(__always)
@@ -749,13 +749,13 @@ private extension DialogContainer.Layout {
     }
     
     @inline(__always)
-    func _progress(dialog: DialogContainer.Item, size: SizeFloat, delta: PointFloat) -> Float {
+    func _progress(dialog: DialogContainer.Item, size: SizeFloat, delta: PointFloat) -> PercentFloat {
         let dialogOffset = self._offset(dialog: dialog, size: size, delta: delta)
         let dialogSize = self._size(dialog: dialog, size: size)
         if dialogOffset < 0 {
-            return dialogOffset / pow(dialogSize, 1.25)
+            return Percent(dialogOffset / pow(dialogSize, 1.25))
         }
-        return dialogOffset / dialogSize
+        return Percent(dialogOffset / dialogSize)
     }
     
 }

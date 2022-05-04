@@ -96,4 +96,8 @@ public extension IScalar {
         return ((1 - progress) * self) + (progress * to)
     }
     
+    func lerp(_ to: Self, progress: Percent< Self >) -> Self where Self : Hashable {
+        return self.lerp(to, progress: progress.value)
+    }
+    
 }

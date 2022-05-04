@@ -12,23 +12,13 @@ public enum ImageViewMode {
     case aspectFill
 }
 
-public protocol IImageView : IView, IViewColorable, IViewTintColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-    
-    var width: DimensionBehaviour? { set get }
-    
-    var height: DimensionBehaviour? { set get }
+public protocol IImageView : IView, IViewDynamicSizeBehavioural, IViewColorable, IViewTintColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var aspectRatio: Float? { set get }
     
     var image: Image { set get }
     
     var mode: ImageViewMode { set get }
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour?) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour?) -> Self
     
     @discardableResult
     func aspectRatio(_ value: Float?) -> Self

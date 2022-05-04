@@ -374,7 +374,7 @@ private extension BookContainer {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.contentLayout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: 0)
+                        self._view.contentLayout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             forward.container.prepareShow(interactive: false)
@@ -494,7 +494,7 @@ private extension BookContainer {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.contentLayout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: 0)
+                        self._view.contentLayout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             backward.container.prepareShow(interactive: false)
@@ -604,7 +604,7 @@ private extension BookContainer {
                 self._interactiveForward = self._forward
             }
             if let forward = self._interactiveForward {
-                let progress = max(0, absDeltaLocation / layoutSize.width)
+                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._view.contentLayout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
             } else {
                 self._view.contentLayout.state = .idle(current: current.bookItem)
@@ -615,7 +615,7 @@ private extension BookContainer {
                 self._interactiveBackward = self._backward
             }
             if let backward = self._interactiveBackward {
-                let progress = max(0, absDeltaLocation / layoutSize.width)
+                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._view.contentLayout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
             } else {
                 self._view.contentLayout.state = .idle(current: current.bookItem)
@@ -665,7 +665,7 @@ private extension BookContainer {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: 1 - progress)
+                    self._view.contentLayout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -679,7 +679,7 @@ private extension BookContainer {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._view.contentLayout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: 1 - progress)
+                    self._view.contentLayout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -836,8 +836,8 @@ private extension BookContainer.Layout {
     enum State {
         case empty
         case idle(current: LayoutItem)
-        case forward(current: LayoutItem, next: LayoutItem, progress: Float)
-        case backward(current: LayoutItem, next: LayoutItem, progress: Float)
+        case forward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
+        case backward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
     }
     
 }

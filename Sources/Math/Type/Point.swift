@@ -136,6 +136,11 @@ public extension Point {
         return Point(x: x, y: y)
     }
     
+    @inlinable
+    func lerp(_ to: Self, progress: Percent< ValueType >) -> Self {
+        return self.lerp(to, progress: progress.value)
+    }
+    
 }
 
 public extension Point {

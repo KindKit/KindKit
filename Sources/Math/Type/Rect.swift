@@ -376,6 +376,11 @@ public extension Rect {
         return Rect(origin: origin, size: size)
     }
     
+    @inlinable
+    func lerp(_ to: Self, progress: Percent< ValueType >) -> Self {
+        return self.lerp(to, progress: progress.value)
+    }
+    
 }
 
 public extension Rect {

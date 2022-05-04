@@ -118,6 +118,11 @@ public extension Size {
         return Size(width: width, height: height)
     }
     
+    @inlinable
+    func lerp(_ to: Self, progress: Percent< ValueType >) -> Self {
+        return self.lerp(to, progress: progress.value)
+    }
+    
 }
 
 public extension Size {

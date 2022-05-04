@@ -433,7 +433,7 @@ private extension PageContainer {
                     preparing: { [weak self] in
                         guard let self = self else { return }
                         self._barView.beginTransition()
-                        self._view.contentLayout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: 0)
+                        self._view.contentLayout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             forward.container.prepareShow(interactive: false)
@@ -545,7 +545,7 @@ private extension PageContainer {
                     preparing: { [weak self] in
                         guard let self = self else { return }
                         self._barView.beginTransition()
-                        self._view.contentLayout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: 0)
+                        self._view.contentLayout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: .zero)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             backward.container.prepareShow(interactive: false)
@@ -668,7 +668,7 @@ private extension PageContainer {
                 }
             }
             if let forward = self._interactiveForward {
-                let progress = max(0, absDeltaLocation / layoutSize.width)
+                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._barView.transition(to: forward.barView, progress: progress)
                 self._view.contentLayout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
             } else {
@@ -683,7 +683,7 @@ private extension PageContainer {
                 }
             }
             if let backward = self._interactiveBackward {
-                let progress = max(0, absDeltaLocation / layoutSize.width)
+                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._barView.transition(to: backward.barView, progress: progress)
                 self._view.contentLayout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
             } else {
@@ -738,8 +738,8 @@ private extension PageContainer {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._barView.transition(to: forward.barView, progress: 1 - progress)
-                    self._view.contentLayout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: 1 - progress)
+                    self._barView.transition(to: forward.barView, progress: progress.invert)
+                    self._view.contentLayout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -753,8 +753,8 @@ private extension PageContainer {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._barView.transition(to: backward.barView, progress: 1 - progress)
-                    self._view.contentLayout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: 1 - progress)
+                    self._barView.transition(to: backward.barView, progress: progress.invert)
+                    self._view.contentLayout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress.invert)
                     self._view.contentLayout.updateIfNeeded()
                 },
                 completion: { [weak self] in
@@ -953,8 +953,8 @@ private extension PageContainer.Layout {
     enum State {
         case empty
         case idle(current: LayoutItem)
-        case forward(current: LayoutItem, next: LayoutItem, progress: Float)
-        case backward(current: LayoutItem, next: LayoutItem, progress: Float)
+        case forward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
+        case backward(current: LayoutItem, next: LayoutItem, progress: PercentFloat)
     }
     
 }

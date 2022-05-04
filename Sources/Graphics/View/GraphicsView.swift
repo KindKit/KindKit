@@ -28,14 +28,14 @@ public class GraphicsView : IGraphicsView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DimensionBehaviour {
+    public var width: StaticSizeBehaviour {
         didSet(oldValue) {
             guard self.width != oldValue else { return }
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DimensionBehaviour {
+    public var height: StaticSizeBehaviour {
         didSet(oldValue) {
             guard self.height != oldValue else { return }
             guard self.isLoaded == true else { return }
@@ -91,8 +91,8 @@ public class GraphicsView : IGraphicsView {
     private var _onChangeStyle: ((_ userIteraction: Bool) -> Void)?
     
     public init(
-        width: DimensionBehaviour,
-        height: DimensionBehaviour,
+        width: StaticSizeBehaviour,
+        height: StaticSizeBehaviour,
         canvas: IGraphicsCanvas,
         isLocked: Bool = false,
         color: Color? = nil,
@@ -122,7 +122,11 @@ public class GraphicsView : IGraphicsView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return available.apply(width: self.width, height: self.height)
+        return StaticSizeBehaviour.apply(
+            available: available,
+            width: self.width,
+            height: self.height
+        )
     }
     
     public func appear(to layout: ILayout) {
@@ -160,13 +164,13 @@ public class GraphicsView : IGraphicsView {
     }
     
     @discardableResult
-    public func width(_ value: DimensionBehaviour) -> Self {
+    public func width(_ value: StaticSizeBehaviour) -> Self {
         self.width = value
         return self
     }
     
     @discardableResult
-    public func height(_ value: DimensionBehaviour) -> Self {
+    public func height(_ value: StaticSizeBehaviour) -> Self {
         self.height = value
         return self
     }

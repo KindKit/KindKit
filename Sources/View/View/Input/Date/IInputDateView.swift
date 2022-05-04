@@ -12,11 +12,7 @@ public enum InputDateViewMode {
     case dateTime
 }
 
-public protocol IInputDateView : IInputView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-
-    var width: DimensionBehaviour { set get }
-    
-    var height: DimensionBehaviour { set get }
+public protocol IInputDateView : IInputView, IViewStaticSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var mode: InputDateViewMode { set get }
     
@@ -51,12 +47,6 @@ public protocol IInputDateView : IInputView, IViewColorable, IViewBorderable, IV
     var toolbar: IInputToolbarView? { set get }
     
     #endif
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
     
     @discardableResult
     func mode(_ value: InputDateViewMode) -> Self

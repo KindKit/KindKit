@@ -120,8 +120,6 @@ open class InputToolbarView : IInputToolbarView {
     private var _onDisappear: (() -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
         items: [IInputToolbarItem],
         size: Float = 55,
         isTranslucent: Bool = false,
@@ -135,7 +133,7 @@ open class InputToolbarView : IInputToolbarView {
         self.barTintColor = barTintColor
         self.contentTintColor = contentTintColor
         self.color = color
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     

@@ -6,11 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public protocol IInputStringView : IInputView, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
-
-    var width: DimensionBehaviour { set get }
-    
-    var height: DimensionBehaviour { set get }
+public protocol IInputStringView : IInputView, IViewStaticSizeBehavioural, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
     
     var text: String { set get }
     
@@ -35,12 +31,6 @@ public protocol IInputStringView : IInputView, IViewColorable, IViewBorderable, 
     var keyboard: InputKeyboard? { set get }
     
     #endif
-    
-    @discardableResult
-    func width(_ value: DimensionBehaviour) -> Self
-    
-    @discardableResult
-    func height(_ value: DimensionBehaviour) -> Self
     
     @discardableResult
     func text(_ value: String) -> Self

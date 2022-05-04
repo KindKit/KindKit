@@ -111,8 +111,6 @@ public class RateView : IRateView {
     private var _onInvisible: (() -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
         itemSize: SizeFloat,
         itemSpacing: Float,
         numberOfItem: UInt,
@@ -139,7 +137,7 @@ public class RateView : IRateView {
         self.shadow = shadow
         self.alpha = alpha
         self.isHidden = isHidden
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     
