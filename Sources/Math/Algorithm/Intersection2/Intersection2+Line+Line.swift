@@ -18,7 +18,8 @@ public extension Intersection2.LineToLine {
     
     struct Location : Equatable {
         
-        public let range: Intersection2.RangeType
+        public let parameter1: ValueType
+        public let parameter2: ValueType
         public let point: Intersection2.PointType
         
     }
@@ -49,7 +50,8 @@ public extension Intersection2 {
             let s1 = oddp2 / dp
             let s2 = oddp1 / dp
             return .point(.init(
-                range: RangeType(lower: s1, upper: s2),
+                parameter1: s1,
+                parameter2: s2,
                 point: line1.origin + s1 * line1.direction
             ))
         }
@@ -58,6 +60,20 @@ public extension Intersection2 {
             return .parallel
         }
         return .none
+    }
+    
+}
+
+public extension Line2 {
+    
+    @inlinable
+    func isIntersects(_ other: Self) -> Bool {
+        return Intersection2.possibly(self, other)
+    }
+    
+    @inlinable
+    func intersection(_ other: Self) -> Intersection2< ValueType >.LineToLine {
+        return Intersection2.find(self, other)
     }
     
 }

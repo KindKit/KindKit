@@ -57,7 +57,7 @@ public extension Intersection2 {
             case .one, .two: return true
             }
         case .point(let data):
-            if data.range.lower.abs <= cf1.extend && data.range.upper.abs <= cf2.extend {
+            if data.parameter1.abs <= cf1.extend && data.parameter2.abs <= cf2.extend {
                 return true
             }
             return false
@@ -87,11 +87,25 @@ public extension Intersection2 {
                 return .two(cf1.center + value1 * cf1.direction, cf1.center + value2 * cf1.direction)
             }
         case .point(let data):
-            if data.range.lower.abs <= cf1.extend && data.range.upper.abs <= cf2.extend {
+            if data.parameter1.abs <= cf1.extend && data.parameter2.abs <= cf2.extend {
                 return .one(data.point)
             }
             return .none
         }
+    }
+    
+}
+
+public extension Segment2 {
+    
+    @inlinable
+    func isIntersects(_ other: Self) -> Bool {
+        return Intersection2.possibly(self, other)
+    }
+    
+    @inlinable
+    func intersection(_ other: Self) -> Intersection2< ValueType >.SegmentToSegment {
+        return Intersection2.find(self, other)
     }
     
 }

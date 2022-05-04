@@ -80,6 +80,8 @@ extension LogUI {
         }()
         private(set) lazy var _autoScrollButton: ButtonView = {
             let backgroundView = EmptyView(
+                width: .fill,
+                height: .fill,
                 color: Color(rgb: 0xFFCF38),
                 cornerRadius: .manual(radius: 4)
             )
@@ -90,7 +92,7 @@ extension LogUI {
             )
             let button = ButtonView(
                 inset: InsetFloat(horizontal: 12, vertical: 4),
-                height: .fixed(44),
+                height: .static(.fixed(44)),
                 backgroundView: backgroundView,
                 textView: textView,
                 isSelected: true
@@ -110,6 +112,8 @@ extension LogUI {
         }()
         private(set) lazy var _closeButton: ButtonView = {
             let backgroundView = EmptyView(
+                width: .fill,
+                height: .fill,
                 color: Color(rgb: 0xA9AEBA),
                 cornerRadius: .manual(radius: 4)
             )
@@ -120,7 +124,7 @@ extension LogUI {
             )
             let button = ButtonView(
                 inset: InsetFloat(horizontal: 12, vertical: 4),
-                height: .fixed(44),
+                height: .static(.fixed(44)),
                 backgroundView: backgroundView,
                 textView: textView
             )

@@ -43,6 +43,8 @@ extension LogUI {
         
         init() {
             self._backgroundView = EmptyView(
+                width: .fill,
+                height: .fill,
                 color: Color(rgba: 0x0000007a)
             )
         }

@@ -70,3 +70,31 @@ fileprivate extension Intersection2 {
     }
     
 }
+
+public extension Line2 {
+    
+    @inlinable
+    func isIntersects(_ other: Box2< ValueType >) -> Bool {
+        return Intersection2.possibly(self, other)
+    }
+    
+    @inlinable
+    func intersection(_ other: Box2< ValueType >) -> Intersection2< ValueType >.LineToBox {
+        return Intersection2.find(self, other)
+    }
+    
+}
+
+public extension Box2 {
+    
+    @inlinable
+    func isIntersects(_ other: Line2< ValueType >) -> Bool {
+        return Intersection2.possibly(other, self)
+    }
+    
+    @inlinable
+    func intersection(_ other: Line2< ValueType >) -> Intersection2< ValueType >.LineToBox {
+        return Intersection2.find(other, self)
+    }
+    
+}

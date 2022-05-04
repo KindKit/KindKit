@@ -35,36 +35,6 @@ public extension Line2 {
 public extension Line2 {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func intersection(_ other: Self) -> Intersection2< ValueType >.LineToLine {
-        return Intersection2.find(self, other)
-    }
-    
-    @inlinable
-    func isIntersects(_ other: Circle< ValueType >) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func intersection(_ other: Circle< ValueType >) -> Intersection2< ValueType >.LineToCircle {
-        return Intersection2.find(self, other)
-    }
-    
-    @inlinable
-    func isIntersects(_ other: Box2< ValueType >) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func intersection(_ other: Box2< ValueType >) -> Intersection2< ValueType >.LineToBox {
-        return Intersection2.find(self, other)
-    }
-    
-    @inlinable
     func perpendicular(_ point: Point< ValueType >) -> Point< ValueType > {
         let n = self.direction.dot(point - self.origin)
         let d = self.direction.dot(self.direction)

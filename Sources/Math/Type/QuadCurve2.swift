@@ -43,15 +43,6 @@ public extension QuadCurve2 {
     
 }
 
-public extension QuadCurve2 {
-    
-    @inlinable
-    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
-        return Closest2.find(point, self)
-    }
-    
-}
-
 extension QuadCurve2 : ICurve2 {
     
     public var isSimple: Bool {

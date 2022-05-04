@@ -30,3 +30,20 @@ public extension Intersection2 {
     }
     
 }
+
+public extension Box2 {
+    
+    @inlinable
+    func isIntersects(_ other: Self) -> Bool {
+        return Intersection2.possibly(self, other)
+    }
+    
+    @inlinable
+    func intersection(_ other: Self) -> Self? {
+        switch Intersection2.find(self, other) {
+        case .none: return nil
+        case .box(let box): return box
+        }
+    }
+    
+}

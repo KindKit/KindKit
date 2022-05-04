@@ -134,21 +134,6 @@ public extension Box2 {
     }
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func isIntersects(_ other: Line2< ValueType >) -> Bool {
-        return Intersection2.possibly(other, self)
-    }
-    
-    @inlinable
-    func intersection(_ other: Line2< ValueType >) -> Intersection2< ValueType >.LineToBox {
-        return Intersection2.find(other, self)
-    }
-    
-    @inlinable
     func union(_ other: Self) -> Self {
         return Box2(
             lower: self.lower.min(other.lower),
@@ -162,14 +147,6 @@ public extension Box2 {
             lower: self.lower.min(other),
             upper: self.upper.max(other)
         )
-    }
-    
-    @inlinable
-    func intersection(_ other: Self) -> Self? {
-        switch Intersection2.find(self, other) {
-        case .none: return nil
-        case .box(let box): return box
-        }
     }
     
     @inlinable

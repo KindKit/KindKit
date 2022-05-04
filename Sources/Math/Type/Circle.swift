@@ -40,14 +40,4 @@ public extension Circle {
         return distance.real.abs <= self.radius
     }
     
-    @inlinable
-    func isIntersects(_ other: Self) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func intersection(_ other: Self) -> Intersection2< ValueType >.CircleToCircle {
-        return Intersection2.find(self, other)
-    }
-    
 }

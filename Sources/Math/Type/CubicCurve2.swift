@@ -70,15 +70,6 @@ public extension CubicCurve2 {
     
 }
 
-public extension CubicCurve2 {
-    
-    @inlinable
-    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
-        return Closest2.find(point, self)
-    }
-    
-}
-
 extension CubicCurve2 : ICurve2 {
     
     public var isSimple: Bool {

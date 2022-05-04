@@ -61,21 +61,6 @@ public extension Segment2 {
 public extension Segment2 {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
-        return Intersection2.possibly(self, other)
-    }
-    
-    @inlinable
-    func intersection(_ other: Self) -> Intersection2< ValueType >.SegmentToSegment {
-        return Intersection2.find(self, other)
-    }
-    
-    @inlinable
-    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
-        return Closest2.find(point, self)
-    }
-    
-    @inlinable
     func direction(_ point: Point< ValueType >) -> ValueType {
         let d = self.end - self.start
         let p = point - self.start

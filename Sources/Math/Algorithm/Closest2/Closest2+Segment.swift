@@ -15,3 +15,12 @@ public extension Closest2 {
     }
     
 }
+
+public extension Segment2 {
+    
+    @inlinable
+    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
+        return Closest2.find(point, self)
+    }
+    
+}

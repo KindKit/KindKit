@@ -45,3 +45,31 @@ public extension Intersection2 {
     }
     
 }
+
+public extension Line2 {
+    
+    @inlinable
+    func isIntersects(_ other: Circle< ValueType >) -> Bool {
+        return Intersection2.possibly(self, other)
+    }
+    
+    @inlinable
+    func intersection(_ other: Circle< ValueType >) -> Intersection2< ValueType >.LineToCircle {
+        return Intersection2.find(self, other)
+    }
+    
+}
+
+public extension Circle {
+    
+    @inlinable
+    func isIntersects(_ other: Line2< ValueType >) -> Bool {
+        return Intersection2.possibly(other, self)
+    }
+    
+    @inlinable
+    func intersection(_ other: Line2< ValueType >) -> Intersection2< ValueType >.LineToCircle {
+        return Intersection2.find(other, self)
+    }
+    
+}
