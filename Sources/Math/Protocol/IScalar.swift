@@ -43,7 +43,9 @@ public protocol IScalar : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral
     
     func atan2(_ other: Self) -> Self
     
+    static prefix func + (arg: Self) -> Self
     static prefix func - (arg: Self) -> Self
+    
     static func + (lhs: Self, rhs: Self) -> Self
     static func += (lhs: inout Self, rhs: Self)
     static func - (lhs: Self, rhs: Self) -> Self

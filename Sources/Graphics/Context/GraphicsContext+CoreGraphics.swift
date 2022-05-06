@@ -38,81 +38,64 @@ public extension GraphicsContext {
 
 public extension GraphicsContext {
     
-    func apply(
-        matrix: Matrix3Float? = nil,
-        alpha: Float? = nil,
+    func apply< ValueType : IScalar >(
+        matrix: Matrix3< ValueType >? = nil,
+        alpha: ValueType? = nil,
         fill: GraphicsFill? = nil,
         stroke: GraphicsStroke? = nil,
         block: () -> Void
     ) {
         self._instance.saveGState()
         if let matrix = matrix {
-            self._instance.concatenate(matrix.cgAffineTransform)
+            self._apply(matrix: matrix)
         }
         if let alpha = alpha {
-            self._instance.setAlpha(CGFloat(alpha))
+            self._apply(alpha: alpha)
         }
         if let fill = fill {
-            switch fill {
-            case .color(let color):
-                self._instance.setFillColor(color.cgColor)
-            case .pattern(let pattern):
-                if let cgPattern = pattern.cgPattern {
-                    var alpha: CGFloat = 1.0
-                    if let cs = CGColorSpace(patternBaseSpace: nil) {
-                        self._instance.setFillColorSpace(cs)
-                    }
-                    self._instance.setFillPattern(cgPattern, colorComponents: &alpha)
-                }
-            }
+            self._apply(fill: fill)
         }
         if let stroke = stroke {
-            self._instance.setLineWidth(stroke.width.cgFloat)
-            self._instance.setLineJoin(stroke.join.cgLineJoin)
-            self._instance.setLineCap(stroke.cap.cgLineCap)
-            if let dash = stroke.dash {
-                self._instance.setLineDash(
-                    phase: dash.phase.cgFloat,
-                    lengths: dash.lengths.compactMap({ $0.cgFloat })
-                )
-            } else {
-                self._instance.setLineDash(phase: 0, lengths: [])
-            }
-            switch stroke.fill {
-            case .color(let color):
-                self._instance.setStrokeColor(color.cgColor)
-            case .pattern(let pattern):
-                if let cgPattern = pattern.cgPattern {
-                    var alpha: CGFloat = 1.0
-                    if let cs = CGColorSpace(patternBaseSpace: nil) {
-                        self._instance.setStrokeColorSpace(cs)
-                    }
-                    self._instance.setStrokePattern(cgPattern, colorComponents: &alpha)
-                }
-            }
+            self._apply(stroke: stroke)
         }
         block()
         self._instance.restoreGState()
     }
     
-    func draw(
-        circle: CircleFloat,
+    func apply(
+        fill: GraphicsFill? = nil,
+        stroke: GraphicsStroke? = nil,
+        block: () -> Void
+    ) {
+        self._instance.saveGState()
+        if let fill = fill {
+            self._apply(fill: fill)
+        }
+        if let stroke = stroke {
+            self._apply(stroke: stroke)
+        }
+        block()
+        self._instance.restoreGState()
+    }
+    
+    func draw< ValueType : IScalar >(
+        circle: Circle< ValueType >,
         mode: GraphicsDrawMode
     ) {
         self._instance.saveGState()
         self._instance.beginPath()
         self._instance.addEllipse(in: CGRect(
-            x: CGFloat(circle.origin.x - circle.radius),
-            y: CGFloat(circle.origin.y - circle.radius),
-            width: CGFloat(circle.radius * 2),
-            height: CGFloat(circle.radius * 2)
+            x: (circle.origin.x - circle.radius).cgFloat,
+            y: (circle.origin.y - circle.radius).cgFloat,
+            width: (circle.radius * 2).cgFloat,
+            height: (circle.radius * 2).cgFloat
         ))
         self._draw(mode: mode)
         self._instance.restoreGState()
     }
     
-    func draw(
-        circles: [CircleFloat],
+    func draw< ValueType : IScalar >(
+        circles: [Circle< ValueType >],
         mode: GraphicsDrawMode
     ) {
         guard circles.isEmpty == false else { return }
@@ -121,10 +104,10 @@ public extension GraphicsContext {
         for index in circles.indices {
             let circle = circles[index]
             self._instance.addEllipse(in: CGRect(
-                x: CGFloat(circle.origin.x - circle.radius),
-                y: CGFloat(circle.origin.y - circle.radius),
-                width: CGFloat(circle.radius * 2),
-                height: CGFloat(circle.radius * 2)
+                x: (circle.origin.x - circle.radius).cgFloat,
+                y: (circle.origin.y - circle.radius).cgFloat,
+                width: (circle.radius * 2).cgFloat,
+                height: (circle.radius * 2).cgFloat
             ))
         }
         if self._instance.isPathEmpty == false {
@@ -133,8 +116,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
-        segment: Segment2Float
+    func draw< ValueType : IScalar >(
+        segment: Segment2< ValueType >
     ) {
         self._instance.saveGState()
         self._instance.beginPath()
@@ -144,8 +127,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
-        segments: [Segment2Float]
+    func draw< ValueType : IScalar >(
+        segments: [Segment2< ValueType >]
     ) {
         guard segments.isEmpty == false else { return }
         self._instance.saveGState()
@@ -158,8 +141,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
-        polyline: Polyline2Float,
+    func draw< ValueType : IScalar >(
+        polyline: Polyline2< ValueType >,
         mode: GraphicsDrawMode
     ) {
         guard polyline.corners.isEmpty == false else { return }
@@ -176,8 +159,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
-        polygon: Polygon2Float,
+    func draw< ValueType : IScalar >(
+        polygon: Polygon2< ValueType >,
         mode: GraphicsDrawMode
     ) {
         guard polygon.countours.isEmpty == false else { return }
@@ -197,8 +180,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
-        path: Path2Float,
+    func draw< ValueType : IScalar >(
+        path: Path2< ValueType >,
         mode: GraphicsDrawMode
     ) {
         guard path.elements.isEmpty == false else { return }
@@ -244,17 +227,17 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw(
+    func draw< ValueType : IScalar >(
         text: NSAttributedString,
-        rect: RectFloat
+        rect: Rect< ValueType >
     ) {
         self._instance.saveGState()
         text.draw(with: rect.cgRect, options: [ .usesLineFragmentOrigin, .usesFontLeading ], context: nil)
         self._instance.restoreGState()
     }
 
-    func clear(
-        rect: RectFloat
+    func clear< ValueType : IScalar >(
+        rect: Rect< ValueType >
     ) {
         self._instance.clear(rect.cgRect)
     }
@@ -262,6 +245,67 @@ public extension GraphicsContext {
 }
 
 private extension GraphicsContext {
+    
+    @inline(__always)
+    func _apply< ValueType : IScalar >(
+        matrix: Matrix3< ValueType >
+    ) {
+        self._instance.concatenate(matrix.cgAffineTransform)
+    }
+    
+    @inline(__always)
+    func _apply< ValueType : IScalar >(
+        alpha: ValueType
+    ) {
+        self._instance.setAlpha(alpha.cgFloat)
+    }
+    
+    @inline(__always)
+    func _apply(
+        fill: GraphicsFill
+    ) {
+        switch fill {
+        case .color(let color):
+            self._instance.setFillColor(color.cgColor)
+        case .pattern(let pattern):
+            if let cgPattern = pattern.cgPattern {
+                var alpha: CGFloat = 1.0
+                if let cs = CGColorSpace(patternBaseSpace: nil) {
+                    self._instance.setFillColorSpace(cs)
+                }
+                self._instance.setFillPattern(cgPattern, colorComponents: &alpha)
+            }
+        }
+    }
+    
+    @inline(__always)
+    func _apply(
+        stroke: GraphicsStroke
+    ) {
+        self._instance.setLineWidth(stroke.width.cgFloat)
+        self._instance.setLineJoin(stroke.join.cgLineJoin)
+        self._instance.setLineCap(stroke.cap.cgLineCap)
+        if let dash = stroke.dash {
+            self._instance.setLineDash(
+                phase: dash.phase.cgFloat,
+                lengths: dash.lengths.compactMap({ $0.cgFloat })
+            )
+        } else {
+            self._instance.setLineDash(phase: 0, lengths: [])
+        }
+        switch stroke.fill {
+        case .color(let color):
+            self._instance.setStrokeColor(color.cgColor)
+        case .pattern(let pattern):
+            if let cgPattern = pattern.cgPattern {
+                var alpha: CGFloat = 1.0
+                if let cs = CGColorSpace(patternBaseSpace: nil) {
+                    self._instance.setStrokeColorSpace(cs)
+                }
+                self._instance.setStrokePattern(cgPattern, colorComponents: &alpha)
+            }
+        }
+    }
     
     @inline(__always)
     func _draw(
