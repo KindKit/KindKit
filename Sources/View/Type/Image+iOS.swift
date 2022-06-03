@@ -131,6 +131,22 @@ public struct Image : Equatable {
 
 public extension Image {
     
+    var grayscale: Image? {
+        let context = CIContext(options: nil)
+        guard let filter = CIFilter(name: "CIPhotoEffectNoir") else {
+            return nil
+        }
+        filter.setValue(CIImage(image: self.native), forKey: kCIInputImageKey)
+        if let output = filter.outputImage, let cgImage = context.createCGImage(output, from: output.extent) {
+            return Image(UIImage(cgImage: cgImage, scale: self.native.scale, orientation: self.native.imageOrientation))
+        }
+        return nil
+    }
+    
+}
+
+public extension Image {
+    
     func pngData() -> Data? {
         return self.native.pngData()
     }
