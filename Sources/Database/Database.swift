@@ -9,6 +9,7 @@ import SQLite3
 public class Database {
     
     public enum Error : Swift.Error {
+        case userVersion
         case sqlite(code: Int, message: String?)
         case sqliteQuery(code: Int)
         case columnNotFound(name: String)
@@ -233,11 +234,22 @@ public extension Database {
         try statement.executeUntilDone()
     }
     
+    func set< EncoderType : IEnumEncodable >(_ encoder: EncoderType.Type, userVersion: EncoderType.RealValue) throws where EncoderType.RawValue : BinaryInteger {
+        try self.set(userVersion: Int(EncoderType(realValue: userVersion).rawValue))
+    }
+    
     func userVersion() throws -> Int {
         let query = "PRAGMA USER_VERSION"
         let statement = try self.statement(query: query)
         try statement.executeUntilRow()
         return Int(statement.value(at: 0))
+    }
+    
+    func userVersion< DecoderType : IEnumDecodable >(_ decoder: DecoderType.Type) throws -> DecoderType.RealValue where DecoderType.RawValue == Int {
+        guard let decoded = DecoderType(rawValue: DecoderType.RawValue(try self.userVersion())) else {
+            throw Error.userVersion
+        }
+        return decoded.realValue
     }
     
     func create(table: Table, ifNotExists: Bool = false) throws {

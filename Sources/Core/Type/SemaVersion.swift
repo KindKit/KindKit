@@ -138,8 +138,10 @@ private extension SemaVersion {
         (?<major>0|[1-9]\d*)
         \.
         (?<minor>0|[1-9]\d*)
-        \.
-        (?<patch>0|[1-9]\d*)
+        (?:
+          \.
+          (?<patch>0|[1-9]\d*)
+        )?
         (?:-
           (?<prerelease>
             (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
@@ -164,8 +166,8 @@ private extension SemaVersion {
             return ""
         }
         guard groups.count == regex.numberOfCaptureGroups else { return nil }
-        guard let major = Int(groups[0]), let minor = Int(groups[1]), let patch = Int(groups[2]) else { return nil }
-        return SemaVersion(major, minor, patch, groups[3], groups[4])
+        guard let major = Int(groups[0]), let minor = Int(groups[1]) else { return nil }
+        return SemaVersion(major, minor, Int(groups[2]) ?? 0, groups[3], groups[4])
     }
     
 }

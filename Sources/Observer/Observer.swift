@@ -21,8 +21,10 @@ public final class Observer< T > {
 }
 
 public enum ObserverPriority : UInt {
-    case utility
-    case userInitiated
+    
+    case `internal`
+    case `public`
+    
 }
 
 public extension Observer {

@@ -61,10 +61,6 @@ extension NSNumber : IDebug {}
 extension URL : IDebug {}
 extension NSURL : IDebug {}
 
-//
-// MARK: Extension IDebug
-//
-
 extension Optional : IDebug {
 
     public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {

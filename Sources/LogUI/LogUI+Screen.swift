@@ -148,7 +148,7 @@ extension LogUI {
         }
         
         func setup() {
-            self.target.add(observer: self, priority: .userInitiated)
+            self.target.add(observer: self, priority: .public)
         }
         
         func destroy() {

@@ -49,7 +49,7 @@ public class ViewController : UIViewController {
         super.init(nibName: nil, bundle: nil)
         
         self.container.delegate = self
-        self._virtualKeyboard.add(observer: self, priority: .userInitiated)
+        self._virtualKeyboard.add(observer: self, priority: .public)
         ContainerBarController.shared.add(observer: self)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)

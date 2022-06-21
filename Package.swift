@@ -27,6 +27,7 @@ let package = Package(
         .library(name: "KindKitRemoteImageView", type: .static, targets: [ "KindKitRemoteImageView" ]),
         .library(name: "KindKitShell", type: .static, targets: [ "KindKitShell" ]),
         .library(name: "KindKitUndoRedo", type: .static, targets: [ "KindKitUndoRedo" ]),
+        .library(name: "KindKitUserDefaults", type: .static, targets: [ "KindKitUserDefaults" ]),
         .library(name: "KindKitView", type: .static, targets: [ "KindKitView" ]),
         .library(name: "KindKitXml", type: .static, targets: [ "KindKitXml" ])
     ],
@@ -39,6 +40,11 @@ let package = Package(
         .target(
             name: "KindKitCore",
             path: "Sources/Core"
+        ),
+        .testTarget(
+            name: "KindKitCore-Tests",
+            dependencies: [ .target(name: "KindKitCore") ],
+            path: "Sources/Core-Tests"
         ),
         .target(
             name: "KindKitDatabase",
@@ -119,6 +125,11 @@ let package = Package(
             name: "KindKitUndoRedo",
             dependencies: [ .target(name: "KindKitCore"), .target(name: "KindKitObserver") ],
             path: "Sources/UndoRedo"
+        ),
+        .target(
+            name: "KindKitUserDefaults",
+            dependencies: [ .target(name: "KindKitCore") ],
+            path: "Sources/UserDefaults"
         ),
         .target(
             name: "KindKitView",

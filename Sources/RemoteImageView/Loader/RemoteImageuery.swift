@@ -38,7 +38,7 @@ public class RemoteImageQuery : IRemoteImageQuery {
             request: Request(url: self.url),
             response: Response(),
             download: download,
-            completed: { request, response in
+            completed: { response in
                 if let error = response.error {
                     failure(error)
                 } else {
@@ -55,7 +55,7 @@ private extension RemoteImageQuery {
     class Request : ApiRequest {
         
         init(url: URL) {
-            super.init(method: "GET", path: .absolute(url))
+            super.init(method: .get, path: .absolute(url))
         }
         
     }

@@ -7,14 +7,14 @@ import KindKitCore
 
 open class ApiRequest : IApiRequest {
 
-    public var method: String
+    public var method: Method
     public var path: Path
     public var queryParams: [String: Any]
     public var trimArraySymbolsQueryParams: Bool
     public var headers: [String: String]
     public var bodyData: Data?
     public var bodyParams: [String: Any]?
-    public var uploadItems: [ApiRequestUploadItem]?
+    public var uploadItems: [UploadItem]?
 
     public var timeout: TimeInterval
     public var retries: TimeInterval
@@ -26,14 +26,14 @@ open class ApiRequest : IApiRequest {
     #endif
 
     public init(
-        method: String,
+        method: Method,
         path: Path,
         queryParams: [String: Any] = [:],
         trimArraySymbolsQueryParams: Bool = false,
         headers: [String: String] = [:],
         bodyData: Data? = nil,
         bodyParams: [String: Any]? = nil,
-        uploadItems: [ApiRequestUploadItem]? = nil,
+        uploadItems: [UploadItem]? = nil,
         timeout: TimeInterval = 30,
         retries: TimeInterval = 0,
         delay: TimeInterval = 1,
@@ -120,7 +120,13 @@ open class ApiRequest : IApiRequest {
                 var rawHeaders: [String: String] = [:]
                 headers.forEach({ rawHeaders[$0.0] = $0.1 })
                 var urlRequest = URLRequest(url: url)
-                urlRequest.httpMethod = self.method
+                switch self.method {
+                case .get: urlRequest.httpMethod = "GET"
+                case .post: urlRequest.httpMethod = "POST"
+                case .put: urlRequest.httpMethod = "PUT"
+                case .delete: urlRequest.httpMethod = "DELETE"
+                case .custom(let name): urlRequest.httpMethod = name
+                }
                 urlRequest.cachePolicy = self.cachePolicy
                 urlRequest.timeoutInterval = self.timeout
                 urlRequest.allHTTPHeaderFields = rawHeaders
@@ -149,9 +155,50 @@ open class ApiRequest : IApiRequest {
 
 public extension ApiRequest {
     
+    enum Method {
+        case get
+        case post
+        case put
+        case delete
+        case custom(_ name: String)
+    }
+    
     enum Path {
         case absolute(_ url: URL)
         case relative(_ url: String)
+    }
+    
+    struct UploadItem {
+
+        public let name: String
+        public let filename: String?
+        public let mimetype: String?
+        public let data: Data
+
+        public init(
+            name: String,
+            filename: String? = nil,
+            mimetype: String? = nil,
+            data: Data
+        ) {
+            self.name = name
+            self.filename = filename
+            self.mimetype = mimetype
+            self.data = data
+        }
+        
+        public init(
+            name: String,
+            filename: String? = nil,
+            mimetype: String? = nil,
+            build: @autoclosure () throws -> Data
+        ) rethrows {
+            self.name = name
+            self.filename = filename
+            self.mimetype = mimetype
+            self.data = try build()
+        }
+
     }
     
 }
@@ -495,31 +542,9 @@ extension ApiRequest : IDebug {
     
 }
 
-#endif
+extension ApiRequest.UploadItem : IDebug {
 
-// MARK: ApiRequestUploadItem
-
-open class ApiRequestUploadItem {
-
-    public private(set) var name: String
-    public private(set) var filename: String?
-    public private(set) var mimetype: String?
-    public private(set) var data: Data
-
-    public init(name: String, filename: String? = nil, mimetype: String? = nil, data: Data) {
-        self.name = name
-        self.filename = filename
-        self.mimetype = mimetype
-        self.data = data
-    }
-
-}
-
-#if DEBUG
-
-extension ApiRequestUploadItem : IDebug {
-
-    open func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
+    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
         let nextIndent = indent + 1
 
         if headerIndent > 0 {

@@ -20,10 +20,8 @@ public struct ApiRequestRedirectOption : OptionSet {
 
 public protocol IApiRequest : AnyObject {
 
-    var timeout: TimeInterval { get }
     var retries: TimeInterval { get }
     var delay: TimeInterval { get }
-    var cachePolicy: URLRequest.CachePolicy { get }
     var redirect: ApiRequestRedirectOption { get }
     #if DEBUG
     var logging: ApiLogging { get }
