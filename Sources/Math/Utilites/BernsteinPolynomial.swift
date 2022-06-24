@@ -6,21 +6,21 @@ import Foundation
 
 protocol IBernsteinPolynomial : Equatable {
     
-    associatedtype LowerOrderPolynomialType: IBernsteinPolynomial
+    associatedtype LowerOrderPolynomial: IBernsteinPolynomial
     
     var order: Int { get }
     var coefficients: [Double] { get }
-    var derivative: LowerOrderPolynomialType { get }
+    var derivative: LowerOrderPolynomial { get }
     
     func value(at: Double) -> Double
     func reduce(a1: Double, a2: Double) -> Double
-    func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType
+    func difference(a1: Double, a2: Double) -> LowerOrderPolynomial
     
 }
 
 extension IBernsteinPolynomial {
     
-    var derivative: LowerOrderPolynomialType {
+    var derivative: LowerOrderPolynomial {
         let order = Double(self.order)
         return self.difference(a1: -order, a2: order)
     }
@@ -45,7 +45,7 @@ struct BernsteinPolynomial {
     
     struct Zero : IBernsteinPolynomial, IBernsteinPolynomialAnalyticalRoots {
         
-        typealias LowerOrderPolynomialType = Zero
+        typealias LowerOrderPolynomial = Zero
         
         var b0: Double
         var order: Int {
@@ -67,8 +67,8 @@ struct BernsteinPolynomial {
             return 0
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(0)
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(0)
         }
         
         func distinct(_ start: Double, _ end: Double) -> [Double] {
@@ -79,7 +79,7 @@ struct BernsteinPolynomial {
     
     struct One : IBernsteinPolynomial, IBernsteinPolynomialAnalyticalRoots {
         
-        typealias LowerOrderPolynomialType = Zero
+        typealias LowerOrderPolynomial = Zero
         
         var b0: Double
         var b1: Double
@@ -99,8 +99,8 @@ struct BernsteinPolynomial {
             return a1 * self.b0 + a2 * self.b1
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(self.reduce(a1: a1, a2: a2))
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(self.reduce(a1: a1, a2: a2))
         }
         
         func distinct(_ start: Double, _ end: Double) -> [Double] {
@@ -116,7 +116,7 @@ struct BernsteinPolynomial {
     
     struct Two : IBernsteinPolynomial, IBernsteinPolynomialAnalyticalRoots {
         
-        typealias LowerOrderPolynomialType = One
+        typealias LowerOrderPolynomial = One
         
         var b0: Double
         var b1: Double
@@ -134,8 +134,8 @@ struct BernsteinPolynomial {
             self.b2 = b2
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(
                 a1 * self.b0 + a2 * self.b1,
                 a1 * self.b1 + a2 * self.b2
             )
@@ -154,7 +154,7 @@ struct BernsteinPolynomial {
     
     struct Three : IBernsteinPolynomial, IBernsteinPolynomialAnalyticalRoots {
         
-        typealias LowerOrderPolynomialType = Two
+        typealias LowerOrderPolynomial = Two
         
         var b0: Double
         var b1: Double
@@ -174,8 +174,8 @@ struct BernsteinPolynomial {
             self.b3 = b3
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(
                 a1 * self.b0 + a2 * self.b1,
                 a1 * self.b1 + a2 * self.b2,
                 a1 * self.b2 + a2 * self.b3
@@ -195,7 +195,7 @@ struct BernsteinPolynomial {
     
     struct Four : IBernsteinPolynomial {
         
-        typealias LowerOrderPolynomialType = Three
+        typealias LowerOrderPolynomial = Three
         
         var b0: Double
         var b1: Double
@@ -217,8 +217,8 @@ struct BernsteinPolynomial {
             self.b4 = b4
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(
                 a1 * self.b0 + a2 * self.b1,
                 a1 * self.b1 + a2 * self.b2,
                 a1 * self.b2 + a2 * self.b3,
@@ -230,7 +230,7 @@ struct BernsteinPolynomial {
     
     struct Five : IBernsteinPolynomial {
         
-        typealias LowerOrderPolynomialType = Four
+        typealias LowerOrderPolynomial = Four
         
         var b0: Double
         var b1: Double
@@ -254,8 +254,8 @@ struct BernsteinPolynomial {
             self.b5 = b5
         }
         
-        func difference(a1: Double, a2: Double) -> LowerOrderPolynomialType {
-            return LowerOrderPolynomialType(
+        func difference(a1: Double, a2: Double) -> LowerOrderPolynomial {
+            return LowerOrderPolynomial(
                 a1 * self.b0 + a2 * self.b1,
                 a1 * self.b1 + a2 * self.b2,
                 a1 * self.b2 + a2 * self.b3,
@@ -270,7 +270,7 @@ struct BernsteinPolynomial {
 
 extension BernsteinPolynomial {
     
-    static func findDistinctRoots< PolynomialType: IBernsteinPolynomial >(of polynomial: PolynomialType, start: Double = 0, end: Double = 1) -> [Double] {
+    static func findDistinctRoots< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> [Double] {
         if let analyticalRoots = polynomial as? IBernsteinPolynomialAnalyticalRoots {
             return analyticalRoots.distinct(start, end)
         }
@@ -314,7 +314,7 @@ extension BernsteinPolynomial {
         return roots
     }
     
-    static func findRootBisection< PolynomialType: IBernsteinPolynomial >(of polynomial: PolynomialType, start: Double = 0, end: Double = 1) -> Double {
+    static func findRootBisection< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> Double {
         var guess = (start + end) / 2
         var low = start
         var high = end
@@ -340,7 +340,7 @@ extension BernsteinPolynomial {
         return guess
     }
     
-    static func newton< PolynomialType: IBernsteinPolynomial >(of polynomial: PolynomialType, derivative: PolynomialType.LowerOrderPolynomialType, guess: Double, _ relaxation: Double = 1) -> Double {
+    static func newton< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, derivative: Polynomial.LowerOrderPolynomial, guess: Double, _ relaxation: Double = 1) -> Double {
         let maxIterations = 20
         var x = guess
         for _ in 0 ..< maxIterations {

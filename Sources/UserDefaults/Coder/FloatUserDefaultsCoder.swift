@@ -18,7 +18,7 @@ public struct FloatUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Float : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = FloatUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = FloatUserDefaultsCoder
+    public typealias UserDefaultsDecoder = FloatUserDefaultsCoder
+    public typealias UserDefaultsEncoder = FloatUserDefaultsCoder
     
 }

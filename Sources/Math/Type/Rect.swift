@@ -7,139 +7,139 @@ import Foundation
 public typealias RectFloat = Rect< Float >
 public typealias RectDouble = Rect< Double >
 
-public struct Rect< ValueType: IScalar & Hashable > : Hashable {
+public struct Rect< Value: IScalar & Hashable > : Hashable {
     
-    public var origin: Point< ValueType >
-    public var size: Size< ValueType >
+    public var origin: Point< Value >
+    public var size: Size< Value >
     
     @inlinable
-    public init(origin: Point< ValueType >, size: Size< ValueType >) {
+    public init(origin: Point< Value >, size: Size< Value >) {
         self.origin = origin
         self.size = size
     }
     
     @inlinable
-    public init(x: ValueType, y: ValueType, width: ValueType, height: ValueType) {
+    public init(x: Value, y: Value, width: Value, height: Value) {
         self.origin = Point(x: x, y: y)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(x: ValueType, y: ValueType, size: Size< ValueType >) {
+    public init(x: Value, y: Value, size: Size< Value >) {
         self.origin = Point(x: x, y: y)
         self.size = size
     }
     
     @inlinable
-    public init(topLeft: Point< ValueType >, bottomRight: Point< ValueType >) {
+    public init(topLeft: Point< Value >, bottomRight: Point< Value >) {
         self.origin = topLeft
         self.size = Size(width: bottomRight.x - topLeft.x, height: bottomRight.y - topLeft.y)
     }
     
     @inlinable
-    public init(topLeft: Point< ValueType >, size: Size< ValueType >) {
+    public init(topLeft: Point< Value >, size: Size< Value >) {
         self.origin = topLeft
         self.size = size
     }
     
     @inlinable
-    public init(topLeft: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(topLeft: Point< Value >, width: Value, height: Value) {
         self.origin = topLeft
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(top: Point< ValueType >, size: Size< ValueType >) {
+    public init(top: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: top.x - size.width / 2, y: top.y)
         self.size = size
     }
     
     @inlinable
-    public init(top: Point< ValueType >, width: ValueType, height: ValueType) {
-        self.origin = Point< ValueType >(x: top.x - width / 2, y: top.y)
+    public init(top: Point< Value >, width: Value, height: Value) {
+        self.origin = Point< Value >(x: top.x - width / 2, y: top.y)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(topRight: Point< ValueType >, size: Size< ValueType >) {
+    public init(topRight: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: topRight.x - size.width, y: topRight.y)
         self.size = size
     }
     
     @inlinable
-    public init(topRight: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(topRight: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: topRight.x - width, y: topRight.y)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(left: Point< ValueType >, size: Size< ValueType >) {
+    public init(left: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: left.x, y: left.y - size.height / 2)
         self.size = size
     }
     
     @inlinable
-    public init(left: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(left: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: left.x, y: left.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(center: Point< ValueType >, size: Size< ValueType >) {
+    public init(center: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: center.x - size.width / 2, y: center.y - size.height / 2)
         self.size = size
     }
     
     @inlinable
-    public init(center: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(center: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: center.x - width / 2, y: center.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(right: Point< ValueType >, size: Size< ValueType >) {
+    public init(right: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: right.x - size.width, y: right.y - size.height / 2)
         self.size = size
     }
     
     @inlinable
-    public init(right: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(right: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: right.x - width, y: right.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(bottomLeft: Point< ValueType >, size: Size< ValueType >) {
+    public init(bottomLeft: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - size.height)
         self.size = size
     }
     
     @inlinable
-    public init(bottomLeft: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(bottomLeft: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - height)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(bottom: Point< ValueType >, size: Size< ValueType >) {
+    public init(bottom: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottom.x - size.width / 2, y: bottom.y - size.height)
         self.size = size
     }
     
     @inlinable
-    public init(bottom: Point< ValueType >, width: ValueType, height: ValueType) {
-        self.origin = Point< ValueType >(x: bottom.x - width / 2, y: bottom.y - height)
+    public init(bottom: Point< Value >, width: Value, height: Value) {
+        self.origin = Point< Value >(x: bottom.x - width / 2, y: bottom.y - height)
         self.size = Size(width: width, height: height)
     }
     
     @inlinable
-    public init(bottomRight: Point< ValueType >, size: Size< ValueType >) {
+    public init(bottomRight: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottomRight.x - size.width, y: bottomRight.y - size.height)
         self.size = size
     }
     
     @inlinable
-    public init(bottomRight: Point< ValueType >, width: ValueType, height: ValueType) {
+    public init(bottomRight: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: bottomRight.x - width, y: bottomRight.y - height)
         self.size = Size(width: width, height: height)
     }
@@ -163,67 +163,67 @@ public extension Rect {
     }
     
     @inlinable
-    var x: ValueType {
+    var x: Value {
         return self.origin.x
     }
     
     @inlinable
-    var y: ValueType {
+    var y: Value {
         return self.origin.y
     }
     
     @inlinable
-    var width: ValueType {
+    var width: Value {
         return self.size.width
     }
 
     @inlinable
-    var height: ValueType {
+    var height: Value {
         return self.size.height
     }
 
     @inlinable
-    var topLeft: Point< ValueType > {
+    var topLeft: Point< Value > {
         return Point(x: self.x, y: self.y)
     }
     
     @inlinable
-    var top: Point< ValueType > {
+    var top: Point< Value > {
         return Point(x: self.x + self.width / 2, y: self.y)
     }
     
     @inlinable
-    var topRight: Point< ValueType > {
+    var topRight: Point< Value > {
         return Point(x: self.x + self.width, y: self.y)
     }
     
     @inlinable
-    var left: Point< ValueType > {
+    var left: Point< Value > {
         return Point(x: self.x, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var center: Point< ValueType > {
+    var center: Point< Value > {
         return Point(x: self.x + self.width / 2, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var right: Point< ValueType > {
+    var right: Point< Value > {
         return Point(x: self.x + self.width, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var bottomLeft: Point< ValueType > {
+    var bottomLeft: Point< Value > {
         return Point(x: self.x, y: self.y + self.height)
     }
     
     @inlinable
-    var bottom: Point< ValueType > {
+    var bottom: Point< Value > {
         return Point(x: self.x + self.width / 2, y: self.y + self.height)
     }
     
     @inlinable
-    var bottomRight: Point< ValueType > {
+    var bottomRight: Point< Value > {
         return Point(x: self.x + self.width, y: self.y + self.height)
     }
     
@@ -237,7 +237,7 @@ public extension Rect {
 public extension Rect {
     
     @inlinable
-    func isContains(_ point: Point< ValueType >) -> Bool {
+    func isContains(_ point: Point< Value >) -> Bool {
         guard self.x <= point.x && self.x + self.width >= point.x else { return false }
         guard self.y <= point.y && self.y + self.height >= point.y else { return false }
         return true
@@ -270,7 +270,7 @@ public extension Rect {
     }
 
     @inlinable
-    func offset(_ point: Point< ValueType >) -> Self {
+    func offset(_ point: Point< Value >) -> Self {
         return Rect(topLeft: self.origin - point, size: self.size)
     }
 
@@ -284,7 +284,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(left: ValueType) -> (left: Self, right: Self) {
+    func split(left: Value) -> (left: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: left, height: self.height),
             right: Rect(x: self.x + left, y: self.y, width: self.width - left, height: self.height)
@@ -292,7 +292,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(right: ValueType) -> (left: Self, right: Self) {
+    func split(right: Value) -> (left: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: self.width - right, height: self.height),
             right: Rect(x: (self.x + self.width) - right, y: self.y, width: right, height: self.height)
@@ -300,7 +300,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(left: ValueType, right: ValueType) -> (left: Self, middle: Self, right: Self) {
+    func split(left: Value, right: Value) -> (left: Self, middle: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: left, height: self.height),
             middle: Rect(x: self.x + left, y: self.y, width: self.width - (left + right), height: self.height),
@@ -309,7 +309,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(top: ValueType) -> (top: Self, bottom: Self) {
+    func split(top: Value) -> (top: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: top),
             bottom: Rect(x: self.x, y: self.y + top, width: self.width, height: self.height - top)
@@ -317,7 +317,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(bottom: ValueType) -> (top: Self, bottom: Self) {
+    func split(bottom: Value) -> (top: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: self.height - bottom),
             bottom: Rect(x: self.x, y: (self.y + self.height) - bottom, width: self.width, height: bottom)
@@ -325,7 +325,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(top: ValueType, bottom: ValueType) -> (top: Self, middle: Self, bottom: Self) {
+    func split(top: Value, bottom: Value) -> (top: Self, middle: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: top),
             middle: Rect(x: self.x, y: self.y + top, width: self.width, height: self.height - (top + bottom)),
@@ -334,18 +334,18 @@ public extension Rect {
     }
     
     @inlinable
-    func inset(_ inset: Inset< ValueType >) -> Self {
+    func inset(_ inset: Inset< Value >) -> Self {
         return Rect(x: self.x + inset.left, y: self.y + inset.top, size: self.size.inset(inset))
     }
     
     @inlinable
-    func grid(rows: UInt, columns: UInt, spacing: Point< ValueType >) -> [Self] {
-        var result: [Rect< ValueType >] = []
+    func grid(rows: UInt, columns: UInt, spacing: Point< Value >) -> [Self] {
+        var result: [Rect< Value >] = []
         if rows > 0 && columns > 0 {
             var origin = self.origin
             let itemSize = Size(
-                width: rows > 1 ? self.width / ValueType(rows - 1) : self.width,
-                height: columns > 1 ? self.height / ValueType(columns - 1) : self.height
+                width: rows > 1 ? self.width / Value(rows - 1) : self.width,
+                height: columns > 1 ? self.height / Value(columns - 1) : self.height
             )
             for _ in 0 ..< rows {
                 origin.x = self.x
@@ -360,24 +360,24 @@ public extension Rect {
     }
     
     @inlinable
-    func aspectFit(_ size: Size< ValueType >) -> Self {
+    func aspectFit(_ size: Size< Value >) -> Self {
         return Rect(center: self.center, size: self.size.aspectFit(size))
     }
     
     @inlinable
-    func aspectFill(_ size: Size< ValueType >) -> Self {
+    func aspectFill(_ size: Size< Value >) -> Self {
         return Rect(center: self.center, size: self.size.aspectFill(size))
     }
     
     @inlinable
-    func lerp(_ to: Self, progress: ValueType) -> Self {
+    func lerp(_ to: Self, progress: Value) -> Self {
         let origin = self.origin.lerp(to.origin, progress: progress)
         let size = self.size.lerp(to.size, progress: progress)
         return Rect(origin: origin, size: size)
     }
     
     @inlinable
-    func lerp(_ to: Self, progress: Percent< ValueType >) -> Self {
+    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
         return self.lerp(to, progress: progress.value)
     }
     
@@ -441,7 +441,7 @@ extension Rect : INearEqutable {
     
 }
 
-extension Rect : Comparable where ValueType: Comparable {
+extension Rect : Comparable where Value: Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.origin < rhs.origin && lhs.size < rhs.size

@@ -109,34 +109,34 @@ public extension UndoRedo {
     }
     
     func track<
-        CommandType: RawRepresentable
+        Command: RawRepresentable
     >(
-        create command: CommandType,
+        create command: Command,
         object: String,
         _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
-    ) where CommandType.RawValue == String {
+    ) where Command.RawValue == String {
         guard let scope = self._scope else { return }
         scope.create(command.rawValue, object, closure)
     }
     
     func track<
-        CommandType: RawRepresentable
+        Command: RawRepresentable
     >(
-        update command: CommandType,
+        update command: Command,
         object: String,
         _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void
-    ) where CommandType.RawValue == String {
+    ) where Command.RawValue == String {
         guard let scope = self._scope else { return }
         scope.update(command.rawValue, object, closure)
     }
     
     func track<
-        CommandType: RawRepresentable
+        Command: RawRepresentable
     >(
-        delete command: CommandType,
+        delete command: Command,
         object: String,
         _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
-    ) where CommandType.RawValue == String {
+    ) where Command.RawValue == String {
         guard let scope = self._scope else { return }
         scope.delete(command.rawValue, object, closure)
     }

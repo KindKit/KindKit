@@ -7,15 +7,15 @@ import Foundation
 public typealias PointFloat = Point< Float >
 public typealias PointDouble = Point< Double >
 
-public struct Point< ValueType: IScalar & Hashable > : Hashable {
+public struct Point< Value: IScalar & Hashable > : Hashable {
     
-    public var x: ValueType
-    public var y: ValueType
+    public var x: Value
+    public var y: Value
     
     @inlinable
     public init(
-        x: ValueType,
-        y: ValueType
+        x: Value,
+        y: Value
     ) {
         self.x = x
         self.y = y
@@ -70,7 +70,7 @@ public extension Point {
     }
     
     @inlinable
-    var length: Distance< ValueType > {
+    var length: Distance< Value > {
         return Distance(squared: self.dot(self))
     }
     
@@ -80,7 +80,7 @@ public extension Point {
     }
     
     @inlinable
-    var normalized: (point: Self, length: Distance< ValueType >) {
+    var normalized: (point: Self, length: Distance< Value >) {
         let length = self.length
         if length.squared > 0 {
             return (point: self / length.real, length: length)
@@ -89,7 +89,7 @@ public extension Point {
     }
     
     @inlinable
-    var angle: Angle< ValueType > {
+    var angle: Angle< Value > {
         return Angle(radians: self.y.atan2(self.x))
     }
     
@@ -98,17 +98,17 @@ public extension Point {
 public extension Point {
     
     @inlinable
-    func dot(_ other: Self) -> ValueType {
+    func dot(_ other: Self) -> Value {
         return self.x * other.x + self.y * other.y
     }
     
     @inlinable
-    func cross(_ other: Self) -> ValueType {
+    func cross(_ other: Self) -> Value {
         return self.x * other.y - self.y * other.x
     }
     
     @inlinable
-    func distance(_ other: Self) -> Distance< ValueType > {
+    func distance(_ other: Self) -> Distance< Value > {
         return (self - other).length
     }
     
@@ -123,21 +123,21 @@ public extension Point {
     }
     
     @inlinable
-    func angle(_ point1: Self, _ point2: Self) -> Angle< ValueType > {
+    func angle(_ point1: Self, _ point2: Self) -> Angle< Value > {
         let d1 = point1 - self
         let d2 = point2 - self
         return Angle(radians: d1.cross(d2).atan2(d1.dot(d2)))
     }
     
     @inlinable
-    func lerp(_ to: Self, progress: ValueType) -> Self {
+    func lerp(_ to: Self, progress: Value) -> Self {
         let x = self.x.lerp(to.x, progress: progress)
         let y = self.y.lerp(to.y, progress: progress)
         return Point(x: x, y: y)
     }
     
     @inlinable
-    func lerp(_ to: Self, progress: Percent< ValueType >) -> Self {
+    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
         return self.lerp(to, progress: progress.value)
     }
     
@@ -156,12 +156,12 @@ public extension Point {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: ValueType) -> Self {
+    static func + (lhs: Self, rhs: Value) -> Self {
         return Point(x: lhs.x + rhs, y: lhs.y + rhs)
     }
     
     @inlinable
-    static func + (lhs: ValueType, rhs: Self) -> Self {
+    static func + (lhs: Value, rhs: Self) -> Self {
         return Point(x: lhs + rhs.x, y: lhs + rhs.y)
     }
     
@@ -171,7 +171,7 @@ public extension Point {
     }
     
     @inlinable
-    static func += (lhs: inout Self, rhs: ValueType) {
+    static func += (lhs: inout Self, rhs: Value) {
         lhs = lhs + rhs
     }
     
@@ -181,12 +181,12 @@ public extension Point {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: ValueType) -> Self {
+    static func - (lhs: Self, rhs: Value) -> Self {
         return Point(x: lhs.x - rhs, y: lhs.y - rhs)
     }
     
     @inlinable
-    static func - (lhs: ValueType, rhs: Self) -> Self {
+    static func - (lhs: Value, rhs: Self) -> Self {
         return Point(x: lhs - rhs.x, y: lhs - rhs.y)
     }
     
@@ -196,7 +196,7 @@ public extension Point {
     }
     
     @inlinable
-    static func -= (lhs: inout Self, rhs: ValueType) {
+    static func -= (lhs: inout Self, rhs: Value) {
         lhs = lhs - rhs
     }
     
@@ -206,17 +206,17 @@ public extension Point {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: ValueType) -> Self {
+    static func * (lhs: Self, rhs: Value) -> Self {
         return Point(x: lhs.x * rhs, y: lhs.y * rhs)
     }
     
     @inlinable
-    static func * (lhs: ValueType, rhs: Self) -> Self {
+    static func * (lhs: Value, rhs: Self) -> Self {
         return Point(x: lhs * rhs.x, y: lhs * rhs.y)
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Matrix3< ValueType >) -> Self {
+    static func * (lhs: Self, rhs: Matrix3< Value >) -> Self {
         return Point(
             x: lhs.x * rhs.m11 + lhs.y * rhs.m21 + rhs.m31,
             y: lhs.x * rhs.m12 + lhs.y * rhs.m22 + rhs.m32
@@ -229,12 +229,12 @@ public extension Point {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: ValueType) {
+    static func *= (lhs: inout Self, rhs: Value) {
         lhs = lhs * rhs
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Matrix3< ValueType >) {
+    static func *= (lhs: inout Self, rhs: Matrix3< Value >) {
         lhs = lhs * rhs
     }
     
@@ -244,12 +244,12 @@ public extension Point {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: ValueType) -> Self {
+    static func / (lhs: Self, rhs: Value) -> Self {
         return Point(x: lhs.x / rhs, y: lhs.y / rhs)
     }
     
     @inlinable
-    static func / (lhs: ValueType, rhs: Self) -> Self {
+    static func / (lhs: Value, rhs: Self) -> Self {
         return Point(x: lhs / rhs.x, y: lhs / rhs.y)
     }
     
@@ -259,7 +259,7 @@ public extension Point {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: ValueType) {
+    static func /= (lhs: inout Self, rhs: Value) {
         lhs = lhs / rhs
     }
     
@@ -274,7 +274,7 @@ extension Point : INearEqutable {
     
 }
 
-extension Point : Comparable where ValueType: Comparable {
+extension Point : Comparable where Value: Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.x < rhs.x && lhs.y < rhs.y

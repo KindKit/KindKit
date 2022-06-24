@@ -7,10 +7,10 @@ import Foundation
 public typealias Box2Float = Box2< Float >
 public typealias Box2Double = Box2< Double >
 
-public struct Box2< ValueType: IScalar & Hashable > : Hashable {
+public struct Box2< Value: IScalar & Hashable > : Hashable {
     
-    public var lower: Point< ValueType >
-    public var upper: Point< ValueType >
+    public var lower: Point< Value >
+    public var upper: Point< Value >
     
     @inlinable
     public init() {
@@ -19,13 +19,13 @@ public struct Box2< ValueType: IScalar & Hashable > : Hashable {
     }
     
     @inlinable
-    public init(lower: Point< ValueType >, upper: Point< ValueType >) {
+    public init(lower: Point< Value >, upper: Point< Value >) {
         self.lower = lower
         self.upper = upper
     }
     
     @inlinable
-    public init(point1: Point< ValueType >, point2: Point< ValueType >) {
+    public init(point1: Point< Value >, point2: Point< Value >) {
         self.lower = point1.min(point2)
         self.upper = point1.max(point2)
     }
@@ -49,73 +49,73 @@ public extension Box2 {
     }
     
     @inlinable
-    var width: ValueType {
+    var width: Value {
         return Swift.max(self.upper.x - self.lower.x, 0)
     }
     
     @inlinable
-    var height: ValueType {
+    var height: Value {
         return Swift.max(self.upper.y - self.lower.y, 0)
     }
     
     @inlinable
-    var topLeft: Point< ValueType > {
+    var topLeft: Point< Value > {
         return Point(x: self.lower.x, y: self.lower.y)
     }
     
     @inlinable
-    var top: Point< ValueType > {
+    var top: Point< Value > {
         return Point(x: self.lower.x + self.width / 2, y: self.lower.y)
     }
     
     @inlinable
-    var topRight: Point< ValueType > {
+    var topRight: Point< Value > {
         return Point(x: self.upper.x, y: self.lower.y)
     }
     
     @inlinable
-    var left: Point< ValueType > {
+    var left: Point< Value > {
         return Point(x: self.lower.x, y: self.lower.y + self.height / 2)
     }
     
     @inlinable
-    var center: Point< ValueType > {
+    var center: Point< Value > {
         return Point(x: self.lower.x + self.width / 2, y: self.lower.y + self.height / 2)
     }
     
     @inlinable
-    var right: Point< ValueType > {
+    var right: Point< Value > {
         return Point(x: self.upper.x, y: self.lower.y + self.height / 2)
     }
     
     @inlinable
-    var bottomLeft: Point< ValueType > {
+    var bottomLeft: Point< Value > {
         return Point(x: self.lower.x, y: self.upper.y)
     }
     
     @inlinable
-    var bottom: Point< ValueType > {
+    var bottom: Point< Value > {
         return Point(x: self.lower.x + self.width / 2, y: self.lower.y + self.height)
     }
     
     @inlinable
-    var bottomRight: Point< ValueType > {
+    var bottomRight: Point< Value > {
         return Point(x: self.upper.x, y: self.upper.y)
     }
     
     @inlinable
-    var area: ValueType {
+    var area: Value {
         let size = self.size
         return size.width * size.height
     }
     
     @inlinable
-    var size: Size< ValueType > {
+    var size: Size< Value > {
         return Size(width: self.width, height: self.height)
     }
     
     @inlinable
-    var centeredForm: (center: Point< ValueType >, extend: Point< ValueType >) {
+    var centeredForm: (center: Point< Value >, extend: Point< Value >) {
         return (
             center: (self.upper + self.lower) * 0.5,
             extend: (self.upper - self.lower) * 0.5
@@ -127,7 +127,7 @@ public extension Box2 {
 public extension Box2 {
     
     @inlinable
-    func isContains(_ point: Point< ValueType >) -> Bool {
+    func isContains(_ point: Point< Value >) -> Bool {
         guard point.x >= self.lower.x && point.x <= self.upper.x else { return false }
         guard point.y >= self.lower.y && point.y <= self.upper.y else { return false }
         return true
@@ -142,7 +142,7 @@ public extension Box2 {
     }
     
     @inlinable
-    func union(_ other: Point< ValueType >) -> Self {
+    func union(_ other: Point< Value >) -> Self {
         return Box2(
             lower: self.lower.min(other),
             upper: self.upper.max(other)
@@ -150,12 +150,12 @@ public extension Box2 {
     }
     
     @inlinable
-    func inset(_ inset: ValueType) -> Self {
+    func inset(_ inset: Value) -> Self {
         return Box2(lower: self.lower - inset, upper: self.upper + inset)
     }
     
     @inlinable
-    func inset(_ inset: Distance< ValueType >) -> Self {
+    func inset(_ inset: Distance< Value >) -> Self {
         return self.inset(inset.real)
     }
     

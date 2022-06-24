@@ -227,7 +227,6 @@ public extension ListLayout {
 
 public extension ListLayout.Helper {
     
-    
     enum OperationType {
         case insert
         case delete

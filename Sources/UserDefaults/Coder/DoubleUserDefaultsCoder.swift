@@ -18,7 +18,7 @@ public struct DoubleUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Double : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = DoubleUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = DoubleUserDefaultsCoder
+    public typealias UserDefaultsDecoder = DoubleUserDefaultsCoder
+    public typealias UserDefaultsEncoder = DoubleUserDefaultsCoder
     
 }

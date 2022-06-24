@@ -18,7 +18,7 @@ public struct DecimalUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Decimal : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = DecimalUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = DecimalUserDefaultsCoder
+    public typealias UserDefaultsDecoder = DecimalUserDefaultsCoder
+    public typealias UserDefaultsEncoder = DecimalUserDefaultsCoder
     
 }

@@ -16,12 +16,12 @@ public protocol IUndoRedoContext {
 
 public extension IUndoRedoContext {
     
-    func command< CommandType: RawRepresentable >(_ type: CommandType.Type) -> CommandType? where CommandType.RawValue == String {
-        return CommandType(rawValue: self.command)
+    func command< Command: RawRepresentable >(_ type: Command.Type) -> Command? where Command.RawValue == String {
+        return Command(rawValue: self.command)
     }
     
-    func keys< KeysType: RawRepresentable >(_ type: KeysType.Type) -> [KeysType] where KeysType.RawValue == String {
-        return self.keys.compactMap({ KeysType(rawValue: $0) })
+    func keys< Keys: RawRepresentable >(_ type: Keys.Type) -> [Keys] where Keys.RawValue == String {
+        return self.keys.compactMap({ Keys(rawValue: $0) })
     }
     
 }

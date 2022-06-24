@@ -7,20 +7,20 @@ import Foundation
 public typealias DistanceFloat = Distance< Float >
 public typealias DistanceDouble = Distance< Double >
 
-public struct Distance< ValueType: IScalar & Hashable > : Hashable {
+public struct Distance< Value: IScalar & Hashable > : Hashable {
     
-    public var squared: ValueType
-    public var real: ValueType {
+    public var squared: Value
+    public var real: Value {
         return self.squared.sqrt
     }
     
     @inlinable
-    public init(real: ValueType) {
+    public init(real: Value) {
         self.squared = real * real
     }
     
     @inlinable
-    public init(squared: ValueType) {
+    public init(squared: Value) {
         self.squared = squared
     }
     
@@ -77,7 +77,7 @@ public extension Distance {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: ValueType) -> Self {
+    static func * (lhs: Self, rhs: Value) -> Self {
         return Distance(squared: lhs.squared * rhs)
     }
     
@@ -87,7 +87,7 @@ public extension Distance {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: ValueType) {
+    static func *= (lhs: inout Self, rhs: Value) {
         lhs = lhs * rhs
     }
     
@@ -97,7 +97,7 @@ public extension Distance {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: ValueType) -> Self {
+    static func / (lhs: Self, rhs: Value) -> Self {
         return Distance(squared: lhs.squared / rhs)
     }
     
@@ -107,7 +107,7 @@ public extension Distance {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: ValueType) {
+    static func /= (lhs: inout Self, rhs: Value) {
         lhs = lhs / rhs
     }
     
@@ -122,7 +122,7 @@ extension Distance : INearEqutable {
     
 }
 
-extension Distance : Comparable where ValueType: Comparable {
+extension Distance : Comparable where Value: Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.squared < rhs.squared

@@ -8,12 +8,12 @@ public typealias IJsonCoderAlias = IJsonDecoderAlias & IJsonEncoderAlias
 
 public protocol IJsonDecoderAlias {
     
-    associatedtype JsonDecoderType : IJsonValueDecoder
+    associatedtype JsonDecoder : IJsonValueDecoder
     
 }
 
 public protocol IJsonEncoderAlias {
     
-    associatedtype JsonEncoderType : IJsonValueEncoder
+    associatedtype JsonEncoder : IJsonValueEncoder
     
 }

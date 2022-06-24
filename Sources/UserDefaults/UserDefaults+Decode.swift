@@ -7,36 +7,36 @@ import KindKitCore
 
 public extension UserDefaults {
     
-    func decode< DecoderType: IUserDefaultsValueDecoder >(
-        _ decoder: DecoderType.Type,
+    func decode< Decoder: IUserDefaultsValueDecoder >(
+        _ decoder: Decoder.Type,
         forKey key: String
-    ) -> DecoderType.ValueType? {
+    ) -> Decoder.Value? {
         guard let value = self.object(forKey: key) as? IUserDefaultsValue else { return nil }
         return try? decoder.decode(value)
     }
     
-    func decode< AliasType: IUserDefaultsDecoderAlias >(
-        _ alias: AliasType.Type,
+    func decode< Alias: IUserDefaultsDecoderAlias >(
+        _ alias: Alias.Type,
         forKey key: String
-    ) -> AliasType.UserDefaultsDecoderType.ValueType? {
-        return self.decode(AliasType.UserDefaultsDecoderType.self, forKey: key)
+    ) -> Alias.UserDefaultsDecoder.Value? {
+        return self.decode(Alias.UserDefaultsDecoder.self, forKey: key)
     }
     
 }
 
 public extension UserDefaults {
     
-    func decode< DecoderType: IUserDefaultsValueDecoder, KeyType: RawRepresentable >(
-        _ decoder: DecoderType.Type,
-        forKey key: KeyType
-    ) -> DecoderType.ValueType? where KeyType.RawValue == String {
+    func decode< Decoder: IUserDefaultsValueDecoder, Key: RawRepresentable >(
+        _ decoder: Decoder.Type,
+        forKey key: Key
+    ) -> Decoder.Value? where Key.RawValue == String {
         return self.decode(decoder, forKey: key.rawValue)
     }
     
-    func decode< AliasType: IUserDefaultsDecoderAlias, KeyType: RawRepresentable >(
-        _ alias: AliasType.Type,
-        forKey key: KeyType
-    ) -> AliasType.UserDefaultsDecoderType.ValueType? where KeyType.RawValue == String {
+    func decode< Alias: IUserDefaultsDecoderAlias, Key: RawRepresentable >(
+        _ alias: Alias.Type,
+        forKey key: Key
+    ) -> Alias.UserDefaultsDecoder.Value? where Key.RawValue == String {
         return self.decode(alias, forKey: key.rawValue)
     }
     
@@ -44,19 +44,19 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func decode< DecoderType: IUserDefaultsValueDecoder >(
-        _ decoder: DecoderType.Type,
+    func decode< Decoder: IUserDefaultsValueDecoder >(
+        _ decoder: Decoder.Type,
         forKey key: String,
-        default: DecoderType.ValueType
-    ) -> DecoderType.ValueType {
+        default: Decoder.Value
+    ) -> Decoder.Value {
         return self.decode(decoder, forKey: key) ?? `default`
     }
     
-    func decode< AliasType: IUserDefaultsDecoderAlias >(
-        _ alias: AliasType.Type,
+    func decode< Alias: IUserDefaultsDecoderAlias >(
+        _ alias: Alias.Type,
         forKey key: String,
-        default: AliasType.UserDefaultsDecoderType.ValueType
-    ) -> AliasType.UserDefaultsDecoderType.ValueType {
+        default: Alias.UserDefaultsDecoder.Value
+    ) -> Alias.UserDefaultsDecoder.Value {
         return self.decode(alias, forKey: key) ?? `default`
     }
     
@@ -64,19 +64,19 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func decode< DecoderType: IUserDefaultsValueDecoder, KeyType: RawRepresentable >(
-        _ decoder: DecoderType.Type,
-        forKey key: KeyType,
-        default: DecoderType.ValueType
-    ) -> DecoderType.ValueType where KeyType.RawValue == String {
+    func decode< Decoder: IUserDefaultsValueDecoder, Key: RawRepresentable >(
+        _ decoder: Decoder.Type,
+        forKey key: Key,
+        default: Decoder.Value
+    ) -> Decoder.Value where Key.RawValue == String {
         return self.decode(decoder, forKey: key.rawValue, default: `default`)
     }
     
-    func decode< AliasType: IUserDefaultsDecoderAlias, KeyType: RawRepresentable >(
-        _ alias: AliasType.Type,
-        forKey key: KeyType,
-        default: AliasType.UserDefaultsDecoderType.ValueType
-    ) -> AliasType.UserDefaultsDecoderType.ValueType where KeyType.RawValue == String {
+    func decode< Alias: IUserDefaultsDecoderAlias, Key: RawRepresentable >(
+        _ alias: Alias.Type,
+        forKey key: Key,
+        default: Alias.UserDefaultsDecoder.Value
+    ) -> Alias.UserDefaultsDecoder.Value where Key.RawValue == String {
         return self.decode(alias, forKey: key.rawValue, default: `default`)
     }
     

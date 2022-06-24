@@ -18,7 +18,7 @@ public struct FloatJsonCoder : IJsonValueCoder {
 
 extension Float : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = FloatJsonCoder
-    public typealias JsonEncoderType = FloatJsonCoder
+    public typealias JsonDecoder = FloatJsonCoder
+    public typealias JsonEncoder = FloatJsonCoder
     
 }

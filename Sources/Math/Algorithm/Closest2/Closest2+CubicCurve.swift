@@ -6,7 +6,7 @@ import Foundation
 
 public extension Closest2 {
     
-    static func find(_ point: PointType, _ curve: CubicCurveType) -> Percent< ValueType > {
+    static func find(_ point: Point< Value >, _ curve: CubicCurve2< Value >) -> Percent< Value > {
         let c = curve - point
         let q = QuadCurve2(start: curve.control1 - curve.start, control: curve.control2 - curve.control1, end: curve.end - curve.control2)
         let p0 = 10 * (c.start * q.start)
@@ -26,7 +26,7 @@ public extension Closest2 {
         let sl = c.start.length.squared
         let el = c.end.length.squared
         var ll = sl
-        var r: Percent< ValueType > = .zero
+        var r: Percent< Value > = .zero
         if el < sl {
             ll = el
             r = .one
@@ -41,7 +41,7 @@ public extension Closest2 {
         )
         for value in BernsteinPolynomial.findDistinctRoots(of: polynomial) {
             guard value > 0.0, value < 1.0 else { break }
-            let nr = Percent(ValueType(value))
+            let nr = Percent(Value(value))
             let p = c.point(at: nr)
             let pl = p.length.squared
             if pl < ll {
@@ -57,7 +57,7 @@ public extension Closest2 {
 public extension CubicCurve2 {
     
     @inlinable
-    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
+    func closest(_ point: Point< Value >) -> Percent< Value > {
         return Closest2.find(point, self)
     }
     

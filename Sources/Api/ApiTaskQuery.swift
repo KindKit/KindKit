@@ -5,17 +5,17 @@
 import Foundation
 import KindKitCore
 
-public final class ApiTaskQuery< RequestType: IApiRequest, ResponseType: IApiResponse > : IApiTaskQuery {
+public final class ApiTaskQuery< Request: IApiRequest, Response: IApiResponse > : IApiTaskQuery {
 
     public typealias ProgressClosure = (_ progress: Progress) -> Void
-    public typealias CompleteClosure = (_ response: ResponseType) -> Void
+    public typealias CompleteClosure = (_ response: Response) -> Void
 
     public private(set) var task: URLSessionTask?
     public private(set) var provider: IApiProvider
     public private(set) var createAt: Date
 
-    public private(set) var request: RequestType
-    public private(set) var response: ResponseType
+    public private(set) var request: Request
+    public private(set) var response: Response
     public private(set) var queue: DispatchQueue
     public private(set) var downloadProgress: Progress = Progress()
     public private(set) var onDownload: ProgressClosure?
@@ -29,8 +29,8 @@ public final class ApiTaskQuery< RequestType: IApiRequest, ResponseType: IApiRes
 
     public init(
         provider: IApiProvider,
-        request: RequestType,
-        response: ResponseType,
+        request: Request,
+        response: Response,
         queue: DispatchQueue,
         onCompleted: @escaping CompleteClosure
     ) {
@@ -44,8 +44,8 @@ public final class ApiTaskQuery< RequestType: IApiRequest, ResponseType: IApiRes
 
     public init(
         provider: IApiProvider,
-        request: RequestType,
-        response: ResponseType,
+        request: Request,
+        response: Response,
         queue: DispatchQueue,
         onDownload: @escaping ProgressClosure,
         onCompleted: @escaping CompleteClosure
@@ -61,8 +61,8 @@ public final class ApiTaskQuery< RequestType: IApiRequest, ResponseType: IApiRes
 
     public init(
         provider: IApiProvider,
-        request: RequestType,
-        response: ResponseType,
+        request: Request,
+        response: Response,
         queue: DispatchQueue,
         onUpload: @escaping ProgressClosure,
         onCompleted: @escaping CompleteClosure

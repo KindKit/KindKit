@@ -8,12 +8,12 @@ public typealias IUserDefaultsCoderAlias = IUserDefaultsDecoderAlias & IUserDefa
 
 public protocol IUserDefaultsDecoderAlias {
     
-    associatedtype UserDefaultsDecoderType : IUserDefaultsValueDecoder
+    associatedtype UserDefaultsDecoder : IUserDefaultsValueDecoder
     
 }
 
 public protocol IUserDefaultsEncoderAlias {
     
-    associatedtype UserDefaultsEncoderType : IUserDefaultsValueEncoder
+    associatedtype UserDefaultsEncoder : IUserDefaultsValueEncoder
     
 }

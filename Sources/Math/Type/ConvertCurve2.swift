@@ -4,14 +4,14 @@
 
 import Foundation
 
-public struct ConvertCurve2< CurveType: ICurve2 & Hashable > : Hashable {
+public struct ConvertCurve2< Curve: ICurve2 & Hashable > : Hashable {
     
-    public let curve: CurveType
-    public let error: CurveType.ValueType
+    public let curve: Curve
+    public let error: Curve.Value
     
     public init(
-        curve: CurveType,
-        error: CurveType.ValueType
+        curve: Curve,
+        error: Curve.Value
     ) {
         self.curve = curve
         self.error = error

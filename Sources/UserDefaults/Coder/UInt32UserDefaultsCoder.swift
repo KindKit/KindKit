@@ -18,7 +18,7 @@ public struct UInt32UserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension UInt32 : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = UInt32UserDefaultsCoder
-    public typealias UserDefaultsEncoderType = UInt32UserDefaultsCoder
+    public typealias UserDefaultsDecoder = UInt32UserDefaultsCoder
+    public typealias UserDefaultsEncoder = UInt32UserDefaultsCoder
     
 }

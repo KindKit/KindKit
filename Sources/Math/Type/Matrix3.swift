@@ -8,23 +8,23 @@ import CoreGraphics
 public typealias Matrix3Float = Matrix3< Float >
 public typealias Matrix3Double = Matrix3< Double >
 
-public struct Matrix3< ValueType: IScalar & Hashable > : Hashable {
+public struct Matrix3< Value: IScalar & Hashable > : Hashable {
     
-    public var m11: ValueType
-    public var m12: ValueType
-    public var m13: ValueType
-    public var m21: ValueType
-    public var m22: ValueType
-    public var m23: ValueType
-    public var m31: ValueType
-    public var m32: ValueType
-    public var m33: ValueType
+    public var m11: Value
+    public var m12: Value
+    public var m13: Value
+    public var m21: Value
+    public var m22: Value
+    public var m23: Value
+    public var m31: Value
+    public var m32: Value
+    public var m33: Value
     
     @inlinable
     public init(
-        _ m11: ValueType, _ m12: ValueType, _ m13: ValueType,
-        _ m21: ValueType, _ m22: ValueType, _ m23: ValueType,
-        _ m31: ValueType, _ m32: ValueType, _ m33: ValueType
+        _ m11: Value, _ m12: Value, _ m13: Value,
+        _ m21: Value, _ m22: Value, _ m23: Value,
+        _ m31: Value, _ m32: Value, _ m33: Value
     ) {
         self.m11 = m11; self.m12 = m12; self.m13 = m13
         self.m21 = m21; self.m22 = m22; self.m23 = m23
@@ -32,7 +32,7 @@ public struct Matrix3< ValueType: IScalar & Hashable > : Hashable {
     }
     
     @inlinable
-    public init(translation: Point< ValueType >) {
+    public init(translation: Point< Value >) {
         self.init(
             1, 0, 0,
             0, 1, 0,
@@ -41,7 +41,7 @@ public struct Matrix3< ValueType: IScalar & Hashable > : Hashable {
     }
     
     @inlinable
-    public init(rotation: Angle< ValueType >) {
+    public init(rotation: Angle< Value >) {
         let radians = rotation.radians
         let cs = radians.cos
         let sn = radians.sin
@@ -53,7 +53,7 @@ public struct Matrix3< ValueType: IScalar & Hashable > : Hashable {
     }
     
     @inlinable
-    public init(scale: Point< ValueType >) {
+    public init(scale: Point< Value >) {
         self.init(
             scale.x, 0, 0,
             0, scale.y, 0,
@@ -100,7 +100,7 @@ public extension Matrix3 {
     }
     
     @inlinable
-    var determinant: ValueType {
+    var determinant: Value {
         let a = self.m11 * self.m22 * self.m33 + self.m12 * self.m23 * self.m31 + self.m13 * self.m21 * self.m32
         let b = self.m13 * self.m22 * self.m31 + self.m11 * self.m23 * self.m32 + self.m12 * self.m21 * self.m33
         return a - b
@@ -125,7 +125,7 @@ public extension Matrix3 {
 public extension Matrix3 {
     
     @inlinable
-    func lerp(_ to: Self, progress: ValueType) -> Self {
+    func lerp(_ to: Self, progress: Value) -> Self {
         let m11 = self.m11.lerp(to.m11, progress: progress)
         let m12 = self.m12.lerp(to.m12, progress: progress)
         let m13 = self.m13.lerp(to.m13, progress: progress)
@@ -163,7 +163,7 @@ public extension Matrix3 {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: ValueType) -> Self {
+    static func * (lhs: Self, rhs: Value) -> Self {
         return Matrix3(
             lhs.m11 * rhs, lhs.m12 * rhs, lhs.m13 * rhs,
             lhs.m21 * rhs, lhs.m22 * rhs, lhs.m23 * rhs,
@@ -177,7 +177,7 @@ public extension Matrix3 {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: ValueType) {
+    static func *= (lhs: inout Self, rhs: Value) {
         lhs = lhs * rhs
     }
     

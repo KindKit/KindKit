@@ -221,8 +221,8 @@ public class ButtonView : IButtonView {
         self._view.invisible()
     }
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self._view.triggeredChangeStyle(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self._view.triggeredChangeStyle(userInteraction)
     }
     
     @discardableResult
@@ -364,7 +364,7 @@ public class ButtonView : IButtonView {
     }
     
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self {
+    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self._view.onChangeStyle(value)
         return self
     }
@@ -645,7 +645,7 @@ private extension ButtonView.Layout {
                 )
             }
         case .left:
-            let offset = imageInset.left + imageSize.width + textInset.left
+            let offset = imageInset.right + imageSize.width + textInset.left
             let baseline = max(imageSize.height, textSize.height) / 2
             image = RectFloat(
                 x: 0,

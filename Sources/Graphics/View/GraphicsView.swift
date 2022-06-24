@@ -88,7 +88,7 @@ public class GraphicsView : IGraphicsView {
     private var _onVisible: (() -> Void)?
     private var _onVisibility: (() -> Void)?
     private var _onInvisible: (() -> Void)?
-    private var _onChangeStyle: ((_ userIteraction: Bool) -> Void)?
+    private var _onChangeStyle: ((_ userInteraction: Bool) -> Void)?
     
     public init(
         width: StaticSizeBehaviour,
@@ -159,8 +159,8 @@ public class GraphicsView : IGraphicsView {
         self._view.setNeedsDisplay()
     }
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self._onChangeStyle?(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self._onChangeStyle?(userInteraction)
     }
     
     @discardableResult
@@ -236,7 +236,7 @@ public class GraphicsView : IGraphicsView {
     }
     
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self {
+    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self._onChangeStyle = value
         return self
     }

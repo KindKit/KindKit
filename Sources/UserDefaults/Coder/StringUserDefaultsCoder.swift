@@ -34,7 +34,7 @@ public struct NonEmptyStringUserDefaultsDecoder : IUserDefaultsValueDecoder {
 
 extension String : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = StringUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = StringUserDefaultsCoder
+    public typealias UserDefaultsDecoder = StringUserDefaultsCoder
+    public typealias UserDefaultsEncoder = StringUserDefaultsCoder
     
 }

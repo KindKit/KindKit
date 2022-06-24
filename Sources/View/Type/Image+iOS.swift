@@ -19,9 +19,11 @@ public struct Image : Equatable {
     @inlinable
     public init(
         name: String,
+        in bundle: Bundle? = nil,
+        compatibleWith traitCollection: UITraitCollection? = nil,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
-        guard let image = UIImage(named: name) else {
+        guard let image = UIImage(named: name, in: bundle, compatibleWith: traitCollection) else {
             fatalError("Not found image with '\(name)'")
         }
         if let renderingMode = renderingMode {
@@ -36,10 +38,12 @@ public struct Image : Equatable {
     @inlinable
     public init(
         names: [String],
+        in bundle: Bundle? = nil,
+        compatibleWith traitCollection: UITraitCollection? = nil,
         duration: TimeInterval,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
-        guard let image = UIImage.animatedImage(with: names.compactMap({ UIImage(named: $0) }), duration: duration) else {
+        guard let image = UIImage.animatedImage(with: names.compactMap({ UIImage(named: $0, in: bundle, compatibleWith: traitCollection) }), duration: duration) else {
             fatalError("Not found images with '\(names)'")
         }
         if let renderingMode = renderingMode {

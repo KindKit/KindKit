@@ -77,7 +77,7 @@ public extension Keychain {
     }
     
     @discardableResult
-    func set< ValueType: BinaryInteger >(_ value: ValueType?, key: String, access: AccessOptions = .defaultOption) -> Bool {
+    func set< Value: BinaryInteger >(_ value: Value?, key: String, access: AccessOptions = .defaultOption) -> Bool {
         guard let value = value else {
             return self._processDelete(key)
         }

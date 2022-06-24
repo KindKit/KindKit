@@ -20,9 +20,9 @@ public extension Matrix3 {
     @inlinable
     init(_ cgAffineTransform: CGAffineTransform) {
         self.init(
-            ValueType(cgAffineTransform.a), ValueType(cgAffineTransform.b), 0,
-            ValueType(cgAffineTransform.c), ValueType(cgAffineTransform.d), 0,
-            ValueType(cgAffineTransform.tx), ValueType(cgAffineTransform.ty), 1
+            Value(cgAffineTransform.a), Value(cgAffineTransform.b), 0,
+            Value(cgAffineTransform.c), Value(cgAffineTransform.d), 0,
+            Value(cgAffineTransform.tx), Value(cgAffineTransform.ty), 1
         )
     }
 }

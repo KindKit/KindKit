@@ -141,8 +141,8 @@ public class BarItemView : IBarItemView {
         self._view.invisible()
     }
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self._view.triggeredChangeStyle(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self._view.triggeredChangeStyle(userInteraction)
     }
     
     @discardableResult

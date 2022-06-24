@@ -19,7 +19,7 @@ public struct DateJsonCoder : IJsonValueCoder {
 
 extension Date : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = DateJsonCoder
-    public typealias JsonEncoderType = DateJsonCoder
+    public typealias JsonDecoder = DateJsonCoder
+    public typealias JsonEncoder = DateJsonCoder
     
 }

@@ -38,9 +38,9 @@ public extension GraphicsContext {
 
 public extension GraphicsContext {
     
-    func apply< ValueType : IScalar >(
-        matrix: Matrix3< ValueType >? = nil,
-        alpha: ValueType? = nil,
+    func apply< Value : IScalar >(
+        matrix: Matrix3< Value >? = nil,
+        alpha: Value? = nil,
         fill: GraphicsFill? = nil,
         stroke: GraphicsStroke? = nil,
         block: () -> Void
@@ -78,8 +78,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        circle: Circle< ValueType >,
+    func draw< Value : IScalar >(
+        circle: Circle< Value >,
         mode: GraphicsDrawMode
     ) {
         self._instance.saveGState()
@@ -94,8 +94,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        circles: [Circle< ValueType >],
+    func draw< Value : IScalar >(
+        circles: [Circle< Value >],
         mode: GraphicsDrawMode
     ) {
         guard circles.isEmpty == false else { return }
@@ -116,8 +116,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        segment: Segment2< ValueType >
+    func draw< Value : IScalar >(
+        segment: Segment2< Value >
     ) {
         self._instance.saveGState()
         self._instance.beginPath()
@@ -127,8 +127,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        segments: [Segment2< ValueType >]
+    func draw< Value : IScalar >(
+        segments: [Segment2< Value >]
     ) {
         guard segments.isEmpty == false else { return }
         self._instance.saveGState()
@@ -141,8 +141,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        polyline: Polyline2< ValueType >,
+    func draw< Value : IScalar >(
+        polyline: Polyline2< Value >,
         mode: GraphicsDrawMode
     ) {
         guard polyline.corners.isEmpty == false else { return }
@@ -159,8 +159,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        polygon: Polygon2< ValueType >,
+    func draw< Value : IScalar >(
+        polygon: Polygon2< Value >,
         mode: GraphicsDrawMode
     ) {
         guard polygon.countours.isEmpty == false else { return }
@@ -180,8 +180,8 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
-        path: Path2< ValueType >,
+    func draw< Value : IScalar >(
+        path: Path2< Value >,
         mode: GraphicsDrawMode
     ) {
         guard path.elements.isEmpty == false else { return }
@@ -227,17 +227,17 @@ public extension GraphicsContext {
         self._instance.restoreGState()
     }
     
-    func draw< ValueType : IScalar >(
+    func draw< Value : IScalar >(
         text: NSAttributedString,
-        rect: Rect< ValueType >
+        rect: Rect< Value >
     ) {
         self._instance.saveGState()
         text.draw(with: rect.cgRect, options: [ .usesLineFragmentOrigin, .usesFontLeading ], context: nil)
         self._instance.restoreGState()
     }
 
-    func clear< ValueType : IScalar >(
-        rect: Rect< ValueType >
+    func clear< Value : IScalar >(
+        rect: Rect< Value >
     ) {
         self._instance.clear(rect.cgRect)
     }
@@ -247,15 +247,15 @@ public extension GraphicsContext {
 private extension GraphicsContext {
     
     @inline(__always)
-    func _apply< ValueType : IScalar >(
-        matrix: Matrix3< ValueType >
+    func _apply< Value : IScalar >(
+        matrix: Matrix3< Value >
     ) {
         self._instance.concatenate(matrix.cgAffineTransform)
     }
     
     @inline(__always)
-    func _apply< ValueType : IScalar >(
-        alpha: ValueType
+    func _apply< Value : IScalar >(
+        alpha: Value
     ) {
         self._instance.setAlpha(alpha.cgFloat)
     }

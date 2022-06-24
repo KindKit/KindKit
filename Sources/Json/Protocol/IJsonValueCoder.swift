@@ -7,8 +7,8 @@ import KindKitCore
 
 public typealias IJsonValueCoder = IJsonValueDecoder & IJsonValueEncoder
 
-public protocol IJsonValueDecoder : IValueDecoder where StorageType == IJsonValue {
+public protocol IJsonValueDecoder : IValueDecoder where Storage == IJsonValue {
 }
 
-public protocol IJsonValueEncoder : IValueEncoder where StorageType == IJsonValue {
+public protocol IJsonValueEncoder : IValueEncoder where Storage == IJsonValue {
 }

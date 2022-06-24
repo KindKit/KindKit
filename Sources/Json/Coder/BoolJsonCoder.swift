@@ -27,7 +27,7 @@ public struct BoolJsonCoder : IJsonValueCoder {
 
 extension Bool : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = BoolJsonCoder
-    public typealias JsonEncoderType = BoolJsonCoder
+    public typealias JsonDecoder = BoolJsonCoder
+    public typealias JsonEncoder = BoolJsonCoder
     
 }

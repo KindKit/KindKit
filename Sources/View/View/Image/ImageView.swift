@@ -152,7 +152,7 @@ public class ImageView : IImageView {
         return DynamicSizeBehaviour.apply(
             available: available,
             width: self.width,
-            height: self.width,
+            height: self.height,
             sizeWithWidth: {
                 switch self.mode {
                 case .origin:

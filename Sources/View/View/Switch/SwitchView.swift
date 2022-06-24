@@ -125,7 +125,7 @@ public class SwitchView : ISwitchView {
     private var _onVisible: (() -> Void)?
     private var _onVisibility: (() -> Void)?
     private var _onInvisible: (() -> Void)?
-    private var _onChangeStyle: ((_ userIteraction: Bool) -> Void)?
+    private var _onChangeStyle: ((_ userInteraction: Bool) -> Void)?
     private var _onChangeValue: (() -> Void)?
     
     public init(
@@ -203,8 +203,8 @@ public class SwitchView : ISwitchView {
         self._onInvisible?()
     }
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self._onChangeStyle?(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self._onChangeStyle?(userInteraction)
     }
     
     @discardableResult
@@ -316,7 +316,7 @@ public class SwitchView : ISwitchView {
     }
     
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self {
+    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self._onChangeStyle = value
         return self
     }

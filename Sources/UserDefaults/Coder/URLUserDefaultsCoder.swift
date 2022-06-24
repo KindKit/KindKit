@@ -24,7 +24,7 @@ public struct URLUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension URL : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = URLUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = URLUserDefaultsCoder
+    public typealias UserDefaultsDecoder = URLUserDefaultsCoder
+    public typealias UserDefaultsEncoder = URLUserDefaultsCoder
     
 }

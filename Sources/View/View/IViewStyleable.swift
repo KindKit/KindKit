@@ -8,21 +8,21 @@ import KindKitMath
 
 public protocol IViewStyleable : AnyObject {
     
-    func triggeredChangeStyle(_ userIteraction: Bool)
+    func triggeredChangeStyle(_ userInteraction: Bool)
     
     @discardableResult
-    func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self
+    func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self
     
 }
 
 extension IWidgetView where Body : IViewStyleable {
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self.body.triggeredChangeStyle(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self.body.triggeredChangeStyle(userInteraction)
     }
     
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self {
+    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self.body.onChangeStyle(value)
         return self
     }

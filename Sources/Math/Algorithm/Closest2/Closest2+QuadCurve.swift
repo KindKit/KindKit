@@ -6,7 +6,7 @@ import Foundation
 
 public extension Closest2 {
     
-    static func find(_ point: PointType, _ curve: QuadCurveType) -> Percent< ValueType > {
+    static func find(_ point: Point< Value >, _ curve: QuadCurve2< Value >) -> Percent< Value > {
         let c = curve - point
         let ds = c.control - c.start
         let de = c.end - c.control
@@ -17,14 +17,14 @@ public extension Closest2 {
         let sl = c.start.length.squared
         let el = c.end.length.squared
         var ll = sl
-        var r: Percent< ValueType > = .zero
+        var r: Percent< Value > = .zero
         if el < sl {
             ll = el
             r = .one
         }
         Bezier.droots((p0.x + p0.y).double, (p1.x + p1.y).double, (p2.x + p2.y).double, (p3.x + p3.y).double, closure: { value in
             guard value > 0 && value < 1 else { return }
-            let nr = Percent(ValueType(value))
+            let nr = Percent(Value(value))
             let p = c.point(at: nr)
             let pl = p.length.squared
             if pl < ll {
@@ -40,7 +40,7 @@ public extension Closest2 {
 public extension QuadCurve2 {
     
     @inlinable
-    func closest(_ point: Point< ValueType >) -> Percent< ValueType > {
+    func closest(_ point: Point< Value >) -> Percent< Value > {
         return Closest2.find(point, self)
     }
     

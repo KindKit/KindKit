@@ -20,7 +20,7 @@ public struct URLJsonCoder : IJsonValueCoder {
 
 extension URL : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = URLJsonCoder
-    public typealias JsonEncoderType = URLJsonCoder
+    public typealias JsonDecoder = URLJsonCoder
+    public typealias JsonEncoder = URLJsonCoder
     
 }

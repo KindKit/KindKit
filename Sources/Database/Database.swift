@@ -234,8 +234,8 @@ public extension Database {
         try statement.executeUntilDone()
     }
     
-    func set< EncoderType : IEnumEncodable >(_ encoder: EncoderType.Type, userVersion: EncoderType.RealValue) throws where EncoderType.RawValue : BinaryInteger {
-        try self.set(userVersion: Int(EncoderType(realValue: userVersion).rawValue))
+    func set< Encoder : IEnumEncodable >(_ encoder: Encoder.Type, userVersion: Encoder.RealValue) throws where Encoder.RawValue : BinaryInteger {
+        try self.set(userVersion: Int(Encoder(realValue: userVersion).rawValue))
     }
     
     func userVersion() throws -> Int {
@@ -245,8 +245,8 @@ public extension Database {
         return Int(statement.value(at: 0))
     }
     
-    func userVersion< DecoderType : IEnumDecodable >(_ decoder: DecoderType.Type) throws -> DecoderType.RealValue where DecoderType.RawValue == Int {
-        guard let decoded = DecoderType(rawValue: DecoderType.RawValue(try self.userVersion())) else {
+    func userVersion< Decoder : IEnumDecodable >(_ decoder: Decoder.Type) throws -> Decoder.RealValue where Decoder.RawValue == Int {
+        guard let decoded = Decoder(rawValue: Decoder.RawValue(try self.userVersion())) else {
             throw Error.userVersion
         }
         return decoded.realValue
@@ -401,7 +401,7 @@ public extension Database {
         return self.numberOfChangedRows
     }
     
-    func select< Type >(table: Table, columns: [Column]? = nil, where: IDatabaseExpressable? = nil, orderBy: OrderBy? = nil, pagination: Pagination? = nil, map: (Database.Statement) throws -> Type) throws -> [Type] {
+    func select< Result >(table: Table, columns: [Column]? = nil, where: IDatabaseExpressable? = nil, orderBy: OrderBy? = nil, pagination: Pagination? = nil, map: (Database.Statement) throws -> Result) throws -> [Result] {
         var bindables: [IDatabaseInputValue] = []
         var query = "SELECT "
         if let columns = columns {
@@ -429,7 +429,7 @@ public extension Database {
         return try statement.executeRows(map)
     }
     
-    func selectFirst< Type >(table: Table, columns: [Column]? = nil, where: IDatabaseExpressable? = nil, orderBy: OrderBy? = nil, pagination: Pagination? = nil, map: (Database.Statement) throws -> Type) throws -> Type? {
+    func selectFirst< Result >(table: Table, columns: [Column]? = nil, where: IDatabaseExpressable? = nil, orderBy: OrderBy? = nil, pagination: Pagination? = nil, map: (Database.Statement) throws -> Result) throws -> Result? {
         var bindables: [IDatabaseInputValue] = []
         var query = "SELECT "
         if let columns = columns {
@@ -477,16 +477,16 @@ extension Database.Column : Hashable {
 
 public extension Database.Statement {
     
-    func value< Type: IDatabaseOutputValue >(of column: Database.Column) throws -> Type {
+    func value< Output: IDatabaseOutputValue >(of column: Database.Column) throws -> Output {
         guard let index = self.columnIndex(of: column.name) else {
             throw Database.Error.columnNotFound(name: column.name)
         }
         if sqlite3_column_type(self._statement, Int32(index)) == SQLITE_NULL {
             throw Database.Error.nullValueOf(column: column.name)
         }
-        var result: Type
+        var result: Output
         do {
-            result = try Type.value(statement: self, at: index)
+            result = try Output.value(statement: self, at: index)
         } catch Error.cast(let index) {
             throw Database.Error.cast(column: self.columnName(at: index))
         } catch let error {
@@ -495,7 +495,7 @@ public extension Database.Statement {
         return result
     }
     
-    func value< Type: RawRepresentable, Value: IDatabaseOutputValue >(of column: Database.Column) throws -> Type where Type.RawValue == Value {
+    func value< Raw: RawRepresentable, Value: IDatabaseOutputValue >(of column: Database.Column) throws -> Raw where Raw.RawValue == Value {
         guard let index = self.columnIndex(of: column.name) else {
             throw Database.Error.columnNotFound(name: column.name)
         }
@@ -510,7 +510,7 @@ public extension Database.Statement {
         } catch let error {
             throw error
         }
-        guard let value = Type(rawValue: rawValue) else {
+        guard let value = Raw(rawValue: rawValue) else {
             throw Database.Error.cast(column: column.name)
         }
         return value
@@ -654,7 +654,7 @@ extension Database.Statement {
         }
     }
     
-    func executeFirstRow< Type >(_ block: (Database.Statement) throws -> Type) throws -> Type? {
+    func executeFirstRow< Result >(_ block: (Database.Statement) throws -> Result) throws -> Result? {
         while true {
             let step = sqlite3_step(self._statement)
             switch step {
@@ -665,8 +665,8 @@ extension Database.Statement {
         }
     }
     
-    func executeRows< Type >(_ block: (Database.Statement) throws -> Type) throws -> [Type] {
-        var results: [Type] = []
+    func executeRows< Result >(_ block: (Database.Statement) throws -> Result) throws -> [Result] {
+        var results: [Result] = []
         while true {
             let step = sqlite3_step(self._statement)
             switch step {

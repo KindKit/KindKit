@@ -31,7 +31,7 @@ public struct BoolUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Bool : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = BoolUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = BoolUserDefaultsCoder
+    public typealias UserDefaultsDecoder = BoolUserDefaultsCoder
+    public typealias UserDefaultsEncoder = BoolUserDefaultsCoder
     
 }

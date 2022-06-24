@@ -17,6 +17,6 @@ public struct SemaVersionJsonCoder : IJsonValueDecoder {
 
 extension SemaVersion : IJsonDecoderAlias {
     
-    public typealias JsonDecoderType = SemaVersionJsonCoder
+    public typealias JsonDecoder = SemaVersionJsonCoder
     
 }

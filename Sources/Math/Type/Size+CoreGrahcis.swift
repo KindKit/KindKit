@@ -18,8 +18,8 @@ public extension Size {
     
     @inlinable
     init(_ cgSize: CGSize) {
-        self.width = ValueType(cgSize.width)
-        self.height = ValueType(cgSize.height)
+        self.width = Value(cgSize.width)
+        self.height = Value(cgSize.height)
     }
     
 }

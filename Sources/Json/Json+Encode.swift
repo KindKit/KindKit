@@ -7,43 +7,43 @@ import KindKitCore
 
 public extension Json {
     
-    func encode< EncoderType: IJsonValueEncoder >(_ encoder: EncoderType.Type, value: EncoderType.ValueType) throws {
+    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value) throws {
         try self._set(value: try encoder.encode(value), path: nil)
     }
     
     @inlinable
-    func encode< EncoderType: IJsonModelEncoder >(_ encoder: EncoderType.Type, value: EncoderType.ModelType) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value)
+    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value)
     }
     
     @inlinable
-    func encode< AliasType: IJsonEncoderAlias >(_ alias: AliasType.Type, value: AliasType.JsonEncoderType.ValueType) throws {
-        try self.encode(AliasType.JsonEncoderType.self, value: value)
+    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value) throws {
+        try self.encode(Alias.JsonEncoder.self, value: value)
     }
     
 }
 
 public extension Json {
     
-    func encode< EncoderType: IJsonValueEncoder >(_ encoder: EncoderType.Type, value: EncoderType.ValueType, path: String) throws {
+    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value, path: String) throws {
         try self._set(value: try encoder.encode(value), path: path)
     }
     
     @inlinable
-    func encode< EncoderType: IJsonModelEncoder >(_ encoder: EncoderType.Type, value: EncoderType.ModelType, path: String) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value, path: path)
+    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model, path: String) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path)
     }
     
     @inlinable
-    func encode< AliasType: IJsonEncoderAlias >(_ alias: AliasType.Type, value: AliasType.JsonEncoderType.ValueType, path: String) throws {
-        try self.encode(AliasType.JsonEncoderType.self, value: value, path: path)
+    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value, path: String) throws {
+        try self.encode(Alias.JsonEncoder.self, value: value, path: path)
     }
     
 }
 
 public extension Json {
     
-    func encode< EncoderType : IJsonValueEncoder >(_ encoder: EncoderType.Type, value: Array< EncoderType.ValueType >, skipping: Bool = false) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Array< Encoder.Value >, skipping: Bool = false) throws {
         let jsonValue = NSMutableArray(capacity: value.count)
         if skipping == true {
             for item in value {
@@ -59,20 +59,20 @@ public extension Json {
     }
     
     @inlinable
-    func encode< EncoderType : IJsonModelEncoder >(_ encoder: EncoderType.Type, value: Array< EncoderType.ModelType >, skipping: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value, skipping: skipping)
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Array< Encoder.Model >, skipping: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< AliasType : IJsonEncoderAlias >(_ alias: AliasType.Type, value: Array< AliasType.JsonEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(AliasType.JsonEncoderType.self, value: value, skipping: skipping)
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Array< Alias.JsonEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(Alias.JsonEncoder.self, value: value, skipping: skipping)
     }
     
 }
 
 public extension Json {
     
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ValueType >, skipping: Bool = false) throws {
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Value, ValueEncoder.Value >, skipping: Bool = false) throws {
         let jsonValue = NSMutableDictionary(capacity: value.count)
         if skipping == true {
             for item in value {
@@ -91,50 +91,50 @@ public extension Json {
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ModelType >, skipping: Bool = false) throws {
-        return try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoderType >.self, value: value, skipping: skipping)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Value, ValueEncoder.Model >, skipping: Bool = false) throws {
+        return try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoder >.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(keyEncoder, ValueAlias.JsonEncoderType.self, value: value, skipping: skipping)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoder.Value, ValueAlias.JsonEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(keyEncoder, ValueAlias.JsonEncoder.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, valueEncoder, value: value, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Model, ValueEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, valueEncoder, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ModelType >, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Model, ValueEncoder.Model >, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, ModelJsonEncoder< ValueEncoder >.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoderType.ModelType, ValueAlias.JsonEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ValueAlias.JsonEncoderType.self, value: value, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoder.Model, ValueAlias.JsonEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, ValueAlias.JsonEncoder.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonValueEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, valueEncoder.self, value: value, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonValueEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, valueEncoder.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonModelEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ModelType >, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonModelEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Model >, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, ModelJsonEncoder< ValueEncoder >.self, value: value, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAliasType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType >, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, ValueAlias.JsonEncoderType.self, value: value, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAlias.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueAlias.JsonEncoder.Value >, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, ValueAlias.JsonEncoder.self, value: value, skipping: skipping)
     }
     
 }
 
 public extension Json {
     
-    func encode< EncoderType: IJsonValueEncoder >(_ encoder: EncoderType.Type, value: Optional< EncoderType.ValueType >, path: String, nullable: Bool = false) throws {
+    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Value >, path: String, nullable: Bool = false) throws {
         if let value = value {
             try self._set(value: try encoder.encode(value), path: path)
         } else if nullable == true {
@@ -143,20 +143,20 @@ public extension Json {
     }
     
     @inlinable
-    func encode< EncoderType: IJsonModelEncoder >(_ encoder: EncoderType.Type, value: Optional< EncoderType.ModelType >, path: String, nullable: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value, path: path, nullable: nullable)
+    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Model >, path: String, nullable: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path, nullable: nullable)
     }
     
     @inlinable
-    func encode< AliasType: IJsonEncoderAlias >(_ alias: AliasType.Type, value: Optional< AliasType.JsonEncoderType.ValueType >, path: String, nullable: Bool = false) throws {
-        try self.encode(AliasType.JsonEncoderType.self, value: value, path: path, nullable: nullable)
+    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Optional< Alias.JsonEncoder.Value >, path: String, nullable: Bool = false) throws {
+        try self.encode(Alias.JsonEncoder.self, value: value, path: path, nullable: nullable)
     }
     
 }
 
 public extension Json {
     
-    func encode< EncoderType : IJsonValueEncoder >(_ encoder: EncoderType.Type, value: Array< EncoderType.ValueType >, path: String, skipping: Bool = false) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Array< Encoder.Value >, path: String, skipping: Bool = false) throws {
         let jsonValue = NSMutableArray(capacity: value.count)
         if skipping == true {
             for item in value {
@@ -172,20 +172,20 @@ public extension Json {
     }
     
     @inlinable
-    func encode< EncoderType : IJsonModelEncoder >(_ encoder: EncoderType.Type, value: Array< EncoderType.ModelType >, path: String, skipping: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value, path: path, skipping: skipping)
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Array< Encoder.Model >, path: String, skipping: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< AliasType : IJsonEncoderAlias >(_ alias: AliasType.Type, value: Array< AliasType.JsonEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(AliasType.JsonEncoderType.self, value: value, path: path, skipping: skipping)
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Array< Alias.JsonEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(Alias.JsonEncoder.self, value: value, path: path, skipping: skipping)
     }
     
 }
 
 public extension Json {
     
-    func encode< EncoderType : IJsonValueEncoder >(_ encoder: EncoderType.Type, value: Optional< Array< EncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Optional< Array< Encoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
         if let value = value {
             try self.encode(encoder, value: value, path: path, skipping: skipping)
         } else if nullable == true {
@@ -194,20 +194,20 @@ public extension Json {
     }
     
     @inlinable
-    func encode< EncoderType : IJsonModelEncoder >(_ encoder: EncoderType.Type, value: Optional< Array< EncoderType.ModelType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< EncoderType >.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Optional< Array< Encoder.Model > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< AliasType : IJsonEncoderAlias >(_ alias: AliasType.Type, value: Optional< Array< AliasType.JsonEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        return try self.encode(AliasType.JsonEncoderType.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Optional< Array< Alias.JsonEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        return try self.encode(Alias.JsonEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
 }
 
 public extension Json {
     
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Value, ValueEncoder.Value >, path: String, skipping: Bool = false) throws {
         let jsonValue = NSMutableDictionary(capacity: value.count)
         if skipping == true {
             for item in value {
@@ -226,50 +226,50 @@ public extension Json {
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ModelType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Value, ValueEncoder.Model >, path: String, skipping: Bool = false) throws {
+        return try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(keyEncoder, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoder.Value, ValueAlias.JsonEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(keyEncoder, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, valueEncoder, value: value, path: path, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Model, ValueEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, valueEncoder, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ModelType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyEncoder.Model, ValueEncoder.Model >, path: String, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoderType.ModelType, ValueAlias.JsonEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyEncoder.Model, ValueAlias.JsonEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(ModelJsonEncoder< KeyEncoder >.self, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonValueEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, valueEncoder.self, value: value, path: path, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonValueEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, valueEncoder.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonModelEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ModelType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonModelEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Model >, path: String, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAliasType.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType >, path: String, skipping: Bool = false) throws {
-        return try self.encode(KeyAliasType.JsonEncoderType.self, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAlias.Type, _ valueAlias: ValueAlias.Type, value: Dictionary< KeyAlias.JsonEncoder.Value, ValueAlias.JsonEncoder.Value >, path: String, skipping: Bool = false) throws {
+        return try self.encode(KeyAlias.JsonEncoder.self, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping)
     }
     
 }
 
 public extension Json {
     
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyEncoder.Value, ValueEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
         if let value = value {
             try self.encode(keyEncoder, valueEncoder, value: value, path: path, skipping: skipping)
         } else if nullable == true {
@@ -278,43 +278,43 @@ public extension Json {
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyEncoderType.ValueType, ValueEncoderType.ModelType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyEncoder.Value, ValueEncoder.Model > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(keyEncoder, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(keyEncoder, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyEncoder : IJsonValueEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyEncoder.Value, ValueAlias.JsonEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(keyEncoder, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonValueEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< KeyEncoderType >.self, valueEncoder, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonValueEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyEncoder.Model, ValueEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< KeyEncoder >.self, valueEncoder, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueEncoderType : IJsonModelEncoder >(_ keyEncoder: KeyEncoderType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyEncoderType.ModelType, ValueEncoderType.ModelType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueEncoder : IJsonModelEncoder >(_ keyEncoder: KeyEncoder.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyEncoder.Model, ValueEncoder.Model > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< KeyEncoder >.self, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyEncoderType : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoderType.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyEncoderType.ModelType, ValueAlias.JsonEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(ModelJsonEncoder< KeyEncoderType >.self, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyEncoder : IJsonModelEncoder, ValueAlias : IJsonEncoderAlias >(_ keyEncoder: KeyEncoder.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyEncoder.Model, ValueAlias.JsonEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(ModelJsonEncoder< KeyEncoder >.self, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonValueEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(KeyAliasType.JsonEncoderType.self, valueEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonValueEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(KeyAlias.JsonEncoder.self, valueEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueEncoderType : IJsonModelEncoder >(_ keyAlias: KeyAliasType.Type, _ valueEncoder: ValueEncoderType.Type, value: Optional< Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueEncoderType.ModelType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(KeyAliasType.JsonEncoderType.self, ModelJsonEncoder< ValueEncoderType >.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueEncoder : IJsonModelEncoder >(_ keyAlias: KeyAlias.Type, _ valueEncoder: ValueEncoder.Type, value: Optional< Dictionary< KeyAlias.JsonEncoder.Value, ValueEncoder.Model > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(KeyAlias.JsonEncoder.self, ModelJsonEncoder< ValueEncoder >.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
     @inlinable
-    func encode< KeyAliasType : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAliasType.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyAliasType.JsonEncoderType.ValueType, ValueAlias.JsonEncoderType.ValueType > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
-        try self.encode(KeyAliasType.JsonEncoderType.self, ValueAlias.JsonEncoderType.self, value: value, path: path, skipping: skipping, nullable: nullable)
+    func encode< KeyAlias : IJsonEncoderAlias, ValueAlias : IJsonEncoderAlias >(_ keyAlias: KeyAlias.Type, _ valueAlias: ValueAlias.Type, value: Optional< Dictionary< KeyAlias.JsonEncoder.Value, ValueAlias.JsonEncoder.Value > >, path: String, skipping: Bool = false, nullable: Bool = false) throws {
+        try self.encode(KeyAlias.JsonEncoder.self, ValueAlias.JsonEncoder.self, value: value, path: path, skipping: skipping, nullable: nullable)
     }
     
 }

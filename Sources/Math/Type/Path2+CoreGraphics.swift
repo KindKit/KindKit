@@ -26,12 +26,12 @@ public extension Path2 {
     init(_ cgPath: CGPath) {
         self.elements = cgPath.elements.compactMap({
             switch $0.type {
-            case .moveToPoint: return .move(to: PointType($0.points[0]))
-            case .addLineToPoint: return .line(to: PointType($0.points[0]))
-            case .addQuadCurveToPoint: return .quad(to: PointType($0.points[1]), control: PointType($0.points[0]))
-            case .addCurveToPoint: return .cubic(to: PointType($0.points[2]), control1: PointType($0.points[1]), control2: PointType($0.points[0]))
+            case .moveToPoint: return .move(to: Point($0.points[0]))
+            case .addLineToPoint: return .line(to: Point($0.points[0]))
+            case .addQuadCurveToPoint: return .quad(to: Point($0.points[1]), control: Point($0.points[0]))
+            case .addCurveToPoint: return .cubic(to: Point($0.points[2]), control1: Point($0.points[1]), control2: Point($0.points[0]))
             case .closeSubpath: return .close
-            @unknown default: fatalError("unhandled case of CGPathElementType")
+            @unknown default: fatalError("unhandled case of CGPathElement")
             }
         })
     }

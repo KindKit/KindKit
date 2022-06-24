@@ -7,9 +7,9 @@ import KindKitCore
 
 public extension UserDefaults {
     
-    func encode< EncoderType: IUserDefaultsValueEncoder >(
-        _ encoder: EncoderType.Type,
-        value: EncoderType.ValueType,
+    func encode< Encoder: IUserDefaultsValueEncoder >(
+        _ encoder: Encoder.Type,
+        value: Encoder.Value,
         forKey key: String
     ) {
         if let value = try? encoder.encode(value) {
@@ -19,31 +19,31 @@ public extension UserDefaults {
         }
     }
     
-    func encode< AliasType: IUserDefaultsEncoderAlias >(
-        _ alias: AliasType.Type,
-        value: AliasType.UserDefaultsEncoderType.ValueType,
+    func encode< Alias: IUserDefaultsEncoderAlias >(
+        _ alias: Alias.Type,
+        value: Alias.UserDefaultsEncoder.Value,
         forKey key: String
     ) {
-        self.encode(AliasType.UserDefaultsEncoderType.self, value: value, forKey: key)
+        self.encode(Alias.UserDefaultsEncoder.self, value: value, forKey: key)
     }
     
 }
 
 public extension UserDefaults {
     
-    func encode< EncoderType: IUserDefaultsValueEncoder, KeyType: RawRepresentable >(
-        _ encoder: EncoderType.Type,
-        value: EncoderType.ValueType,
-        forKey key: KeyType
-    ) where KeyType.RawValue == String {
+    func encode< Encoder: IUserDefaultsValueEncoder, Key: RawRepresentable >(
+        _ encoder: Encoder.Type,
+        value: Encoder.Value,
+        forKey key: Key
+    ) where Key.RawValue == String {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
-    func encode< AliasType: IUserDefaultsEncoderAlias, KeyType: RawRepresentable >(
-        _ alias: AliasType.Type,
-        value: AliasType.UserDefaultsEncoderType.ValueType,
-        forKey key: KeyType
-    ) where KeyType.RawValue == String {
+    func encode< Alias: IUserDefaultsEncoderAlias, Key: RawRepresentable >(
+        _ alias: Alias.Type,
+        value: Alias.UserDefaultsEncoder.Value,
+        forKey key: Key
+    ) where Key.RawValue == String {
         self.encode(alias, value: value, forKey: key.rawValue)
     }
     
@@ -51,9 +51,9 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func encode< EncoderType: IUserDefaultsValueEncoder >(
-        _ encoder: EncoderType.Type,
-        value: EncoderType.ValueType?,
+    func encode< Encoder: IUserDefaultsValueEncoder >(
+        _ encoder: Encoder.Type,
+        value: Encoder.Value?,
         forKey key: String
     ) {
         if let value = value {
@@ -63,31 +63,31 @@ public extension UserDefaults {
         }
     }
     
-    func encode< AliasType: IUserDefaultsEncoderAlias >(
-        _ alias: AliasType.Type,
-        value: AliasType.UserDefaultsEncoderType.ValueType?,
+    func encode< Alias: IUserDefaultsEncoderAlias >(
+        _ alias: Alias.Type,
+        value: Alias.UserDefaultsEncoder.Value?,
         forKey key: String
     ) {
-        self.encode(AliasType.UserDefaultsEncoderType.self, value: value, forKey: key)
+        self.encode(Alias.UserDefaultsEncoder.self, value: value, forKey: key)
     }
     
 }
 
 public extension UserDefaults {
     
-    func encode< EncoderType: IUserDefaultsValueEncoder, KeyType: RawRepresentable >(
-        _ encoder: EncoderType.Type,
-        value: EncoderType.ValueType?,
-        forKey key: KeyType
-    ) where KeyType.RawValue == String {
+    func encode< Encoder: IUserDefaultsValueEncoder, Key: RawRepresentable >(
+        _ encoder: Encoder.Type,
+        value: Encoder.Value?,
+        forKey key: Key
+    ) where Key.RawValue == String {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
-    func encode< AliasType: IUserDefaultsEncoderAlias, KeyType: RawRepresentable >(
-        _ alias: AliasType.Type,
-        value: AliasType.UserDefaultsEncoderType.ValueType?,
-        forKey key: KeyType
-    ) where KeyType.RawValue == String {
+    func encode< Alias: IUserDefaultsEncoderAlias, Key: RawRepresentable >(
+        _ alias: Alias.Type,
+        value: Alias.UserDefaultsEncoder.Value?,
+        forKey key: Key
+    ) where Key.RawValue == String {
         self.encode(alias, value: value, forKey: key.rawValue)
     }
     

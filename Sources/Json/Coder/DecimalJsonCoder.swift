@@ -18,7 +18,7 @@ public struct DecimalJsonCoder : IJsonValueCoder {
 
 extension Decimal : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = DecimalJsonCoder
-    public typealias JsonEncoderType = DecimalJsonCoder
+    public typealias JsonDecoder = DecimalJsonCoder
+    public typealias JsonEncoder = DecimalJsonCoder
     
 }

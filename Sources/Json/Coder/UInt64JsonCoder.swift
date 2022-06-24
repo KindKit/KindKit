@@ -18,7 +18,7 @@ public struct UInt64JsonCoder : IJsonValueCoder {
 
 extension UInt64 : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = UInt64JsonCoder
-    public typealias JsonEncoderType = UInt64JsonCoder
+    public typealias JsonDecoder = UInt64JsonCoder
+    public typealias JsonEncoder = UInt64JsonCoder
     
 }

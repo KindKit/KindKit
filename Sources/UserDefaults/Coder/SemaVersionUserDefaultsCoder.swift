@@ -21,6 +21,6 @@ public struct SemaVersionUserDefaultsCoder : IUserDefaultsValueDecoder {
 
 extension SemaVersion : IUserDefaultsDecoderAlias {
     
-    public typealias UserDefaultsDecoderType = SemaVersionUserDefaultsCoder
+    public typealias UserDefaultsDecoder = SemaVersionUserDefaultsCoder
     
 }

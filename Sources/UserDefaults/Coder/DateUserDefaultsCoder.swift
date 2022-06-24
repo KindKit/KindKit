@@ -19,7 +19,7 @@ public struct DateUserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Date : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = DateUserDefaultsCoder
-    public typealias UserDefaultsEncoderType = DateUserDefaultsCoder
+    public typealias UserDefaultsDecoder = DateUserDefaultsCoder
+    public typealias UserDefaultsEncoder = DateUserDefaultsCoder
     
 }

@@ -24,27 +24,27 @@ public protocol IUndoRedoMutatingTransformContext : IUndoRedoTransformContext {
 
 public extension IUndoRedoTransformContext {
     
-    func old< KeyType: RawRepresentable, ValueType >(
-        _ key: KeyType
-    ) -> ValueType where KeyType.RawValue == String {
-        return self.old(key.rawValue) as! ValueType
+    func old< Key: RawRepresentable, Value >(
+        _ key: Key
+    ) -> Value where Key.RawValue == String {
+        return self.old(key.rawValue) as! Value
     }
     
-    func new< KeyType: RawRepresentable, ValueType >(
-        _ key: KeyType
-    ) -> ValueType where KeyType.RawValue == String {
-        return self.new(key.rawValue) as! ValueType
+    func new< Key: RawRepresentable, Value >(
+        _ key: Key
+    ) -> Value where Key.RawValue == String {
+        return self.new(key.rawValue) as! Value
     }
     
 }
 
 public extension IUndoRedoMutatingTransformContext {
     
-    mutating func set< KeyType: RawRepresentable, ValueType >(
-        _ key: KeyType,
-        new: ValueType,
-        old: ValueType
-    ) where KeyType.RawValue == String {
+    mutating func set< Key: RawRepresentable, Value >(
+        _ key: Key,
+        new: Value,
+        old: Value
+    ) where Key.RawValue == String {
         self.set(key.rawValue, new: new, old: old)
     }
     

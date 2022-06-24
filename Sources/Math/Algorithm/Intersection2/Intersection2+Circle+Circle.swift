@@ -9,8 +9,8 @@ public extension Intersection2 {
     enum CircleToCircle : Equatable {
         case none
         case identical
-        case one(PointType)
-        case two(PointType, PointType)
+        case one(Point< Value >)
+        case two(Point< Value >, Point< Value >)
     }
     
 }
@@ -18,7 +18,7 @@ public extension Intersection2 {
 public extension Intersection2.CircleToCircle {
     
     @inlinable
-    var point1: Intersection2.PointType? {
+    var point1: Point< Value >? {
         switch self {
         case .one(let point): return point
         case .two(let point, _): return point
@@ -27,7 +27,7 @@ public extension Intersection2.CircleToCircle {
     }
     
     @inlinable
-    var point2: Intersection2.PointType? {
+    var point2: Point< Value >? {
         switch self {
         case .two(_, let point): return point
         default: return nil
@@ -39,13 +39,13 @@ public extension Intersection2.CircleToCircle {
 public extension Intersection2 {
     
     @inlinable
-    static func possibly(_ circle1: CircleType, _ circle2: CircleType) -> Bool {
+    static func possibly(_ circle1: Circle< Value >, _ circle2: Circle< Value >) -> Bool {
         let cl = (circle1.origin - circle2.origin).length.real
         let sr = circle1.radius + circle2.radius
         return cl <= sr
     }
     
-    static func find(_ circle1: CircleType, _ circle2: CircleType) -> CircleToCircle {
+    static func find(_ circle1: Circle< Value >, _ circle2: Circle< Value >) -> CircleToCircle {
         let cmc = circle2.origin - circle1.origin
         let rmr = circle1.radius - circle2.radius
         let cdot = cmc.dot(cmc)
@@ -71,7 +71,7 @@ public extension Intersection2 {
                     d = 0
                 }
                 let t = d.sqrt
-                let v = PointType(x: cmc.y, y: -cmc.x)
+                let v = Point(x: cmc.y, y: -cmc.x)
                 if t > 0 {
                     return .two(tmp - t * v, tmp + t * v)
                 } else {
@@ -93,7 +93,7 @@ public extension Circle {
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Intersection2< ValueType >.CircleToCircle {
+    func intersection(_ other: Self) -> Intersection2< Value >.CircleToCircle {
         return Intersection2.find(self, other)
     }
     

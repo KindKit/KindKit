@@ -7,11 +7,11 @@ import Foundation
 public typealias PercentFloat = Percent< Float >
 public typealias PercentDouble = Percent< Double >
 
-public struct Percent< ValueType : IScalar & Hashable > : Hashable {
+public struct Percent< Value : IScalar & Hashable > : Hashable {
     
-    public var value: ValueType
+    public var value: Value
     
-    public init(_ value: ValueType) {
+    public init(_ value: Value) {
         self.value = value
     }
     
@@ -132,7 +132,7 @@ extension Percent : INearEqutable {
     
 }
 
-extension Percent : Comparable where ValueType : Comparable {
+extension Percent : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.value < rhs.value

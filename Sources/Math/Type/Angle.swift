@@ -7,20 +7,20 @@ import Foundation
 public typealias AngleFloat = Angle< Float >
 public typealias AngleDouble = Angle< Double >
 
-public struct Angle< ValueType: IScalar & Hashable > : Hashable {
+public struct Angle< Value: IScalar & Hashable > : Hashable {
     
-    public var degrees: ValueType {
+    public var degrees: Value {
         return self.radians.radiansToDegrees
     }
-    public var radians: ValueType
+    public var radians: Value
     
     @inlinable
-    public init(radians: ValueType) {
+    public init(radians: Value) {
         self.radians = radians
     }
     
     @inlinable
-    public init(degrees: ValueType) {
+    public init(degrees: Value) {
         self.radians = degrees.degreesToRadians
     }
     
@@ -60,7 +60,7 @@ public extension Angle {
     @inlinable
     var normalized: Self {
         var r = self
-        let l = ValueType.pi * 2
+        let l = Value.pi * 2
         while r.radians <= -l {
             r.radians += l
         }
@@ -85,7 +85,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: ValueType) -> Self {
+    static func + (lhs: Self, rhs: Value) -> Self {
         return Angle(radians: lhs.radians + rhs)
     }
     
@@ -95,7 +95,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func += (lhs: inout Self, rhs: ValueType) {
+    static func += (lhs: inout Self, rhs: Value) {
         lhs = lhs + rhs
     }
     
@@ -105,7 +105,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: ValueType) -> Self {
+    static func - (lhs: Self, rhs: Value) -> Self {
         return Angle(radians: lhs.radians - rhs)
     }
     
@@ -115,7 +115,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func -= (lhs: inout Self, rhs: ValueType) {
+    static func -= (lhs: inout Self, rhs: Value) {
         lhs = lhs - rhs
     }
     
@@ -125,7 +125,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: ValueType) -> Self {
+    static func * (lhs: Self, rhs: Value) -> Self {
         return Angle(radians: lhs.radians * rhs)
     }
     
@@ -135,7 +135,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: ValueType) {
+    static func *= (lhs: inout Self, rhs: Value) {
         lhs = lhs * rhs
     }
     
@@ -145,7 +145,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: ValueType) -> Self {
+    static func / (lhs: Self, rhs: Value) -> Self {
         return Angle(radians: lhs.radians / rhs)
     }
     
@@ -155,7 +155,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: ValueType) {
+    static func /= (lhs: inout Self, rhs: Value) {
         lhs = lhs / rhs
     }
     
@@ -170,7 +170,7 @@ extension Angle : INearEqutable {
     
 }
 
-extension Angle : Comparable where ValueType: Comparable {
+extension Angle : Comparable where Value: Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.radians < rhs.radians

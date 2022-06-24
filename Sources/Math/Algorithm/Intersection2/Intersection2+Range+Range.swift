@@ -8,8 +8,8 @@ public extension Intersection2 {
     
     enum RangeToRange : Equatable {
         case none
-        case one(ValueType)
-        case two(ValueType, ValueType)
+        case one(Value)
+        case two(Value, Value)
     }
     
 }
@@ -17,7 +17,7 @@ public extension Intersection2 {
 public extension Intersection2.RangeToRange {
     
     @inlinable
-    var value1: ValueType? {
+    var value1: Value? {
         switch self {
         case .one(let value): return value
         case .two(let value, _): return value
@@ -26,7 +26,7 @@ public extension Intersection2.RangeToRange {
     }
     
     @inlinable
-    var value2: ValueType? {
+    var value2: Value? {
         switch self {
         case .two(_, let value): return value
         default: return nil
@@ -38,12 +38,12 @@ public extension Intersection2.RangeToRange {
 public extension Intersection2 {
     
     @inlinable
-    static func possibly(_ range1: RangeType, _ range2: RangeType) -> Bool {
+    static func possibly(_ range1: Range, _ range2: Range) -> Bool {
         return range1.lower <= range2.upper && range1.upper >= range2.lower
     }
     
     @inlinable
-    static func find(_ range1: RangeType, _ range2: RangeType) -> RangeToRange {
+    static func find(_ range1: Range, _ range2: Range) -> RangeToRange {
         if range1.lower < range2.upper && range1.upper > range2.lower {
             return .none
         } else if range1.upper > range1.lower {

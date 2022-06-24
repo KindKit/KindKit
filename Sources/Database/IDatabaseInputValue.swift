@@ -13,7 +13,7 @@ public protocol IDatabaseInputValue {
 
 extension Database.Statement {
     
-    func bind< Type : Sequence >(_ bindables: Type) throws where Type.Iterator.Element == IDatabaseInputValue {
+    func bind< BindSequence : Sequence >(_ bindables: BindSequence) throws where BindSequence.Iterator.Element == IDatabaseInputValue {
         var index = 1
         for bindable in bindables {
             try bindable.bindTo(statement: self, at: index)

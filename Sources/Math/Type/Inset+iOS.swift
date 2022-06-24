@@ -20,10 +20,10 @@ public extension Inset {
     
     @inlinable
     init(_ uiEdgeInsets: UIEdgeInsets) {
-        self.top = ValueType(uiEdgeInsets.top)
-        self.left = ValueType(uiEdgeInsets.left)
-        self.right = ValueType(uiEdgeInsets.right)
-        self.bottom = ValueType(uiEdgeInsets.bottom)
+        self.top = Value(uiEdgeInsets.top)
+        self.left = Value(uiEdgeInsets.left)
+        self.right = Value(uiEdgeInsets.right)
+        self.bottom = Value(uiEdgeInsets.bottom)
     }
     
 }

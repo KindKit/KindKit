@@ -61,7 +61,7 @@ public class InputListView : IInputListView {
         set(value) {
             self._selectedItem = value
             guard self.isLoaded == true else { return }
-            self._view.update(selectedItem: self._selectedItem, userIteraction: false)
+            self._view.update(selectedItem: self._selectedItem, userInteraction: false)
         }
         get { return self._selectedItem }
     }
@@ -432,7 +432,7 @@ extension InputListView: InputListViewDelegate {
     
     func select(item: IInputListViewItem) {
         self._selectedItem = item
-        self._view.update(selectedItem: item, userIteraction: true)
+        self._view.update(selectedItem: item, userInteraction: true)
         self._onEditing?()
     }
     

@@ -21,23 +21,23 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func remove< KeyType: RawRepresentable >(
-        forKey key: KeyType
-    ) where KeyType.RawValue == String {
+    func remove< Key: RawRepresentable >(
+        forKey key: Key
+    ) where Key.RawValue == String {
         self.remove(forKey: key.rawValue)
     }
     
-    func remove< KeyType: RawRepresentable >(
-        forKeys keys: [KeyType]
-    ) where KeyType.RawValue == String {
+    func remove< Key: RawRepresentable >(
+        forKeys keys: [Key]
+    ) where Key.RawValue == String {
         for key in keys {
             self.remove(forKey: key.rawValue)
         }
     }
     
-    func remove< KeyType: RawRepresentable & CaseIterable >(
-        forKeys keys: KeyType.Type
-    ) where KeyType.RawValue == String {
+    func remove< Key: RawRepresentable & CaseIterable >(
+        forKeys keys: Key.Type
+    ) where Key.RawValue == String {
         for key in keys.allCases {
             self.remove(forKey: key.rawValue)
         }

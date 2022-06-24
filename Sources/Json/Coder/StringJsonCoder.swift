@@ -30,7 +30,7 @@ public struct NonEmptyStringJsonDecoder : IJsonValueDecoder {
 
 extension String : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = StringJsonCoder
-    public typealias JsonEncoderType = StringJsonCoder
+    public typealias JsonDecoder = StringJsonCoder
+    public typealias JsonEncoder = StringJsonCoder
     
 }

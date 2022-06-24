@@ -7,18 +7,18 @@ import Foundation
 public typealias CubicCurve2Float = CubicCurve2< Float >
 public typealias CubicCurve2Double = CubicCurve2< Double >
 
-public struct CubicCurve2< ValueType: IScalar & Hashable > : Hashable {
+public struct CubicCurve2< Value: IScalar & Hashable > : Hashable {
     
-    public var start: Point< ValueType >
-    public var control1: Point< ValueType >
-    public var control2: Point< ValueType >
-    public var end: Point< ValueType >
+    public var start: Point< Value >
+    public var control1: Point< Value >
+    public var control2: Point< Value >
+    public var end: Point< Value >
     
     public init(
-        start: Point< ValueType >,
-        control1: Point< ValueType >,
-        control2: Point< ValueType >,
-        end: Point< ValueType >
+        start: Point< Value >,
+        control1: Point< Value >,
+        control2: Point< Value >,
+        end: Point< Value >
     ) {
         self.start = start
         self.control1 = control1
@@ -26,14 +26,14 @@ public struct CubicCurve2< ValueType: IScalar & Hashable > : Hashable {
         self.end = end
     }
     
-    public init(_ line: Segment2< ValueType >) {
+    public init(_ line: Segment2< Value >) {
         self.start = line.start
         self.control1 = (1.0 / 3.0) * line.start + (1.0 / 3.0) * line.end
         self.control2 = (2.0 / 3.0) * line.start + (2.0 / 3.0) * line.end
         self.end = line.end
     }
     
-    public init(_ curve: QuadCurve2< ValueType >) {
+    public init(_ curve: QuadCurve2< Value >) {
         self.start = curve.start
         self.control1 = (1.0 / 3.0) * curve.control + (1.0 / 3.0) * curve.end
         self.control2 = (2.0 / 3.0) * curve.start + (2.0 / 3.0) * curve.control
@@ -44,7 +44,7 @@ public struct CubicCurve2< ValueType: IScalar & Hashable > : Hashable {
 
 public extension CubicCurve2 {
     
-    var segment: ConvertCurve2< Segment2< ValueType > > {
+    var segment: ConvertCurve2< Segment2< Value > > {
         let line = Segment2(start: self.start, end: self.end)
         let d1 = self.control1 - line.point(at: Percent(1.0 / 3.0))
         let d2 = self.control2 - line.point(at: Percent(2.0 / 3.0))
@@ -56,7 +56,7 @@ public extension CubicCurve2 {
         )
     }
     
-    var quadCurve: ConvertCurve2< QuadCurve2< ValueType > > {
+    var quadCurve: ConvertCurve2< QuadCurve2< Value > > {
         let line = Segment2(start: self.start, end: self.end)
         let d1 = self.control1 - line.point(at: Percent(1.0 / 3.0))
         let d2 = self.control2 - line.point(at: Percent(2.0 / 3.0))
@@ -85,7 +85,7 @@ extension CubicCurve2 : ICurve2 {
     }
     
     @inlinable
-    public var points: [Point< ValueType >] {
+    public var points: [Point< Value >] {
         return [ self.start, self.control1, self.control2, self.end ]
     }
     
@@ -94,14 +94,14 @@ extension CubicCurve2 : ICurve2 {
         return CubicCurve2(start: self.end, control1: self.control2, control2: self.control1, end: self.start)
     }
     
-    public var length: Distance< ValueType > {
-        return Distance(squared: ValueType(Bezier.length({
-            let derivative = self.derivative(at: Percent(ValueType($0)))
+    public var length: Distance< Value > {
+        return Distance(squared: Value(Bezier.length({
+            let derivative = self.derivative(at: Percent(Value($0)))
             return derivative.length.squared.double
         })))
     }
     
-    public var bbox: Box2< ValueType > {
+    public var bbox: Box2< Value > {
         var lower = self.start.min(self.end)
         var upper = self.start.max(self.end)
         let ds = self.control1 - self.start
@@ -110,7 +110,7 @@ extension CubicCurve2 : ICurve2 {
         if self.control1.x < lower.x || self.control1.x > upper.x || self.control2.x < lower.x || self.control2.x > upper.x {
             Bezier.droots(ds.x.double, dc.x.double, de.x.double, closure: { k in
                 guard k > 0.0 && k < 1.0 else { return }
-                let v = self.point(at: Percent(ValueType(k)))
+                let v = self.point(at: Percent(Value(k)))
                 if v.x < lower.x {
                     lower.x = v.x
                 } else if v.x > upper.x {
@@ -121,7 +121,7 @@ extension CubicCurve2 : ICurve2 {
         if self.control1.y < lower.y || self.control1.y > upper.y || self.control2.y < lower.y || self.control2.y > upper.y {
             Bezier.droots(ds.y.double, dc.y.double, de.y.double, closure: { k in
                 guard k > 0.0 && k < 1.0 else { return }
-                let v = self.point(at: Percent(ValueType(k)))
+                let v = self.point(at: Percent(Value(k)))
                 if v.y < lower.y {
                     lower.y = v.y
                 } else if v.y > upper.y {
@@ -132,7 +132,7 @@ extension CubicCurve2 : ICurve2 {
         return Box2(lower: lower, upper: upper)
     }
     
-    public func point(at location: Percent< ValueType >) -> Point< ValueType > {
+    public func point(at location: Percent< Value >) -> Point< Value > {
         if location <= .zero {
             return self.start
         } else if location >= .one {
@@ -148,7 +148,7 @@ extension CubicCurve2 : ICurve2 {
         return (a * self.start) + (b * self.control1) + (c * self.control2) + (d * self.end)
     }
     
-    public func normal(at location: Percent< ValueType >) -> Point< ValueType > {
+    public func normal(at location: Percent< Value >) -> Point< Value > {
         var d = self.derivative(at: location)
         if d ~~ .zero && (location <= .zero || location >= .one) {
             if location ~~ .zero {
@@ -163,7 +163,7 @@ extension CubicCurve2 : ICurve2 {
         return d.perpendicular.normalized.point
     }
     
-    public func derivative(at location: Percent< ValueType >) -> Point< ValueType > {
+    public func derivative(at location: Percent< Value >) -> Point< Value > {
         let il = 1 - location.value
         let p0 = 3 * (self.control1 - self.start)
         let p1 = 3 * (self.control2 - self.control1)
@@ -174,7 +174,7 @@ extension CubicCurve2 : ICurve2 {
         return (a * p0) + (b * p1) + (c * p2)
     }
     
-    public func split(at location: Percent< ValueType >) -> (left: Self, right: Self) {
+    public func split(at location: Percent< Value >) -> (left: Self, right: Self) {
         let h0 = self.start
         let h1 = self.control1
         let h2 = self.control2
@@ -191,7 +191,7 @@ extension CubicCurve2 : ICurve2 {
         )
     }
     
-    public func cut(start: Percent< ValueType >, end: Percent< ValueType >) -> Self {
+    public func cut(start: Percent< Value >, end: Percent< Value >) -> Self {
         guard start > .zero || end < .one else { return self }
         let k = (end.value - start.value) / 3.0
         let s = self.point(at: start)
@@ -216,7 +216,7 @@ public extension CubicCurve2 {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: Point< ValueType >) -> Self {
+    static func + (lhs: Self, rhs: Point< Value >) -> Self {
         return CubicCurve2(
             start: lhs.start + rhs,
             control1: lhs.control1 + rhs,
@@ -236,7 +236,7 @@ public extension CubicCurve2 {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Point< ValueType >) -> Self {
+    static func - (lhs: Self, rhs: Point< Value >) -> Self {
         return CubicCurve2(
             start: lhs.start - rhs,
             control1: lhs.control1 - rhs,
@@ -246,7 +246,7 @@ public extension CubicCurve2 {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Matrix3< ValueType >) -> Self {
+    static func * (lhs: Self, rhs: Matrix3< Value >) -> Self {
         return CubicCurve2(
             start: lhs.start * rhs,
             control1: lhs.control1 * rhs,

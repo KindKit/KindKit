@@ -18,8 +18,8 @@ public extension Point {
     
     @inlinable
     init(_ cgPoint: CGPoint) {
-        self.x = ValueType(cgPoint.x)
-        self.y = ValueType(cgPoint.y)
+        self.x = Value(cgPoint.x)
+        self.y = Value(cgPoint.y)
     }
     
 }

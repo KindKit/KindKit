@@ -66,8 +66,12 @@ public struct Color : Equatable {
     
     @inlinable
     @available(iOS 11.0, *)
-    public init(name: String) {
-        guard let native = UIColor(named: name) else {
+    public init(
+        name: String,
+        in bundle: Bundle? = nil,
+        compatibleWith traitCollection: UITraitCollection? = nil
+    ) {
+        guard let native = UIColor(named: name, in: bundle, compatibleWith: traitCollection) else {
             fatalError("Not found color with '\(name)'")
         }
         self.native = native
@@ -75,7 +79,9 @@ public struct Color : Equatable {
     
     @inlinable
     @available(iOS 13.0, *)
-    public init(dynamicProvider: @escaping (UITraitCollection) -> Color) {
+    public init(
+        dynamicProvider: @escaping (UITraitCollection) -> Color
+    ) {
         self.native = UIColor(dynamicProvider: { return dynamicProvider($0).native })
     }
     

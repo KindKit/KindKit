@@ -8,8 +8,8 @@ public extension Intersection2 {
     
     enum SegmentToSegment : Equatable {
         case none
-        case one(PointType)
-        case two(PointType, PointType)
+        case one(Point< Value >)
+        case two(Point< Value >, Point< Value >)
     }
     
 }
@@ -17,7 +17,7 @@ public extension Intersection2 {
 public extension Intersection2.SegmentToSegment {
     
     @inlinable
-    var point1: Intersection2.PointType? {
+    var point1: Point< Value >? {
         switch self {
         case .one(let point): return point
         case .two(let point, _): return point
@@ -26,7 +26,7 @@ public extension Intersection2.SegmentToSegment {
     }
     
     @inlinable
-    var point2: Intersection2.PointType? {
+    var point2: Point< Value >? {
         switch self {
         case .two(_, let point): return point
         default: return nil
@@ -37,7 +37,7 @@ public extension Intersection2.SegmentToSegment {
 
 public extension Intersection2 {
     
-    static func possibly(_ segment1: SegmentType, _ segment2: SegmentType) -> Bool {
+    static func possibly(_ segment1: Segment2< Value >, _ segment2: Segment2< Value >) -> Bool {
         let cf1 = segment1.centeredForm
         let cf2 = segment2.centeredForm
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
@@ -49,8 +49,8 @@ public extension Intersection2 {
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Intersection2.find(
-                RangeType(lower: -cf1.extend, upper: cf1.extend),
-                RangeType(lower: t - cf2.extend, upper: t + cf2.extend)
+                Range(lower: -cf1.extend, upper: cf1.extend),
+                Range(lower: t - cf2.extend, upper: t + cf2.extend)
             )
             switch i {
             case .none: return false
@@ -64,7 +64,7 @@ public extension Intersection2 {
         }
     }
     
-    static func find(_ segment1: SegmentType, _ segment2: SegmentType) -> SegmentToSegment {
+    static func find(_ segment1: Segment2< Value >, _ segment2: Segment2< Value >) -> SegmentToSegment {
         let cf1 = segment1.centeredForm
         let cf2 = segment2.centeredForm
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
@@ -76,8 +76,8 @@ public extension Intersection2 {
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Intersection2.find(
-                RangeType(lower: -cf1.extend, upper: cf1.extend),
-                RangeType(lower: t - cf2.extend, upper: t + cf2.extend)
+                Range(lower: -cf1.extend, upper: cf1.extend),
+                Range(lower: t - cf2.extend, upper: t + cf2.extend)
             )
             switch i {
             case .none: return .none
@@ -104,7 +104,7 @@ public extension Segment2 {
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Intersection2< ValueType >.SegmentToSegment {
+    func intersection(_ other: Self) -> Intersection2< Value >.SegmentToSegment {
         return Intersection2.find(self, other)
     }
     

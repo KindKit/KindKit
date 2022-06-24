@@ -7,15 +7,15 @@ import Foundation
 public typealias InsetFloat = Inset< Float >
 public typealias InsetDouble = Inset< Double >
 
-public struct Inset< ValueType: IScalar & Hashable > : Hashable {
+public struct Inset< Value: IScalar & Hashable > : Hashable {
     
-    public var top: ValueType
-    public var left: ValueType
-    public var right: ValueType
-    public var bottom: ValueType
+    public var top: Value
+    public var left: Value
+    public var right: Value
+    public var bottom: Value
     
     @inlinable
-    public init(top: ValueType, left: ValueType, right: ValueType, bottom: ValueType) {
+    public init(top: Value, left: Value, right: Value, bottom: Value) {
         self.top = top
         self.left = left
         self.right = right
@@ -23,7 +23,7 @@ public struct Inset< ValueType: IScalar & Hashable > : Hashable {
     }
     
     @inlinable
-    public init(horizontal: ValueType, vertical: ValueType) {
+    public init(horizontal: Value, vertical: Value) {
         self.top = vertical
         self.left = horizontal
         self.right = horizontal
@@ -49,12 +49,12 @@ public extension Inset {
     }
     
     @inlinable
-    var horizontal: ValueType {
+    var horizontal: Value {
         return self.left + self.right
     }
     
     @inlinable
-    var vertical: ValueType {
+    var vertical: Value {
         return self.top + self.bottom
     }
     
@@ -118,7 +118,7 @@ extension Inset : INearEqutable {
     
 }
 
-extension Inset : Comparable where ValueType: Comparable {
+extension Inset : Comparable where Value: Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.top < rhs.top && lhs.left < rhs.left && lhs.right < rhs.right && lhs.bottom < rhs.bottom

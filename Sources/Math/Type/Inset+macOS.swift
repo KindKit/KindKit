@@ -20,10 +20,10 @@ public extension Inset {
     
     @inlinable
     init(_ nsEdgeInsets: NSEdgeInsets) {
-        self.top = ValueType(nsEdgeInsets.top)
-        self.left = ValueType(nsEdgeInsets.left)
-        self.right = ValueType(nsEdgeInsets.right)
-        self.bottom = ValueType(nsEdgeInsets.bottom)
+        self.top = Value(nsEdgeInsets.top)
+        self.left = Value(nsEdgeInsets.left)
+        self.right = Value(nsEdgeInsets.right)
+        self.bottom = Value(nsEdgeInsets.bottom)
     }
     
 }

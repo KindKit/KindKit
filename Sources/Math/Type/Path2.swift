@@ -8,9 +8,7 @@ import CoreGraphics
 public typealias Path2Float = Path2< Float >
 public typealias Path2Double = Path2< Double >
 
-public struct Path2< ValueType: IScalar & Hashable > : Hashable {
-    
-    public typealias PointType = Point< ValueType >
+public struct Path2< Value: IScalar & Hashable > : Hashable {
     
     public var elements: [Element]
     
@@ -26,10 +24,10 @@ public struct Path2< ValueType: IScalar & Hashable > : Hashable {
 public extension Path2 {
     
     enum Element : Hashable {
-        case move(to: Path2.PointType)
-        case line(to: Path2.PointType)
-        case quad(to: Path2.PointType, control: Path2.PointType)
-        case cubic(to: Path2.PointType, control1: Path2.PointType, control2: Path2.PointType)
+        case move(to: Point< Value >)
+        case line(to: Point< Value >)
+        case quad(to: Point< Value >, control: Point< Value >)
+        case cubic(to: Point< Value >, control1: Point< Value >, control2: Point< Value >)
         case close
     }
     
@@ -55,22 +53,22 @@ public extension Path2 {
     }
     
     @inlinable
-    mutating func move(to point: Path2.PointType) {
+    mutating func move(to point: Point< Value >) {
         self.elements.append(.move(to: point))
     }
     
     @inlinable
-    mutating func line(to point: Path2.PointType) {
+    mutating func line(to point: Point< Value >) {
         self.elements.append(.line(to: point))
     }
     
     @inlinable
-    mutating func quad(to point: Path2.PointType, control: Path2.PointType) {
+    mutating func quad(to point: Point< Value >, control: Point< Value >) {
         self.elements.append(.quad(to: point, control: control))
     }
     
     @inlinable
-    mutating func quad(to point: Path2.PointType, control1: Path2.PointType, control2: Path2.PointType) {
+    mutating func quad(to point: Point< Value >, control1: Point< Value >, control2: Point< Value >) {
         self.elements.append(.cubic(to: point, control1: control1, control2: control2))
     }
     

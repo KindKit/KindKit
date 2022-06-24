@@ -18,7 +18,7 @@ public struct DoubleJsonCoder : IJsonValueCoder {
 
 extension Double : IJsonCoderAlias {
     
-    public typealias JsonDecoderType = DoubleJsonCoder
-    public typealias JsonEncoderType = DoubleJsonCoder
+    public typealias JsonDecoder = DoubleJsonCoder
+    public typealias JsonEncoder = DoubleJsonCoder
     
 }

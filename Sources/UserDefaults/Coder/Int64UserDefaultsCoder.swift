@@ -18,7 +18,7 @@ public struct Int64UserDefaultsCoder : IUserDefaultsValueCoder {
 
 extension Int64 : IUserDefaultsCoderAlias {
     
-    public typealias UserDefaultsDecoderType = Int64UserDefaultsCoder
-    public typealias UserDefaultsEncoderType = Int64UserDefaultsCoder
+    public typealias UserDefaultsDecoder = Int64UserDefaultsCoder
+    public typealias UserDefaultsEncoder = Int64UserDefaultsCoder
     
 }

@@ -6,18 +6,18 @@ import Foundation
 
 public protocol IValueDecoder {
     
-    associatedtype StorageType
-    associatedtype ValueType
+    associatedtype Storage
+    associatedtype Value
     
-    static func decode(_ value: StorageType) throws -> ValueType
+    static func decode(_ value: Storage) throws -> Value
 
 }
 
 public protocol IValueEncoder {
     
-    associatedtype StorageType
-    associatedtype ValueType
+    associatedtype Storage
+    associatedtype Value
 
-    static func encode(_ value: ValueType) throws -> StorageType
+    static func encode(_ value: Value) throws -> Storage
 
 }

@@ -5,19 +5,19 @@
 import Foundation
 import KindKitCore
 
-public struct ModelJsonDecoder< DecoderType : IJsonModelDecoder > : IJsonValueDecoder {
+public struct ModelJsonDecoder< Decoder : IJsonModelDecoder > : IJsonValueDecoder {
     
-    public static func decode(_ value: IJsonValue) throws -> DecoderType.ModelType {
-        return try DecoderType.decode(Json(root: value))
+    public static func decode(_ value: IJsonValue) throws -> Decoder.Model {
+        return try Decoder.decode(Json(root: value))
     }
     
 }
 
-public struct ModelJsonEncoder< EncoderType : IJsonModelEncoder > : IJsonValueEncoder {
+public struct ModelJsonEncoder< Encoder : IJsonModelEncoder > : IJsonValueEncoder {
     
-    public static func encode(_ value: EncoderType.ModelType) throws -> IJsonValue {
+    public static func encode(_ value: Encoder.Model) throws -> IJsonValue {
         let json = Json()
-        try EncoderType.encode(value, json: json)
+        try Encoder.encode(value, json: json)
         if let root = json.root {
             return root
         }

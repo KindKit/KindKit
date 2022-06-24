@@ -21,15 +21,15 @@ public protocol IApiProvider : AnyObject {
 
 public extension IApiProvider {
 
-    func send< RequestType: IApiRequest, ResponseType: IApiResponse >(
-        request: @autoclosure () throws -> RequestType,
-        response: ResponseType,
+    func send< Request: IApiRequest, Response: IApiResponse >(
+        request: @autoclosure () throws -> Request,
+        response: Response,
         queue: DispatchQueue = DispatchQueue.main,
-        completed: @escaping (_ response: ResponseType) -> Void
+        completed: @escaping (_ response: Response) -> Void
     ) -> IApiQuery {
         let query: IApiQuery
         if let request = try? request() {
-            query = ApiTaskQuery< RequestType, ResponseType >(
+            query = ApiTaskQuery< Request, Response >(
                 provider: self,
                 request: request,
                 response: response,
@@ -37,7 +37,7 @@ public extension IApiProvider {
                 onCompleted: completed
             )
         } else {
-            query = ApiFailQuery< ResponseType >(
+            query = ApiFailQuery< Response >(
                 provider: self,
                 response: response,
                 queue: queue,
@@ -48,16 +48,16 @@ public extension IApiProvider {
         return query
     }
 
-    func send< RequestType: IApiRequest, ResponseType: IApiResponse >(
-        request: @autoclosure () throws -> RequestType,
-        response: ResponseType,
+    func send< Request: IApiRequest, Response: IApiResponse >(
+        request: @autoclosure () throws -> Request,
+        response: Response,
         queue: DispatchQueue = DispatchQueue.main,
         download: @escaping (_ progress: Progress) -> Void,
-        completed: @escaping (_ response: ResponseType) -> Void
+        completed: @escaping (_ response: Response) -> Void
     ) -> IApiQuery {
         let query: IApiQuery
         if let request = try? request() {
-            query = ApiTaskQuery< RequestType, ResponseType >(
+            query = ApiTaskQuery< Request, Response >(
                 provider: self,
                 request: request,
                 response: response,
@@ -66,7 +66,7 @@ public extension IApiProvider {
                 onCompleted: completed
             )
         } else {
-            query = ApiFailQuery< ResponseType >(
+            query = ApiFailQuery< Response >(
                 provider: self,
                 response: response,
                 queue: queue,
@@ -77,16 +77,16 @@ public extension IApiProvider {
         return query
     }
 
-    func send< RequestType: IApiRequest, ResponseType: IApiResponse >(
-        request: @autoclosure () throws -> RequestType,
-        response: ResponseType,
+    func send< Request: IApiRequest, Response: IApiResponse >(
+        request: @autoclosure () throws -> Request,
+        response: Response,
         queue: DispatchQueue = DispatchQueue.main,
         upload: @escaping (_ progress: Progress) -> Void,
-        completed: @escaping (_ response: ResponseType) -> Void
+        completed: @escaping (_ response: Response) -> Void
     ) -> IApiQuery {
         let query: IApiQuery
         if let request = try? request() {
-            query = ApiTaskQuery< RequestType, ResponseType >(
+            query = ApiTaskQuery< Request, Response >(
                 provider: self,
                 request: request,
                 response: response,
@@ -95,7 +95,7 @@ public extension IApiProvider {
                 onCompleted: completed
             )
         } else {
-            query = ApiFailQuery< ResponseType >(
+            query = ApiFailQuery< Response >(
                 provider: self,
                 response: response,
                 queue: queue,
@@ -110,13 +110,13 @@ public extension IApiProvider {
 
 public extension IApiProvider {
     
-    func send< ResponseType: IApiResponse >(
-        response: ResponseType,
+    func send< Response: IApiResponse >(
+        response: Response,
         queue: DispatchQueue = DispatchQueue.main,
         prepare: @escaping () -> (http: HTTPURLResponse?, data: Data?, error: Error?),
-        completed: @escaping (_ response: ResponseType) -> Void
+        completed: @escaping (_ response: Response) -> Void
     ) -> IApiQuery {
-        let query = ApiMockQuery< ResponseType >(
+        let query = ApiMockQuery< Response >(
             provider: self,
             response: response,
             queue: queue,

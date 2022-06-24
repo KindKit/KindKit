@@ -4,5 +4,5 @@
 
 import Foundation
 
-public struct Polylabel2< ValueType: IScalar & Hashable > {
+public struct Polylabel2< Value: IScalar & Hashable > {
 }

@@ -8,16 +8,16 @@ public typealias IJsonModelCoder = IJsonModelDecoder & IJsonModelEncoder
 
 public protocol IJsonModelDecoder {
     
-    associatedtype ModelType
+    associatedtype Model
     
-    static func decode(_ json: Json) throws -> ModelType
+    static func decode(_ json: Json) throws -> Model
 
 }
 
 public protocol IJsonModelEncoder {
     
-    associatedtype ModelType
+    associatedtype Model
 
-    static func encode(_ model: ModelType, json: Json) throws
+    static func encode(_ model: Model, json: Json) throws
 
 }

@@ -96,7 +96,7 @@ extension NativeInputListView {
     func update(view: InputListView) {
         self._view = view
         self.update(items: view.items)
-        self.update(selectedItem: view.selectedItem, userIteraction: false)
+        self.update(selectedItem: view.selectedItem, userInteraction: false)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -118,8 +118,8 @@ extension NativeInputListView {
         self._applyText()
     }
     
-    func update(selectedItem: IInputListViewItem?, userIteraction: Bool) {
-        if userIteraction == false {
+    func update(selectedItem: IInputListViewItem?, userInteraction: Bool) {
+        if userInteraction == false {
             let animated = self.isFirstResponder
             if let view = self._view, let selectedItem = selectedItem {
                 if let index = view.items.firstIndex(where: { $0 === selectedItem }) {

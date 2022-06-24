@@ -349,8 +349,8 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
         }
     }
     
-    public func triggeredChangeStyle(_ userIteraction: Bool) {
-        self._view.triggeredChangeStyle(userIteraction)
+    public func triggeredChangeStyle(_ userInteraction: Bool) {
+        self._view.triggeredChangeStyle(userInteraction)
     }
     
     @discardableResult
@@ -486,7 +486,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
     }
     
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userIteraction: Bool) -> Void)?) -> Self {
+    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self._view.onChangeStyle(value)
         return self
     }

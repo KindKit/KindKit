@@ -4,14 +4,14 @@
 
 import Foundation
 
-public final class ApiFailQuery< ResponseType: IApiResponse > : IApiQuery {
+public final class ApiFailQuery< Response: IApiResponse > : IApiQuery {
     
-    public typealias CompleteClosure = (_ response: ResponseType) -> Void
+    public typealias CompleteClosure = (_ response: Response) -> Void
     
     public private(set) var provider: IApiProvider
     public private(set) var createAt: Date
     
-    public private(set) var response: ResponseType
+    public private(set) var response: Response
     public private(set) var queue: DispatchQueue
     public private(set) var onCompleted: CompleteClosure
     
@@ -20,7 +20,7 @@ public final class ApiFailQuery< ResponseType: IApiResponse > : IApiQuery {
     
     public init(
         provider: IApiProvider,
-        response: ResponseType,
+        response: Response,
         queue: DispatchQueue,
         onCompleted: @escaping CompleteClosure
     ) {

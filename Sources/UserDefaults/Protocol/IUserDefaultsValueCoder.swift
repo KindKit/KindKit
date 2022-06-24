@@ -7,8 +7,8 @@ import KindKitCore
 
 public typealias IUserDefaultsValueCoder = IUserDefaultsValueDecoder & IUserDefaultsValueEncoder
 
-public protocol IUserDefaultsValueDecoder : IValueDecoder where StorageType == IUserDefaultsValue {
+public protocol IUserDefaultsValueDecoder : IValueDecoder where Storage == IUserDefaultsValue {
 }
 
-public protocol IUserDefaultsValueEncoder : IValueEncoder where StorageType == IUserDefaultsValue {
+public protocol IUserDefaultsValueEncoder : IValueEncoder where Storage == IUserDefaultsValue {
 }

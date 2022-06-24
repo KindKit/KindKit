@@ -20,20 +20,20 @@ public protocol IUndoRedoMutatingPermanentContext : IUndoRedoPermanentContext {
 
 public extension IUndoRedoPermanentContext {
     
-    func get< KeyType: RawRepresentable, ValueType >(
-        _ key: KeyType
-    ) -> ValueType where KeyType.RawValue == String {
-        return self.get(key.rawValue) as! ValueType
+    func get< Key: RawRepresentable, Value >(
+        _ key: Key
+    ) -> Value where Key.RawValue == String {
+        return self.get(key.rawValue) as! Value
     }
     
 }
 
 public extension IUndoRedoMutatingPermanentContext {
     
-    mutating func set< KeyType: RawRepresentable, ValueType >(
-        _ key: KeyType,
-        value: ValueType
-    ) where KeyType.RawValue == String {
+    mutating func set< Key: RawRepresentable, Value >(
+        _ key: Key,
+        value: Value
+    ) where Key.RawValue == String {
         self.set(key.rawValue, value: value)
     }
     

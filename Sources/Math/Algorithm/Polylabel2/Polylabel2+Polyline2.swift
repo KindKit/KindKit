@@ -7,15 +7,15 @@ import Foundation
 public extension Polylabel2 {
 
     static func find(
-        polyline: Polyline2< ValueType >
-    ) -> Point< ValueType >
-        where ValueType : Strideable, ValueType.Stride == ValueType
+        polyline: Polyline2< Value >
+    ) -> Point< Value >
+        where Value : Strideable, Value.Stride == Value
     {
-            func polylabel(polygon: [[[ValueType]]], precision: ValueType = 1) -> [ValueType] {
-                var minX: ValueType = .leastNormalMagnitude
-                var minY: ValueType = .leastNormalMagnitude
-                var maxX: ValueType = .greatestFiniteMagnitude
-                var maxY: ValueType = .greatestFiniteMagnitude
+            func polylabel(polygon: [[[Value]]], precision: Value = 1) -> [Value] {
+                var minX: Value = .leastNormalMagnitude
+                var minY: Value = .leastNormalMagnitude
+                var maxX: Value = .greatestFiniteMagnitude
+                var maxY: Value = .greatestFiniteMagnitude
                 for i in 0..<polygon[0].count {
                     let p = polygon[0][i]
                     if i == 0 || p[0] < minX {
@@ -76,14 +76,14 @@ public extension Polylabel2 {
                 return [bestCell.x, bestCell.y]
             }
             
-            func compareMax(a: Cell, b: Cell) -> ValueType {
+            func compareMax(a: Cell, b: Cell) -> Value {
                 return b.max - a.max
             }
             
-            func getCentroidCell(polygon:[[[ValueType]]]) -> Cell {
-                var area: ValueType = 0
-                var x: ValueType = 0
-                var y: ValueType = 0
+            func getCentroidCell(polygon:[[[Value]]]) -> Cell {
+                var area: Value = 0
+                var x: Value = 0
+                var y: Value = 0
                 let points = polygon[0]
                 
                 var j = points.count - 1
@@ -104,15 +104,15 @@ public extension Polylabel2 {
                 return Cell(x: x / area, y: y / area, h: 0, polygon: polygon);
             }
             
-            func toMultiArray(corners: [Point< ValueType> ]) -> [[ValueType]] {
+            func toMultiArray(corners: [Point< Value> ]) -> [[Value]] {
                 return corners.map { [$0.x, $0.y] }
             }
             
-            let polygon: [[[ValueType]]] = [toMultiArray(corners: polyline.corners)]
+            let polygon: [[[Value]]] = [toMultiArray(corners: polyline.corners)]
             
             let point = polylabel(polygon: polygon)
             
-            return  Point< ValueType >(x: point[0], y: point[1])
+            return  Point< Value >(x: point[0], y: point[1])
     }
         
 }
@@ -121,13 +121,13 @@ private extension Polylabel2 {
     
     struct Queue {
         var data: [Cell]
-        var compare: (Cell, Cell) -> ValueType
+        var compare: (Cell, Cell) -> Value
         var length: Int { get {
                 return data.count
             }
         }
         
-        init(data: [Cell], compare: @escaping (Cell, Cell) -> ValueType) {
+        init(data: [Cell], compare: @escaping (Cell, Cell) -> Value) {
             self.data = data
             self.compare = compare
             if (self.length > 0) {
@@ -205,22 +205,22 @@ private extension Polylabel2 {
     }
 
     struct Cell {
-        var x: ValueType
-        var y: ValueType
-        var h: ValueType
-        var polygon: [[[ValueType]]]
-        var d: ValueType { get {
+        var x: Value
+        var y: Value
+        var h: Value
+        var polygon: [[[Value]]]
+        var d: Value { get {
             return pointToPolygonDist(x: x, y: y, polygon: polygon)
             }
         }
-        var max: ValueType { get {
-            return d + h * ValueType(2).sqrt
+        var max: Value { get {
+            return d + h * Value(2).sqrt
             }
         }
         
-        func pointToPolygonDist(x: ValueType, y: ValueType, polygon: [[[ValueType]]]) -> ValueType {
+        func pointToPolygonDist(x: Value, y: Value, polygon: [[[Value]]]) -> Value {
             var inside = false
-            var minDistSq: ValueType = .greatestFiniteMagnitude
+            var minDistSq: Value = .greatestFiniteMagnitude
             for k in 0..<polygon.count {
                 let ring = polygon[k]
                 var j = ring.count - 1
@@ -242,7 +242,7 @@ private extension Polylabel2 {
             return (inside ? 1 : -1) * (minDistSq).sqrt
         }
         
-        func getSegDistSq(px: ValueType, py: ValueType, a: [ValueType], b: [ValueType]) -> ValueType {
+        func getSegDistSq(px: Value, py: Value, a: [Value], b: [Value]) -> Value {
             var x = a[0]
             var y = a[1]
             var dx = b[0] - x
@@ -276,8 +276,8 @@ private extension Polylabel2 {
 
 public extension Polyline2 {
 
-    func visualCenter() -> Point < ValueType > where ValueType : Strideable, ValueType.Stride == ValueType {
-        return Polylabel2<ValueType>.find(polyline: self)
+    func visualCenter() -> Point < Value > where Value : Strideable, Value.Stride == Value {
+        return Polylabel2<Value>.find(polyline: self)
     }
 
 }

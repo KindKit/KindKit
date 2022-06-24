@@ -6,13 +6,13 @@ import Foundation
 
 public extension Operation2.Extrude {
     
-    static func perform< ValueType: IScalar & Hashable >(
-        polyline: Polyline2< ValueType >,
+    static func perform< Value: IScalar & Hashable >(
+        polyline: Polyline2< Value >,
         index: EdgeIndex,
-        left: ValueType,
-        right: ValueType,
-        distance: ValueType
-    ) -> Polyline2< ValueType > {
+        left: Value,
+        right: Value,
+        distance: Value
+    ) -> Polyline2< Value > {
         guard polyline.isValid(index) == true else { return polyline }
         guard let es = polyline[edges: index] else { return polyline }
         guard distance !~ 0 else { return polyline }
@@ -63,7 +63,7 @@ public extension Operation2.Extrude {
 
 public extension Polyline2 {
     
-    func extrude(index: EdgeIndex, left: ValueType, right: ValueType, distance: ValueType) -> Self {
+    func extrude(index: EdgeIndex, left: Value, right: Value, distance: Value) -> Self {
         return Operation2.Extrude.perform(polyline: self, index: index, left: left, right: right, distance: distance)
     }
     
