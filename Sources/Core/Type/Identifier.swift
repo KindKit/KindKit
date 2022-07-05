@@ -53,3 +53,6 @@ extension Identifier: ExpressibleByExtendedGraphemeClusterLiteral where Raw == S
 
 extension Identifier: ExpressibleByUnicodeScalarLiteral where Raw == String {
 }
+
+extension Identifier : Codable where Raw : Codable {
+}
