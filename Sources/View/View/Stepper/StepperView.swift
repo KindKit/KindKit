@@ -6,13 +6,13 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-protocol SwitchViewDelegate : AnyObject {
+protocol StepperViewDelegate : AnyObject {
     
-    func changed(value: Bool)
+    func changed(value: Float)
     
 }
 
-public class SwitchView : ISwitchView {
+public class StepperView : IStepperView {
         
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?
@@ -45,31 +45,43 @@ public class SwitchView : ISwitchView {
             self.setNeedForceLayout()
         }
     }
-    public var thumbColor: Color {
+    public var minValue: Float {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(thumbColor: self.thumbColor)
+            self._view.update(minValue: self.minValue)
         }
     }
-    public var offColor: Color {
+    public var maxValue: Float {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(offColor: self.offColor)
+            self._view.update(maxValue: self.maxValue)
         }
     }
-    public var onColor: Color {
+    public var stepValue: Float {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(onColor: self.onColor)
+            self._view.update(stepValue: self.stepValue)
         }
     }
-    public var value: Bool {
+    public var value: Float {
         set(value) {
             self._value = value
             guard self.isLoaded == true else { return }
             self._view.update(value: self._value)
         }
         get { return self._value }
+    }
+    public var isAutorepeat: Bool {
+        didSet {
+            guard self.isLoaded == true else { return }
+            self._view.update(isAutorepeat: self.isAutorepeat)
+        }
+    }
+    public var isWraps: Bool {
+        didSet {
+            guard self.isLoaded == true else { return }
+            self._view.update(isWraps: self.isWraps)
+        }
     }
     public var isLocked: Bool {
         set(value) {
@@ -119,7 +131,7 @@ public class SwitchView : ISwitchView {
         return self._reuse.content()
     }
     private var _isLocked: Bool
-    private var _value: Bool
+    private var _value: Float
     private var _onAppear: (() -> Void)?
     private var _onDisappear: (() -> Void)?
     private var _onVisible: (() -> Void)?
@@ -131,10 +143,12 @@ public class SwitchView : ISwitchView {
     public init(
         width: StaticSizeBehaviour,
         height: StaticSizeBehaviour,
-        thumbColor: Color,
-        offColor: Color,
-        onColor: Color,
-        value: Bool,
+        minValue: Float,
+        maxValue: Float,
+        stepValue: Float = 1,
+        value: Float,
+        isAutorepeat: Bool = true,
+        isWraps: Bool = false,
         isLocked: Bool = false,
         color: Color? = nil,
         border: ViewBorder = .none,
@@ -146,10 +160,12 @@ public class SwitchView : ISwitchView {
         self.isVisible = false
         self.width = width
         self.height = height
-        self.thumbColor = thumbColor
-        self.offColor = offColor
-        self.onColor = onColor
+        self.minValue = minValue
+        self.maxValue = maxValue
+        self.stepValue = stepValue
         self._value = value
+        self.isAutorepeat = isAutorepeat
+        self.isWraps = isWraps
         self._isLocked = isLocked
         self.color = color
         self.border = border
@@ -220,26 +236,38 @@ public class SwitchView : ISwitchView {
     }
     
     @discardableResult
-    public func thumbColor(_ value: Color) -> Self {
-        self.thumbColor = value
+    public func minValue(_ value: Float) -> Self {
+        self.minValue = value
         return self
     }
     
     @discardableResult
-    public func offColor(_ value: Color) -> Self {
-        self.offColor = value
+    public func maxValue(_ value: Float) -> Self {
+        self.maxValue = value
         return self
     }
     
     @discardableResult
-    public func onColor(_ value: Color) -> Self {
-        self.onColor = value
+    public func stepValue(_ value: Float) -> Self {
+        self.stepValue = value
         return self
     }
     
     @discardableResult
-    public func value(_ value: Bool) -> Self {
+    public func value(_ value: Float) -> Self {
         self.value = value
+        return self
+    }
+    
+    @discardableResult
+    public func isAutorepeat(_ value: Bool) -> Self {
+        self.isAutorepeat = value
+        return self
+    }
+    
+    @discardableResult
+    public func isWraps(_ value: Bool) -> Self {
+        self.isWraps = value
         return self
     }
     
@@ -329,9 +357,9 @@ public class SwitchView : ISwitchView {
     
 }
 
-extension SwitchView : SwitchViewDelegate {
+extension StepperView : StepperViewDelegate {
     
-    func changed(value: Bool) {
+    func changed(value: Float) {
         self._value = value
         self._onChangeValue?()
     }
