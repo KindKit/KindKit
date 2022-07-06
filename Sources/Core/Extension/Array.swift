@@ -6,6 +6,15 @@ import Foundation
 
 public extension Array {
     
+    init(range: Range< Element >) where Element : Strideable, Element.Stride : SignedInteger {
+        self.init(unsafeUninitializedCapacity: range.count, initializingWith: { buffer, count in
+            for (index, value) in range.enumerated() {
+                buffer[index] = value
+            }
+            count = range.count
+        })
+    }
+    
     @inlinable
     func reorder(
         where block: (_ lhs: Element, _ rhs: Element) throws -> [Element]

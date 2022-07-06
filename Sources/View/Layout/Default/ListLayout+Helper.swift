@@ -235,12 +235,12 @@ public extension ListLayout.Helper {
     class Operation {
         
         public var type: OperationType
-        public var indices: Set< Int >
+        public var indices: [Int]
         public var progress: PercentFloat
         
         public init(
             type: OperationType,
-            indices: Set< Int >,
+            indices: [Int],
             progress: PercentFloat
         ) {
             self.type = type

@@ -139,7 +139,7 @@ public final class ListLayout : ILayout {
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(
                 type: .insert,
-                indices: Set< Int >(range: safeIndex ..< safeIndex + items.count),
+                indices: Array(range: safeIndex ..< safeIndex + items.count),
                 progress: .zero
             ))
         } else {
@@ -159,7 +159,7 @@ public final class ListLayout : ILayout {
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(
                 type: .delete,
-                indices: Set< Int >(range: range),
+                indices: Array(range: range),
                 progress: .zero
             ))
         } else {
@@ -176,7 +176,7 @@ public final class ListLayout : ILayout {
             if self._animations.isEmpty == false {
                 self._operations.append(Helper.Operation(
                     type: .delete,
-                    indices: Set< Int >(indices),
+                    indices: indices,
                     progress: .zero
                 ))
             } else {
@@ -367,18 +367,19 @@ private extension ListLayout {
                         break
                     }
                 }
-                self.setNeedForceUpdate()
-                self.updateIfNeeded()
                 self._operations.removeAll()
                 if let index = self._animations.firstIndex(where: { $0 === animation }) {
                     self._animations.remove(at: index)
                 }
-                if let animation = self._animations.first {
-                    self._animate(animation: animation)
-                } else {
+                if self._animations.isEmpty == true {
                     self.isAnimating = false
                 }
+                self.setNeedForceUpdate()
+                self.updateIfNeeded()
                 animation.completion?()
+                if let animation = self._animations.first {
+                    self._animate(animation: animation)
+                }
             }
         )
     }
