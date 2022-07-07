@@ -42,6 +42,19 @@ public class CellView< ContentView : IView > : ICellView {
         set(value) { self._view.isHighlighted = value }
         get { return self._view.isHighlighted }
     }
+    public var isLocked: Bool {
+        set(value) { self._view.isLocked = value }
+        get { return self._view.isLocked }
+    }
+    public var isSelected: Bool {
+        set(value) {
+            if self._isSelected != value {
+                self._isSelected = value
+                self.triggeredChangeStyle(false)
+            }
+        }
+        get { return self._isSelected }
+    }
     public var shouldPressed: Bool
     public private(set) var contentView: ContentView {
         didSet(oldValue) {
@@ -71,6 +84,7 @@ public class CellView< ContentView : IView > : ICellView {
     }
     
     private var _view: CustomView< Layout >
+    private var _isSelected: Bool
     #if os(iOS)
     private var _pressedGesture: ITapGesture
     #endif
@@ -79,6 +93,8 @@ public class CellView< ContentView : IView > : ICellView {
     public init(
         shouldPressed: Bool = true,
         contentView: ContentView,
+        isLocked: Bool = false,
+        isSelected: Bool = false,
         color: Color? = nil,
         border: ViewBorder = .none,
         cornerRadius: ViewCornerRadius = .none,
@@ -109,6 +125,7 @@ public class CellView< ContentView : IView > : ICellView {
                 contentItem: LayoutItem(view: contentView)
             ),
             shouldHighlighting: true,
+            isLocked: isLocked,
             color: color,
             border: border,
             cornerRadius: cornerRadius,
@@ -117,6 +134,7 @@ public class CellView< ContentView : IView > : ICellView {
             isHidden: isHidden
         )
         #endif
+        self._isSelected = isSelected
         self._init()
     }
     
@@ -161,6 +179,18 @@ public class CellView< ContentView : IView > : ICellView {
     @discardableResult
     public func highlight(_ value: Bool) -> Self {
         self._view.highlight(value)
+        return self
+    }
+    
+    @discardableResult
+    public func lock(_ value: Bool) -> Self {
+        self._view.lock(value)
+        return self
+    }
+    
+    @discardableResult
+    public func select(_ value: Bool) -> Self {
+        self.isSelected = value
         return self
     }
     

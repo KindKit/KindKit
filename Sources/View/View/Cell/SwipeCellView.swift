@@ -42,6 +42,19 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
         set(value) { self._view.isHighlighted = value }
         get { return self._view.isHighlighted }
     }
+    public var isLocked: Bool {
+        set(value) { self._view.isLocked = value }
+        get { return self._view.isLocked }
+    }
+    public var isSelected: Bool {
+        set(value) {
+            if self._isSelected != value {
+                self._isSelected = value
+                self.triggeredChangeStyle(false)
+            }
+        }
+        get { return self._isSelected }
+    }
     public var shouldPressed: Bool
     public var contentView: ContentView {
         didSet(oldValue) {
@@ -115,6 +128,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
     
     private var _layout: Layout
     private var _view: CustomView< Layout >
+    private var _isSelected: Bool
     #if os(iOS)
     private var _pressedGesture: ITapGesture
     private var _interactiveGesture: IPanGesture
@@ -136,6 +150,8 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
         trailingView: IView? = nil,
         trailingLimit: Float = 0,
         trailingSize: Float = 0,
+        isLocked: Bool = false,
+        isSelected: Bool = false,
         color: Color? = nil,
         border: ViewBorder = .none,
         cornerRadius: ViewCornerRadius = .none,
@@ -167,6 +183,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
             gestures: [ self._pressedGesture, self._interactiveGesture ],
             contentLayout: self._layout,
             shouldHighlighting: true,
+            isLocked: isLocked,
             color: color,
             border: border,
             cornerRadius: cornerRadius,
@@ -186,6 +203,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
             isHidden: isHidden
         )
         #endif
+        self._isSelected = isSelected
         self._init()
     }
     
@@ -362,6 +380,18 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
     @discardableResult
     public func highlight(_ value: Bool) -> Self {
         self._view.highlight(value)
+        return self
+    }
+    
+    @discardableResult
+    public func lock(_ value: Bool) -> Self {
+        self._view.lock(value)
+        return self
+    }
+    
+    @discardableResult
+    public func select(_ value: Bool) -> Self {
+        self.isSelected = value
         return self
     }
     
