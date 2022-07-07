@@ -17,7 +17,7 @@ open class ApiResponse : IApiResponse {
     public init() {
     }
 
-    open func parse(response: URLResponse, data: Data?) {
+    public func parse(response: URLResponse, data: Data?) {
         self.url = response.url
         self.mimeType = response.mimeType
         self.textEncodingName = response.textEncodingName

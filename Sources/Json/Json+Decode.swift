@@ -97,7 +97,7 @@ public extension Json {
         var result: [KeyDecoder.Value : ValueDecoder.Value] = [:]
         if skipping == true {
             for jsonItem in jsonDictionary {
-                let key = try keyDecoder.decode(jsonItem.key as! IJsonValue)
+                guard let key = try? keyDecoder.decode(jsonItem.key as! IJsonValue) else { continue }
                 guard let value = try? valueDecoder.decode(jsonItem.value as! IJsonValue) else { continue }
                 result[key] = value
             }
@@ -294,7 +294,7 @@ public extension Json {
         var result: [KeyDecoder.Value : ValueDecoder.Value] = [:]
         if skipping == true {
             for jsonItem in jsonDictionary {
-                let key = try keyDecoder.decode(jsonItem.key as! IJsonValue)
+                guard let key = try? keyDecoder.decode(jsonItem.key as! IJsonValue) else { continue }
                 guard let value = try? valueDecoder.decode(jsonItem.value as! IJsonValue) else { continue }
                 result[key] = value
             }
