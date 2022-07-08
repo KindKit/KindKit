@@ -84,14 +84,10 @@ public class LocationPermission : IPermission {
         switch self._rawStatus() {
         case .notDetermined:
             self._willRequest(source: source)
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: [ .badge, .alert, .sound ],
-                completionHandler: { [weak self] settings, error in
-                    DispatchQueue.main.async(execute: {
-                        self?._didRequest(source: source)
-                    })
-                }
-            )
+            switch self.preferedWhen {
+            case .always: self._locationManager.requestAlwaysAuthorization()
+            case .inUse: self._locationManager.requestWhenInUseAuthorization()
+            }
         case .denied:
             #if os(iOS)
             guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -160,10 +156,6 @@ private extension LocationPermission {
     }
     
     func _didRequest(source: Any?) {
-        switch self.preferedWhen {
-        case .always: self._locationManager.requestAlwaysAuthorization()
-        case .inUse: self._locationManager.requestWhenInUseAuthorization()
-        }
         self._observer.notify({ $0.didRequest(self, source: source) })
     }
     
