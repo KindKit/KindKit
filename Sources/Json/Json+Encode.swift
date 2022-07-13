@@ -8,12 +8,16 @@ import KindKitCore
 public extension Json {
     
     func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value) throws {
-        try self._set(value: try encoder.encode(value), path: nil)
+        try self.set(value: try encoder.encode(value))
     }
     
     @inlinable
     func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model) throws {
-        try self.encode(ModelJsonEncoder< Encoder >.self, value: value)
+        if self.isEmpty == true || self.isDictionary == true {
+            try Encoder.encode(value, json: self)
+        } else {
+            try self.encode(ModelJsonEncoder< Encoder >.self, value: value)
+        }
     }
     
     @inlinable
@@ -26,7 +30,7 @@ public extension Json {
 public extension Json {
     
     func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value, path: String) throws {
-        try self._set(value: try encoder.encode(value), path: path)
+        try self.set(value: try encoder.encode(value), path: path)
     }
     
     @inlinable

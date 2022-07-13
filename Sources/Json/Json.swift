@@ -37,6 +37,10 @@ public final class Json {
 
 public extension Json {
     
+    var isEmpty: Bool {
+        return self.root == nil
+    }
+    
     var isDictionary: Bool {
         return self.root is NSDictionary
     }
