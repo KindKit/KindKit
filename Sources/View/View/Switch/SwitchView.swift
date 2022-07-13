@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -337,3 +339,5 @@ extension SwitchView : SwitchViewDelegate {
     }
     
 }
+
+#endif

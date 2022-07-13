@@ -58,7 +58,6 @@ final class NativeScrollView : UIScrollView {
                 }
                 if oldValue.size != value.size {
                     self.needLayoutContent = true
-                    self.setNeedsLayout()
                 }
             }
         }
@@ -266,34 +265,6 @@ extension NativeScrollView {
         self._layoutManager.layout = nil
         self.customDelegate = nil
         self._view = nil
-    }
-    
-    func contentOffset(with view: IView, horizontal: ScrollViewScrollAlignment, vertical: ScrollViewScrollAlignment) -> PointFloat? {
-        guard let item = view.item else { return nil }
-        let contentInset = InsetFloat(self.contentInset)
-        let contentSize = SizeFloat(self.contentSize)
-        let visibleSize = SizeFloat(self.bounds.size)
-        let itemFrame = item.frame
-        let x: Float
-        switch horizontal {
-        case .leading: x = -contentInset.left + itemFrame.x
-        case .center: x = -contentInset.left + ((itemFrame.x + (itemFrame.width / 2)) - ((visibleSize.width - contentInset.right) / 2))
-        case .trailing: x = ((itemFrame.x + itemFrame.width) - visibleSize.width) + contentInset.right
-        }
-        let y: Float
-        switch vertical {
-        case .leading: y = -contentInset.top + itemFrame.y
-        case .center: y = -contentInset.top + ((itemFrame.y + (itemFrame.size.height / 2)) - ((visibleSize.height - contentInset.bottom) / 2))
-        case .trailing: y = ((itemFrame.y + itemFrame.size.height) - visibleSize.height) + contentInset.bottom
-        }
-        let lowerX = -contentInset.left
-        let lowerY = -contentInset.top
-        let upperX = (contentSize.width - visibleSize.width) + contentInset.right
-        let upperY = (contentSize.height - visibleSize.height) + contentInset.bottom
-        return PointFloat(
-            x: max(lowerX, min(x, upperX)),
-            y: max(lowerY, min(y, upperY))
-        )
     }
     
 }

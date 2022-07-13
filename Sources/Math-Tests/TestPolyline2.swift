@@ -13,16 +13,16 @@ class TestPolyline2: XCTestCase {
             PointFloat(x: 10, y: 0)
         ])
         let np = op.extrude(index: EdgeIndex(0), left: 0, right: 4.5, distance: 5)
-        if np[corner: CornerIndex(0)] != PointFloat(x: 0, y: -5) {
+        if np[corner: CornerIndex(1)] != PointFloat(x: 0, y: -5) {
             XCTFail()
         }
-        if np[corner: CornerIndex(1)] != PointFloat(x: 4.5, y: -5) {
+        if np[corner: CornerIndex(2)] != PointFloat(x: 4.5, y: -5) {
             XCTFail()
         }
-        if np[corner: CornerIndex(2)] != PointFloat(x: 4.5, y: 0) {
+        if np[corner: CornerIndex(3)] != PointFloat(x: 4.5, y: 0) {
             XCTFail()
         }
-        if np[corner: CornerIndex(3)] != PointFloat(x: 10, y: 0) {
+        if np[corner: CornerIndex(4)] != PointFloat(x: 10, y: 0) {
             XCTFail()
         }
     }

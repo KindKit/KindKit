@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -104,25 +106,24 @@ public class DialogContainer : IDialogContainer {
         contentContainer: (IContainer & IContainerParentable)? = nil
     ) {
         self.isPresented = false
-        #if os(iOS)
-        self.animationVelocity = 1200
-        self.interactiveLimit = 20
-        #endif
         self.contentContainer = contentContainer
-        #if os(iOS)
-        self._interactiveGesture = PanGesture(
-            isEnabled: false
-        )
+        #if os(macOS)
+        self.animationVelocity = 1200
         self._view = CustomView(
-            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 containerInset: .zero,
                 contentItem: contentContainer.flatMap({ LayoutItem(view: $0.view) }),
                 state: .idle
             )
         )
-        #else
+        #elseif os(iOS)
+        self.animationVelocity = 1200
+        self.interactiveLimit = 20
+        self._interactiveGesture = PanGesture(
+            isEnabled: false
+        )
         self._view = CustomView(
+            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 containerInset: .zero,
                 contentItem: contentContainer.flatMap({ LayoutItem(view: $0.view) }),
@@ -293,23 +294,29 @@ private extension DialogContainer {
                         guard let self = self else { return }
                         dialog.container.finishShow(interactive: false)
                         self._view.contentLayout.state = .idle
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         completion?()
                     }
                 )
             } else {
                 dialog.container.finishShow(interactive: false)
                 self._view.contentLayout.state = .idle
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             }
         } else {
             self._view.contentLayout.state = .idle
             self._view.contentLayout.dialogItem = nil
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         }
     }
@@ -346,8 +353,10 @@ private extension DialogContainer {
                         dialog.container.finishHide(interactive: false)
                         self._view.contentLayout.state = .idle
                         self._view.contentLayout.dialogItem = nil
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         completion?()
                     }
                 )
@@ -355,15 +364,19 @@ private extension DialogContainer {
                 dialog.container.finishHide(interactive: false)
                 self._view.contentLayout.state = .idle
                 self._view.contentLayout.dialogItem = nil
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             }
         } else {
             self._view.contentLayout.state = .idle
             self._view.contentLayout.dialogItem = nil
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         }
     }

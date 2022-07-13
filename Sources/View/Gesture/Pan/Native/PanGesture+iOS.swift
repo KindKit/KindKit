@@ -8,7 +8,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public final class PinchGesture : NSObject, IPinchGesture {
+public final class PanGesture : NSObject, IPanGesture {
     
     public var native: NativeGesture {
         return self._native
@@ -29,13 +29,12 @@ public final class PinchGesture : NSObject, IPinchGesture {
         set(value) { self._native.delaysTouchesEnded = value }
         get { return self._native.delaysTouchesEnded }
     }
-    @available(iOS 9.2, *)
     public var requiresExclusiveTouchType: Bool {
         set(value) { self._native.requiresExclusiveTouchType = value }
         get { return self._native.requiresExclusiveTouchType }
     }
     
-    private var _native: UIPinchGestureRecognizer
+    private var _native: UIPanGestureRecognizer
     private var _onShouldBegin: (() -> Bool)?
     private var _onShouldSimultaneously: ((_ otherGesture: NativeGesture) -> Bool)?
     private var _onShouldRequireFailure: ((_ otherGesture: NativeGesture) -> Bool)?
@@ -49,32 +48,42 @@ public final class PinchGesture : NSObject, IPinchGesture {
         isEnabled: Bool = true,
         cancelsTouchesInView: Bool = false,
         delaysTouchesBegan: Bool = false,
-        delaysTouchesEnded: Bool = true
+        delaysTouchesEnded: Bool = true,
+        requiresExclusiveTouchType: Bool = true
     ) {
-        self._native = UIPinchGestureRecognizer()
-        self._native.isEnabled = isEnabled
-        self._native.cancelsTouchesInView = cancelsTouchesInView
-        self._native.delaysTouchesBegan = delaysTouchesBegan
-        self._native.delaysTouchesEnded = delaysTouchesEnded
+        let native = UIPanGestureRecognizer()
+        native.isEnabled = isEnabled
+        native.cancelsTouchesInView = cancelsTouchesInView
+        native.delaysTouchesBegan = delaysTouchesBegan
+        native.delaysTouchesEnded = delaysTouchesEnded
+        native.requiresExclusiveTouchType = requiresExclusiveTouchType
+        self._native = native
         super.init()
         self._native.delegate = self
         self._native.addTarget(self, action: #selector(self._handle))
     }
     
-    @available(iOS 9.2, *)
     public init(
         isEnabled: Bool = true,
         cancelsTouchesInView: Bool = true,
         delaysTouchesBegan: Bool = false,
         delaysTouchesEnded: Bool = true,
-        requiresExclusiveTouchType: Bool = true
+        requiresExclusiveTouchType: Bool = true,
+        screenEdge: ScreenEdge
     ) {
-        self._native = UIPinchGestureRecognizer()
-        self._native.isEnabled = isEnabled
-        self._native.cancelsTouchesInView = cancelsTouchesInView
-        self._native.delaysTouchesBegan = delaysTouchesBegan
-        self._native.delaysTouchesEnded = delaysTouchesEnded
-        self._native.requiresExclusiveTouchType = requiresExclusiveTouchType
+        let native = UIScreenEdgePanGestureRecognizer()
+        native.isEnabled = isEnabled
+        native.cancelsTouchesInView = cancelsTouchesInView
+        native.delaysTouchesBegan = delaysTouchesBegan
+        native.delaysTouchesEnded = delaysTouchesEnded
+        native.requiresExclusiveTouchType = requiresExclusiveTouchType
+        switch screenEdge {
+        case .top: native.edges = [ .top ]
+        case .left: native.edges = [ .left ]
+        case .right: native.edges = [ .right ]
+        case .bottom: native.edges = [ .bottom ]
+        }
+        self._native = native
         super.init()
         self._native.delegate = self
         self._native.addTarget(self, action: #selector(self._handle))
@@ -84,12 +93,12 @@ public final class PinchGesture : NSObject, IPinchGesture {
         self.native.require(toFail: gesture)
     }
     
-    public func velocity() -> Float {
-        return Float(self._native.velocity)
+    public func translation(in view: IView) -> PointFloat {
+        return PointFloat(self._native.translation(in: view.native))
     }
     
-    public func scale() -> Float {
-        return Float(self._native.scale)
+    public func velocity(in view: IView) -> PointFloat {
+        return PointFloat(self._native.velocity(in: view.native))
     }
     
     public func location(in view: IView) -> PointFloat {
@@ -149,10 +158,21 @@ public final class PinchGesture : NSObject, IPinchGesture {
         self._onEnd = value
         return self
     }
-
+    
 }
 
-private extension PinchGesture {
+public extension PanGesture {
+    
+    enum ScreenEdge {
+        case top
+        case left
+        case right
+        case bottom
+    }
+    
+}
+
+private extension PanGesture {
     
     @objc
     func _handle() {
@@ -168,7 +188,7 @@ private extension PinchGesture {
     
 }
 
-extension PinchGesture : UIGestureRecognizerDelegate {
+extension PanGesture : UIGestureRecognizerDelegate {
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view is UIControl {

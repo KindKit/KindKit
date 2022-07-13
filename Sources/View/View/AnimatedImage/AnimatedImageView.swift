@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -389,3 +391,5 @@ public class AnimatedImageView : IAnimatedImageView {
     }
 
 }
+
+#endif

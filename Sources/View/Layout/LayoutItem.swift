@@ -31,6 +31,16 @@ public class LayoutItem {
 public extension LayoutItem {
     
     @inlinable
+    var isLoaded: Bool {
+        return self.view.isLoaded
+    }
+    
+    @inlinable
+    var isAppeared: Bool {
+        return self.view.isAppeared
+    }
+    
+    @inlinable
     var isHidden: Bool {
         return self.view.isHidden
     }

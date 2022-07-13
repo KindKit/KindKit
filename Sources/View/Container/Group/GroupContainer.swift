@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -90,7 +92,9 @@ public class GroupContainer< Screen : IGroupScreen > : IGroupContainer, IContain
     ) {
         self.isPresented = false
         self.screen = screen
-        #if os(iOS)
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
+        #elseif os(iOS)
         self.animationVelocity = UIScreen.main.animationVelocity
         #endif
         self._barView = screen.groupBarView
@@ -393,8 +397,10 @@ private extension GroupContainer {
                             current.container.finishHide(interactive: false)
                             forward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         completion?()
                     }
                 )
@@ -407,8 +413,10 @@ private extension GroupContainer {
                 if self.isPresented == true {
                     forward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             } else if let current = current {
                 if self.isPresented == true {
@@ -419,13 +427,17 @@ private extension GroupContainer {
                 if self.isPresented == true {
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             }
         } else if let current = current, let forward = forward {
@@ -439,8 +451,10 @@ private extension GroupContainer {
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else if let forward = forward {
             if self.isPresented == true {
@@ -451,8 +465,10 @@ private extension GroupContainer {
             if self.isPresented == true {
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else if let current = current {
             if self.isPresented == true {
@@ -463,14 +479,18 @@ private extension GroupContainer {
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else {
             self._barView.selectedItemView(nil)
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         }
     }
@@ -502,8 +522,10 @@ private extension GroupContainer {
                             current.container.finishHide(interactive: false)
                             backward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         completion?()
                     }
                 )
@@ -516,8 +538,10 @@ private extension GroupContainer {
                 if self.isPresented == true {
                     backward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             } else if let current = current {
                 if self.isPresented == true {
@@ -528,13 +552,17 @@ private extension GroupContainer {
                 if self.isPresented == true {
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 completion?()
             }
         } else if let current = current, let backward = backward {
@@ -548,8 +576,10 @@ private extension GroupContainer {
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else if let backward = backward {
             if self.isPresented == true {
@@ -560,8 +590,10 @@ private extension GroupContainer {
             if self.isPresented == true {
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else if let current = current {
             if self.isPresented == true {
@@ -572,14 +604,18 @@ private extension GroupContainer {
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         } else {
             self._barView.selectedItemView(nil)
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             completion?()
         }
     }

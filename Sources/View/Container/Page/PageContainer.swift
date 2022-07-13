@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -101,26 +103,25 @@ public class PageContainer< Screen : IPageScreen > : IPageContainer, IContainerS
     ) {
         self.isPresented = false
         self.screen = screen
-        #if os(iOS)
-        self.animationVelocity = UIScreen.main.animationVelocity
-        self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
-        #endif
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
         self._barView = screen.pageBarView
-        #if os(iOS)
-        self._interactiveGesture = PanGesture()
         self._view = CustomView(
-            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 barItem: LayoutItem(view: self._barView),
                 barVisibility: screen.pageBarVisibility,
                 barHidden: screen.pageBarHidden
             )
         )
-        #else
+        #elseif os(iOS)
+        self.animationVelocity = UIScreen.main.animationVelocity
+        self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
+        self._interactiveGesture = PanGesture()
+        self._barView = screen.pageBarView
         self._view = CustomView(
+            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 barItem: LayoutItem(view: self._barView),
-                barInset: 0,
                 barVisibility: screen.pageBarVisibility,
                 barHidden: screen.pageBarHidden
             )
@@ -453,8 +454,10 @@ private extension PageContainer {
                             current.container.finishHide(interactive: false)
                             forward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         interCompletion(forward)
                     }
                 )
@@ -465,8 +468,10 @@ private extension PageContainer {
                     forward.container.prepareShow(interactive: false)
                     forward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(forward)
             } else if let current = current {
                 self._barView.selectedItemView(nil)
@@ -475,13 +480,17 @@ private extension PageContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             }
         } else if let current = current, let forward = forward {
@@ -493,8 +502,10 @@ private extension PageContainer {
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(forward)
         } else if let forward = forward {
             self._barView.selectedItemView(forward.barView)
@@ -503,8 +514,10 @@ private extension PageContainer {
                 forward.container.prepareShow(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(forward)
         } else if let current = current {
             self._barView.selectedItemView(nil)
@@ -513,14 +526,18 @@ private extension PageContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         } else {
             self._barView.selectedItemView(nil)
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         }
     }
@@ -565,8 +582,10 @@ private extension PageContainer {
                             current.container.finishHide(interactive: false)
                             backward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         interCompletion(backward)
                     }
                 )
@@ -577,8 +596,10 @@ private extension PageContainer {
                     backward.container.prepareShow(interactive: false)
                     backward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(backward)
             } else if let current = current {
                 self._barView.selectedItemView(nil)
@@ -587,13 +608,17 @@ private extension PageContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             }
         } else if let current = current, let backward = backward {
@@ -605,8 +630,10 @@ private extension PageContainer {
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(backward)
         } else if let backward = backward {
             self._barView.selectedItemView(nil)
@@ -615,8 +642,10 @@ private extension PageContainer {
                 backward.container.prepareShow(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(backward)
         } else if let current = current {
             self._barView.selectedItemView(nil)
@@ -625,14 +654,18 @@ private extension PageContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         } else {
             self._barView.selectedItemView(nil)
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         }
     }
@@ -779,8 +812,10 @@ private extension PageContainer {
         self._interactiveBackward?.container.cancelShow(interactive: true)
         self._resetInteractiveAnimation()
         self.screen.finishInteractiveToForward()
+        #if os(iOS)
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
+        #endif
     }
     
     func _finishBackwardInteractiveAnimation() {
@@ -795,8 +830,10 @@ private extension PageContainer {
         self._interactiveBackward?.container.finishShow(interactive: true)
         self._resetInteractiveAnimation()
         self.screen.finishInteractiveToBackward()
+        #if os(iOS)
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
+        #endif
     }
     
     func _cancelInteractiveAnimation() {
@@ -809,8 +846,10 @@ private extension PageContainer {
         self._interactiveBackward?.container.cancelShow(interactive: true)
         self._resetInteractiveAnimation()
         self.screen.cancelInteractive()
+        #if os(iOS)
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
+        #endif
     }
     
     func _resetInteractiveAnimation() {

@@ -2,55 +2,76 @@
 //  KindKitView
 //
 
-#if os(OSX)
+#if os(macOS)
 
 import AppKit
 
 public extension NSView {
     
-    func set(border: ViewBorder) {
+    func update(color: Color?) {
+        let layer = self.layer!
+        if let color = color {
+            layer.backgroundColor = color.native.cgColor
+        } else {
+            layer.backgroundColor = nil
+        }
+    }
+    
+    func update(border: ViewBorder) {
+        let layer = self.layer!
         switch border {
         case .none:
-            self.layer!.borderWidth = 0
-            self.layer!.borderColor = nil
+            layer.borderWidth = 0
+            layer.borderColor = nil
             break
         case .manual(let width, let color):
-            self.layer!.borderWidth = CGFloat(width)
-            self.layer!.borderColor = color.cgColor
+            layer.borderWidth = CGFloat(width)
+            layer.borderColor = color.cgColor
             break
         }
     }
 
-    func set(shadow: ViewShadow?) {
+    func update(shadow: ViewShadow?) {
+        let layer = self.layer!
         if let shadow = shadow {
-            self.layer!.shadowColor = shadow.color.cgColor
-            self.layer!.shadowOpacity = Float(shadow.opacity)
-            self.layer!.shadowRadius = CGFloat(shadow.radius)
-            self.layer!.shadowOffset = CGSize(
+            layer.shadowColor = shadow.color.cgColor
+            layer.shadowOpacity = Float(shadow.opacity)
+            layer.shadowRadius = CGFloat(shadow.radius)
+            layer.shadowOffset = CGSize(
                 width: CGFloat(shadow.offset.x),
                 height: CGFloat(shadow.offset.y)
             )
-            self.layer!.masksToBounds = false
+            layer.masksToBounds = false
         } else {
-            self.layer!.shadowColor = nil
-            self.layer!.masksToBounds = false
+            layer.shadowColor = nil
+            layer.masksToBounds = false
         }
     }
     
     func update(cornerRadius: ViewCornerRadius) {
+        let layer = self.layer!
         switch cornerRadius {
         case .none:
-            self.layer!.cornerRadius = 0
+            layer.cornerRadius = 0
         case .manual(let radius):
-            self.layer!.cornerRadius = CGFloat(radius)
+            layer.cornerRadius = CGFloat(radius)
         case .auto:
             let boundsSize = self.bounds.size
-            self.layer!.cornerRadius = CGFloat(ceil(min(boundsSize.width - 1, boundsSize.height - 1) / 2))
+            layer.cornerRadius = CGFloat(ceil(min(boundsSize.width - 1, boundsSize.height - 1) / 2))
         }
     }
 
     func updateShadowPath() {
-        #warning("Need impl")
+        let layer = self.layer!
+        if layer.shadowColor != nil {
+            layer.shadowPath = CGPath(roundedRect: self.bounds, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius, transform: nil)
+        } else {
+            layer.shadowPath = nil
+        }
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
     }
     
 }

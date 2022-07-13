@@ -5,7 +5,6 @@
 import Foundation
 import CoreGraphics
 import KindKitCore
-import UIKit
 
 public typealias Polygon2Float = Polygon2< Float >
 public typealias Polygon2Double = Polygon2< Double >

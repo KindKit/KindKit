@@ -7,7 +7,7 @@ let package = Package(
     name: "KindKit",
     platforms: [
         .iOS(.v10),
-        .macOS(.v10_14)
+        .macOS(.v11)
     ],
     products: [
         .library(name: "KindKitApi", type: .static, targets: [ "KindKitApi" ]),

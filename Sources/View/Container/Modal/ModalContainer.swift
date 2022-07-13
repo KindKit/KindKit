@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -102,24 +104,23 @@ public class ModalContainer : IModalContainer {
         contentContainer: (IContainer & IContainerParentable)? = nil
     ) {
         self.isPresented = false
-        #if os(iOS)
-        self.animationVelocity = Float(max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 3)
-        self.interactiveLimit = 20
-        #endif
         self.contentContainer = contentContainer
-        #if os(iOS)
-        self._interactiveGesture = PanGesture(
-            isEnabled: false
-        )
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
         self._view = CustomView(
-            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 contentItem: contentContainer.flatMap({ LayoutItem(view: $0.view) }),
                 state: .empty
             )
         )
-        #else
+        #elseif os(iOS)
+        self.animationVelocity = Float(max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 3)
+        self.interactiveLimit = 20
+        self._interactiveGesture = PanGesture(
+            isEnabled: false
+        )
         self._view = CustomView(
+            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 contentItem: contentContainer.flatMap({ LayoutItem(view: $0.view) }),
                 state: .empty

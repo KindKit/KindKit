@@ -2,7 +2,7 @@
 //  KindKitView
 //
 
-#if os(OSX)
+#if os(macOS)
 
 import AppKit
 import KindKitCore
@@ -54,7 +54,7 @@ public extension Animation {
 fileprivate func AnimationDisplayLinkCallback(_ displayLink: CVDisplayLink, _ nowTime: UnsafePointer< CVTimeStamp >, _ outputTime: UnsafePointer< CVTimeStamp >, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer< CVOptionFlags >, _ context: UnsafeMutableRawPointer?) -> CVReturn {
     guard let context = context else { return kCVReturnSuccess }
     let displayLink = Unmanaged< Animation.DisplayLink >.fromOpaque(context).takeRetainedValue()
-    let delta = Float(outputTime.pointee.videoTime - displayLink._prevTime.videoTime) / Float(outputTime.pointee.videoTimeScale)
+    let delta = TimeInterval(outputTime.pointee.videoTime - displayLink._prevTime.videoTime) / TimeInterval(outputTime.pointee.videoTimeScale)
     displayLink._prevTime = outputTime.pointee
     displayLink.delegate?.update(delta)
     return kCVReturnSuccess

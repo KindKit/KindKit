@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -158,14 +160,9 @@ public class HamburgerContainer : IHamburgerContainer {
         trailingContainer: IHamburgerMenuContainer? = nil
     ) {
         self.isPresented = false
-        #if os(iOS)
-        self.animationVelocity = UIScreen.main.animationVelocity
-        #endif
-        #if os(iOS)
-        self._pressedGesture = TapGesture()
-        self._interactiveGesture = PanGesture()
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
         self._view = CustomView(
-            gestures: [ self._pressedGesture, self._interactiveGesture ],
             contentLayout: Layout(
                 state: .idle,
                 contentItem: LayoutItem(view: contentContainer.view),
@@ -175,8 +172,12 @@ public class HamburgerContainer : IHamburgerContainer {
                 trailingSize: trailingContainer?.hamburgerSize ?? 0
             )
         )
-        #else
+        #elseif os(iOS)
+        self.animationVelocity = UIScreen.main.animationVelocity
+        self._pressedGesture = TapGesture()
+        self._interactiveGesture = PanGesture()
         self._view = CustomView(
+            gestures: [ self._pressedGesture, self._interactiveGesture ],
             contentLayout: Layout(
                 state: .idle,
                 contentItem: LayoutItem(view: contentContainer.view),

@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -247,3 +249,5 @@ public class SpinnerView : ISpinnerView {
     }
     
 }
+
+#endif

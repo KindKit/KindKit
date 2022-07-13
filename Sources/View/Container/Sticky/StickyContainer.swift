@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -70,8 +72,10 @@ public class StickyContainer< Screen : IStickyScreen, ContentContainer : IContai
                 self._contentContainer.prepareShow(interactive: false)
                 self._contentContainer.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             self.didChangeInsets()
         }
         get { return self._contentContainer }

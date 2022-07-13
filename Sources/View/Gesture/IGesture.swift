@@ -12,16 +12,33 @@ public protocol IGesture : AnyObject {
     
     var isEnabled: Bool { set get }
     
+    #if os(macOS)
+    
+    var delaysPrimaryMouseButtonEvents: Bool { get }
+
+    var delaysSecondaryMouseButtonEvents: Bool { get }
+
+    var delaysOtherMouseButtonEvents: Bool { get }
+
+    var delaysKeyEvents: Bool { get }
+
+    var delaysMagnificationEvents: Bool { get }
+
+    var delaysRotationEvents: Bool { get }
+    
+    #elseif os(iOS)
+    
     var cancelsTouchesInView: Bool { set get }
     
     var delaysTouchesBegan: Bool { set get }
     
     var delaysTouchesEnded: Bool { set get }
     
-    @available(iOS 9.2, *)
     var requiresExclusiveTouchType: Bool { set get }
     
     func require(toFail gesture: NativeGesture)
+    
+    #endif
     
     func contains(in view: IView) -> Bool
     
@@ -47,9 +64,8 @@ public protocol IGesture : AnyObject {
 public extension IGesture {
     
     func contains(in view: IView) -> Bool {
-        let bounds = RectFloat(view.native.bounds)
-        let location = PointFloat(self.native.location(in: view.native))
-        return bounds.isContains(location)
+        let location = self.location(in: view)
+        return view.bounds.isContains(location)
     }
     
 }

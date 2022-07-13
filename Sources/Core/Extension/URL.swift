@@ -3,7 +3,11 @@
 //
 
 import Foundation
+#if os(macOS)
+import Carbon
+#elseif os(iOS)
 import MobileCoreServices
+#endif
 
 public extension URL {
     
