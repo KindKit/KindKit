@@ -44,7 +44,6 @@ extension CompositionLayout.View : ICompositionLayoutEntity {
     }
     
     public func items(bounds: RectFloat) -> [LayoutItem] {
-        guard self.item.isHidden == false else { return [] }
         return [ self.item ]
     }
     

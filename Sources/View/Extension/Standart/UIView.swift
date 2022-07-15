@@ -71,8 +71,7 @@ public extension UIView {
     func updateShadowPath() {
         let layer = self.layer
         if layer.shadowColor != nil {
-            let path = UIBezierPath(roundedRect: self.bounds, cornerRadius: layer.cornerRadius)
-            layer.shadowPath = path.cgPath
+            layer.shadowPath = CGPath(roundedRect: self.bounds, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius, transform: nil)
         } else {
             layer.shadowPath = nil
         }

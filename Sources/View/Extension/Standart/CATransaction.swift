@@ -2,7 +2,7 @@
 //  KindKitView
 //
 
-#if os(OSX)
+#if os(macOS)
 import AppKit
 #elseif os(iOS)
 import UIKit

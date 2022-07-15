@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -365,3 +367,5 @@ extension StepperView : StepperViewDelegate {
     }
     
 }
+
+#endif

@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -298,3 +300,5 @@ private extension RateView {
     }
     
 }
+
+#endif

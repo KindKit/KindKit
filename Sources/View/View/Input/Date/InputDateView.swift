@@ -2,6 +2,8 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -260,12 +262,16 @@ public class InputDateView : IInputDateView {
     
     public func appear(to layout: ILayout) {
         self.layout = layout
+        #if os(iOS)
         self.toolbar?.appear(to: self)
+        #endif
         self._onAppear?()
     }
     
     public func disappear() {
+        #if os(iOS)
         self.toolbar?.disappear()
+        #endif
         self._reuse.disappear()
         self.layout = nil
         self._onDisappear?()
@@ -505,3 +511,5 @@ extension InputDateView: InputDateViewDelegate {
     }
     
 }
+
+#endif

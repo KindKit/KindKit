@@ -2,12 +2,12 @@
 //  KindKitView
 //
 
-#if os(OSX)
+#if os(macOS)
 
 import AppKit
 import KindKitCore
 
-public struct Font {
+public struct Font : Hashable {
 
     public var native: NSFont
     

@@ -3,10 +3,10 @@
 //
 
 import Foundation
-#if os(iOS)
-import UIKit
-#elseif os(OSX)
+#if os(macOS)
 import AppKit
+#elseif os(iOS)
+import UIKit
 #endif
 import KindKitCore
 import KindKitMath
@@ -60,38 +60,55 @@ struct LayoutManager {
             })
             if disappearing.count > 0 {
                 for item in disappearing {
-                    self._disappear(view: item.view)
+                    self._disappear(item: item)
                 }
             }
             var needForceUpdate = false
             for (index, item) in items.enumerated() {
-                let frame = item.frame
-                let isLoaded = item.view.isLoaded
-                let isAppeared = item.view.isAppeared
-                let isVisible = bounds.isIntersects(frame)
-                if isLoaded == true || isVisible == true {
-                    item.view.native.frame = frame.cgRect
-                    if isVisible == true && item.isNeedForceUpdate == true {
-                        layout.invalidate(item: item)
-                        item.resetNeedForceUpdate()
-                        needForceUpdate = true
+                let isLoaded = item.isLoaded
+                let isAppeared = item.isAppeared
+                let isHidden = item.isHidden
+                if isHidden == false {
+                    let frame = item.frame
+                    let isVisible = bounds.isIntersects(frame)
+                    if isLoaded == true || isVisible == true {
+                        item.view.native.frame = frame.cgRect
+                        if isVisible == true && item.isNeedForceUpdate == true {
+                            layout.invalidate(item: item)
+                            item.resetNeedForceUpdate()
+                            needForceUpdate = true
+                        }
+                        if item.view.native.superview !== self.contentView {
+                            #if os(macOS)
+                            self.contentView.addSubview(item.view.native, positioned: .above, relativeTo: self.contentView.subviews[index])
+                            #elseif os(iOS)
+                            self.contentView.insertSubview(item.view.native, at: index)
+                            #endif
+                        }
                     }
-                    if item.view.native.superview !== self.contentView {
-                        self.contentView.insertSubview(item.view.native, at: index)
+                    if isAppeared == false {
+                        item.view.appear(to: layout)
                     }
-                }
-                if isAppeared == false {
-                    item.view.appear(to: layout)
-                }
-                if isVisible == true {
-                    if item.view.isVisible == false {
-                        item.view.visible()
+                    if isVisible == true {
+                        if item.view.isVisible == false {
+                            item.view.visible()
+                        } else {
+                            item.view.visibility()
+                        }
                     } else {
-                        item.view.visibility()
+                        if item.view.isVisible == true {
+                            item.view.invisible()
+                        }
                     }
                 } else {
+                    if isAppeared == false {
+                        item.view.appear(to: layout)
+                    }
                     if item.view.isVisible == true {
                         item.view.invisible()
+                    }
+                    if isLoaded == true {
+                        item.view.native.removeFromSuperview()
                     }
                 }
             }
@@ -107,7 +124,7 @@ struct LayoutManager {
     @inline(__always)
     mutating func clear() {
         for item in self.items {
-            self._disappear(view: item.view)
+            self._disappear(item: item)
         }
         self.items.removeAll()
     }
@@ -117,18 +134,18 @@ struct LayoutManager {
 private extension LayoutManager {
     
     @inline(__always)
-    func _disappear(view: IView) {
+    func _disappear(item: LayoutItem) {
         let native: NativeView?
-        if view.isLoaded == true {
-            native = view.native
+        if item.view.isLoaded == true {
+            native = item.view.native
         } else {
             native = nil
         }
-        if view.isVisible == true {
-            view.invisible()
+        if item.view.isVisible == true {
+            item.view.invisible()
         }
-        if view.isAppeared == true {
-            view.disappear()
+        if item.view.isAppeared == true {
+            item.view.disappear()
         }
         native?.removeFromSuperview()
     }

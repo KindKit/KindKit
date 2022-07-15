@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -79,15 +81,24 @@ public class StackContainer< Screen : IStackScreen > : IStackContainer, IContain
         self.isPresented = false
         self.screen = screen
         self.hidesGroupBarWhenPushed = hidesGroupBarWhenPushed
-        #if os(iOS)
-        self.animationVelocity = UIScreen.main.animationVelocity
-        self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.45)
-        #endif
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
         self._rootItem = Item(
             container: rootContainer,
             insets: .zero
         )
-        #if os(iOS)
+        self._view = CustomView(
+            contentLayout: Layout(
+                state: .idle(current: self._rootItem.item)
+            )
+        )
+        #elseif os(iOS)
+        self.animationVelocity = UIScreen.main.animationVelocity
+        self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.45)
+        self._rootItem = Item(
+            container: rootContainer,
+            insets: .zero
+        )
         self._interactiveGesture = PanGesture(screenEdge: .left)
         self._view = CustomView(
             gestures: [ self._interactiveGesture ],
@@ -95,16 +106,10 @@ public class StackContainer< Screen : IStackScreen > : IStackContainer, IContain
                 state: .idle(current: self._rootItem.item)
             )
         )
-        #else
-        self._view = CustomView(
-            layout: Layout(
-                state: .idle(current: self._rootItem.item)
-            )
-        )
-        #endif
         self._interactiveGroupBottomBar = false
         self._interactiveGroupBarOldVisibility = 1
         self._interactiveGroupBarNewVisibility = 1
+        #endif
         self._items = []
         self._init()
         ContainerBarController.shared.add(observer: self)
@@ -502,8 +507,10 @@ private extension StackContainer {
                             current.container.finishHide(interactive: false)
                             forward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         if hideBar == true {
                             ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                         }
@@ -516,8 +523,10 @@ private extension StackContainer {
                     forward.container.prepareShow(interactive: false)
                     forward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
@@ -528,16 +537,20 @@ private extension StackContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
                 completion?()
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
@@ -551,8 +564,10 @@ private extension StackContainer {
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -563,8 +578,10 @@ private extension StackContainer {
                 forward.container.prepareShow(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -575,16 +592,20 @@ private extension StackContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
             completion?()
         } else {
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -634,8 +655,10 @@ private extension StackContainer {
                             current.container.finishHide(interactive: false)
                             backward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         if hideBar == true {
                             ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                         }
@@ -648,8 +671,10 @@ private extension StackContainer {
                     backward.container.prepareShow(interactive: false)
                     backward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
@@ -660,16 +685,20 @@ private extension StackContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
                 completion?()
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 if hideBar == true {
                     ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
                 }
@@ -683,8 +712,10 @@ private extension StackContainer {
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -695,8 +726,10 @@ private extension StackContainer {
                 backward.container.prepareShow(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -707,16 +740,20 @@ private extension StackContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
             completion?()
         } else {
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             if hideBar == true {
                 ContainerBarController.shared.set(.group, visibility: groupBarNewVisibility)
             }
@@ -811,8 +848,10 @@ private extension StackContainer {
         backward.container.finishShow(interactive: true)
         current.container.parent = nil
         self._resetInteractiveAnimation()
+        #if os(iOS)
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
+        #endif
         if self._interactiveGroupBottomBar == true {
             ContainerBarController.shared.set(.group, visibility: self._interactiveGroupBarNewVisibility)
         }
@@ -824,8 +863,10 @@ private extension StackContainer {
         current.container.cancelHide(interactive: true)
         backward.container.cancelShow(interactive: true)
         self._resetInteractiveAnimation()
+        #if os(iOS)
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
+        #endif
         if self._interactiveGroupBottomBar == true {
             ContainerBarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility)
         }

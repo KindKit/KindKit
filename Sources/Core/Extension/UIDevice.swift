@@ -2,6 +2,8 @@
 //  KindKitCore
 //
 
+#if os(iOS)
+
 import UIKit
 
 public extension UIDevice {
@@ -19,3 +21,5 @@ public extension UIDevice {
     }
     
 }
+
+#endif

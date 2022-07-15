@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -165,7 +167,9 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
         self.leadingLimit = leadingLimit > 0 ? leadingLimit : leadingSize / 2
         self.trailingView = trailingView
         self.trailingLimit = trailingLimit > 0 ? trailingLimit : trailingSize / 2
-        #if os(iOS)
+        #if os(macOS)
+        self.animationVelocity = Float(NSScreen.main!.frame.width * 2)
+        #elseif os(iOS)
         self.animationVelocity = Float(UIScreen.main.bounds.width * 2)
         #endif
         self._layout = Layout(

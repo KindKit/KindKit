@@ -7,6 +7,7 @@ import Foundation
 import UIKit
 #endif
 import CoreLocation
+import UserNotifications
 import KindKitObserver
 
 public class LocationPermission : IPermission {
@@ -143,8 +144,9 @@ private extension LocationPermission {
     func _rawStatus() -> CLAuthorizationStatus {
         if #available(iOS 14, *) {
             return self._locationManager.authorizationStatus
+        } else {
+            return CLLocationManager.authorizationStatus()
         }
-        return CLLocationManager.authorizationStatus()
     }
     
     func _didRedirectToSettings(source: Any) {

@@ -3,11 +3,11 @@
 //
 
 import KindKitCore
+import KindKitMath
 
-#if os(OSX)
+#if os(macOS)
 
 import AppKit
-import KindKitCore
 
 public struct Image {
 

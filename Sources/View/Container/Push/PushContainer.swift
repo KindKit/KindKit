@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -108,17 +110,10 @@ public class PushContainer : IPushContainer {
         contentContainer: (IContainer & IContainerParentable)? = nil
     ) {
         self.isPresented = false
-        #if os(iOS)
-        self.animationVelocity = 500
-        self.interactiveLimit = 20
-        #endif
         self.contentContainer = contentContainer
-        #if os(iOS)
-        self._interactiveGesture = PanGesture(
-            isEnabled: false
-        )
+        #if os(macOS)
+        self.animationVelocity = 500
         self._view = CustomView(
-            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 additionalInset: additionalInset,
                 containerInset: .zero,
@@ -126,8 +121,14 @@ public class PushContainer : IPushContainer {
                 state: .empty
             )
         )
-        #else
+        #elseif os(iOS)
+        self.animationVelocity = 500
+        self.interactiveLimit = 20
+        self._interactiveGesture = PanGesture(
+            isEnabled: false
+        )
         self._view = CustomView(
+            gestures: [ self._interactiveGesture ],
             contentLayout: Layout(
                 additionalInset: additionalInset,
                 containerInset: .zero,
@@ -318,8 +319,10 @@ private extension PushContainer {
                     self._didPresent(push: push)
                     push.container.finishShow(interactive: false)
                     self._view.contentLayout.state = .idle(push: push)
+                    #if os(iOS)
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
+                    #endif
                     completion?()
                 }
             )
@@ -327,8 +330,10 @@ private extension PushContainer {
             self._didPresent(push: push)
             push.container.finishShow(interactive: false)
             self._view.contentLayout.state = .idle(push: push)
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
         }
     }
     
@@ -368,16 +373,20 @@ private extension PushContainer {
                     guard let self = self else { return }
                     push.container.finishHide(interactive: false)
                     self._view.contentLayout.state = .empty
+                    #if os(iOS)
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
+                    #endif
                     completion?()
                 }
             )
         } else {
             push.container.finishHide(interactive: false)
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
         }
     }
     

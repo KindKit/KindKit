@@ -6,16 +6,68 @@ import Foundation
 
 public extension Date {
     
-    func isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
-        return calendar.isDate(self, equalTo: date, toGranularity: component)
+    init?(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int,
+        minute: Int,
+        second: Int,
+        calendar: Calendar = Calendar.current,
+        timeZone: TimeZone = TimeZone.current
+    ) {
+        let components = DateComponents(
+            calendar: calendar,
+            timeZone: timeZone,
+            year: year,
+            month: month,
+            day: day,
+            hour: hour,
+            minute: minute,
+            second: second
+        )
+        guard let date = components.date else { return nil }
+        self = date
     }
     
-    func format(_ format: String, calendar: Calendar = Calendar.current, locale: Locale = Locale.current) -> String {
-        let formatter = DateFormatter()
-        formatter.calendar = calendar
-        formatter.locale = locale
-        formatter.dateFormat = format
-        return formatter.string(from: self)
+    init?(
+        year: Int,
+        month: Int,
+        day: Int,
+        calendar: Calendar = Calendar.current,
+        timeZone: TimeZone = TimeZone.current
+    ) {
+        let components = DateComponents(
+            calendar: calendar,
+            timeZone: timeZone,
+            year: year,
+            month: month,
+            day: day
+        )
+        guard let date = components.date else { return nil }
+        self = date
+    }
+    
+    init?(
+        hour: Int,
+        minute: Int,
+        second: Int,
+        calendar: Calendar = Calendar.current,
+        timeZone: TimeZone = TimeZone.current
+    ) {
+        let components = DateComponents(
+            calendar: calendar,
+            timeZone: timeZone,
+            hour: hour,
+            minute: minute,
+            second: second
+        )
+        guard let date = components.date else { return nil }
+        self = date
+    }
+    
+    func isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
+        return calendar.isDate(self, equalTo: date, toGranularity: component)
     }
 
 }

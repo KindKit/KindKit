@@ -29,7 +29,6 @@ public final class TapGesture : NSObject, ITapGesture {
         set(value) { self._native.delaysTouchesEnded = value }
         get { return self._native.delaysTouchesEnded }
     }
-    @available(iOS 9.2, *)
     public var requiresExclusiveTouchType: Bool {
         set(value) { self._native.requiresExclusiveTouchType = value }
         get { return self._native.requiresExclusiveTouchType }
@@ -50,27 +49,6 @@ public final class TapGesture : NSObject, ITapGesture {
     private var _onShouldBeRequiredToFailBy: ((_ otherGesture: NativeGesture) -> Bool)?
     private var _onTriggered: (() -> Void)?
     
-    public init(
-        isEnabled: Bool = true,
-        cancelsTouchesInView: Bool = true,
-        delaysTouchesBegan: Bool = false,
-        delaysTouchesEnded: Bool = true,
-        numberOfTapsRequired: UInt = 1,
-        numberOfTouchesRequired: UInt = 1
-    ) {
-        self._native = UITapGestureRecognizer()
-        self._native.isEnabled = isEnabled
-        self._native.cancelsTouchesInView = cancelsTouchesInView
-        self._native.delaysTouchesBegan = delaysTouchesBegan
-        self._native.delaysTouchesEnded = delaysTouchesEnded
-        self._native.numberOfTapsRequired = Int(numberOfTapsRequired)
-        self._native.numberOfTouchesRequired = Int(numberOfTouchesRequired)
-        super.init()
-        self._native.delegate = self
-        self._native.addTarget(self, action: #selector(self._handle))
-    }
-        
-    @available(iOS 9.2, *)
     public init(
         isEnabled: Bool = true,
         cancelsTouchesInView: Bool = false,

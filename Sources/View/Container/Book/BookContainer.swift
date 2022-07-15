@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -71,18 +73,17 @@ public class BookContainer< Screen : IBookScreen > : IBookContainer {
     ) {
         self.isPresented = false
         self.screen = screen
-        #if os(iOS)
+        #if os(macOS)
+        self.animationVelocity = NSScreen.main!.animationVelocity
+        self._view = CustomView(
+            contentLayout: Layout()
+        )
+        #elseif os(iOS)
         self.animationVelocity = UIScreen.main.animationVelocity
         self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
-        #endif
-        #if os(iOS)
         self._interactiveGesture = PanGesture()
         self._view = CustomView(
             gestures: [ self._interactiveGesture ],
-            contentLayout: Layout()
-        )
-        #else
-        self._view = CustomView(
             contentLayout: Layout()
         )
         #endif
@@ -392,8 +393,10 @@ private extension BookContainer {
                             current.container.finishHide(interactive: false)
                             forward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         interCompletion(forward)
                     }
                 )
@@ -403,8 +406,10 @@ private extension BookContainer {
                     forward.container.prepareShow(interactive: false)
                     forward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(forward)
             } else if let current = current {
                 self._view.contentLayout.state = .empty
@@ -412,13 +417,17 @@ private extension BookContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             }
         } else if let current = current, let forward = forward {
@@ -429,8 +438,10 @@ private extension BookContainer {
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(forward)
         } else if let forward = forward {
             self._view.contentLayout.state = .idle(current: forward.bookItem)
@@ -438,8 +449,10 @@ private extension BookContainer {
                 forward.container.prepareShow(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(forward)
         } else if let current = current {
             self._view.contentLayout.state = .empty
@@ -447,13 +460,17 @@ private extension BookContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         } else {
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         }
     }
@@ -512,8 +529,10 @@ private extension BookContainer {
                             current.container.finishHide(interactive: false)
                             backward.container.finishShow(interactive: false)
                         }
+                        #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
+                        #endif
                         interCompletion(backward)
                     }
                 )
@@ -523,8 +542,10 @@ private extension BookContainer {
                     backward.container.prepareShow(interactive: false)
                     backward.container.finishShow(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(backward)
             } else if let current = current {
                 self._view.contentLayout.state = .empty
@@ -532,13 +553,17 @@ private extension BookContainer {
                     current.container.prepareHide(interactive: false)
                     current.container.finishHide(interactive: false)
                 }
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             } else {
                 self._view.contentLayout.state = .empty
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
                 interCompletion(nil)
             }
         } else if let current = current, let backward = backward {
@@ -549,8 +574,10 @@ private extension BookContainer {
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(backward)
         } else if let backward = backward {
             self._view.contentLayout.state = .idle(current: backward.bookItem)
@@ -558,8 +585,10 @@ private extension BookContainer {
                 backward.container.prepareShow(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(backward)
         } else if let current = current {
             self._view.contentLayout.state = .empty
@@ -567,13 +596,17 @@ private extension BookContainer {
                 current.container.prepareHide(interactive: false)
                 current.container.finishHide(interactive: false)
             }
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         } else {
             self._view.contentLayout.state = .empty
+            #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
+            #endif
             interCompletion(nil)
         }
     }

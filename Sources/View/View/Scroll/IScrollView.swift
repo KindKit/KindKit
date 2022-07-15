@@ -60,11 +60,13 @@ public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable
     
     var isDecelerating: Bool { get }
     
-    @available(iOS 10.0, *)
+    #if os(iOS)
+    
     var refreshColor: Color? { set get }
     
-    @available(iOS 10.0, *)
     var isRefreshing: Bool { get }
+    
+    #endif
     
     func add(observer: IScrollViewObserver)
     
@@ -72,15 +74,21 @@ public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable
     
     func scrollToTop(animated: Bool, completion: (() -> Void)?)
 
-    func contentOffset(with view: IView, horizontal: ScrollViewScrollAlignment, vertical: ScrollViewScrollAlignment) -> PointFloat?
+    func contentOffset(
+        with view: IView,
+        horizontal: ScrollViewScrollAlignment,
+        vertical: ScrollViewScrollAlignment
+    ) -> PointFloat?
     
-    @available(iOS 10.0, *)
+    #if os(iOS)
+    
     @discardableResult
     func beginRefresh() -> Self
     
-    @available(iOS 10.0, *)
     @discardableResult
     func endRefresh() -> Self
+    
+    #endif
     
     @discardableResult
     func direction(_ value: ScrollViewDirection) -> Self
@@ -97,13 +105,15 @@ public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable
     @discardableResult
     func contentOffset(_ value: PointFloat, normalized: Bool) -> Self
     
-    @available(iOS 10.0, *)
+    #if os(iOS)
+    
     @discardableResult
     func refreshColor(_ value: Color?) -> Self
     
-    @available(iOS 10.0, *)
     @discardableResult
     func onTriggeredRefresh(_ value: (() -> Void)?) -> Self
+    
+    #endif
     
     @discardableResult
     func onBeginScrolling(_ value: (() -> Void)?) -> Self

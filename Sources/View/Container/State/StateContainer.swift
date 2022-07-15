@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindKitCore
@@ -60,8 +62,10 @@ public class StateContainer : IStateContainer {
                 self._view.contentLayout.item = nil
             }
             if self.isPresented == true {
+                #if os(iOS)
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
+                #endif
             }
         }
         get { return self._container }
