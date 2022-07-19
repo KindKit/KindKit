@@ -68,23 +68,23 @@ public class ButtonView : IButtonView {
     public var spinnerView: ISpinnerView? {
         didSet { self._layout.spinnerItem = self.spinnerView.flatMap({ LayoutItem(view: $0) }) }
     }
-    public var imagePosition: ButtonViewImagePosition {
-        set(value) { self._layout.imagePosition = value }
-        get { return self._layout.imagePosition }
+    public var secondaryPosition: ButtonViewSecondaryPosition {
+        set(value) { self._layout.secondaryPosition = value }
+        get { return self._layout.secondaryPosition }
     }
-    public var imageInset: InsetFloat {
-        set(value) { self._layout.imageInset = value }
-        get { return self._layout.imageInset }
+    public var secondaryInset: InsetFloat {
+        set(value) { self._layout.secondaryInset = value }
+        get { return self._layout.secondaryInset }
     }
-    public var imageView: IView? {
-        didSet { self._layout.imageItem = self.imageView.flatMap({ LayoutItem(view: $0) }) }
+    public var secondaryView: IView? {
+        didSet { self._layout.secondaryItem = self.secondaryView.flatMap({ LayoutItem(view: $0) }) }
     }
-    public var textInset: InsetFloat {
-        set(value) { self._layout.textInset = value }
-        get { return self._layout.textInset }
+    public var primaryInset: InsetFloat {
+        set(value) { self._layout.primaryInset = value }
+        get { return self._layout.primaryInset }
     }
-    public var textView: IView? {
-        didSet { self._layout.textItem = self.textView.flatMap({ LayoutItem(view: $0) }) }
+    public var primaryView: IView {
+        didSet { self._layout.primaryItem = LayoutItem(view: self.primaryView) }
     }
     public var isHighlighted: Bool {
         set(value) { self._view.isHighlighted = value }
@@ -137,11 +137,11 @@ public class ButtonView : IButtonView {
         spinnerPosition: ButtonViewSpinnerPosition = .fill,
         spinnerView: ISpinnerView? = nil,
         spinnerAnimating: Bool = false,
-        imagePosition: ButtonViewImagePosition = .left,
-        imageInset: InsetFloat = InsetFloat(horizontal: 4, vertical: 4),
-        imageView: IView? = nil,
-        textInset: InsetFloat = InsetFloat(horizontal: 4, vertical: 4),
-        textView: IView? = nil,
+        secondaryPosition: ButtonViewSecondaryPosition = .left,
+        secondaryInset: InsetFloat = InsetFloat(horizontal: 4, vertical: 4),
+        secondaryView: IView? = nil,
+        primaryInset: InsetFloat = InsetFloat(horizontal: 4, vertical: 4),
+        primaryView: IView,
         isLocked: Bool = false,
         isSelected: Bool = false,
         color: Color? = nil,
@@ -155,8 +155,8 @@ public class ButtonView : IButtonView {
         self.height = height
         self.backgroundView = backgroundView
         self.spinnerView = spinnerView
-        self.imageView = imageView
-        self.textView = textView
+        self.secondaryView = secondaryView
+        self.primaryView = primaryView
         self._layout = Layout(
             inset: inset,
             alignment: alignment,
@@ -164,11 +164,11 @@ public class ButtonView : IButtonView {
             spinnerPosition: spinnerPosition,
             spinnerItem: spinnerView.flatMap({ return LayoutItem(view: $0) }),
             spinnerAnimating: spinnerAnimating,
-            imagePosition: imagePosition,
-            imageInset: imageInset,
-            imageItem: imageView.flatMap({ return LayoutItem(view: $0) }),
-            textInset: textInset,
-            textItem: textView.flatMap({ return LayoutItem(view: $0) })
+            secondaryPosition: secondaryPosition,
+            secondaryInset: secondaryInset,
+            secondaryItem: secondaryView.flatMap({ return LayoutItem(view: $0) }),
+            primaryInset: primaryInset,
+            primaryItem: LayoutItem(view: primaryView)
         )
         self._view = ControlView(
             contentLayout: self._layout,
@@ -262,20 +262,20 @@ public class ButtonView : IButtonView {
     }
     
     @discardableResult
-    public func imagePosition(_ value: ButtonViewImagePosition) -> Self {
-        self.imagePosition = value
+    public func secondaryPosition(_ value: ButtonViewSecondaryPosition) -> Self {
+        self.secondaryPosition = value
         return self
     }
     
     @discardableResult
-    public func imageInset(_ value: InsetFloat) -> Self {
-        self.imageInset = value
+    public func secondaryInset(_ value: InsetFloat) -> Self {
+        self.secondaryInset = value
         return self
     }
     
     @discardableResult
-    public func textInset(_ value: InsetFloat) -> Self {
-        self.textInset = value
+    public func primaryInset(_ value: InsetFloat) -> Self {
+        self.primaryInset = value
         return self
     }
     
@@ -401,24 +401,24 @@ extension ButtonView {
         var spinnerAnimating: Bool {
             didSet { self.setNeedForceUpdate() }
         }
-        var imagePosition: ButtonViewImagePosition {
+        var secondaryPosition: ButtonViewSecondaryPosition {
             didSet { self.setNeedForceUpdate() }
         }
-        var imageInset: InsetFloat {
+        var secondaryInset: InsetFloat {
             didSet { self.setNeedForceUpdate() }
         }
-        var imageItem: LayoutItem? {
-            didSet { self.setNeedForceUpdate(item: self.imageItem) }
+        var secondaryItem: LayoutItem? {
+            didSet { self.setNeedForceUpdate(item: self.secondaryItem) }
         }
-        var textInset: InsetFloat {
+        var primaryInset: InsetFloat {
             didSet { self.setNeedForceUpdate() }
         }
-        var textItem: LayoutItem? {
-            didSet { self.setNeedForceUpdate(item: self.textItem) }
+        var primaryItem: LayoutItem {
+            didSet { self.setNeedForceUpdate(item: self.primaryItem) }
         }
         private var _cacheSpinnerSize: SizeFloat?
-        private var _cacheImageSize: SizeFloat?
-        private var _cacheTextSize: SizeFloat?
+        private var _cacheSecondarySize: SizeFloat?
+        private var _cachePrimarySize: SizeFloat?
 
         init(
             inset: InsetFloat,
@@ -427,11 +427,11 @@ extension ButtonView {
             spinnerPosition: ButtonViewSpinnerPosition,
             spinnerItem: LayoutItem?,
             spinnerAnimating: Bool,
-            imagePosition: ButtonViewImagePosition,
-            imageInset: InsetFloat,
-            imageItem: LayoutItem?,
-            textInset: InsetFloat,
-            textItem: LayoutItem?
+            secondaryPosition: ButtonViewSecondaryPosition,
+            secondaryInset: InsetFloat,
+            secondaryItem: LayoutItem?,
+            primaryInset: InsetFloat,
+            primaryItem: LayoutItem
         ) {
             self.inset = inset
             self.alignment = alignment
@@ -439,20 +439,20 @@ extension ButtonView {
             self.spinnerPosition = spinnerPosition
             self.spinnerItem = spinnerItem
             self.spinnerAnimating = spinnerAnimating
-            self.imagePosition = imagePosition
-            self.imageInset = imageInset
-            self.imageItem = imageItem
-            self.textInset = textInset
-            self.textItem = textItem
+            self.secondaryPosition = secondaryPosition
+            self.secondaryInset = secondaryInset
+            self.secondaryItem = secondaryItem
+            self.primaryInset = primaryInset
+            self.primaryItem = primaryItem
         }
         
         public func invalidate(item: LayoutItem) {
             if self.spinnerItem === item {
                 self._cacheSpinnerSize = nil
-            } else if self.imageItem === item {
-                self._cacheImageSize = nil
-            } else if self.textItem === item {
-                self._cacheTextSize = nil
+            } else if self.secondaryItem === item {
+                self._cacheSecondarySize = nil
+            } else if self.primaryItem === item {
+                self._cachePrimarySize = nil
             }
         }
         
@@ -464,49 +464,43 @@ extension ButtonView {
                 switch self.spinnerPosition {
                 case .fill:
                     spinnerItem.frame = RectFloat(center: availableBounds.center, size: spinnerSize).integral
-                case .image:
-                    if self.imageItem != nil, let textItem = self.textItem {
-                        let textSize = self._textSize(availableBounds.size, item: textItem)
+                case .secondary:
+                    if self.secondaryItem != nil {
+                        let primarySize = self._primarySize(availableBounds.size, item: self.primaryItem)
                         let frames = self._frame(
                             bounds: availableBounds,
                             alignment: self.alignment,
-                            imagePosition: self.imagePosition,
-                            imageInset: self.imageInset,
-                            imageSize: spinnerSize,
-                            textInset: self.textInset,
-                            textSize: textSize
+                            secondaryPosition: self.secondaryPosition,
+                            secondaryInset: self.secondaryInset,
+                            secondarySize: spinnerSize,
+                            primaryInset: self.primaryInset,
+                            primarySize: primarySize
                         )
-                        spinnerItem.frame = frames.image.integral
-                        textItem.frame = frames.text.integral
+                        spinnerItem.frame = frames.secondary.integral
+                        self.primaryItem.frame = frames.primary.integral
                     } else {
                         spinnerItem.frame = RectFloat(center: availableBounds.center, size: spinnerSize).integral
                     }
                 }
-            } else if let imageItem = self.imageItem, let textItem = self.textItem {
-                let imageSize = self._imageSize(availableBounds.size, item: imageItem)
-                let textSize = self._textSize(availableBounds.size, item: textItem)
+            } else if let secondaryItem = self.secondaryItem {
+                let secondarySize = self._secondarySize(availableBounds.size, item: secondaryItem)
+                let primarySize = self._primarySize(availableBounds.size, item: self.primaryItem)
                 let frames = self._frame(
                     bounds: availableBounds,
                     alignment: self.alignment,
-                    imagePosition: self.imagePosition,
-                    imageInset: self.imageInset,
-                    imageSize: imageSize,
-                    textInset: self.textInset,
-                    textSize: textSize
+                    secondaryPosition: self.secondaryPosition,
+                    secondaryInset: self.secondaryInset,
+                    secondarySize: secondarySize,
+                    primaryInset: self.primaryInset,
+                    primarySize: primarySize
                 )
-                imageItem.frame = frames.image.integral
-                textItem.frame = frames.text.integral
-            } else if let imageItem = self.imageItem {
-                let imageSize = self._imageSize(availableBounds.size, item: imageItem)
+                secondaryItem.frame = frames.secondary.integral
+                self.primaryItem.frame = frames.primary.integral
+            } else {
+                let primarySize = self._primarySize(availableBounds.size, item: self.primaryItem)
                 switch self.alignment {
-                case .fill: imageItem.frame = availableBounds
-                case .center: imageItem.frame = RectFloat(center: availableBounds.center, size: imageSize).integral
-                }
-            } else if let textItem = self.textItem {
-                let textSize = self._textSize(availableBounds.size, item: textItem)
-                switch self.alignment {
-                case .fill: textItem.frame = availableBounds
-                case .center: textItem.frame = RectFloat(center: availableBounds.center, size: textSize).integral
+                case .fill: self.primaryItem.frame = availableBounds
+                case .center: self.primaryItem.frame = RectFloat(center: availableBounds.center, size: primarySize).integral
                 }
             }
             return bounds.size
@@ -515,55 +509,52 @@ extension ButtonView {
         func size(available: SizeFloat) -> SizeFloat {
             var size = SizeFloat(width: 0, height: 0)
             let spinnerSize = self.spinnerItem.flatMap({ return $0.size(available: available) })
-            let imageSize = self.imageItem.flatMap({ return $0.size(available: available) })
-            let textSize = self.textItem.flatMap({ return $0.size(available: available) })
+            let secondarySize = self.secondaryItem.flatMap({ return $0.size(available: available) })
+            let primarySize = self.primaryItem.size(available: available)
             if self.spinnerAnimating == true, let spinnerSize = spinnerSize {
                 switch self.spinnerPosition {
                 case .fill:
                     size.width = self.inset.left + spinnerSize.width + self.inset.right
                     size.height = self.inset.top + spinnerSize.height + self.inset.bottom
-                case .image:
-                    if imageSize != nil, let textSize = textSize {
-                        switch self.imagePosition {
+                case .secondary:
+                    if secondarySize != nil {
+                        switch self.secondaryPosition {
                         case .top:
-                            size.width = self.inset.left + max(spinnerSize.width, textSize.width) + self.inset.right
-                            size.height = self.inset.top + spinnerSize.height + self.imageInset.bottom + self.textInset.top + textSize.height + self.inset.bottom
+                            size.width = self.inset.left + max(spinnerSize.width, primarySize.width) + self.inset.right
+                            size.height = self.inset.top + spinnerSize.height + self.secondaryInset.bottom + self.primaryInset.top + primarySize.height + self.inset.bottom
                         case .left:
-                            size.width += self.inset.left + spinnerSize.width + self.imageInset.right + self.textInset.left + textSize.width + self.inset.right
-                            size.height = self.inset.top + max(spinnerSize.height, textSize.height) + self.inset.bottom
+                            size.width += self.inset.left + spinnerSize.width + self.secondaryInset.right + self.primaryInset.left + primarySize.width + self.inset.right
+                            size.height = self.inset.top + max(spinnerSize.height, primarySize.height) + self.inset.bottom
                         case .right:
-                            size.width = self.inset.left + textSize.width + self.textInset.right + self.imageInset.left + spinnerSize.width + self.inset.right
-                            size.height = self.inset.top + max(spinnerSize.height, textSize.height) + self.inset.bottom
+                            size.width = self.inset.left + primarySize.width + self.primaryInset.right + self.secondaryInset.left + spinnerSize.width + self.inset.right
+                            size.height = self.inset.top + max(spinnerSize.height, primarySize.height) + self.inset.bottom
                         case .bottom:
-                            size.width = self.inset.left + max(spinnerSize.width, textSize.width) + self.inset.right
-                            size.height = self.inset.top + textSize.height + self.textInset.bottom + self.imageInset.top + spinnerSize.height + self.inset.bottom
+                            size.width = self.inset.left + max(spinnerSize.width, primarySize.width) + self.inset.right
+                            size.height = self.inset.top + primarySize.height + self.primaryInset.bottom + self.secondaryInset.top + spinnerSize.height + self.inset.bottom
                         }
                     } else {
                         size.width = self.inset.left + spinnerSize.width + self.inset.right
                         size.height = self.inset.top + spinnerSize.height + self.inset.bottom
                     }
                 }
-            } else if let imageSize = imageSize, let textSize = textSize {
-                switch self.imagePosition {
+            } else if let secondarySize = secondarySize {
+                switch self.secondaryPosition {
                 case .top:
-                    size.width = self.inset.left + max(imageSize.width, textSize.width) + self.inset.right
-                    size.height = self.inset.top + imageSize.height + self.imageInset.bottom + self.textInset.top + textSize.height + self.inset.bottom
+                    size.width = self.inset.left + max(secondarySize.width, primarySize.width) + self.inset.right
+                    size.height = self.inset.top + secondarySize.height + self.secondaryInset.bottom + self.primaryInset.top + primarySize.height + self.inset.bottom
                 case .left:
-                    size.width = self.inset.left + imageSize.width + self.imageInset.right + self.textInset.left + textSize.width + self.inset.right
-                    size.height = self.inset.top + max(imageSize.height, textSize.height) + self.inset.bottom
+                    size.width = self.inset.left + secondarySize.width + self.secondaryInset.right + self.primaryInset.left + primarySize.width + self.inset.right
+                    size.height = self.inset.top + max(secondarySize.height, primarySize.height) + self.inset.bottom
                 case .right:
-                    size.width = self.inset.left + textSize.width + self.textInset.right + self.imageInset.left + imageSize.width + self.inset.right
-                    size.height = self.inset.top + max(imageSize.height, textSize.height) + self.inset.bottom
+                    size.width = self.inset.left + primarySize.width + self.primaryInset.right + self.secondaryInset.left + secondarySize.width + self.inset.right
+                    size.height = self.inset.top + max(secondarySize.height, primarySize.height) + self.inset.bottom
                 case .bottom:
-                    size.width = self.inset.left + max(imageSize.width, textSize.width) + self.inset.right
-                    size.height = self.inset.top + textSize.height + self.textInset.bottom + self.imageInset.top + imageSize.height + self.inset.bottom
+                    size.width = self.inset.left + max(secondarySize.width, primarySize.width) + self.inset.right
+                    size.height = self.inset.top + primarySize.height + self.primaryInset.bottom + self.secondaryInset.top + secondarySize.height + self.inset.bottom
                 }
-            } else if let imageSize = imageSize {
-                size.width = self.inset.left + imageSize.width + self.inset.right
-                size.height = self.inset.top + imageSize.height + self.inset.bottom
-            } else if let textSize = textSize {
-                size.width = self.inset.left + textSize.width + self.inset.right
-                size.height = self.inset.top + textSize.height + self.inset.bottom
+            } else {
+                size.width = self.inset.left + primarySize.width + self.inset.right
+                size.height = self.inset.top + primarySize.height + self.inset.bottom
             }
             return size
         }
@@ -575,12 +566,10 @@ extension ButtonView {
                     items.append(item)
                 }
             } else {
-                if let item = self.imageItem {
+                if let item = self.secondaryItem {
                     items.append(item)
                 }
-                if let item = self.textItem {
-                    items.append(item)
-                }
+                items.append(self.primaryItem)
             }
             return items
         }
@@ -599,136 +588,136 @@ private extension ButtonView.Layout {
         return self._cacheSpinnerSize!
     }
     
-    func _imageSize(_ available: SizeFloat, item: LayoutItem) -> SizeFloat {
-        if let size = self._cacheImageSize {
+    func _secondarySize(_ available: SizeFloat, item: LayoutItem) -> SizeFloat {
+        if let size = self._cacheSecondarySize {
             return size
         }
-        self._cacheImageSize = item.size(available: available)
-        return self._cacheImageSize!
+        self._cacheSecondarySize = item.size(available: available)
+        return self._cacheSecondarySize!
     }
     
-    func _textSize(_ available: SizeFloat, item: LayoutItem) -> SizeFloat {
-        if let size = self._cacheTextSize {
+    func _primarySize(_ available: SizeFloat, item: LayoutItem) -> SizeFloat {
+        if let size = self._cachePrimarySize {
             return size
         }
-        self._cacheTextSize = item.size(available: available)
-        return self._cacheTextSize!
+        self._cachePrimarySize = item.size(available: available)
+        return self._cachePrimarySize!
     }
     
-    func _frame(bounds: RectFloat, alignment: ButtonViewAlignment, imagePosition: ButtonViewImagePosition, imageInset: InsetFloat, imageSize: SizeFloat, textInset: InsetFloat, textSize: SizeFloat) -> (image: RectFloat, text: RectFloat) {
-        let image: RectFloat
-        let text: RectFloat
-        switch imagePosition {
+    func _frame(bounds: RectFloat, alignment: ButtonViewAlignment, secondaryPosition: ButtonViewSecondaryPosition, secondaryInset: InsetFloat, secondarySize: SizeFloat, primaryInset: InsetFloat, primarySize: SizeFloat) -> (secondary: RectFloat, primary: RectFloat) {
+        let secondary: RectFloat
+        let primary: RectFloat
+        switch secondaryPosition {
         case .top:
-            let offset = imageInset.top + imageSize.height + textInset.top
-            let baseline = max(imageSize.width, textSize.width) / 2
-            image = RectFloat(
-                x: baseline - (imageSize.width / 2),
+            let offset = secondaryInset.top + secondarySize.height + primaryInset.top
+            let baseline = max(secondarySize.width, primarySize.width) / 2
+            secondary = RectFloat(
+                x: baseline - (secondarySize.width / 2),
                 y: 0,
-                width: imageSize.width,
-                height: imageSize.height
+                width: secondarySize.width,
+                height: secondarySize.height
             )
             switch alignment {
             case .fill:
-                text = RectFloat(
-                    x: baseline - (textSize.width / 2),
+                primary = RectFloat(
+                    x: baseline - (primarySize.width / 2),
                     y: offset,
-                    width: textSize.width,
+                    width: primarySize.width,
                     height: bounds.height - offset
                 )
             case .center:
-                text = RectFloat(
-                    x: baseline - (textSize.width / 2),
+                primary = RectFloat(
+                    x: baseline - (primarySize.width / 2),
                     y: offset,
-                    width: textSize.width,
-                    height: textSize.height
+                    width: primarySize.width,
+                    height: primarySize.height
                 )
             }
         case .left:
-            let offset = imageInset.right + imageSize.width + textInset.left
-            let baseline = max(imageSize.height, textSize.height) / 2
-            image = RectFloat(
+            let offset = secondaryInset.right + secondarySize.width + primaryInset.left
+            let baseline = max(secondarySize.height, primarySize.height) / 2
+            secondary = RectFloat(
                 x: 0,
-                y: baseline - (imageSize.height / 2),
-                width: imageSize.width,
-                height: imageSize.height
+                y: baseline - (secondarySize.height / 2),
+                width: secondarySize.width,
+                height: secondarySize.height
             )
             switch alignment {
             case .fill:
-                text = RectFloat(
+                primary = RectFloat(
                     x: offset,
-                    y: baseline - (textSize.height / 2),
+                    y: baseline - (primarySize.height / 2),
                     width: bounds.width - offset,
-                    height: textSize.height
+                    height: primarySize.height
                 )
             case .center:
-                text = RectFloat(
+                primary = RectFloat(
                     x: offset,
-                    y: baseline - (textSize.height / 2),
-                    width: textSize.width,
-                    height: textSize.height
+                    y: baseline - (primarySize.height / 2),
+                    width: primarySize.width,
+                    height: primarySize.height
                 )
             }
         case .right:
-            let offset = imageInset.left + textSize.width + textInset.right
-            let baseline = max(imageSize.height, textSize.height) / 2
-            image = RectFloat(
+            let offset = secondaryInset.left + primarySize.width + primaryInset.right
+            let baseline = max(secondarySize.height, primarySize.height) / 2
+            secondary = RectFloat(
                 x: offset,
-                y: baseline - (imageSize.height / 2),
-                width: imageSize.width,
-                height: imageSize.height
+                y: baseline - (secondarySize.height / 2),
+                width: secondarySize.width,
+                height: secondarySize.height
             )
             switch alignment {
             case .fill:
-                text = RectFloat(
+                primary = RectFloat(
                     x: 0,
-                    y: baseline - (textSize.height / 2),
+                    y: baseline - (primarySize.height / 2),
                     width: bounds.width - offset,
-                    height: textSize.height
+                    height: primarySize.height
                 )
             case .center:
-                text = RectFloat(
+                primary = RectFloat(
                     x: 0,
-                    y: baseline - (textSize.height / 2),
-                    width: textSize.width,
-                    height: textSize.height
+                    y: baseline - (primarySize.height / 2),
+                    width: primarySize.width,
+                    height: primarySize.height
                 )
             }
         case .bottom:
-            let offset = imageInset.top + textSize.height + textInset.bottom
-            let baseline = max(imageSize.width, textSize.width) / 2
-            image = RectFloat(
-                x: baseline - (imageSize.width / 2),
+            let offset = secondaryInset.top + primarySize.height + primaryInset.bottom
+            let baseline = max(secondarySize.width, primarySize.width) / 2
+            secondary = RectFloat(
+                x: baseline - (secondarySize.width / 2),
                 y: offset,
-                width: imageSize.width,
-                height: imageSize.height
+                width: secondarySize.width,
+                height: secondarySize.height
             )
             switch alignment {
             case .fill:
-                text = RectFloat(
-                    x: baseline - (textSize.width / 2),
+                primary = RectFloat(
+                    x: baseline - (primarySize.width / 2),
                     y: 0,
-                    width: textSize.width,
+                    width: primarySize.width,
                     height: bounds.height - offset
                 )
             case .center:
-                text = RectFloat(
-                    x: baseline - (textSize.width / 2),
+                primary = RectFloat(
+                    x: baseline - (primarySize.width / 2),
                     y: 0,
-                    width: textSize.width,
-                    height: textSize.height
+                    width: primarySize.width,
+                    height: primarySize.height
                 )
             }
         }
-        let union = image.union(text)
+        let union = secondary.union(primary)
         let center = bounds.center
         let offset = PointFloat(
             x: center.x - (union.width / 2),
             y: center.y - (union.height / 2)
         )
         return (
-            image: RectFloat(center: image.center + offset, size: image.size),
-            text: RectFloat(center: text.center + offset, size: text.size)
+            secondary: RectFloat(center: secondary.center + offset, size: secondary.size),
+            primary: RectFloat(center: primary.center + offset, size: primary.size)
         )
     }
     

@@ -18,9 +18,9 @@ public protocol IStackBarView : IBarView {
     
     var leadingViewSpacing: Float { set get }
     
-    var titleView: IView? { set get }
+    var centerView: IView? { set get }
     
-    var titleSpacing: Float { set get }
+    var centerSpacing: Float { set get }
     
     var trailingViews: [IView] { set get }
     
@@ -46,10 +46,10 @@ public protocol IStackBarView : IBarView {
     func leadingViewSpacing(_ value: Float) -> Self
     
     @discardableResult
-    func titleView(_ value: IView?) -> Self
+    func centerView(_ value: IView?) -> Self
     
     @discardableResult
-    func titleSpacing(_ value: Float) -> Self
+    func centerSpacing(_ value: Float) -> Self
     
     @discardableResult
     func trailingViews(_ value: [IView]) -> Self

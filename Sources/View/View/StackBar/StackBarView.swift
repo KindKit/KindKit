@@ -24,10 +24,10 @@ public class StackBarView : BarView, IStackBarView {
     public var leadingViewSpacing: Float {
         didSet { self._relayout() }
     }
-    public var titleView: IView? {
+    public var centerView: IView? {
         didSet { self._relayout() }
     }
-    public var titleSpacing: Float {
+    public var centerSpacing: Float {
         didSet { self._relayout() }
     }
     public var trailingViews: [IView] {
@@ -51,8 +51,8 @@ public class StackBarView : BarView, IStackBarView {
         headerSpacing: Float = 8,
         leadingViews: [IView] = [],
         leadingViewSpacing: Float = 4,
-        titleView: IView? = nil,
-        titleSpacing: Float = 4,
+        centerView: IView? = nil,
+        centerSpacing: Float = 4,
         trailingViews: [IView] = [],
         trailingViewSpacing: Float = 4,
         footerView: IView? = nil,
@@ -70,8 +70,8 @@ public class StackBarView : BarView, IStackBarView {
         self.headerSpacing = headerSpacing
         self.leadingViews = leadingViews
         self.leadingViewSpacing = leadingViewSpacing
-        self.titleView = titleView
-        self.titleSpacing = titleSpacing
+        self.centerView = centerView
+        self.centerSpacing = centerSpacing
         self.trailingViews = trailingViews
         self.trailingViewSpacing = trailingViewSpacing
         self.footerView = footerView
@@ -83,8 +83,8 @@ public class StackBarView : BarView, IStackBarView {
                 headerSpacing: headerSpacing,
                 leadingViews: leadingViews,
                 leadingViewSpacing: leadingViewSpacing,
-                titleView: titleView,
-                titleSpacing: titleSpacing,
+                centerView: centerView,
+                centerSpacing: centerSpacing,
                 trailingViews: trailingViews,
                 trailingViewSpacing: trailingViewSpacing,
                 footerView: footerView,
@@ -136,14 +136,14 @@ public class StackBarView : BarView, IStackBarView {
     }
     
     @discardableResult
-    public func titleView(_ value: IView?) -> Self {
-        self.titleView = value
+    public func centerView(_ value: IView?) -> Self {
+        self.centerView = value
         return self
     }
     
     @discardableResult
-    public func titleSpacing(_ value: Float) -> Self {
-        self.titleSpacing = value
+    public func centerSpacing(_ value: Float) -> Self {
+        self.centerSpacing = value
         return self
     }
     
@@ -181,8 +181,8 @@ private extension StackBarView {
         headerSpacing: Float,
         leadingViews: [IView],
         leadingViewSpacing: Float,
-        titleView: IView?,
-        titleSpacing: Float,
+        centerView: IView?,
+        centerSpacing: Float,
         trailingViews: [IView],
         trailingViewSpacing: Float,
         footerView: IView?,
@@ -204,11 +204,11 @@ private extension StackBarView {
             center: CompositionLayout.Margin(
                 inset: InsetFloat(
                     top: 0,
-                    left: leadingViews.count > 0 ? titleSpacing : 0,
-                    right: trailingViews.count > 0 ? titleSpacing : 0,
+                    left: leadingViews.count > 0 ? centerSpacing : 0,
+                    right: trailingViews.count > 0 ? centerSpacing : 0,
                     bottom: 0
                 ),
-                entity: titleView.flatMap({ CompositionLayout.View($0) }) ?? CompositionLayout.None()
+                entity: centerView.flatMap({ CompositionLayout.View($0) }) ?? CompositionLayout.None()
             ),
             trailing: CompositionLayout.HStack(
                 alignment: .fill,
@@ -239,8 +239,8 @@ private extension StackBarView {
             headerSpacing: self.headerSpacing,
             leadingViews: self.leadingViews,
             leadingViewSpacing: self.leadingViewSpacing,
-            titleView: self.titleView,
-            titleSpacing: self.titleSpacing,
+            centerView: self.centerView,
+            centerSpacing: self.centerSpacing,
             trailingViews: self.trailingViews,
             trailingViewSpacing: self.trailingViewSpacing,
             footerView: self.footerView,

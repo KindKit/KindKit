@@ -13,10 +13,10 @@ public enum ButtonViewAlignment {
 
 public enum ButtonViewSpinnerPosition {
     case fill
-    case image
+    case secondary
 }
 
-public enum ButtonViewImagePosition {
+public enum ButtonViewSecondaryPosition {
     case top
     case left
     case right
@@ -37,15 +37,15 @@ public protocol IButtonView : IView, IViewDynamicSizeBehavioural, IViewHighlight
     
     var spinnerView: ISpinnerView? { set get }
     
-    var imagePosition: ButtonViewImagePosition { set get }
+    var secondaryPosition: ButtonViewSecondaryPosition { set get }
     
-    var imageInset: InsetFloat { set get }
+    var secondaryInset: InsetFloat { set get }
     
-    var imageView: IView? { set get }
+    var secondaryView: IView? { set get }
     
-    var textInset: InsetFloat { set get }
+    var primaryInset: InsetFloat { set get }
     
-    var textView: IView? { set get }
+    var primaryView: IView { set get }
     
     @discardableResult
     func inset(_ value: InsetFloat) -> Self
@@ -60,13 +60,13 @@ public protocol IButtonView : IView, IViewDynamicSizeBehavioural, IViewHighlight
     func spinnerAnimating(_ value: Bool) -> Self
     
     @discardableResult
-    func imagePosition(_ value: ButtonViewImagePosition) -> Self
+    func secondaryPosition(_ value: ButtonViewSecondaryPosition) -> Self
     
     @discardableResult
-    func imageInset(_ value: InsetFloat) -> Self
+    func secondaryInset(_ value: InsetFloat) -> Self
     
     @discardableResult
-    func textInset(_ value: InsetFloat) -> Self
+    func primaryInset(_ value: InsetFloat) -> Self
     
     @discardableResult
     func onPressed(_ value: (() -> Void)?) -> Self
