@@ -7,7 +7,7 @@ import Foundation
 public typealias CircleFloat = Circle< Float >
 public typealias CircleDouble = Circle< Double >
 
-public struct Circle< Value: IScalar & Hashable > : Hashable {
+public struct Circle< Value : IScalar & Hashable > : Hashable {
     
     public var origin: Point< Value >
     public var radius: Value

@@ -8,7 +8,7 @@ import CoreGraphics
 public typealias Matrix3Float = Matrix3< Float >
 public typealias Matrix3Double = Matrix3< Double >
 
-public struct Matrix3< Value: IScalar & Hashable > : Hashable {
+public struct Matrix3< Value : IScalar & Hashable > : Hashable {
     
     public var m11: Value
     public var m12: Value

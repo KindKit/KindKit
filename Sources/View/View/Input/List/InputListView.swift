@@ -430,7 +430,7 @@ public extension InputListView {
     
 }
 
-extension InputListView: InputListViewDelegate {
+extension InputListView : InputListViewDelegate {
     
     func beginEditing() {
         self._onBeginEditing?()

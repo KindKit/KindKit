@@ -6,7 +6,7 @@ import Foundation
 
 public extension Operation2.Simplify {
     
-    static func perform< Value: IScalar & Hashable >(
+    static func perform< Value : IScalar & Hashable >(
         polyline: Polyline2< Value >,
         distance: Value
     ) -> Polyline2< Value > {

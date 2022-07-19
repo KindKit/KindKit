@@ -7,7 +7,7 @@ import Foundation
 public typealias AngleFloat = Angle< Float >
 public typealias AngleDouble = Angle< Double >
 
-public struct Angle< Value: IScalar & Hashable > : Hashable {
+public struct Angle< Value : IScalar & Hashable > : Hashable {
     
     public var degrees: Value {
         return self.radians.radiansToDegrees
@@ -170,7 +170,7 @@ extension Angle : INearEqutable {
     
 }
 
-extension Angle : Comparable where Value: Comparable {
+extension Angle : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.radians < rhs.radians

@@ -9,7 +9,7 @@ import CoreGraphics
 
 public protocol ICurve2 {
     
-    associatedtype Value: IScalar & Hashable
+    associatedtype Value : IScalar & Hashable
     
     var isSimple: Bool { get }
 

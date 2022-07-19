@@ -148,11 +148,11 @@ private extension Path {
     #endif
     
     @inline(__always)
-    static func _join< Compoment: StringProtocol >(prefix: String, component: Compoment) -> String {
+    static func _join< Compoment : StringProtocol >(prefix: String, component: Compoment) -> String {
         return Self._join(prefix: prefix, components: component.split(separator: "/"))
     }
     
-    static func _join< Compoments: Sequence >(prefix: String, components: Compoments) -> String where Compoments.Element: StringProtocol {
+    static func _join< Compoments : Sequence >(prefix: String, components: Compoments) -> String where Compoments.Element: StringProtocol {
         var buffer = prefix
         for component in components {
             switch component {

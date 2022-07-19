@@ -7,7 +7,7 @@ import Foundation
 public typealias CubicCurve2Float = CubicCurve2< Float >
 public typealias CubicCurve2Double = CubicCurve2< Double >
 
-public struct CubicCurve2< Value: IScalar & Hashable > : Hashable {
+public struct CubicCurve2< Value : IScalar & Hashable > : Hashable {
     
     public var start: Point< Value >
     public var control1: Point< Value >

@@ -477,7 +477,7 @@ extension Database.Column : Hashable {
 
 public extension Database.Statement {
     
-    func value< Output: IDatabaseOutputValue >(of column: Database.Column) throws -> Output {
+    func value< Output : IDatabaseOutputValue >(of column: Database.Column) throws -> Output {
         guard let index = self.columnIndex(of: column.name) else {
             throw Database.Error.columnNotFound(name: column.name)
         }
@@ -495,7 +495,7 @@ public extension Database.Statement {
         return result
     }
     
-    func value< Raw: RawRepresentable, Value: IDatabaseOutputValue >(of column: Database.Column) throws -> Raw where Raw.RawValue == Value {
+    func value< Raw : RawRepresentable, Value : IDatabaseOutputValue >(of column: Database.Column) throws -> Raw where Raw.RawValue == Value {
         guard let index = self.columnIndex(of: column.name) else {
             throw Database.Error.columnNotFound(name: column.name)
         }

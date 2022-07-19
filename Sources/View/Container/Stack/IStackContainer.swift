@@ -23,7 +23,7 @@ public protocol IStackContainer : IContainer, IContainerParentable {
     func set(containers: [IStackContentContainer], animated: Bool, completion: (() -> Void)?)
     func push(container: IStackContentContainer, animated: Bool, completion: (() -> Void)?)
     func push(containers: [IStackContentContainer], animated: Bool, completion: (() -> Void)?)
-    func push< Wireframe: IWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer
+    func push< Wireframe : IWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer
     func pop(animated: Bool, completion: (() -> Void)?)
     func popTo(container: IStackContentContainer, animated: Bool, completion: (() -> Void)?)
     func popToRoot(animated: Bool, completion: (() -> Void)?)
@@ -58,7 +58,7 @@ public extension IStackContainer {
     }
     
     @inlinable
-    func push< Wireframe: IWireframe >(wireframe: Wireframe, animated: Bool = true, completion: (() -> Void)? = nil) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer {
+    func push< Wireframe : IWireframe >(wireframe: Wireframe, animated: Bool = true, completion: (() -> Void)? = nil) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer {
         self.push(wireframe: wireframe, animated: animated, completion: completion)
     }
     

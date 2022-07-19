@@ -5,7 +5,7 @@
 import XCTest
 @testable import KindKitMath
 
-class TestIntersection2: XCTestCase {
+class TestIntersection2 : XCTestCase {
     
     func testPossiblyCircleToCircle() {
         let c1 = CircleFloat(origin: Point(x: -1, y: 0), radius: 1)

@@ -21,7 +21,7 @@ public protocol IApiProvider : AnyObject {
 
 public extension IApiProvider {
 
-    func send< Request: IApiRequest, Response: IApiResponse >(
+    func send< Request : IApiRequest, Response : IApiResponse >(
         request: @autoclosure () throws -> Request,
         response: Response,
         queue: DispatchQueue = DispatchQueue.main,
@@ -48,7 +48,7 @@ public extension IApiProvider {
         return query
     }
 
-    func send< Request: IApiRequest, Response: IApiResponse >(
+    func send< Request : IApiRequest, Response : IApiResponse >(
         request: @autoclosure () throws -> Request,
         response: Response,
         queue: DispatchQueue = DispatchQueue.main,
@@ -77,7 +77,7 @@ public extension IApiProvider {
         return query
     }
 
-    func send< Request: IApiRequest, Response: IApiResponse >(
+    func send< Request : IApiRequest, Response : IApiResponse >(
         request: @autoclosure () throws -> Request,
         response: Response,
         queue: DispatchQueue = DispatchQueue.main,
@@ -110,7 +110,7 @@ public extension IApiProvider {
 
 public extension IApiProvider {
     
-    func send< Response: IApiResponse >(
+    func send< Response : IApiResponse >(
         response: Response,
         queue: DispatchQueue = DispatchQueue.main,
         prepare: @escaping () -> (http: HTTPURLResponse?, data: Data?, error: Error?),

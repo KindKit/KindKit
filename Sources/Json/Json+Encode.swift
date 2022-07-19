@@ -7,12 +7,12 @@ import KindKitCore
 
 public extension Json {
     
-    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value) throws {
         try self.set(value: try encoder.encode(value))
     }
     
     @inlinable
-    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model) throws {
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model) throws {
         if self.isEmpty == true || self.isDictionary == true {
             try Encoder.encode(value, json: self)
         } else {
@@ -21,7 +21,7 @@ public extension Json {
     }
     
     @inlinable
-    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value) throws {
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value) throws {
         try self.encode(Alias.JsonEncoder.self, value: value)
     }
     
@@ -29,17 +29,17 @@ public extension Json {
 
 public extension Json {
     
-    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value, path: String) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Encoder.Value, path: String) throws {
         try self.set(value: try encoder.encode(value), path: path)
     }
     
     @inlinable
-    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model, path: String) throws {
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Encoder.Model, path: String) throws {
         try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path)
     }
     
     @inlinable
-    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value, path: String) throws {
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Alias.JsonEncoder.Value, path: String) throws {
         try self.encode(Alias.JsonEncoder.self, value: value, path: path)
     }
     
@@ -138,7 +138,7 @@ public extension Json {
 
 public extension Json {
     
-    func encode< Encoder: IJsonValueEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Value >, path: String, nullable: Bool = false) throws {
+    func encode< Encoder : IJsonValueEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Value >, path: String, nullable: Bool = false) throws {
         if let value = value {
             try self._set(value: try encoder.encode(value), path: path)
         } else if nullable == true {
@@ -147,12 +147,12 @@ public extension Json {
     }
     
     @inlinable
-    func encode< Encoder: IJsonModelEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Model >, path: String, nullable: Bool = false) throws {
+    func encode< Encoder : IJsonModelEncoder >(_ encoder: Encoder.Type, value: Optional< Encoder.Model >, path: String, nullable: Bool = false) throws {
         try self.encode(ModelJsonEncoder< Encoder >.self, value: value, path: path, nullable: nullable)
     }
     
     @inlinable
-    func encode< Alias: IJsonEncoderAlias >(_ alias: Alias.Type, value: Optional< Alias.JsonEncoder.Value >, path: String, nullable: Bool = false) throws {
+    func encode< Alias : IJsonEncoderAlias >(_ alias: Alias.Type, value: Optional< Alias.JsonEncoder.Value >, path: String, nullable: Bool = false) throws {
         try self.encode(Alias.JsonEncoder.self, value: value, path: path, nullable: nullable)
     }
     

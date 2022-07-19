@@ -7,7 +7,7 @@ import Foundation
 public typealias DistanceFloat = Distance< Float >
 public typealias DistanceDouble = Distance< Double >
 
-public struct Distance< Value: IScalar & Hashable > : Hashable {
+public struct Distance< Value : IScalar & Hashable > : Hashable {
     
     public var squared: Value
     public var real: Value {
@@ -122,7 +122,7 @@ extension Distance : INearEqutable {
     
 }
 
-extension Distance : Comparable where Value: Comparable {
+extension Distance : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.squared < rhs.squared

@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public struct EnumUserDefaultsDecoder< Enum : IEnumDecodable, Decoder: IUserDefaultsValueDecoder > : IUserDefaultsValueDecoder where Enum.RawValue == Decoder.Value {
+public struct EnumUserDefaultsDecoder< Enum : IEnumDecodable, Decoder : IUserDefaultsValueDecoder > : IUserDefaultsValueDecoder where Enum.RawValue == Decoder.Value {
     
     public enum Error : Swift.Error {
         case cast
@@ -19,7 +19,7 @@ public struct EnumUserDefaultsDecoder< Enum : IEnumDecodable, Decoder: IUserDefa
     
 }
 
-public struct EnumUserDefaultsEncoder< Enum : IEnumEncodable, Encoder: IUserDefaultsValueEncoder > : IUserDefaultsValueEncoder where Enum.RawValue == Encoder.Value {
+public struct EnumUserDefaultsEncoder< Enum : IEnumEncodable, Encoder : IUserDefaultsValueEncoder > : IUserDefaultsValueEncoder where Enum.RawValue == Encoder.Value {
     
     public static func encode(_ value: Enum.RealValue) throws -> IUserDefaultsValue {
         let encoded = Enum(realValue: value)

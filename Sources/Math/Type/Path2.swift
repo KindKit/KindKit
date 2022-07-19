@@ -8,7 +8,7 @@ import CoreGraphics
 public typealias Path2Float = Path2< Float >
 public typealias Path2Double = Path2< Double >
 
-public struct Path2< Value: IScalar & Hashable > : Hashable {
+public struct Path2< Value : IScalar & Hashable > : Hashable {
     
     public var elements: [Element]
     

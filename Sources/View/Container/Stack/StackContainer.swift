@@ -304,7 +304,7 @@ public class StackContainer< Screen : IStackScreen > : IStackContainer, IContain
         }
     }
     
-    public func push< Wireframe: IWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer {
+    public func push< Wireframe : IWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IStackContentContainer {
         guard self._items.contains(where: { $0.container === wireframe.container }) == false else {
             completion?()
             return

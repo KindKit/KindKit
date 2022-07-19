@@ -4,7 +4,7 @@
 
 import Foundation
 
-public final class ApiMockQuery< Response: IApiResponse > : IApiQuery {
+public final class ApiMockQuery< Response : IApiResponse > : IApiQuery {
     
     public typealias PrepareClosure = () -> (http: HTTPURLResponse?, data: Data?, error: Error?)
     public typealias CompleteClosure = (_ response: Response) -> Void

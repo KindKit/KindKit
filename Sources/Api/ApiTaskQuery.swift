@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public final class ApiTaskQuery< Request: IApiRequest, Response: IApiResponse > : IApiTaskQuery {
+public final class ApiTaskQuery< Request : IApiRequest, Response : IApiResponse > : IApiTaskQuery {
 
     public typealias ProgressClosure = (_ progress: Progress) -> Void
     public typealias CompleteClosure = (_ response: Response) -> Void
@@ -190,8 +190,6 @@ public final class ApiTaskQuery< Request: IApiRequest, Response: IApiResponse > 
     }
     
 }
-
-// MARK: Private
 
 private extension ApiTaskQuery {
 

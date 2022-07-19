@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct ConvertCurve2< Curve: ICurve2 & Hashable > : Hashable {
+public struct ConvertCurve2< Curve : ICurve2 & Hashable > : Hashable {
     
     public let curve: Curve
     public let error: Curve.Value

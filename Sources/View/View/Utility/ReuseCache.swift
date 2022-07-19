@@ -28,7 +28,7 @@ public final class ReuseCache {
         self._items = [:]
     }
     
-    public func set< Reusable: IReusable >(_ reusable: Reusable.Type, name: String?, content: Reusable.Content) {
+    public func set< Reusable : IReusable >(_ reusable: Reusable.Type, name: String?, content: Reusable.Content) {
         let identificator: String
         if let name = name {
             identificator = "\(reusable.reuseIdentificator)::\(name)"
@@ -43,7 +43,7 @@ public final class ReuseCache {
         reusable.cleanupReuse(content: content)
     }
     
-    public func get< Reusable: IReusable >(_ reusable: Reusable.Type, name: String?, owner: Reusable.Owner) -> Reusable.Content {
+    public func get< Reusable : IReusable >(_ reusable: Reusable.Type, name: String?, owner: Reusable.Owner) -> Reusable.Content {
         let identificator: String
         if let name = name {
             identificator = "\(reusable.reuseIdentificator)::\(name)"

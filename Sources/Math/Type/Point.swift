@@ -7,7 +7,7 @@ import Foundation
 public typealias PointFloat = Point< Float >
 public typealias PointDouble = Point< Double >
 
-public struct Point< Value: IScalar & Hashable > : Hashable {
+public struct Point< Value : IScalar & Hashable > : Hashable {
     
     public var x: Value
     public var y: Value
@@ -274,7 +274,7 @@ extension Point : INearEqutable {
     
 }
 
-extension Point : Comparable where Value: Comparable {
+extension Point : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.x < rhs.x && lhs.y < rhs.y

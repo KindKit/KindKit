@@ -148,8 +148,6 @@ public extension ApiProvider {
     
 }
 
-// MARK: Private
-
 private extension ApiProvider {
     
     func _set(query: IApiTaskQuery) {

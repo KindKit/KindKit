@@ -431,7 +431,7 @@ public class InputStringView : IInputStringView {
 
 }
 
-extension InputStringView: InputStringViewDelegate {
+extension InputStringView : InputStringViewDelegate {
     
     func beginEditing() {
         self._onBeginEditing?()

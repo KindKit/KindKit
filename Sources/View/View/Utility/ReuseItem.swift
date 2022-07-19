@@ -9,7 +9,7 @@ public enum ReuseItemBehaviour {
     case unloadWhenDisappear
 }
 
-public struct ReuseItem< Reusable: IReusable > {
+public struct ReuseItem< Reusable : IReusable > {
     
     private let _behaviour: ReuseItemBehaviour
     private let _name: String?

@@ -7,7 +7,7 @@ import Foundation
 public typealias SizeFloat = Size< Float >
 public typealias SizeDouble = Size< Double >
 
-public struct Size< Value: IScalar & Hashable > : Hashable {
+public struct Size< Value : IScalar & Hashable > : Hashable {
     
     public var width: Value
     public var height: Value
@@ -223,7 +223,7 @@ extension Size : INearEqutable {
     
 }
 
-extension Size : Comparable where Value: Comparable {
+extension Size : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.width < rhs.width && lhs.height < rhs.height

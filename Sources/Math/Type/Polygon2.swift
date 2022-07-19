@@ -9,7 +9,7 @@ import KindKitCore
 public typealias Polygon2Float = Polygon2< Float >
 public typealias Polygon2Double = Polygon2< Double >
 
-public struct Polygon2< Value: IScalar & Hashable > : Hashable {
+public struct Polygon2< Value : IScalar & Hashable > : Hashable {
     
     public var countours: [Polyline2< Value >] {
         didSet {

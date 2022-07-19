@@ -7,7 +7,7 @@ import Foundation
 public typealias Segment2Float = Segment2< Float >
 public typealias Segment2Double = Segment2< Double >
 
-public struct Segment2< Value: IScalar & Hashable > : Hashable {
+public struct Segment2< Value : IScalar & Hashable > : Hashable {
     
     public var start: Point< Value >
     public var end: Point< Value >

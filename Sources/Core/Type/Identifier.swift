@@ -7,7 +7,7 @@ import Foundation
 public protocol IIdentifierKind {
 }
 
-public struct Identifier< Raw, Kind: IIdentifierKind > {
+public struct Identifier< Raw, Kind : IIdentifierKind > {
     
     public let raw: Raw
     
@@ -17,14 +17,10 @@ public struct Identifier< Raw, Kind: IIdentifierKind > {
 
 }
 
-extension Identifier : Equatable where Raw : Equatable {
-}
-
-extension Identifier : Hashable where Raw : Hashable {
+extension Identifier where Raw == String {
     
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(String(describing: Kind.self))
-        hasher.combine(self.raw)
+    public init() {
+        self.init(UUID().uuidString)
     }
     
 }
@@ -48,10 +44,22 @@ extension Identifier : ExpressibleByStringLiteral where Raw == String {
     
 }
 
-extension Identifier: ExpressibleByExtendedGraphemeClusterLiteral where Raw == String {
+extension Identifier : ExpressibleByExtendedGraphemeClusterLiteral where Raw == String {
 }
 
-extension Identifier: ExpressibleByUnicodeScalarLiteral where Raw == String {
+extension Identifier : ExpressibleByUnicodeScalarLiteral where Raw == String {
+}
+
+extension Identifier : Equatable where Raw : Equatable {
+}
+
+extension Identifier : Hashable where Raw : Hashable {
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(String(describing: Kind.self))
+        hasher.combine(self.raw)
+    }
+    
 }
 
 extension Identifier : Codable where Raw : Codable {

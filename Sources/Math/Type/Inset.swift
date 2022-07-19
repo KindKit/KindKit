@@ -7,7 +7,7 @@ import Foundation
 public typealias InsetFloat = Inset< Float >
 public typealias InsetDouble = Inset< Double >
 
-public struct Inset< Value: IScalar & Hashable > : Hashable {
+public struct Inset< Value : IScalar & Hashable > : Hashable {
     
     public var top: Value
     public var left: Value
@@ -118,7 +118,7 @@ extension Inset : INearEqutable {
     
 }
 
-extension Inset : Comparable where Value: Comparable {
+extension Inset : Comparable where Value : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.top < rhs.top && lhs.left < rhs.left && lhs.right < rhs.right && lhs.bottom < rhs.bottom

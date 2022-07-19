@@ -109,7 +109,7 @@ public extension UndoRedo {
     }
     
     func track<
-        Command: RawRepresentable
+        Command : RawRepresentable
     >(
         create command: Command,
         object: String,
@@ -120,7 +120,7 @@ public extension UndoRedo {
     }
     
     func track<
-        Command: RawRepresentable
+        Command : RawRepresentable
     >(
         update command: Command,
         object: String,
@@ -131,7 +131,7 @@ public extension UndoRedo {
     }
     
     func track<
-        Command: RawRepresentable
+        Command : RawRepresentable
     >(
         delete command: Command,
         object: String,

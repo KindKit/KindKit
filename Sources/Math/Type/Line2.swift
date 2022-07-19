@@ -7,7 +7,7 @@ import Foundation
 public typealias Line2Float = Line2< Float >
 public typealias Line2Double = Line2< Double >
 
-public struct Line2< Value: IScalar & Hashable > : Hashable {
+public struct Line2< Value : IScalar & Hashable > : Hashable {
     
     public var origin: Point< Value >
     public var direction: Point< Value >

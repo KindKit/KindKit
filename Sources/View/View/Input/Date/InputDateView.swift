@@ -495,7 +495,7 @@ public class InputDateView : IInputDateView {
 
 }
 
-extension InputDateView: InputDateViewDelegate {
+extension InputDateView : InputDateViewDelegate {
     
     func beginEditing() {
         self._onBeginEditing?()

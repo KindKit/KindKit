@@ -34,9 +34,9 @@ public protocol IScalar : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral
     var cos: Self { get }
     var acos: Self { get }
     
-    init< Value: BinaryInteger >(_ value: Value)
+    init< Value : BinaryInteger >(_ value: Value)
     
-    init< Value: BinaryFloatingPoint >(_ value: Value)
+    init< Value : BinaryFloatingPoint >(_ value: Value)
     
     func clamp(_ lower: Self, _ upper: Self) -> Self
     func lerp(_ to: Self, progress: Self) -> Self

@@ -24,13 +24,13 @@ public protocol IUndoRedoMutatingTransformContext : IUndoRedoTransformContext {
 
 public extension IUndoRedoTransformContext {
     
-    func old< Key: RawRepresentable, Value >(
+    func old< Key : RawRepresentable, Value >(
         _ key: Key
     ) -> Value where Key.RawValue == String {
         return self.old(key.rawValue) as! Value
     }
     
-    func new< Key: RawRepresentable, Value >(
+    func new< Key : RawRepresentable, Value >(
         _ key: Key
     ) -> Value where Key.RawValue == String {
         return self.new(key.rawValue) as! Value
@@ -40,7 +40,7 @@ public extension IUndoRedoTransformContext {
 
 public extension IUndoRedoMutatingTransformContext {
     
-    mutating func set< Key: RawRepresentable, Value >(
+    mutating func set< Key : RawRepresentable, Value >(
         _ key: Key,
         new: Value,
         old: Value

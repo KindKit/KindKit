@@ -9,7 +9,7 @@ import KindKitCore
 public typealias Polyline2Float = Polyline2< Float >
 public typealias Polyline2Double = Polyline2< Double >
 
-public struct Polyline2< Value: IScalar & Hashable > : Hashable {
+public struct Polyline2< Value : IScalar & Hashable > : Hashable {
     
     public var corners: [Point< Value >] {
         didSet {

@@ -5,7 +5,7 @@
 import XCTest
 @testable import KindKitMath
 
-class TestPolyline2: XCTestCase {
+class TestPolyline2 : XCTestCase {
     
     func testExtrude1() {
         let op = Polyline2Float(corners: [

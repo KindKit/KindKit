@@ -4,7 +4,7 @@
 
 import Foundation
 
-public final class ApiFailQuery< Response: IApiResponse > : IApiQuery {
+public final class ApiFailQuery< Response : IApiResponse > : IApiQuery {
     
     public typealias CompleteClosure = (_ response: Response) -> Void
     

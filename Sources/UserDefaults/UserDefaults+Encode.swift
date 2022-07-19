@@ -7,7 +7,7 @@ import KindKitCore
 
 public extension UserDefaults {
     
-    func encode< Encoder: IUserDefaultsValueEncoder >(
+    func encode< Encoder : IUserDefaultsValueEncoder >(
         _ encoder: Encoder.Type,
         value: Encoder.Value,
         forKey key: String
@@ -19,7 +19,7 @@ public extension UserDefaults {
         }
     }
     
-    func encode< Alias: IUserDefaultsEncoderAlias >(
+    func encode< Alias : IUserDefaultsEncoderAlias >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.Value,
         forKey key: String
@@ -31,7 +31,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func encode< Encoder: IUserDefaultsValueEncoder, Key: RawRepresentable >(
+    func encode< Encoder : IUserDefaultsValueEncoder, Key : RawRepresentable >(
         _ encoder: Encoder.Type,
         value: Encoder.Value,
         forKey key: Key
@@ -39,7 +39,7 @@ public extension UserDefaults {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
-    func encode< Alias: IUserDefaultsEncoderAlias, Key: RawRepresentable >(
+    func encode< Alias : IUserDefaultsEncoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.Value,
         forKey key: Key
@@ -51,7 +51,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func encode< Encoder: IUserDefaultsValueEncoder >(
+    func encode< Encoder : IUserDefaultsValueEncoder >(
         _ encoder: Encoder.Type,
         value: Encoder.Value?,
         forKey key: String
@@ -63,7 +63,7 @@ public extension UserDefaults {
         }
     }
     
-    func encode< Alias: IUserDefaultsEncoderAlias >(
+    func encode< Alias : IUserDefaultsEncoderAlias >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.Value?,
         forKey key: String
@@ -75,7 +75,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
-    func encode< Encoder: IUserDefaultsValueEncoder, Key: RawRepresentable >(
+    func encode< Encoder : IUserDefaultsValueEncoder, Key : RawRepresentable >(
         _ encoder: Encoder.Type,
         value: Encoder.Value?,
         forKey key: Key
@@ -83,7 +83,7 @@ public extension UserDefaults {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
-    func encode< Alias: IUserDefaultsEncoderAlias, Key: RawRepresentable >(
+    func encode< Alias : IUserDefaultsEncoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.Value?,
         forKey key: Key

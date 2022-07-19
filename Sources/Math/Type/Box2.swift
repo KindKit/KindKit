@@ -7,7 +7,7 @@ import Foundation
 public typealias Box2Float = Box2< Float >
 public typealias Box2Double = Box2< Double >
 
-public struct Box2< Value: IScalar & Hashable > : Hashable {
+public struct Box2< Value : IScalar & Hashable > : Hashable {
     
     public var lower: Point< Value >
     public var upper: Point< Value >

@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct Intersection2< Value: IScalar & Hashable > {
+public struct Intersection2< Value : IScalar & Hashable > {
 }
 
 public extension Intersection2 {

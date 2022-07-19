@@ -6,7 +6,7 @@ import Foundation
 
 public extension Center2 {
     
-    static func find< Value: IScalar & Hashable >(
+    static func find< Value : IScalar & Hashable >(
         polyline: Polyline2< Value >
     ) -> Point< Value > {
         

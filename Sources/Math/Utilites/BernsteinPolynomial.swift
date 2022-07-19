@@ -6,7 +6,7 @@ import Foundation
 
 protocol IBernsteinPolynomial : Equatable {
     
-    associatedtype LowerOrderPolynomial: IBernsteinPolynomial
+    associatedtype LowerOrderPolynomial : IBernsteinPolynomial
     
     var order: Int { get }
     var coefficients: [Double] { get }
@@ -270,7 +270,7 @@ struct BernsteinPolynomial {
 
 extension BernsteinPolynomial {
     
-    static func findDistinctRoots< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> [Double] {
+    static func findDistinctRoots< Polynomial : IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> [Double] {
         if let analyticalRoots = polynomial as? IBernsteinPolynomialAnalyticalRoots {
             return analyticalRoots.distinct(start, end)
         }
@@ -314,7 +314,7 @@ extension BernsteinPolynomial {
         return roots
     }
     
-    static func findRootBisection< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> Double {
+    static func findRootBisection< Polynomial : IBernsteinPolynomial >(of polynomial: Polynomial, start: Double = 0, end: Double = 1) -> Double {
         var guess = (start + end) / 2
         var low = start
         var high = end
@@ -340,7 +340,7 @@ extension BernsteinPolynomial {
         return guess
     }
     
-    static func newton< Polynomial: IBernsteinPolynomial >(of polynomial: Polynomial, derivative: Polynomial.LowerOrderPolynomial, guess: Double, _ relaxation: Double = 1) -> Double {
+    static func newton< Polynomial : IBernsteinPolynomial >(of polynomial: Polynomial, derivative: Polynomial.LowerOrderPolynomial, guess: Double, _ relaxation: Double = 1) -> Double {
         let maxIterations = 20
         var x = guess
         for _ in 0 ..< maxIterations {

@@ -20,7 +20,7 @@ public protocol IUndoRedoMutatingPermanentContext : IUndoRedoPermanentContext {
 
 public extension IUndoRedoPermanentContext {
     
-    func get< Key: RawRepresentable, Value >(
+    func get< Key : RawRepresentable, Value >(
         _ key: Key
     ) -> Value where Key.RawValue == String {
         return self.get(key.rawValue) as! Value
@@ -30,7 +30,7 @@ public extension IUndoRedoPermanentContext {
 
 public extension IUndoRedoMutatingPermanentContext {
     
-    mutating func set< Key: RawRepresentable, Value >(
+    mutating func set< Key : RawRepresentable, Value >(
         _ key: Key,
         value: Value
     ) where Key.RawValue == String {
