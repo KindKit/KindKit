@@ -5,13 +5,10 @@
 import Foundation
 import KindKitCore
 
-public protocol IContext {
-}
-
 public protocol IContextable {
     
-    associatedtype Context
+    associatedtype AssociatedContext
     
-    var context: Context { get }
+    var context: AssociatedContext { get }
     
 }

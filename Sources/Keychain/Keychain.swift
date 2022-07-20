@@ -12,7 +12,7 @@ public final class Keychain {
 
     public init(
         accessGroup: String? = nil,
-        synchronizable: Bool = true
+        synchronizable: Bool = false
     ) {
         self.accessGroup = accessGroup
         self.synchronizable = synchronizable
