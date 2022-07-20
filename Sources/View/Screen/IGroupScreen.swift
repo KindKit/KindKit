@@ -7,9 +7,9 @@ import KindKitCore
 
 public protocol IGroupScreen : IScreen {
     
-    associatedtype GroupBar : IGroupBarView
+    associatedtype AssociatedGroupBar : IGroupBarView
     
-    var groupBarView: GroupBar { get }
+    var groupBarView: AssociatedGroupBar { get }
     var groupBarVisibility: Float { get }
     var groupBarHidden: Bool { get }
     

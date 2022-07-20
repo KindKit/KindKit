@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class ExpandLayout< ContentView : IView, DetailView : IView > : ILayout {
+public final class ExpandLayout< ContentView : IView, DetailView : IView > : ILayout {
     
     public unowned var delegate: ILayoutDelegate?
     public unowned var view: IView?

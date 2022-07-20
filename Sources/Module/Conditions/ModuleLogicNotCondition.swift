@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public class ModuleLogicNotCondition : IModuleCondition {
+public final class ModuleLogicNotCondition : IModuleCondition {
     
     public var state: Bool {
         return !self._condition.state

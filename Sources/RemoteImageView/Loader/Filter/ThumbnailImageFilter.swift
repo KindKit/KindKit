@@ -7,7 +7,7 @@ import KindKitCore
 import KindKitMath
 import KindKitView
 
-public class ThumbnailImageFilter : IRemoteImageFilter {
+public final class ThumbnailImageFilter : IRemoteImageFilter {
 
     public let size: SizeFloat
     public var name: String {

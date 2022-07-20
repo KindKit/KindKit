@@ -9,7 +9,7 @@ import KindKitView
 
 extension RemoteImageLoader {
     
-    class Task {
+    final class Task {
         
         var query: IRemoteImageQuery
         var filter: IRemoteImageFilter?

@@ -8,7 +8,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class AnimatedImageView : IAnimatedImageView {
+public final class AnimatedImageView : IAnimatedImageView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

@@ -17,7 +17,7 @@ protocol InputStringViewDelegate : AnyObject {
     
 }
 
-public class InputStringView : IInputStringView {
+public final class InputStringView : IInputStringView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

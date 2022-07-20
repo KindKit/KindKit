@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class ModalContainer : IModalContainer {
+public final class ModalContainer : IModalContainer {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -171,7 +173,6 @@ public class ModalContainer : IModalContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.contentContainer?.prepareShow(interactive: interactive)
         self.currentContainer?.prepareShow(interactive: interactive)
     }
@@ -449,7 +450,7 @@ private extension ModalContainer {
 
 private extension ModalContainer {
     
-    class Item {
+    final class Item {
         
         var container: IModalContentContainer
         var item: LayoutItem
@@ -485,7 +486,7 @@ private extension ModalContainer {
 
 private extension ModalContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

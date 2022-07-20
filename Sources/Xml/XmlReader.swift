@@ -24,7 +24,7 @@ public struct XmlReader {
 
 private extension XmlReader {
     
-    class Delegate : NSObject, XMLParserDelegate {
+    final class Delegate : NSObject, XMLParserDelegate {
         
         public var document: XmlDocument
         private var rootNodes: [XmlNode]

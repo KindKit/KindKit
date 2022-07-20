@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class ScreenContainer< Screen : IScreen & IScreenViewable > : IScreenContainer, IContainerScreenable {
+public final class ScreenContainer< Screen : IScreen & IScreenViewable > : IScreenContainer, IContainerScreenable {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -81,7 +83,6 @@ public class ScreenContainer< Screen : IScreen & IScreenViewable > : IScreenCont
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.screen.prepareShow(interactive: interactive)
     }
     
@@ -230,7 +231,7 @@ extension ScreenContainer : IPushContentContainer where Screen : IScreenPushable
 
 private extension ScreenContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

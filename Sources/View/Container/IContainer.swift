@@ -17,6 +17,7 @@ public protocol IContainer : AnyObject {
     var statusBarStyle: UIStatusBarStyle { get }
     var statusBarAnimation: UIStatusBarAnimation { get }
     var supportedOrientations: UIInterfaceOrientationMask { get }
+    var viewController: UIViewController? { get }
     #endif
     var isPresented: Bool { get }
     var view: IView { get }

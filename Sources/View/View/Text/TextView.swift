@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class TextView : ITextView {
+public final class TextView : ITextView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

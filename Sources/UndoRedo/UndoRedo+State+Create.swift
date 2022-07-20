@@ -6,7 +6,7 @@ import Foundation
 
 extension UndoRedo.State {
     
-    class Create : IUndoRedoState {
+    final class Create : IUndoRedoState {
         
         private var _contexts: [IUndoRedoMutatingPermanentContext]
 

@@ -14,7 +14,7 @@ protocol SwitchViewDelegate : AnyObject {
     
 }
 
-public class SwitchView : ISwitchView {
+public final class SwitchView : ISwitchView {
         
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

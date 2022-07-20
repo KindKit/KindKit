@@ -9,7 +9,7 @@ import KindKitView
 
 public extension GraphicsGuide {
 
-    class Angle : IGraphicsGuide {
+    final class Angle : IGraphicsGuide {
         
         public var isEnabled: Bool
         public var value: AngleFloat

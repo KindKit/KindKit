@@ -13,7 +13,7 @@ protocol NativeCustomViewDelegate : AnyObject {
     
 }
 
-public class CustomView< Layout : ILayout > : ICustomView {
+public final class CustomView< Layout : ILayout > : ICustomView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

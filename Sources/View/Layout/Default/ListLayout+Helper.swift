@@ -232,7 +232,7 @@ public extension ListLayout.Helper {
         case delete
     }
     
-    class Operation {
+    final class Operation {
         
         public var type: OperationType
         public var indices: [Int]

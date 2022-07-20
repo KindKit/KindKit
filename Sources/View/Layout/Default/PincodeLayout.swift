@@ -6,7 +6,13 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class PincodeLayout< TitleView : IView, PincodeView : IView, ErrorView : IView, ButtonView : IView, AccessoryView : IView > : ILayout {
+public final class PincodeLayout<
+    TitleView : IView,
+    PincodeView : IView,
+    ErrorView : IView,
+    ButtonView : IView,
+    AccessoryView : IView
+> : ILayout {
     
     public unowned var delegate: ILayoutDelegate?
     public unowned var view: IView?

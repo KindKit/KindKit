@@ -19,7 +19,7 @@ protocol WebViewDelegate : AnyObject {
     
 }
 
-public class WebView : IWebView {
+public final class WebView : IWebView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

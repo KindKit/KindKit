@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IScreenViewable : AnyObject {
     
-    associatedtype View : IView
+    associatedtype AssociatedView : IView
     
-    var view: View { get }
+    var view: AssociatedView { get }
     
     func didChangeInsets()
     
@@ -23,7 +23,7 @@ public extension IScreenViewable {
     
 }
 
-public extension IScreenViewable where Self : IScreen, View : IScrollView {
+public extension IScreenViewable where Self : IScreen, AssociatedView : IScrollView {
     
     func didChangeInsets() {
         self.view.contentInset = self.inheritedInsets()

@@ -6,7 +6,7 @@ import Foundation
 
 public extension Log.Target {
     
-    class Default : ILogTarget {
+    final class Default : ILogTarget {
         
         public var enabled: Bool
         

@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public class ModuleLogicAndCondition : IModuleCondition {
+public final class ModuleLogicAndCondition : IModuleCondition {
     
     public var state: Bool {
         guard self._conditions.isEmpty == false else {

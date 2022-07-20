@@ -11,7 +11,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class SwipeCellView< ContentView : IView > : ISwipeCellView {
+public final class SwipeCellView< ContentView : IView > : ISwipeCellView {
     
     public var layout: ILayout? {
         get { return self._view.layout }
@@ -559,7 +559,7 @@ public class SwipeCellView< ContentView : IView > : ISwipeCellView {
 
 private extension SwipeCellView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

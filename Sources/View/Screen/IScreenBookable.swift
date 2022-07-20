@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IScreenBookable : AnyObject {
     
-    associatedtype BookIdentifier
+    associatedtype AssociatedBookIdentifier
     
-    var bookIdentifier: BookIdentifier { get }
+    var bookIdentifier: AssociatedBookIdentifier { get }
     
 }
 

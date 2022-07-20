@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class StateLayout< State : Equatable & Hashable > : ILayout {
+public final class StateLayout< State : Equatable & Hashable > : ILayout {
     
     public unowned var delegate: ILayoutDelegate?
     public unowned var view: IView?

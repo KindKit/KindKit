@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class BarItemView : IBarItemView {
+public final class BarItemView : IBarItemView {
     
     public var layout: ILayout? {
         get { return self._view.layout }
@@ -256,7 +256,7 @@ private extension BarItemView {
 
 private extension BarItemView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

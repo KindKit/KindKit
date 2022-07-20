@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public class ModuleConstCondition : IModuleCondition {
+public final class ModuleConstCondition : IModuleCondition {
     
     public var state: Bool
     

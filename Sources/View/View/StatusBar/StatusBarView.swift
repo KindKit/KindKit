@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class StatusBarView : IStatusBarView {
+public final class StatusBarView : IStatusBarView {
     
     public var layout: ILayout? {
         get { return self._view.layout }

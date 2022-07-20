@@ -264,7 +264,7 @@ public extension ListLayout {
 
 private extension ListLayout {
     
-    class AnimationContext {
+    final class AnimationContext {
         
         let delay: TimeInterval
         let duration: TimeInterval

@@ -9,7 +9,7 @@ import KindKitView
 
 public extension GraphicsGuide {
 
-    class Point : IGraphicsGuide {
+    final class Point : IGraphicsGuide {
         
         public var isEnabled: Bool
         public var points: [PointFloat]

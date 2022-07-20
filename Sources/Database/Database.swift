@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import SQLite3
 
-public class Database {
+public final class Database {
     
     public enum Error : Swift.Error {
         case userVersion

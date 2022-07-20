@@ -9,7 +9,7 @@ import UIKit
 import AppTrackingTransparency
 import KindKitObserver
 
-public class AppTrackingPermission : IPermission {
+public final class AppTrackingPermission : IPermission {
     
     public var status: PermissionStatus {
         if #available(macOS 11.0, iOS 14.5, *) {

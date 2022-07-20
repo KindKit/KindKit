@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public class ModuleBlockCondition : IModuleCondition {
+public final class ModuleBlockCondition : IModuleCondition {
     
     public var state: Bool {
         return self._block()

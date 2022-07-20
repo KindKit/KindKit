@@ -16,7 +16,7 @@ protocol InputDateViewDelegate : AnyObject {
     
 }
 
-public class InputDateView : IInputDateView {
+public final class InputDateView : IInputDateView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

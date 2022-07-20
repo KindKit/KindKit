@@ -13,7 +13,7 @@ protocol IRemoteImageLoaderDelegate : AnyObject {
     
 }
 
-public class RemoteImageLoader {
+public final class RemoteImageLoader {
     
     public let provider: ApiProvider
     public let cache: RemoteImageCache

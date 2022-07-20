@@ -8,7 +8,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class ViewController : UIViewController {
+public final class ViewController : UIViewController {
     
     public let container: IRootContainer
     public private(set) var virtualKeyboardHeight: Float {
@@ -36,15 +36,33 @@ public class ViewController : UIViewController {
         return true
     }
     
+    private var _containerView: UIView? {
+        willSet(newValue) {
+            guard self._containerView != newValue else { return }
+            if let containerView = self._containerView {
+                containerView.removeFromSuperview()
+            }
+        }
+        didSet(oldValue) {
+            guard self._containerView != oldValue else { return }
+            if let containerView = self._containerView {
+                containerView.frame = self.view.bounds
+                self.view.addSubview(containerView)
+            }
+        }
+    }
     private var _virtualKeyboard: VirtualKeyboard
     private var _virtualKeyboardAnimationTask: IAnimationTask?
+    private var _owner: AnyObject?
     
     public init(
-        container: IRootContainer
+        container: IRootContainer,
+        owner: AnyObject? = nil
     ) {
         self.container = container
         self.virtualKeyboardHeight = 0
         self._virtualKeyboard = VirtualKeyboard()
+        self._owner = owner
         
         super.init(nibName: nil, bundle: nil)
         
@@ -53,6 +71,50 @@ public class ViewController : UIViewController {
         ContainerBarController.shared.add(observer: self)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
+    }
+    
+    public convenience init(
+        container: IRootContentContainer,
+        owner: AnyObject? = nil
+    ) {
+        self.init(
+            container: RootContainer(
+                contentContainer: container
+            ),
+            owner: owner
+        )
+    }
+    
+    public convenience init< Screen : IScreen & IScreenViewable >(
+        screen: Screen,
+        owner: AnyObject? = nil
+    ) {
+        self.init(
+            container: ScreenContainer(
+                screen: screen
+            ),
+            owner: owner
+        )
+    }
+    
+    public convenience init< Wireframe : IWireframe >(
+        wireframe: Wireframe
+    ) where Wireframe : AnyObject, Wireframe.Container : IRootContainer {
+        self.init(
+            container: wireframe.container,
+            owner: wireframe
+        )
+    }
+    
+    public convenience init< Wireframe : IWireframe >(
+        wireframe: Wireframe
+    ) where Wireframe : AnyObject, Wireframe.Container : IRootContentContainer {
+        self.init(
+            container: RootContainer(
+                contentContainer: wireframe.container
+            ),
+            owner: wireframe
+        )
     }
     
     public required init?(coder: NSCoder) {
@@ -69,18 +131,17 @@ public class ViewController : UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    public override func loadView() {
-        self.view = self.container.view.native
-    }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         self.container.safeArea = self._safeArea()
         if let statusBarView = self.container.statusBarView {
             statusBarView.height = self._statusBarHeight()
         }
-        self.container.prepareShow(interactive: false)
-        self.container.finishShow(interactive: false)
+        self._containerView = self.container.view.native
+        if self.container.isPresented == false {
+            self.container.prepareShow(interactive: false)
+            self.container.finishShow(interactive: false)
+        }
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -88,9 +149,17 @@ public class ViewController : UIViewController {
         self._updateStatusBarHeight()
     }
     
+    public override func viewDidDisappear(_ animated: Bool) {
+        self._containerView = nil
+        super.viewDidDisappear(animated)
+    }
+    
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self._updateSafeArea()
+        if let containerView = self._containerView {
+            containerView.frame = self.view.bounds
+        }
     }
     
     @available(iOS 11.0, *)
@@ -107,6 +176,10 @@ public class ViewController : UIViewController {
 }
 
 extension ViewController : IRootContainerDelegate {
+    
+    public func viewController() -> UIViewController? {
+        return self
+    }
     
     public func updateOrientations() {
         let interfaceOrientation = self._interfaceOrientation()
@@ -182,8 +255,12 @@ private extension ViewController {
     }
     
     func _updateSafeArea() {
-        self.container.safeArea = self._safeArea()
-        self.container.view.layoutIfNeeded()
+        if self.container.isPresented == true {
+            self.container.safeArea = self._safeArea()
+        }
+        if let containerView = self._containerView {
+            containerView.layoutIfNeeded()
+        }
     }
     
     func _safeArea() -> InsetFloat {

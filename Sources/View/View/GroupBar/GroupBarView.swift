@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class GroupBarView : BarView, IGroupBarView {
+public final class GroupBarView : BarView, IGroupBarView {
     
     public var delegate: IGroupBarViewDelegate?
     public var itemInset: InsetFloat {
@@ -116,7 +116,7 @@ extension GroupBarView : IBarItemViewDelegate {
 
 private extension GroupBarView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

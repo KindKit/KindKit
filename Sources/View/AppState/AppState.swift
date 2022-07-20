@@ -37,7 +37,7 @@ public extension IAppStateObserver {
     
 }
 
-public class AppState {
+public final class AppState {
     
     private var _active: Bool?
     private let _observer: Observer< IAppStateObserver >

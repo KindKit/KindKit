@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class PushContainer : IPushContainer {
+public final class PushContainer : IPushContainer {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -179,7 +181,6 @@ public class PushContainer : IPushContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.contentContainer?.prepareShow(interactive: interactive)
         self.currentContainer?.prepareShow(interactive: interactive)
     }
@@ -505,7 +506,7 @@ private extension PushContainer {
 
 private extension PushContainer {
     
-    class Item {
+    final class Item {
         
         var container: IPushContentContainer
         var item: LayoutItem
@@ -527,7 +528,7 @@ private extension PushContainer {
 
 private extension PushContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

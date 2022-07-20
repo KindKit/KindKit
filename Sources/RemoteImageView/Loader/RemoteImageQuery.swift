@@ -7,7 +7,7 @@ import KindKitCore
 import KindKitApi
 import KindKitView
 
-public class RemoteImageQuery : IRemoteImageQuery {
+public final class RemoteImageQuery : IRemoteImageQuery {
     
     public let url: URL
     public var key: String {
@@ -52,7 +52,7 @@ public class RemoteImageQuery : IRemoteImageQuery {
 
 private extension RemoteImageQuery {
     
-    class Request : ApiRequest {
+    final class Request : ApiRequest {
         
         init(url: URL) {
             super.init(method: .get, path: .absolute(url))
@@ -64,7 +64,7 @@ private extension RemoteImageQuery {
 
 private extension RemoteImageQuery {
     
-    class Response : ApiResponse {
+    final class Response : ApiResponse {
         
         var data: Data!
         var image: Image!

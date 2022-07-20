@@ -7,9 +7,9 @@ import KindKitCore
 
 public protocol IPageScreen : IScreen {
     
-    associatedtype PageBar : IPageBarView
+    associatedtype AssociatedPageBar : IPageBarView
     
-    var pageBarView: PageBar { get }
+    var pageBarView: AssociatedPageBar { get }
     var pageBarVisibility: Float { get }
     var pageBarHidden: Bool { get }
     

@@ -9,7 +9,7 @@ import KindKitCore
 
 public extension Animation {
     
-    class DisplayLink : NSObject {
+    final class DisplayLink : NSObject {
         
         unowned var delegate: IAnimationQueueDelegate?
         

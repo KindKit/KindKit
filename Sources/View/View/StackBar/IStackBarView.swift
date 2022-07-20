@@ -20,6 +20,8 @@ public protocol IStackBarView : IBarView {
     
     var centerView: IView? { set get }
     
+    var centerFilling: Bool { set get }
+    
     var centerSpacing: Float { set get }
     
     var trailingViews: [IView] { set get }
@@ -47,6 +49,9 @@ public protocol IStackBarView : IBarView {
     
     @discardableResult
     func centerView(_ value: IView?) -> Self
+    
+    @discardableResult
+    func centerFilling(_ value: Bool) -> Self
     
     @discardableResult
     func centerSpacing(_ value: Float) -> Self

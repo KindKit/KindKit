@@ -17,6 +17,18 @@ public protocol IContainerParentable : AnyObject {
 
 public extension IContainerParentable where Self : IContainer {
     
+    #if os(iOS)
+    
+    var viewController: UIViewController? {
+        return self.parent?.viewController
+    }
+    
+    #endif
+    
+}
+
+public extension IContainerParentable where Self : IContainer {
+    
     func inheritedInsets(interactive: Bool) -> InsetFloat {
         guard let parent = self.parent else { return .zero }
         self.view.layoutIfNeeded()

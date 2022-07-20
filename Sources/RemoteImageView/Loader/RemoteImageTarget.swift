@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitView
 
-public class RemoteImageTarget {
+public final class RemoteImageTarget {
     
     public let onProgress: ((_ progress: Float) -> Void)?
     public let onImage: ((_ image: Image) -> Void)?

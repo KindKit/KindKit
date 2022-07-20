@@ -6,8 +6,15 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class StackBarView : BarView, IStackBarView {
+public final class StackBarView : BarView, IStackBarView {
     
+    public override var size: Float? {
+        set(value) {
+            guard super.size != value else { return }
+            self._relayout()
+        }
+        get { return super.size }
+    }
     public var inset: InsetFloat {
         set(value) { self._contentView.contentLayout.inset = value }
         get { return self._contentView.contentLayout.inset }
@@ -25,6 +32,9 @@ public class StackBarView : BarView, IStackBarView {
         didSet { self._relayout() }
     }
     public var centerView: IView? {
+        didSet { self._relayout() }
+    }
+    public var centerFilling: Bool {
         didSet { self._relayout() }
     }
     public var centerSpacing: Float {
@@ -52,6 +62,7 @@ public class StackBarView : BarView, IStackBarView {
         leadingViews: [IView] = [],
         leadingViewSpacing: Float = 4,
         centerView: IView? = nil,
+        centerFilling: Bool = false,
         centerSpacing: Float = 4,
         trailingViews: [IView] = [],
         trailingViewSpacing: Float = 4,
@@ -71,6 +82,7 @@ public class StackBarView : BarView, IStackBarView {
         self.leadingViews = leadingViews
         self.leadingViewSpacing = leadingViewSpacing
         self.centerView = centerView
+        self.centerFilling = centerFilling
         self.centerSpacing = centerSpacing
         self.trailingViews = trailingViews
         self.trailingViewSpacing = trailingViewSpacing
@@ -84,11 +96,13 @@ public class StackBarView : BarView, IStackBarView {
                 leadingViews: leadingViews,
                 leadingViewSpacing: leadingViewSpacing,
                 centerView: centerView,
+                centerFilling: centerFilling,
                 centerSpacing: centerSpacing,
                 trailingViews: trailingViews,
                 trailingViewSpacing: trailingViewSpacing,
                 footerView: footerView,
-                footerSpacing: footerSpacing
+                footerSpacing: footerSpacing,
+                size: size
             )
         )
         super.init(
@@ -142,6 +156,12 @@ public class StackBarView : BarView, IStackBarView {
     }
     
     @discardableResult
+    public func centerFilling(_ value: Bool) -> Self {
+        self.centerFilling = value
+        return self
+    }
+    
+    @discardableResult
     public func centerSpacing(_ value: Float) -> Self {
         self.centerSpacing = value
         return self
@@ -175,63 +195,6 @@ public class StackBarView : BarView, IStackBarView {
 
 private extension StackBarView {
     
-    static func _layout(
-        inset: InsetFloat,
-        headerView: IView?,
-        headerSpacing: Float,
-        leadingViews: [IView],
-        leadingViewSpacing: Float,
-        centerView: IView?,
-        centerSpacing: Float,
-        trailingViews: [IView],
-        trailingViewSpacing: Float,
-        footerView: IView?,
-        footerSpacing: Float
-    ) -> CompositionLayout {
-        var vstack: [ICompositionLayoutEntity] = []
-        if let headerView = headerView {
-            vstack.append(CompositionLayout.Margin(
-                inset: InsetFloat(top: 0, left: 0, right: 0, bottom: headerSpacing),
-                entity: CompositionLayout.View(headerView)
-            ))
-        }
-        vstack.append(CompositionLayout.HAccessory(
-            leading: CompositionLayout.HStack(
-                alignment: .fill,
-                spacing: leadingViewSpacing,
-                entities: leadingViews.compactMap({ CompositionLayout.View($0) })
-            ),
-            center: CompositionLayout.Margin(
-                inset: InsetFloat(
-                    top: 0,
-                    left: leadingViews.count > 0 ? centerSpacing : 0,
-                    right: trailingViews.count > 0 ? centerSpacing : 0,
-                    bottom: 0
-                ),
-                entity: centerView.flatMap({ CompositionLayout.View($0) }) ?? CompositionLayout.None()
-            ),
-            trailing: CompositionLayout.HStack(
-                alignment: .fill,
-                spacing: trailingViewSpacing,
-                entities: trailingViews.reversed().compactMap({ CompositionLayout.View($0) })
-            ),
-            filling: true
-        ))
-        if let footerView = footerView {
-            vstack.append(CompositionLayout.Margin(
-                inset: InsetFloat(top: footerSpacing, left: 0, right: 0, bottom: 0),
-                entity: CompositionLayout.View(footerView)
-            ))
-        }
-        return CompositionLayout(
-            inset: inset,
-            entity: CompositionLayout.VStack(
-                alignment: .fill,
-                entities: vstack
-            )
-        )
-    }
-    
     func _relayout() {
         self._contentView.contentLayout = Self._layout(
             inset: self.inset,
@@ -240,11 +203,169 @@ private extension StackBarView {
             leadingViews: self.leadingViews,
             leadingViewSpacing: self.leadingViewSpacing,
             centerView: self.centerView,
+            centerFilling: self.centerFilling,
             centerSpacing: self.centerSpacing,
             trailingViews: self.trailingViews,
             trailingViewSpacing: self.trailingViewSpacing,
             footerView: self.footerView,
-            footerSpacing: self.footerSpacing
+            footerSpacing: self.footerSpacing,
+            size: self.size
+        )
+    }
+    
+    static func _layout(
+        inset: InsetFloat,
+        headerView: IView?,
+        headerSpacing: Float,
+        leadingViews: [IView],
+        leadingViewSpacing: Float,
+        centerView: IView?,
+        centerFilling: Bool,
+        centerSpacing: Float,
+        trailingViews: [IView],
+        trailingViewSpacing: Float,
+        footerView: IView?,
+        footerSpacing: Float,
+        size: Float?
+    ) -> CompositionLayout {
+        if headerView == nil && leadingViews.isEmpty == true && centerView == nil && trailingViews.isEmpty == true && footerView == nil {
+            return CompositionLayout(
+                entity: CompositionLayout.None()
+            )
+        }
+        return CompositionLayout(
+            inset: inset,
+            entity: self._entity(
+                headerView: headerView,
+                headerSpacing: headerSpacing,
+                leadingViews: leadingViews,
+                leadingViewSpacing: leadingViewSpacing,
+                centerView: centerView,
+                centerFilling: centerFilling,
+                centerSpacing: centerSpacing,
+                trailingViews: trailingViews,
+                trailingViewSpacing: trailingViewSpacing,
+                footerView: footerView,
+                footerSpacing: footerSpacing,
+                size: size
+            )
+        )
+    }
+    
+    static func _entity(
+        headerView: IView?,
+        headerSpacing: Float,
+        leadingViews: [IView],
+        leadingViewSpacing: Float,
+        centerView: IView?,
+        centerFilling: Bool,
+        centerSpacing: Float,
+        trailingViews: [IView],
+        trailingViewSpacing: Float,
+        footerView: IView?,
+        footerSpacing: Float,
+        size: Float?
+    ) -> ICompositionLayoutEntity {
+        let content = Self._entity(
+            leadingViews: leadingViews,
+            leadingViewSpacing: leadingViewSpacing,
+            centerView: centerView,
+            centerFilling: centerFilling,
+            centerSpacing: centerSpacing,
+            trailingViews: trailingViews,
+            trailingViewSpacing: trailingViewSpacing
+        )
+        let leading: ICompositionLayoutEntity?
+        if let headerView = headerView {
+            leading = CompositionLayout.Margin(
+                inset: InsetFloat(top: 0, left: 0, right: 0, bottom: headerSpacing),
+                entity: CompositionLayout.View(headerView)
+            )
+        } else {
+            leading = nil
+        }
+        let trailing: ICompositionLayoutEntity?
+        if let footerView = footerView {
+            trailing = CompositionLayout.Margin(
+                inset: InsetFloat(top: footerSpacing, left: 0, right: 0, bottom: 0),
+                entity: CompositionLayout.View(footerView)
+            )
+        } else {
+            trailing = nil
+        }
+        if leading == nil && trailing == nil {
+            return content
+        }
+        if size != nil {
+            var stackEntities: [ICompositionLayoutEntity] = []
+            if let leading = leading {
+                stackEntities.append(leading)
+            }
+            stackEntities.append(content)
+            if let trailing = trailing {
+                stackEntities.append(trailing)
+            }
+            return CompositionLayout.VStack(
+                alignment: .fill,
+                entities: stackEntities
+            )
+        }
+        return CompositionLayout.VAccessory(
+            leading: leading,
+            center: content,
+            trailing: trailing,
+            filling: true
+        )
+    }
+    
+    static func _entity(
+        leadingViews: [IView],
+        leadingViewSpacing: Float,
+        centerView: IView?,
+        centerFilling: Bool,
+        centerSpacing: Float,
+        trailingViews: [IView],
+        trailingViewSpacing: Float
+    ) -> ICompositionLayoutEntity {
+        let center: ICompositionLayoutEntity
+        if let centerView = centerView {
+            center = CompositionLayout.Margin(
+                inset: InsetFloat(
+                    top: 0,
+                    left: leadingViews.count > 0 ? centerSpacing : 0,
+                    right: trailingViews.count > 0 ? centerSpacing : 0,
+                    bottom: 0
+                ),
+                entity: CompositionLayout.View(centerView)
+            )
+        } else {
+            center = CompositionLayout.None()
+        }
+        let leading: ICompositionLayoutEntity?
+        if leadingViews.isEmpty == false {
+            leading = CompositionLayout.HStack(
+                alignment: .fill,
+                spacing: leadingViewSpacing,
+                entities: leadingViews.map({ CompositionLayout.View($0) })
+            )
+        } else {
+            leading = nil
+        }
+        let trailing: ICompositionLayoutEntity?
+        if trailingViews.isEmpty == false {
+            trailing = CompositionLayout.HStack(
+                alignment: .fill,
+                spacing: trailingViewSpacing,
+                entities: trailingViews.reversed().map({ CompositionLayout.View($0) })
+            )
+        } else {
+            trailing = nil
+        }
+        return CompositionLayout.HAccessory(
+            leading: leading,
+            center: center,
+            trailing: trailing,
+            filling: centerFilling
         )
     }
     

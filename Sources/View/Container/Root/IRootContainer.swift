@@ -3,14 +3,21 @@
 //
 
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 import KindKitCore
 import KindKitMath
 
 public protocol IRootContainerDelegate : AnyObject {
     
     #if os(iOS)
+    
+    func viewController() -> UIViewController?
+    
     func updateOrientations()
     func updateStatusBar()
+    
     #endif
     
 }

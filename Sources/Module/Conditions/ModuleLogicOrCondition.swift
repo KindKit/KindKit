@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public class ModuleLogicOrCondition : IModuleCondition {
+public final class ModuleLogicOrCondition : IModuleCondition {
     
     public var state: Bool {
         for condition in self._conditions {

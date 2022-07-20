@@ -7,7 +7,7 @@ import KindKitCore
 import KindKitView
 import KindKitMath
 
-public class RemoteImageView : IRemoteImageView {
+public final class RemoteImageView : IRemoteImageView {
     
     public var layout: ILayout? {
         get { return self._view.layout }
@@ -304,7 +304,7 @@ private extension RemoteImageView {
 
 private extension RemoteImageView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

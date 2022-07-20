@@ -9,7 +9,7 @@ import KindKitView
 
 public extension GraphicsGuide {
     
-    class Rule : IGraphicsGuide {
+    final class Rule : IGraphicsGuide {
         
         public var isEnabled: Bool
         public var size: Float

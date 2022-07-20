@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitPermission
 
-public class ModulePermissionCondition : IModuleCondition {
+public final class ModulePermissionCondition : IModuleCondition {
     
     public var state: Bool {
         return self._states.contains(self._permission.status)

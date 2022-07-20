@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class LayoutItem {
+public final class LayoutItem {
     
     public var frame: RectFloat
     public private(set) var view: IView

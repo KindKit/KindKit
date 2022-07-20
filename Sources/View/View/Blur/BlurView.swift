@@ -8,7 +8,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class BlurView : IBlurView {
+public final class BlurView : IBlurView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

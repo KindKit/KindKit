@@ -9,7 +9,7 @@ import KindKitView
 
 extension LogUI {
     
-    class Screen : IScreen, IScreenStackable, IScreenViewable {
+    final class Screen : IScreen, IScreenStackable, IScreenViewable {
         
         let target: LogUI.Target
         var onClose: (() -> Void)?

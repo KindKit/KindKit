@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public protocol IRouterable {
+public protocol IScreenRouterable {
     
     associatedtype AssociatedRouter
     

@@ -9,7 +9,7 @@ import KindKitView
 
 public extension GraphicsGuide {
     
-    class Grid : IGraphicsGuide {
+    final class Grid : IGraphicsGuide {
         
         public var isEnabled: Bool
         public var gridSize: PointFloat

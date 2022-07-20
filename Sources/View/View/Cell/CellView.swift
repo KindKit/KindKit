@@ -9,7 +9,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class CellView< ContentView : IView > : ICellView {
+public final class CellView< ContentView : IView > : ICellView {
     
     public var layout: ILayout? {
         get { return self._view.layout }
@@ -288,7 +288,7 @@ public class CellView< ContentView : IView > : ICellView {
 
 private extension CellView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

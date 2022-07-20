@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class Log {
+public final class Log {
     
     private var _targets: [ILogTarget]
     

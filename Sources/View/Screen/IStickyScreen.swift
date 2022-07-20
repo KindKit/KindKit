@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IStickyScreen : IScreen {
     
-    associatedtype StickyBar : IBarView
+    associatedtype AssociatedStickyBar : IBarView
     
-    var stickyView: StickyBar { get }
+    var stickyView: AssociatedStickyBar { get }
     var stickyVisibility: Float { get }
     var stickyHidden: Bool { get }
     

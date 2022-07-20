@@ -8,7 +8,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class ProgressView : IProgressView {
+public final class ProgressView : IProgressView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

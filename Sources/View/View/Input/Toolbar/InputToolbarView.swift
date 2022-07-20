@@ -62,7 +62,7 @@ public struct InputToolbarFlexibleSpaceItem : IInputToolbarItem {
     
 }
 
-open class InputToolbarView : IInputToolbarView {
+public final class InputToolbarView : IInputToolbarView {
     
     public private(set) unowned var parentView: IView?
     public var native: NativeView {

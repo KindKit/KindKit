@@ -8,7 +8,7 @@ import KindKitCore
 
 #if os(macOS)
 
-public class Shell {
+public final class Shell {
     
     public typealias OnData = (_ data: Data) -> Void
     public typealias OnCompletion = (_ result: Result) -> Void

@@ -3,6 +3,9 @@
 //
 
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 import KindKitCore
 import KindKitMath
 
@@ -73,6 +76,14 @@ public extension IScreen {
 
 public extension IScreen {
     
+    #if os(iOS)
+    
+    var viewController: UIViewController? {
+        return self.container?.viewController
+    }
+    
+    #endif
+    
     func inheritedInsets(interactive: Bool = false) -> InsetFloat {
         return self.container?.inheritedInsets(interactive: interactive) ?? .zero
     }
@@ -80,8 +91,6 @@ public extension IScreen {
 }
 
 #if os(iOS)
-
-import UIKit
 
 public protocol IScreenStatusable : AnyObject {
     

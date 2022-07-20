@@ -16,7 +16,7 @@ protocol NativeControlViewDelegate : AnyObject {
     
 }
 
-public class ControlView< Layout : ILayout > : IControlView {
+public final class ControlView< Layout : ILayout > : IControlView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class GroupContainer< Screen : IGroupScreen > : IGroupContainer, IContainerScreenable {
+public final class GroupContainer< Screen : IGroupScreen > : IGroupContainer, IContainerScreenable {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -624,7 +626,7 @@ private extension GroupContainer {
 
 private extension GroupContainer {
     
-    class Item {
+    final class Item {
         
         var container: IGroupContentContainer
         var barView: IBarItemView {
@@ -651,7 +653,7 @@ private extension GroupContainer {
 
     }
     
-    class RootLayout : ILayout {
+    final class RootLayout : ILayout {
         
         enum State {
             case empty

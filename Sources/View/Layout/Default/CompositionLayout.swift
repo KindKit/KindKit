@@ -20,7 +20,7 @@ public protocol ICompositionLayoutEntity {
     
 }
 
-public class CompositionLayout : ILayout {
+public final class CompositionLayout : ILayout {
     
     public unowned var delegate: ILayoutDelegate?
     public unowned var view: IView?

@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class ModuleManager : IModuleManager {
+public final class ModuleManager : IModuleManager {
     
     public var modules: [IModule]
     

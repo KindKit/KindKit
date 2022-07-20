@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IScreenGroupable : AnyObject {
     
-    associatedtype GroupItemView : IBarItemView
+    associatedtype AssociatedGroupItemView : IBarItemView
     
-    var groupItemView: GroupItemView { get }
+    var groupItemView: AssociatedGroupItemView { get }
     
 }
 

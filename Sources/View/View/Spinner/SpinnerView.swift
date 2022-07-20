@@ -8,7 +8,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class SpinnerView : ISpinnerView {
+public final class SpinnerView : ISpinnerView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

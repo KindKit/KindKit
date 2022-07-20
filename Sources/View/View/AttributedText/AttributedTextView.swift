@@ -13,7 +13,7 @@ protocol AttributedTextViewDelegate : AnyObject {
     
 }
 
-public class AttributedTextView : IAttributedTextView {
+public final class AttributedTextView : IAttributedTextView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

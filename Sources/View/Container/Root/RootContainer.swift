@@ -11,7 +11,7 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class RootContainer : IRootContainer {
+public final class RootContainer : IRootContainer {
     
     public unowned var delegate: IRootContainerDelegate?
     public var shouldInteractive: Bool {
@@ -29,6 +29,9 @@ public class RootContainer : IRootContainer {
     }
     public var supportedOrientations: UIInterfaceOrientationMask {
         return self.contentContainer.supportedOrientations
+    }
+    public var viewController: UIViewController? {
+        return self.delegate?.viewController()
     }
     #endif
     public private(set) var isPresented: Bool
@@ -149,7 +152,6 @@ public class RootContainer : IRootContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.overlayContainer?.prepareShow(interactive: interactive)
         self.contentContainer.prepareShow(interactive: interactive)
     }
@@ -194,7 +196,7 @@ private extension RootContainer {
 
 private extension RootContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?
@@ -223,7 +225,10 @@ private extension RootContainer {
                 overlayItem.frame = bounds
             }
             if let statusBarItem = self.statusBarItem {
-                let statusBarSize = statusBarItem.size(available: SizeFloat(width: bounds.size.width, height: .infinity))
+                let statusBarSize = statusBarItem.size(available: SizeFloat(
+                    width: bounds.size.width,
+                    height: .infinity
+                ))
                 statusBarItem.frame = RectFloat(
                     x: bounds.origin.x,
                     y: bounds.origin.y,

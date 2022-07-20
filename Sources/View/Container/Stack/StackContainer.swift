@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class StackContainer< Screen : IStackScreen > : IStackContainer, IContainerScreenable {
+public final class StackContainer< Screen : IStackScreen > : IStackContainer, IContainerScreenable {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -115,6 +117,22 @@ public class StackContainer< Screen : IStackScreen > : IStackContainer, IContain
         ContainerBarController.shared.add(observer: self)
     }
     
+    public convenience init<
+        RootScreen : IScreen & IScreenStackable & IScreenViewable
+    >(
+        screen: Screen,
+        rootScreen: RootScreen,
+        hidesGroupBarWhenPushed: Bool = false
+    ) {
+        self.init(
+            screen: screen,
+            rootContainer: ScreenContainer(
+                screen: rootScreen
+            ),
+            hidesGroupBarWhenPushed: hidesGroupBarWhenPushed
+        )
+    }
+    
     deinit {
         ContainerBarController.shared.remove(observer: self)
         self.screen.destroy()
@@ -179,7 +197,6 @@ public class StackContainer< Screen : IStackScreen > : IStackContainer, IContain
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.screen.prepareShow(interactive: interactive)
         self._currentItem.container.prepareShow(interactive: interactive)
     }
@@ -884,7 +901,7 @@ private extension StackContainer {
 
 private extension StackContainer {
     
-    class Item {
+    final class Item {
         
         var container: IStackContentContainer
         var owner: AnyObject?
@@ -951,7 +968,7 @@ private extension StackContainer {
 
 private extension StackContainer.Item {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?
@@ -1021,7 +1038,7 @@ private extension StackContainer.Item {
 
 private extension StackContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         enum State {
             case empty

@@ -9,7 +9,7 @@ import KindKitView
 
 public extension GraphicsGuide {
 
-    class Lines : IGraphicsGuide {
+    final class Lines : IGraphicsGuide {
         
         public var isEnabled: Bool
         public var lines: [Line2Float]

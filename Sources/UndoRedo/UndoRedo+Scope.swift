@@ -6,7 +6,7 @@ import Foundation
 
 extension UndoRedo {
     
-    class Scope : IUndoRedoScope {
+    final class Scope : IUndoRedoScope {
         
         var isValid: Bool {
             return self._states.isEmpty == false

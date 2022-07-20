@@ -14,7 +14,7 @@ protocol StepperViewDelegate : AnyObject {
     
 }
 
-public class StepperView : IStepperView {
+public final class StepperView : IStepperView {
         
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

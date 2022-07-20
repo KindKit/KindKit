@@ -15,7 +15,7 @@ protocol ILogUITargetObserver : AnyObject {
 
 public extension LogUI {
 
-    class Target : ILogTarget {
+    final class Target : ILogTarget {
             
         public var enabled: Bool
         public let limit: Int

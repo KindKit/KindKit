@@ -5,7 +5,7 @@
 import Foundation
 import KindKitCore
 
-public protocol IContextable {
+public protocol IScreenContextable {
     
     associatedtype AssociatedContext
     

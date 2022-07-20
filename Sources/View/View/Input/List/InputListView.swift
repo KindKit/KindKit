@@ -16,7 +16,7 @@ protocol InputListViewDelegate : AnyObject {
     
 }
 
-public class InputListView : IInputListView {
+public final class InputListView : IInputListView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?
@@ -413,7 +413,7 @@ public class InputListView : IInputListView {
 
 public extension InputListView {
     
-    class Item< Value > : IInputListViewItem {
+    final class Item< Value > : IInputListViewItem {
         
         public var title: String
         public var value: Value

@@ -8,7 +8,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class GradientView : IGradientView {
+public final class GradientView : IGradientView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

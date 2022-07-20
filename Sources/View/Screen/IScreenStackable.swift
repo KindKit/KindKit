@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IScreenStackable : AnyObject {
     
-    associatedtype StackBar : IStackBarView
+    associatedtype AssociatedStackBar : IStackBarView
     
-    var stackBarView: StackBar { get }
+    var stackBarView: AssociatedStackBar { get }
     var stackBarVisibility: Float { get }
     var stackBarHidden: Bool { get }
     

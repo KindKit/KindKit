@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class StateContainer : IStateContainer {
+public final class StateContainer : IStateContainer {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -105,7 +107,6 @@ public class StateContainer : IStateContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.container?.prepareShow(interactive: interactive)
     }
     
@@ -146,7 +147,7 @@ private extension StateContainer {
 
 private extension StateContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

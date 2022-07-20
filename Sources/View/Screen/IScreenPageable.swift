@@ -8,9 +8,9 @@ import KindKitMath
 
 public protocol IScreenPageable : AnyObject {
     
-    associatedtype PageItemView : IBarItemView
+    associatedtype AssociatedPageItemView : IBarItemView
     
-    var pageItemView: PageItemView { get }
+    var pageItemView: AssociatedPageItemView { get }
     
 }
 

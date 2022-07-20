@@ -5,7 +5,7 @@
 import Foundation
 import KindKitObserver
 
-public class UndoRedo {
+public final class UndoRedo {
     
     public unowned var delegate: IUndoRedoDelegate
     public private(set) var isEnabled: Bool

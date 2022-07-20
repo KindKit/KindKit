@@ -8,7 +8,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class RateView : IRateView {
+public final class RateView : IRateView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

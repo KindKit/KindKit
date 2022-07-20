@@ -25,7 +25,7 @@ protocol ScrollViewDelegate : AnyObject {
     
 }
 
-public class ScrollView< Layout : ILayout > : IScrollView {
+public final class ScrollView< Layout : ILayout > : IScrollView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

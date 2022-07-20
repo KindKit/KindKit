@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class StickyContainer< Screen : IStickyScreen, ContentContainer : IContainer > : IStickyContainer where ContentContainer : IContainerParentable {
+public final class StickyContainer< Screen : IStickyScreen, ContentContainer : IContainer > : IStickyContainer where ContentContainer : IContainerParentable {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -155,7 +157,6 @@ public class StickyContainer< Screen : IStickyScreen, ContentContainer : IContai
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.screen.prepareShow(interactive: interactive)
         self._contentContainer.prepareShow(interactive: interactive)
     }
@@ -288,7 +289,7 @@ extension StickyContainer : IContainerBarControllerObserver {
 
 private extension StickyContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

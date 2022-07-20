@@ -10,7 +10,7 @@ import UserNotifications
 import KindKitObserver
 
 @available(iOS 10.0, *)
-public class NotificationPermission : IPermission {
+public final class NotificationPermission : IPermission {
     
     public var status: PermissionStatus {
         switch self._rawStatus() {

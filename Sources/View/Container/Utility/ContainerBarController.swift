@@ -13,7 +13,7 @@ public protocol IContainerBarControllerObserver : AnyObject {
     
 }
 
-public class ContainerBarController {
+public final class ContainerBarController {
     
     public var isAnimating: Bool {
         return self._animation != nil

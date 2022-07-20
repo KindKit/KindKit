@@ -13,7 +13,7 @@ public protocol ScrollViewHidingBarExtensionObserver : AnyObject {
     
 }
 
-public class ScrollViewHidingBarExtension {
+public final class ScrollViewHidingBarExtension {
     
     public var direction: Direction
     public var state: State

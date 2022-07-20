@@ -12,7 +12,7 @@ protocol IAnimationQueueDelegate : AnyObject {
     
 }
 
-public class Animation {
+public final class Animation {
     
     public static let `default` = Animation()
     
@@ -66,7 +66,7 @@ public extension Animation {
 
 private extension Animation {
     
-    class Task : IAnimationTask {
+    final class Task : IAnimationTask {
         
         var delay: TimeInterval
         var duration: TimeInterval

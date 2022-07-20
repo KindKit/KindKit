@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class DialogContainer : IDialogContainer {
+public final class DialogContainer : IDialogContainer {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -169,7 +171,6 @@ public class DialogContainer : IDialogContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.contentContainer?.prepareShow(interactive: interactive)
         self.currentContainer?.prepareShow(interactive: interactive)
     }
@@ -499,7 +500,7 @@ private extension DialogContainer {
 
 private extension DialogContainer {
     
-    class Item {
+    final class Item {
         
         var container: IDialogContentContainer
         var item: LayoutItem
@@ -521,7 +522,7 @@ private extension DialogContainer {
 
 private extension DialogContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

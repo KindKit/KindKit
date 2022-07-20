@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class ButtonView : IButtonView {
+public final class ButtonView : IButtonView {
     
     public var layout: ILayout? {
         get { return self._view.layout }
@@ -379,7 +379,7 @@ public class ButtonView : IButtonView {
 
 extension ButtonView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

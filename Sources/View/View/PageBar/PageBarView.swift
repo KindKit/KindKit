@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class PageBarView : BarView, IPageBarView {
+public final class PageBarView : BarView, IPageBarView {
     
     public var delegate: IPageBarViewDelegate?
     public var leadingView: IView? {
@@ -202,7 +202,7 @@ extension PageBarView : IBarItemViewDelegate {
 
 private extension PageBarView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         enum IndicatorState {
             case empty

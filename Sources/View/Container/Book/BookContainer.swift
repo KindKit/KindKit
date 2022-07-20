@@ -11,12 +11,14 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-public class BookContainer< Screen : IBookScreen > : IBookContainer {
+public final class BookContainer< Screen : IBookScreen > : IBookContainer {
     
     public unowned var parent: IContainer? {
         didSet(oldValue) {
             guard self.parent !== oldValue else { return }
-            self.didChangeInsets()
+            if self.parent == nil || self.parent?.isPresented == true {
+                self.didChangeInsets()
+            }
         }
     }
     public var shouldInteractive: Bool {
@@ -130,7 +132,6 @@ public class BookContainer< Screen : IBookScreen > : IBookContainer {
     }
     
     public func prepareShow(interactive: Bool) {
-        self.didChangeInsets()
         self.screen.prepareShow(interactive: interactive)
         self.current?.prepareShow(interactive: interactive)
     }
@@ -796,7 +797,7 @@ private extension BookContainer {
 
 private extension BookContainer {
     
-    class Item {
+    final class Item {
         
         var container: IBookContentContainer
         var bookItem: LayoutItem
@@ -814,7 +815,7 @@ private extension BookContainer {
 
 private extension BookContainer {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

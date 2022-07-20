@@ -230,7 +230,7 @@ public class BarView : IBarView {
 
 extension BarView {
     
-    class Layout : ILayout {
+    final class Layout : ILayout {
         
         unowned var delegate: ILayoutDelegate?
         unowned var view: IView?

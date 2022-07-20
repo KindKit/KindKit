@@ -10,7 +10,7 @@ import CoreLocation
 import UserNotifications
 import KindKitObserver
 
-public class LocationPermission : IPermission {
+public final class LocationPermission : IPermission {
     
     public let preferedWhen: When
     public var status: PermissionStatus {

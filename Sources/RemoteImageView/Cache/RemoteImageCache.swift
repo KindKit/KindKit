@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitView
 
-public class RemoteImageCache {
+public final class RemoteImageCache {
 
     public private(set) var name: String
     public private(set) var memory: [String: Image]

@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class ExternalView : IExternalView {
+public final class ExternalView : IExternalView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

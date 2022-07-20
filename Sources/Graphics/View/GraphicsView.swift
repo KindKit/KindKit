@@ -7,7 +7,7 @@ import KindKitCore
 import KindKitMath
 import KindKitView
     
-public class GraphicsView : IGraphicsView {
+public final class GraphicsView : IGraphicsView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

@@ -6,7 +6,7 @@ import Foundation
 import KindKitCore
 import KindKitMath
 
-public class EmptyView : IEmptyView {
+public final class EmptyView : IEmptyView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?

@@ -27,7 +27,7 @@ public struct LogUI {
 
 extension LogUI {
     
-    class StackScreen : IStackScreen, IScreenModalable {
+    final class StackScreen : IStackScreen, IScreenModalable {
         
         var container: IContainer?
         var modalPresentation: ScreenModalPresentation {
