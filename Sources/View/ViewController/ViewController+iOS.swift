@@ -48,6 +48,7 @@ public final class ViewController : UIViewController {
             if let containerView = self._containerView {
                 containerView.frame = self.view.bounds
                 self.view.addSubview(containerView)
+                containerView.layoutIfNeeded()
             }
         }
     }
