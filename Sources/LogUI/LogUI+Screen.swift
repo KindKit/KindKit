@@ -22,8 +22,8 @@ extension LogUI {
                 self._autoScrollButton
             ],
             leadingViewSpacing: 4,
-            titleView: self._searchView,
-            titleSpacing: 8,
+            centerView: self._searchView,
+            centerSpacing: 8,
             trailingViews: [
                 self._closeButton
             ],
@@ -94,7 +94,7 @@ extension LogUI {
                 inset: InsetFloat(horizontal: 12, vertical: 4),
                 height: .static(.fixed(44)),
                 backgroundView: backgroundView,
-                textView: textView,
+                primaryView: textView,
                 isSelected: true
             )
             button.onChangeStyle({ [unowned button, unowned backgroundView] _ in
@@ -126,7 +126,7 @@ extension LogUI {
                 inset: InsetFloat(horizontal: 12, vertical: 4),
                 height: .static(.fixed(44)),
                 backgroundView: backgroundView,
-                textView: textView
+                primaryView: textView
             )
             button.onPressed({ [unowned self] in
                 if self._searchView.isEditing == true {

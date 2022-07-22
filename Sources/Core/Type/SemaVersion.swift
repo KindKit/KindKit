@@ -135,18 +135,18 @@ private extension SemaVersion {
         let pattern = #"""
         ^
         v?
-        (?<major>0|[1-9]\d*)
+        (?<major>[0-9]\d*)
         \.
-        (?<minor>0|[1-9]\d*)
+        (?<minor>[0-9]\d*)
         (?:
           \.
-          (?<patch>0|[1-9]\d*)
+          (?<patch>[0-9]\d*)
         )?
         (?:-
           (?<prerelease>
-            (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
+            (?:[0-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
             (?:\.
-              (?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
+              (?:[0-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)
             )
           *)
         )?
