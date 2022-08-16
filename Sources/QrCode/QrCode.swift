@@ -54,8 +54,7 @@ public struct QrCode {
         let widthRatio = CGFloat(size.width) / ciImageSize.width
         let heightRatio = CGFloat(size.height) / ciImageSize.height
         guard
-            let qrCodeImage = ciImage.nonInterpolatedImage(withScale: CGPoint(x: widthRatio, y: heightRatio)),
-            let qrCodeCgImage = qrCodeImage.cgImage,
+            let qrCodeCgImage = ciImage.cgImage(withScale: CGPoint(x: widthRatio, y: heightRatio)),
             let qrCodeCgColorSpace = qrCodeCgImage.colorSpace
         else {
             return nil

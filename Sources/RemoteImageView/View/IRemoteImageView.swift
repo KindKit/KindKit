@@ -13,7 +13,7 @@ public protocol IRemoteImageView : IView, IViewColorable, IViewBorderable, IView
     var imageView: IImageView? { get }
     var progressView: IProgressView? { set get }
     var errorView: IView? { set get }
-    var loader: RemoteImageLoader { get }
+    var loader: RemoteImage.Loader { get }
     var query: IRemoteImageQuery { set get }
     var filter: IRemoteImageFilter? { set get }
     

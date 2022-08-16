@@ -6,9 +6,7 @@ import Foundation
 
 public protocol IApiTaskQuery : IApiQuery {
 
-    var task: URLSessionTask? { get }
-
-    func prepare(session: URLSession) -> Bool
+    var task: URLSessionTask { get }
     
     func upload(bytes: Int64, totalBytes: Int64)
     func resumeDownload(bytes: Int64, totalBytes: Int64)

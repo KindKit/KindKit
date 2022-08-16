@@ -4,7 +4,11 @@
 
 #if canImport(CoreGraphics)
 
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
+#endif
 import CoreGraphics
 import KindKitCore
 import KindKitMath
@@ -206,7 +210,7 @@ public extension GraphicsContext {
         image: Image,
         positioning: GraphicsContext.Positioning
     ) {
-        guard let cgImage = image.native.cgImage else { return }
+        guard let cgImage = image.cgImage else { return }
         let w = image.size.width.cgFloat
         let h = image.size.height.cgFloat
         let rect: CGRect

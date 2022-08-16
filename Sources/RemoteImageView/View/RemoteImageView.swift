@@ -57,7 +57,7 @@ public final class RemoteImageView : IRemoteImageView {
             self._layout.errorItem = self.errorView.flatMap({ LayoutItem(view: $0) })
         }
     }
-    public private(set) var loader: RemoteImageLoader
+    public private(set) var loader: RemoteImage.Loader
     public var query: IRemoteImageQuery
     public var filter: IRemoteImageFilter?
     public var color: Color? {
@@ -91,7 +91,7 @@ public final class RemoteImageView : IRemoteImageView {
         placeholderView: IImageView,
         progressView: IProgressView? = nil,
         errorView: IView? = nil,
-        loader: RemoteImageLoader = RemoteImageLoader.shared,
+        loader: RemoteImage.Loader = RemoteImage.Loader.shared,
         query: IRemoteImageQuery,
         filter: IRemoteImageFilter? = nil,
         color: Color? = nil,
@@ -285,11 +285,11 @@ private extension RemoteImageView {
             self.isLoading = true
             self._layout.state = .loading
             self.progressView?.progress(0)
-            self.loader.download(
-                query: self.query,
-                filter: self.filter,
-                target: self
-            )
+            if let filter = self.filter {
+                self.loader.download(target: self, query: self.query, filter: filter)
+            } else {
+                self.loader.download(target: self, query: self.query)
+            }
         }
     }
 

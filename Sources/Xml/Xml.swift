@@ -134,6 +134,14 @@ public struct XmlValue {
 
 #if DEBUG
 
+extension XmlDocument : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return self.debugString()
+    }
+    
+}
+
 extension XmlDocument : IDebug {
     
     public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
@@ -152,6 +160,14 @@ extension XmlDocument : IDebug {
             buffer.append(String(repeating: "\t", count: footerIndent))
         }
         buffer.append(">")
+    }
+    
+}
+
+extension XmlNode : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return self.debugString()
     }
     
 }
@@ -188,6 +204,14 @@ extension XmlNode : IDebug {
     
 }
 
+extension XmlAttribute : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return self.debugString()
+    }
+    
+}
+
 extension XmlAttribute : IDebug {
     
     public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
@@ -206,6 +230,14 @@ extension XmlAttribute : IDebug {
             buffer.append(String(repeating: "\t", count: footerIndent))
         }
         buffer.append(">")
+    }
+    
+}
+
+extension XmlValue : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return self.debugString()
     }
     
 }

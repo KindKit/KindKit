@@ -12,9 +12,9 @@ public extension DispatchWorkItem {
         return workItem
     }
     
-    static func async(block: @escaping () -> Void, queue: DispatchQueue, after: DispatchTime) -> DispatchWorkItem {
+    static func async(block: @escaping () -> Void, queue: DispatchQueue, delay: TimeInterval) -> DispatchWorkItem {
         let workItem = DispatchWorkItem(block: block)
-        queue.asyncAfter(deadline: after, execute: workItem)
+        queue.asyncAfter(deadline: .now() + delay, execute: block)
         return workItem
     }
     

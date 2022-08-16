@@ -16,6 +16,20 @@ extension LogUI {
         
         var container: IContainer?
         
+        #if os(macOS)
+        private(set) lazy var stackBarView = StackBarView(
+            inset: InsetFloat(horizontal: 12, vertical: 8),
+            leadingViews: [
+                self._autoScrollButton
+            ],
+            leadingViewSpacing: 4,
+            trailingViews: [
+                self._closeButton
+            ],
+            trailingViewSpacing: 4,
+            color: Color(rgb: 0xffffff)
+        )
+        #elseif os(iOS)
         private(set) lazy var stackBarView = StackBarView(
             inset: InsetFloat(horizontal: 12, vertical: 8),
             leadingViews: [
@@ -30,6 +44,7 @@ extension LogUI {
             trailingViewSpacing: 4,
             color: Color(rgb: 0xffffff)
         )
+        #endif
         private(set) lazy var view: ScrollView< ListLayout > = {
             let view = ScrollView(
                 direction: [ .vertical ],
@@ -44,6 +59,7 @@ extension LogUI {
             })
             return view
         }()
+        #if os(iOS)
         private(set) lazy var _searchView: InputStringView = {
             let inputView = InputStringView(
                 width: .fill,
@@ -78,6 +94,7 @@ extension LogUI {
             })
             return inputView
         }()
+        #endif
         private(set) lazy var _autoScrollButton: ButtonView = {
             let backgroundView = EmptyView(
                 width: .fill,
@@ -129,11 +146,15 @@ extension LogUI {
                 primaryView: textView
             )
             button.onPressed({ [unowned self] in
+                #if os(iOS)
                 if self._searchView.isEditing == true {
                     self._searchView.endEditing()
                 } else {
                     self._pressedClose()
                 }
+                #else
+                self._pressedClose()
+                #endif
             })
             return button
         }()

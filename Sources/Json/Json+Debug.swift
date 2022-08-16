@@ -5,9 +5,15 @@
 import Foundation
 import KindKitCore
 
-
-
 #if DEBUG
+
+extension Json : CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        return self.debugString()
+    }
+    
+}
 
 extension Json : IDebug {
 

@@ -4,13 +4,14 @@
 
 import Foundation
 
-public protocol IApiResponse : AnyObject {
+public protocol IApiResponse {
+    
+    associatedtype Success
+    associatedtype Failure : Swift.Error
+    
+    typealias Result = Swift.Result< Success, Failure >
 
-    var error: Error? { get }
-
-    func parse(response: URLResponse, data: Data?)
-    func parse(error: Error)
-
-    func reset()
+    func parse(meta: Api.Response.Meta, data: Data?) -> Result
+    func parse(error: Error) -> Result
     
 }

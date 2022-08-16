@@ -2,6 +2,8 @@
 //  KindKitGraphics
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
@@ -242,3 +244,5 @@ public final class GraphicsView : IGraphicsView {
     }
     
 }
+
+#endif

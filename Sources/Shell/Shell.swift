@@ -40,7 +40,7 @@ public final class Shell {
         self.onError = onError
         self.onCompletion = onCompletion
         
-        self._queue = DispatchQueue(label: "ShellQueue")
+        self._queue = DispatchQueue(label: "KindKitShell.Shell")
         
         self._process = Process()
         self._process.launchPath = "/bin/bash"

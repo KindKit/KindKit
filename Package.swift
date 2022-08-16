@@ -14,6 +14,7 @@ let package = Package(
         .library(name: "KindKitCore",type: .static, targets: [ "KindKitCore" ]),
         .library(name: "KindKitDatabase", type: .static, targets: [ "KindKitDatabase" ]),
         .library(name: "KindKitDataSource", type: .static, targets: [ "KindKitDataSource" ]),
+        .library(name: "KindKitFlow", type: .static, targets: [ "KindKitFlow" ]),
         .library(name: "KindKitGraphics", type: .static, targets: [ "KindKitGraphics" ]),
         .library(name: "KindKitJson", type: .static, targets: [ "KindKitJson" ]),
         .library(name: "KindKitKeychain", type: .static, targets: [ "KindKitKeychain" ]),
@@ -34,8 +35,13 @@ let package = Package(
     targets: [
         .target(
             name: "KindKitApi",
-            dependencies: [ .target(name: "KindKitCore") ],
+            dependencies: [ .target(name: "KindKitCore"), .target(name: "KindKitJson"), .target(name: "KindKitFlow") ],
             path: "Sources/Api"
+        ),
+        .testTarget(
+            name: "KindKitApi-Tests",
+            dependencies: [ .target(name: "KindKitApi") ],
+            path: "Tests/Api"
         ),
         .target(
             name: "KindKitCore",
@@ -44,7 +50,7 @@ let package = Package(
         .testTarget(
             name: "KindKitCore-Tests",
             dependencies: [ .target(name: "KindKitCore") ],
-            path: "Sources/Core-Tests"
+            path: "Tests/Core"
         ),
         .target(
             name: "KindKitDatabase",
@@ -53,8 +59,18 @@ let package = Package(
         ),
         .target(
             name: "KindKitDataSource",
-            dependencies: [ .target(name: "KindKitCore") ],
+            dependencies: [ .target(name: "KindKitCore"), .target(name: "KindKitApi") ],
             path: "Sources/DataSource"
+        ),
+        .target(
+            name: "KindKitFlow",
+            dependencies: [ .target(name: "KindKitCore") ],
+            path: "Sources/Flow"
+        ),
+        .testTarget(
+            name: "KindKitFlow-Tests",
+            dependencies: [ .target(name: "KindKitFlow") ],
+            path: "Tests/Flow"
         ),
         .target(
             name: "KindKitGraphics",
@@ -89,7 +105,7 @@ let package = Package(
         .testTarget(
             name: "KindKitMath-Tests",
             dependencies: [ .target(name: "KindKitMath") ],
-            path: "Sources/Math-Tests"
+            path: "Tests/Math"
         ),
         .target(
             name: "KindKitModule",
@@ -115,6 +131,11 @@ let package = Package(
             name: "KindKitRemoteImageView",
             dependencies: [ .target(name: "KindKitApi"), .target(name: "KindKitView") ],
             path: "Sources/RemoteImageView"
+        ),
+        .testTarget(
+            name: "KindKitRemoteImageView-Tests",
+            dependencies: [ .target(name: "KindKitRemoteImageView") ],
+            path: "Tests/RemoteImageView"
         ),
         .target(
             name: "KindKitShell",
