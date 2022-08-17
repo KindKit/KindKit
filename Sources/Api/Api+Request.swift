@@ -54,9 +54,11 @@ public extension Api {
                         params.append(.init(name: param.name, value: param.value))
                     }
                 }
-                components.queryItems = try params.compactMap({
-                    return URLQueryItem(name: try $0.name.encoded, value: try $0.value.encoded)
-                })
+                if params.count > 0 {
+                    components.queryItems = try params.compactMap({
+                        return URLQueryItem(name: try $0.name.encoded, value: try $0.value.encoded)
+                    })
+                }
             }
             guard let url = components.url else {
                 throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)

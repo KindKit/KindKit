@@ -40,12 +40,13 @@ class TestFlow : XCTestCase {
     
     func testChain() {
         let expectation = self.expectation(description: "Test")
-        let basePipeline = Flow< Int, Never >()
-            .dispatch(.background)
-            .accumulate()
-            .pipeline()
         let pipeline = Flow< Int, Never >()
-            .run(pipeline: basePipeline)
+            .run(
+                pipeline: Flow< Int, Never >()
+                    .dispatch(.background)
+                    .accumulate()
+                    .pipeline()
+            )
             .dispatch(.main)
             .each()
             .pipeline()
