@@ -6,9 +6,11 @@ import Foundation
 import KindKitCore
 
 public enum JsonError : Error {
+    
     case notJson
     case access
     case cast
+    
 }
 
 public final class Json {
@@ -57,6 +59,15 @@ public extension Json {
     func array() throws -> NSArray {
         guard let array = self.root as? NSArray else { throw JsonError.notJson }
         return array
+    }
+    
+}
+
+public extension Json {
+    
+    func build(_ block: (_ json: Self) throws -> Void) rethrows -> Self {
+        try block(self)
+        return self
     }
     
 }

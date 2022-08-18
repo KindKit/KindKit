@@ -20,6 +20,14 @@ public extension Api.Request {
 
 public extension Api.Request.Data {
     
+    static func json(_ block: (_ json: Json) throws -> Void) rethrows -> Api.Request.Data {
+        return .json(try Json().build(block))
+    }
+    
+}
+
+public extension Api.Request.Data {
+    
     func build() throws -> (raw: Foundation.Data, mimetype: String) {
         switch self {
         case .file(let url):

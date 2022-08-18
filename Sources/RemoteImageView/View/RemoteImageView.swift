@@ -120,6 +120,13 @@ public final class RemoteImageView : IRemoteImageView {
             shadow: shadow,
             alpha: alpha
         )
+        self._onFinish = { ImageView(image: $0) }
+        self._view.onAppear({ [unowned self] in
+            self.startLoading()
+        })
+        self._view.onDisappear({ [unowned self] in
+            self.stopLoading()
+        })
     }
     
     public func loadIfNeeded() {
