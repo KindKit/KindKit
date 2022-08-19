@@ -65,6 +65,12 @@ public extension Api.Request.Body {
                     }
                 }
             }
+            do {
+                let footerString = "--\(boundary)--\r\n"
+                if let footerData = footerString.data(using: .ascii) {
+                    data.append(footerData)
+                }
+            }
             return (data: data, [
                 .contentType("multipart/form-data; boundary=\(boundary)"),
                 .contentLength(data.count)
