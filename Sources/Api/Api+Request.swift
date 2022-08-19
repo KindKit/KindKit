@@ -74,10 +74,11 @@ public extension Api {
                 let build = try body.build()
                 urlRequest.httpBody = build.data
                 headers.append(contentsOf: build.headers)
-            } else {
+            }
+            if self.headers.isEmpty == false {
                 headers.append(contentsOf: self.headers)
             }
-            if headers.count > 0 {
+            if headers.isEmpty == false {
                 var httpHeaders: [String : String] = [:]
                 for header in headers {
                     httpHeaders[header.name] = header.value
