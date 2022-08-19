@@ -55,8 +55,8 @@ public extension Api {
                     }
                 }
                 if params.count > 0 {
-                    components.queryItems = try params.compactMap({
-                        return URLQueryItem(name: try $0.name.encoded, value: try $0.value.encoded)
+                    components.queryItems = params.compactMap({
+                        return URLQueryItem(name: $0.name.string, value: $0.value.string)
                     })
                 }
             }
