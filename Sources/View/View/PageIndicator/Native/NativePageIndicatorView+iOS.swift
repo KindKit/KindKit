@@ -35,38 +35,22 @@ extension PageIndicatorView {
     
 }
 
-final class NativePageIndicatorView : UIView {
+final class NativePageIndicatorView : UIPageControl {
     
     unowned var customDelegate: PageIndicatorViewDelegate?
     
     private unowned var _view: PageIndicatorView?
-    private var _pageControl: UIPageControl!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self._pageControl = UIPageControl()
-        self._pageControl.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
-        self.addSubview(self._pageControl)
+        self.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        let bounds = self.bounds
-        let progressSize = self._pageControl.sizeThatFits(bounds.size)
-        self._pageControl.frame = CGRect(
-            x: bounds.midX - (progressSize.width / 2),
-            y: bounds.midY - (progressSize.height / 2),
-            width: progressSize.width,
-            height: progressSize.height
-        )
     }
     
 }
@@ -89,19 +73,19 @@ extension NativePageIndicatorView {
     }
     
     func update(pageColor: Color) {
-        self._pageControl.pageIndicatorTintColor = pageColor.native
+        self.pageIndicatorTintColor = pageColor.native
     }
     
     func update(currentPageColor: Color) {
-        self._pageControl.currentPageIndicatorTintColor = currentPageColor.native
+        self.currentPageIndicatorTintColor = currentPageColor.native
     }
     
     func update(currentPage: Float) {
-        self._pageControl.currentPage = Int(currentPage)
+        self.currentPage = Int(currentPage)
     }
     
     func update(numberOfPages: UInt) {
-        self._pageControl.numberOfPages = Int(numberOfPages)
+        self.numberOfPages = Int(numberOfPages)
         self.setNeedsLayout()
     }
     
@@ -117,7 +101,7 @@ private extension NativePageIndicatorView {
     @objc
     func _changed(_ sender: Any) {
         self.customDelegate?.changed(
-            currentPage: Float(self._pageControl.currentPage)
+            currentPage: Float(self.currentPage)
         )
     }
     

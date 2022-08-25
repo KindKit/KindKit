@@ -57,6 +57,13 @@ final class NativePagingView : UIScrollView {
                     self.updateShadowPath()
                 }
                 if oldValue.size != value.size {
+                    if self._revalidatePage == nil {
+                        self._revalidatePage = Self._currentPage(
+                            viewportSize: oldValue.size,
+                            contentOffset: self.contentOffset,
+                            contentSize: self.contentSize
+                        )
+                    }
                     self.needLayoutContent = true
                 }
             }
@@ -83,6 +90,7 @@ final class NativePagingView : UIScrollView {
             self.setNeedsLayout()
         }
     }
+    private var _revalidatePage: Float?
     private var _isLayout: Bool
     
     override init(frame: CGRect) {
@@ -123,10 +131,10 @@ final class NativePagingView : UIScrollView {
         super.layoutSubviews()
         
         self._safeLayout({
-            let bounds = RectFloat(self.bounds)
             if self.needLayoutContent == true {
                 self.needLayoutContent = false
                 
+                let bounds = RectFloat(self.bounds)
                 let layoutBounds: RectFloat
                 if #available(iOS 11.0, *) {
                     let inset = InsetFloat(self.adjustedContentInset)
@@ -144,15 +152,23 @@ final class NativePagingView : UIScrollView {
                 let size = self._layoutManager.size
                 self.contentSize = size.cgSize
                 self.customDelegate?._update(
-                    numberOfPages: self._numberOfPages(
+                    numberOfPages: Self._numberOfPages(
                         bounds: bounds,
                         contentSize: size
                     ),
                     contentSize: size
                 )
+                if let page = self._revalidatePage {
+                    self.contentOffset = Self._contentOffset(
+                        currentPage: page,
+                        viewportSize: bounds.size,
+                        contentSize: size
+                    )
+                    self._revalidatePage = nil
+                }
             }
             self._layoutManager.visible(
-                bounds: bounds,
+                bounds: RectFloat(self.bounds),
                 inset: self._visibleInset
             )
         })
@@ -209,33 +225,18 @@ extension NativePagingView {
     }
     
     func update(direction: PagingViewDirection, currentPage: Float, numberOfPages: UInt) {
-        if currentPage > .leastNonzeroMagnitude {
-            switch direction {
-            case .horizontal:
-                let s = self.contentSize.width
-                if s > .leastNonzeroMagnitude {
-                    let p = s / CGFloat(numberOfPages)
-                    self.contentOffset = CGPoint(x: p * CGFloat(currentPage), y: 0)
-                } else {
-                    self.contentOffset = .zero
-                }
-            case .vertical:
-                let s = self.contentSize.height
-                if s > .leastNonzeroMagnitude {
-                    let p = s / CGFloat(numberOfPages)
-                    self.contentOffset = CGPoint(x: 0, y: p * CGFloat(currentPage))
-                } else {
-                    self.contentOffset = .zero
-                }
-            }
-        } else {
-            self.contentOffset = .zero
-        }
+        self.contentOffset = Self._contentOffset(
+            direction: direction,
+            currentPage: currentPage,
+            numberOfPages: numberOfPages,
+            contentSize: self.contentSize
+        )
     }
     
     func cleanup() {
         self._layoutManager.layout = nil
         self.customDelegate = nil
+        self._revalidatePage = nil
         self._view = nil
     }
     
@@ -243,19 +244,71 @@ extension NativePagingView {
 
 private extension NativePagingView {
     
-    func _currentPage() -> Float {
-        let bounds = self.bounds
-        let contentOffset = self.contentOffset
-        let contentSize = self.contentSize
-        if contentSize.width > bounds.width {
-            return Float(contentOffset.x / bounds.width)
-        } else if contentSize.height > bounds.height {
-            return Float(contentOffset.y / bounds.height)
+    static func _contentOffset(
+        direction: PagingViewDirection,
+        currentPage: Float,
+        numberOfPages: UInt,
+        contentSize: CGSize
+    ) -> CGPoint {
+        if currentPage > .leastNonzeroMagnitude {
+            switch direction {
+            case .horizontal:
+                let s = contentSize.width
+                if s > .leastNonzeroMagnitude {
+                    let p = s / CGFloat(numberOfPages)
+                    return CGPoint(x: p * CGFloat(currentPage), y: 0)
+                }
+            case .vertical:
+                let s = contentSize.height
+                if s > .leastNonzeroMagnitude {
+                    let p = s / CGFloat(numberOfPages)
+                    return CGPoint(x: 0, y: p * CGFloat(currentPage))
+                }
+            }
+        }
+        return .zero
+    }
+    
+    static func _contentOffset(
+        currentPage: Float,
+        viewportSize: SizeFloat,
+        contentSize: SizeFloat
+    ) -> CGPoint {
+        if currentPage > .leastNonzeroMagnitude {
+            if contentSize.width > viewportSize.width {
+                let s = contentSize.width
+                if s > .leastNonzeroMagnitude {
+                    let p = s / (contentSize.width / viewportSize.width)
+                    return CGPoint(x: CGFloat(p * currentPage), y: 0)
+                }
+            } else if contentSize.height > viewportSize.height {
+                let s = contentSize.height
+                if s > .leastNonzeroMagnitude {
+                    let p = s / (contentSize.height / viewportSize.height)
+                    return CGPoint(x: 0, y: CGFloat(p * currentPage))
+                }
+            }
+        }
+        return .zero
+    }
+    
+    static func _currentPage(
+        viewportSize: CGSize,
+        contentOffset: CGPoint,
+        contentSize: CGSize
+    ) -> Float {
+        if contentSize.width > viewportSize.width {
+            return Float(contentOffset.x / viewportSize.width)
+        } else if contentSize.height > viewportSize.height {
+            return Float(contentOffset.y / viewportSize.height)
         }
         return 0
     }
     
-    func _numberOfPages(bounds: RectFloat, contentSize: SizeFloat) -> UInt {
+    static func _numberOfPages(
+        bounds: RectFloat,
+        contentSize: SizeFloat
+    ) -> UInt {
         if contentSize.width > bounds.width {
             return UInt(contentSize.width / bounds.width)
         } else if contentSize.height > bounds.height {
@@ -281,7 +334,13 @@ extension NativePagingView : UIScrollViewDelegate {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.customDelegate?._paginging(currentPage: self._currentPage())
+        self.customDelegate?._paginging(
+            currentPage: Self._currentPage(
+                viewportSize: self.bounds.size,
+                contentOffset: self.contentOffset,
+                contentSize: self.contentSize
+            )
+        )
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
