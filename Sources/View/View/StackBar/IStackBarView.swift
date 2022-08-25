@@ -31,41 +31,93 @@ public protocol IStackBarView : IBarView {
     var footerView: IView? { set get }
     
     var footerSpacing: Float { set get }
-    
-    @discardableResult
-    func inset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func headerView(_ value: IView?) -> Self
-    
-    @discardableResult
-    func headerSpacing(_ value: Float) -> Self
-    
-    @discardableResult
-    func leadingViews(_ value: [IView]) -> Self
-    
-    @discardableResult
-    func leadingViewSpacing(_ value: Float) -> Self
-    
-    @discardableResult
-    func centerView(_ value: IView?) -> Self
-    
-    @discardableResult
-    func centerFilling(_ value: Bool) -> Self
-    
-    @discardableResult
-    func centerSpacing(_ value: Float) -> Self
-    
-    @discardableResult
-    func trailingViews(_ value: [IView]) -> Self
-    
-    @discardableResult
-    func trailingViewSpacing(_ value: Float) -> Self
-    
-    @discardableResult
-    func footerView(_ value: IView?) -> Self
-    
-    @discardableResult
-    func footerSpacing(_ value: Float) -> Self
 
+}
+
+public extension IStackBarView {
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: InsetFloat) -> Self {
+        self.inset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func headerView(_ value: IView?) -> Self {
+        self.headerView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func headerSpacing(_ value: Float) -> Self {
+        self.headerSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadingViews(_ value: [IView]) -> Self {
+        self.leadingViews = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadingViewSpacing(_ value: Float) -> Self {
+        self.leadingViewSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerView(_ value: IView?) -> Self {
+        self.centerView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerFilling(_ value: Bool) -> Self {
+        self.centerFilling = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerSpacing(_ value: Float) -> Self {
+        self.centerSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailingViews(_ value: [IView]) -> Self {
+        self.trailingViews = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailingViewSpacing(_ value: Float) -> Self {
+        self.trailingViewSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func footerView(_ value: IView?) -> Self {
+        self.footerView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func footerSpacing(_ value: Float) -> Self {
+        self.footerSpacing = value
+        return self
+    }
+    
 }

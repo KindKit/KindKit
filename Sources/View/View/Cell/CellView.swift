@@ -171,74 +171,8 @@ public final class CellView< ContentView : IView > : ICellView {
     }
     
     @discardableResult
-    public func shouldHighlighting(_ value: Bool) -> Self {
-        self._view.shouldHighlighting(value)
-        return self
-    }
-    
-    @discardableResult
-    public func highlight(_ value: Bool) -> Self {
-        self._view.highlight(value)
-        return self
-    }
-    
-    @discardableResult
-    public func lock(_ value: Bool) -> Self {
-        self._view.lock(value)
-        return self
-    }
-    
-    @discardableResult
-    public func select(_ value: Bool) -> Self {
-        self.isSelected = value
-        return self
-    }
-    
-    @discardableResult
-    public func shouldPressed(_ value: Bool) -> Self {
-        self.shouldPressed = value
-        return self
-    }
-    
-    @discardableResult
     public func contentView(_ value: ContentView) -> Self {
         self.contentView = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self._view.color(value)
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self._view.border(value)
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self._view.cornerRadius(value)
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self._view.shadow(value)
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self._view.alpha(value)
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self._view.hidden(value)
         return self
     }
     

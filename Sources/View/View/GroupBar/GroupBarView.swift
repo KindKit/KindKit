@@ -80,30 +80,6 @@ public final class GroupBarView : BarView, IGroupBarView {
         )
     }
     
-    @discardableResult
-    public func itemInset(_ value: InsetFloat) -> Self {
-        self.itemInset = value
-        return self
-    }
-    
-    @discardableResult
-    public func itemSpacing(_ value: Float) -> Self {
-        self.itemSpacing = value
-        return self
-    }
-    
-    @discardableResult
-    public func itemViews(_ value: [IBarItemView]) -> Self {
-        self.itemViews = value
-        return self
-    }
-    
-    @discardableResult
-    public func selectedItemView(_ value: IBarItemView?) -> Self {
-        self.selectedItemView = value
-        return self
-    }
-    
 }
 
 extension GroupBarView : IBarItemViewDelegate {

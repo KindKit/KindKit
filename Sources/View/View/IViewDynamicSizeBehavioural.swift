@@ -12,34 +12,50 @@ public protocol IViewDynamicSizeBehavioural : AnyObject {
     
     var height: DynamicSizeBehaviour { set get }
     
-    @discardableResult
-    func width(_ value: DynamicSizeBehaviour) -> Self
+}
+
+public extension IViewDynamicSizeBehavioural {
     
+    @inlinable
     @discardableResult
-    func height(_ value: DynamicSizeBehaviour) -> Self
+    func width(_ value: DynamicSizeBehaviour) -> Self {
+        self.width = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func height(_ value: DynamicSizeBehaviour) -> Self {
+        self.height = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewDynamicSizeBehavioural {
+public extension IWidgetView where Body : IViewDynamicSizeBehavioural {
     
-    public var width: DynamicSizeBehaviour {
+    @inlinable
+    var width: DynamicSizeBehaviour {
         set(value) { self.body.width = value }
         get { return self.body.width }
     }
     
-    public var height: DynamicSizeBehaviour {
+    @inlinable
+    var height: DynamicSizeBehaviour {
         set(value) { self.body.height = value }
         get { return self.body.height }
     }
     
+    @inlinable
     @discardableResult
-    public func width(_ value: DynamicSizeBehaviour) -> Self {
+    func width(_ value: DynamicSizeBehaviour) -> Self {
         self.body.width(value)
         return self
     }
     
+    @inlinable
     @discardableResult
-    public func height(_ value: DynamicSizeBehaviour) -> Self {
+    func height(_ value: DynamicSizeBehaviour) -> Self {
         self.body.height(value)
         return self
     }

@@ -19,8 +19,16 @@ public protocol IBarItemView : IView, IViewSelectable, IViewHighlightable, IView
     var contentInset: InsetFloat { set get }
     
     var contentView: IView { set get }
-    
-    @discardableResult
-    func contentInset(_ value: InsetFloat) -> Self
 
+}
+
+public extension IBarItemView {
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: InsetFloat) -> Self {
+        self.contentInset = value
+        return self
+    }
+    
 }

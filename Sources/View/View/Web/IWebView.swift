@@ -58,15 +58,6 @@ public protocol IWebView : IView, IViewStaticSizeBehavioural, IViewColorable, IV
     func evaluate< Result >(javaScript: String, success: @escaping (Result) -> Void, failure: @escaping (Error) -> Void)
     
     @discardableResult
-    func enablePinchGesture(_ value: Bool) -> Self
-    
-    @discardableResult
-    func contentInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func request(_ value: WebViewRequest) -> Self
-    
-    @discardableResult
     func onContentSize(_ value: (() -> Void)?) -> Self
     
     @discardableResult
@@ -78,4 +69,29 @@ public protocol IWebView : IView, IViewStaticSizeBehavioural, IViewColorable, IV
     @discardableResult
     func onDecideNavigation(_ value: ((_ request: URLRequest) -> WebViewNavigationPolicy)?) -> Self
 
+}
+
+public extension IWebView {
+    
+    @inlinable
+    @discardableResult
+    func enablePinchGesture(_ value: Bool) -> Self {
+        self.enablePinchGesture = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: InsetFloat) -> Self {
+        self.contentInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func request(_ value: WebViewRequest) -> Self {
+        self.request = value
+        return self
+    }
+    
 }

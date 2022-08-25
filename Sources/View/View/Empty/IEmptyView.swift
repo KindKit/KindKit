@@ -10,7 +10,15 @@ public protocol IEmptyView : IView, IViewStaticSizeBehavioural, IViewColorable, 
     
     var aspectRatio: Float? { set get }
     
+}
+
+public extension IEmptyView {
+    
+    @inlinable
     @discardableResult
-    func aspectRatio(_ value: Float?) -> Self
+    func aspectRatio(_ value: Float?) -> Self {
+        self.aspectRatio = value
+        return self
+    }
     
 }

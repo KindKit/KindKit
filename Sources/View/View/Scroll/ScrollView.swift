@@ -72,6 +72,13 @@ public final class ScrollView< Layout : ILayout > : IScrollView {
             self._view.update(indicatorDirection: self.indicatorDirection)
         }
     }
+    public var visibleInset: InsetFloat {
+        didSet(oldValue) {
+            guard self.visibleInset != oldValue else { return }
+            guard self.isLoaded == true else { return }
+            self._view.update(visibleInset: self.visibleInset)
+        }
+    }
     public var contentInset: InsetFloat {
         didSet(oldValue) {
             guard self.contentInset != oldValue else { return }
@@ -87,13 +94,6 @@ public final class ScrollView< Layout : ILayout > : IScrollView {
             }
         }
         get { return self._contentOffset }
-    }
-    public var visibleInset: InsetFloat {
-        didSet(oldValue) {
-            guard self.visibleInset != oldValue else { return }
-            guard self.isLoaded == true else { return }
-            self._view.update(visibleInset: self.visibleInset)
-        }
     }
     public private(set) var contentSize: SizeFloat
     public var contentLayout: Layout {
@@ -363,6 +363,21 @@ public final class ScrollView< Layout : ILayout > : IScrollView {
         )
     }
     
+    @discardableResult
+    public func contentOffset(_ value: PointFloat, normalized: Bool) -> Self {
+        self._contentOffset = value
+        if self.isLoaded == true {
+            self._view.update(contentOffset: value, normalized: normalized)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func contentLayout(_ value: Layout) -> Self {
+        self.contentLayout = value
+        return self
+    }
+    
     #if os(iOS)
     
     @available(iOS 10.0, *)
@@ -380,104 +395,6 @@ public final class ScrollView< Layout : ILayout > : IScrollView {
     }
     
     #endif
-    
-    @discardableResult
-    public func width(_ value: DynamicSizeBehaviour) -> Self {
-        self.width = value
-        return self
-    }
-    
-    @discardableResult
-    public func height(_ value: DynamicSizeBehaviour) -> Self {
-        self.height = value
-        return self
-    }
-    
-    @discardableResult
-    public func direction(_ value: ScrollViewDirection) -> Self {
-        self.direction = value
-        return self
-    }
-    
-    @discardableResult
-    public func indicatorDirection(_ value: ScrollViewDirection) -> Self {
-        self.indicatorDirection = value
-        return self
-    }
-    
-    @discardableResult
-    public func visibleInset(_ value: InsetFloat) -> Self {
-        self.visibleInset = value
-        return self
-    }
-    
-    @discardableResult
-    public func contentInset(_ value: InsetFloat) -> Self {
-        self.contentInset = value
-        return self
-    }
-    
-    @discardableResult
-    public func contentOffset(_ value: PointFloat, normalized: Bool) -> Self {
-        self._contentOffset = value
-        if self.isLoaded == true {
-            self._view.update(contentOffset: value, normalized: normalized)
-        }
-        return self
-    }
-    
-    #if os(iOS)
-    
-    @available(iOS 10.0, *)
-    @discardableResult
-    public func refreshColor(_ value: Color?) -> Self {
-        self.refreshColor = value
-        return self
-    }
-    
-    #endif
-    
-    @discardableResult
-    public func contentLayout(_ value: Layout) -> Self {
-        self.contentLayout = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self.border = value
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self.cornerRadius = value
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self.shadow = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self.isHidden = value
-        return self
-    }
     
     @discardableResult
     public func onAppear(_ value: (() -> Void)?) -> Self {

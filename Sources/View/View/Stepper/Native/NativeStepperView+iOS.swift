@@ -37,11 +37,9 @@ extension StepperView {
 
 final class NativeStepperView : UIView {
     
-    typealias View = IView & IViewCornerRadiusable & IViewShadowable
-    
     unowned var customDelegate: StepperViewDelegate?
     
-    private unowned var _view: View?
+    private unowned var _view: StepperView?
     private var _stepper: UIStepper!
     
     override init(frame: CGRect) {

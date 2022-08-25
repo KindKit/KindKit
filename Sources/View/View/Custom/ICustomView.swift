@@ -22,8 +22,23 @@ public protocol ICustomView : IView, IViewDynamicSizeBehavioural, IViewHighlight
     
     @discardableResult
     func remove(gesture: IGesture) -> Self
-    
-    @discardableResult
-    func shouldHighlighting(_ value: Bool) -> Self
 
+}
+
+public extension ICustomView {
+    
+    @inlinable
+    @discardableResult
+    func shouldHighlighting(_ value: Bool) -> Self {
+        self.shouldHighlighting = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func gestures(_ value: [IGesture]) -> Self {
+        self.gestures = value
+        return self
+    }
+    
 }

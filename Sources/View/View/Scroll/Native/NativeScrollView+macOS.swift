@@ -56,8 +56,8 @@ final class NativeScrollView : NSScrollView {
     }
     override var frame: CGRect {
         set(value) {
-            if super.frame != value {
-                let oldValue = value
+            let oldValue = super.frame
+            if oldValue != value {
                 super.frame = value
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)

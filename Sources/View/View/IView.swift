@@ -27,9 +27,6 @@ public protocol IView : IBaseView {
     func invisible()
     
     @discardableResult
-    func hidden(_ value: Bool) -> Self
-    
-    @discardableResult
     func onVisible(_ value: (() -> Void)?) -> Self
     
     @discardableResult
@@ -45,6 +42,13 @@ public extension IView {
     @inlinable
     var isAppeared: Bool {
         return self.layout != nil
+    }
+    
+    @inlinable
+    @discardableResult
+    func hidden(_ value: Bool) -> Self {
+        self.isHidden = value
+        return self
     }
     
     @inlinable

@@ -15,14 +15,16 @@ public protocol IViewStyleable : AnyObject {
     
 }
 
-extension IWidgetView where Body : IViewStyleable {
+public extension IWidgetView where Body : IViewStyleable {
     
-    public func triggeredChangeStyle(_ userInteraction: Bool) {
+    @inlinable
+    func triggeredChangeStyle(_ userInteraction: Bool) {
         self.body.triggeredChangeStyle(userInteraction)
     }
     
+    @inlinable
     @discardableResult
-    public func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
+    func onChangeStyle(_ value: ((_ userInteraction: Bool) -> Void)?) -> Self {
         self.body.onChangeStyle(value)
         return self
     }

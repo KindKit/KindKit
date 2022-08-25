@@ -20,22 +20,50 @@ public protocol IStepperView : IView, IViewStaticSizeBehavioural, IViewColorable
     
     var isWraps: Bool { set get }
     
-    @discardableResult
-    func minValue(_ value: Float) -> Self
+}
+
+public extension IStepperView {
     
+    @inlinable
     @discardableResult
-    func maxValue(_ value: Float) -> Self
+    func minValue(_ value: Float) -> Self {
+        self.minValue = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func stepValue(_ value: Float) -> Self
+    func maxValue(_ value: Float) -> Self {
+        self.maxValue = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func value(_ value: Float) -> Self
+    func stepValue(_ value: Float) -> Self {
+        self.stepValue = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func isAutorepeat(_ value: Bool) -> Self
+    func value(_ value: Float) -> Self {
+        self.value = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func isWraps(_ value: Bool) -> Self
+    func isAutorepeat(_ value: Bool) -> Self {
+        self.isAutorepeat = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func isWraps(_ value: Bool) -> Self {
+        self.isWraps = value
+        return self
+    }
     
 }

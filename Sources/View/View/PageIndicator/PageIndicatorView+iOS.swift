@@ -2,11 +2,19 @@
 //  KindKitView
 //
 
+#if os(iOS)
+
 import Foundation
 import KindKitCore
 import KindKitMath
 
-public final class ImageView : IImageView {
+protocol PageIndicatorViewDelegate : AnyObject {
+    
+    func changed(currentPage: Float)
+    
+}
+
+public final class PageIndicatorView : IPageIndicatorView {
     
     public private(set) unowned var layout: ILayout?
     public unowned var item: LayoutItem?
@@ -27,36 +35,56 @@ public final class ImageView : IImageView {
             self.setNeedForceLayout()
         }
     }
-    public var width: DynamicSizeBehaviour {
+    public var width: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var height: DynamicSizeBehaviour {
+    public var height: StaticSizeBehaviour {
         didSet {
             guard self.isLoaded == true else { return }
             self.setNeedForceLayout()
         }
     }
-    public var aspectRatio: Float? {
+    public var pageColor: Color {
         didSet {
             guard self.isLoaded == true else { return }
-            self.setNeedForceLayout()
+            self._view.update(pageColor: self.pageColor)
         }
     }
-    public var image: Image {
+    public var currentPageColor: Color {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(image: self.image)
-            self.setNeedForceLayout()
+            self._view.update(currentPageColor: self.currentPageColor)
         }
     }
-    public var mode: ImageViewMode {
+    public var currentPage: Float {
+        set(value) {
+            if self._currentPage != value {
+                self._currentPage = value
+                self.pagingView?.currentPage = value
+                if self.isLoaded == true {
+                    self._view.update(currentPage: self.currentPage)
+                }
+            }
+        }
+        get { return self._currentPage }
+    }
+    public var numberOfPages: UInt {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(mode: self.mode)
-            self.setNeedForceLayout()
+            self._view.update(numberOfPages: self.numberOfPages)
+        }
+    }
+    public unowned var pagingView: IPagingView? {
+        willSet(newValue) {
+            guard self.pagingView !== newValue else { return }
+            self.pagingView?.remove(pageIndicator: self)
+        }
+        didSet(oldValue) {
+            guard self.pagingView !== oldValue else { return }
+            self.pagingView?.add(pageIndicator: self)
         }
     }
     public var color: Color? {
@@ -65,22 +93,16 @@ public final class ImageView : IImageView {
             self._view.update(color: self.color)
         }
     }
-    public var tintColor: Color? {
+    public var border: ViewBorder {
         didSet {
             guard self.isLoaded == true else { return }
-            self._view.update(tintColor: self.tintColor)
+            self._view.update(border: self.border)
         }
     }
     public var cornerRadius: ViewCornerRadius {
         didSet {
             guard self.isLoaded == true else { return }
             self._view.update(cornerRadius: self.cornerRadius)
-        }
-    }
-    public var border: ViewBorder {
-        didSet {
-            guard self.isLoaded == true else { return }
-            self._view.update(border: self.border)
         }
     }
     public var shadow: ViewShadow? {
@@ -100,6 +122,7 @@ public final class ImageView : IImageView {
     private var _view: Reusable.Content {
         return self._reuse.content()
     }
+    private var _currentPage: Float
     private var _onAppear: (() -> Void)?
     private var _onDisappear: (() -> Void)?
     private var _onVisible: (() -> Void)?
@@ -107,15 +130,13 @@ public final class ImageView : IImageView {
     private var _onInvisible: (() -> Void)?
     
     public init(
-        reuseBehaviour: ReuseItemBehaviour = .unloadWhenDisappear,
-        reuseName: String? = nil,
-        width: DynamicSizeBehaviour = .fit,
-        height: DynamicSizeBehaviour = .fit,
-        aspectRatio: Float? = nil,
-        image: Image,
-        mode: ImageViewMode = .aspectFit,
+        width: StaticSizeBehaviour = .fill,
+        height: StaticSizeBehaviour,
+        pageColor: Color,
+        currentPageColor: Color,
+        currentPage: Float = 0,
+        numberOfPages: UInt = 0,
         color: Color? = nil,
-        tintColor: Color? = nil,
         border: ViewBorder = .none,
         cornerRadius: ViewCornerRadius = .none,
         shadow: ViewShadow? = nil,
@@ -125,17 +146,17 @@ public final class ImageView : IImageView {
         self.isVisible = false
         self.width = width
         self.height = height
-        self.aspectRatio = aspectRatio
-        self.image = image
-        self.mode = mode
+        self.pageColor = pageColor
+        self.currentPageColor = currentPageColor
+        self._currentPage = currentPage
+        self.numberOfPages = numberOfPages
         self.color = color
-        self.tintColor = tintColor
         self.border = border
         self.cornerRadius = cornerRadius
         self.shadow = shadow
         self.alpha = alpha
         self.isHidden = isHidden
-        self._reuse = ReuseItem(behaviour: reuseBehaviour, name: reuseName)
+        self._reuse = ReuseItem()
         self._reuse.configure(owner: self)
     }
     
@@ -149,70 +170,10 @@ public final class ImageView : IImageView {
     
     public func size(available: SizeFloat) -> SizeFloat {
         guard self.isHidden == false else { return .zero }
-        return DynamicSizeBehaviour.apply(
+        return StaticSizeBehaviour.apply(
             available: available,
             width: self.width,
-            height: self.height,
-            sizeWithWidth: {
-                switch self.mode {
-                case .origin:
-                    if let aspectRatio = self.aspectRatio {
-                        return SizeFloat(width: $0, height: $0 / aspectRatio)
-                    }
-                    return image.size
-                case .aspectFit, .aspectFill:
-                    let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
-                    return SizeFloat(width: $0, height: $0 / aspectRatio)
-                }
-            },
-            sizeWithHeight: {
-                switch self.mode {
-                case .origin:
-                    if let aspectRatio = self.aspectRatio {
-                        return SizeFloat(width: $0 * aspectRatio, height: $0)
-                    }
-                    return image.size
-                case .aspectFit, .aspectFill:
-                    let aspectRatio = self.aspectRatio ?? self.image.size.aspectRatio
-                    return SizeFloat(width: $0 * aspectRatio, height: $0)
-                }
-            },
-            size: {
-                switch self.mode {
-                case .origin:
-                    if let aspectRatio = self.aspectRatio {
-                        if available.width.isInfinite == true && available.height.isInfinite == false {
-                            return SizeFloat(
-                                width: available.height * aspectRatio,
-                                height: available.height
-                            )
-                        } else if available.width.isInfinite == false && available.height.isInfinite == true {
-                            return SizeFloat(
-                                width: available.width,
-                                height: available.width / aspectRatio
-                            )
-                        }
-                    }
-                    return self.image.size
-                case .aspectFit, .aspectFill:
-                    if available.isInfinite == true {
-                        return self.image.size
-                    } else if available.width.isInfinite == true {
-                        let aspectRatio = self.image.size.aspectRatio
-                        return SizeFloat(
-                            width: available.height * aspectRatio,
-                            height: available.height
-                        )
-                    } else if available.height.isInfinite == true {
-                        let aspectRatio = self.image.size.aspectRatio
-                        return SizeFloat(
-                            width: available.width,
-                            height: available.width / aspectRatio
-                        )
-                    }
-                    return self.image.size.aspectFit(available)
-                }
-            }
+            height: self.height
         )
     }
     
@@ -270,5 +231,18 @@ public final class ImageView : IImageView {
         self._onInvisible = value
         return self
     }
-
+    
 }
+
+extension PageIndicatorView : PageIndicatorViewDelegate {
+    
+    func changed(currentPage: Float) {
+        if self._currentPage != currentPage {
+            self._currentPage = currentPage
+            self.pagingView?.scrollTo(page: UInt(currentPage))
+        }
+    }
+    
+}
+
+#endif

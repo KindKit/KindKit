@@ -37,37 +37,6 @@ public protocol IInputListView : IInputView, IViewStaticSizeBehavioural, IViewCo
     #endif
     
     @discardableResult
-    func items(_ value: [IInputListViewItem]) -> Self
-    
-    @discardableResult
-    func selectedItem(_ value: IInputListViewItem?) -> Self
-    
-    @discardableResult
-    func textFont(_ value: Font) -> Self
-    
-    @discardableResult
-    func textColor(_ value: Color) -> Self
-    
-    @discardableResult
-    func textInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func placeholder(_ value: InputPlaceholder) -> Self
-    
-    @discardableResult
-    func placeholderInset(_ value: InsetFloat?) -> Self
-    
-    @discardableResult
-    func alignment(_ value: TextAlignment) -> Self
-    
-    #if os(iOS)
-    
-    @discardableResult
-    func toolbar(_ value: IInputToolbarView?) -> Self
-    
-    #endif
-    
-    @discardableResult
     func onBeginEditing(_ value: (() -> Void)?) -> Self
     
     @discardableResult
@@ -75,5 +44,76 @@ public protocol IInputListView : IInputView, IViewStaticSizeBehavioural, IViewCo
     
     @discardableResult
     func onEndEditing(_ value: (() -> Void)?) -> Self
+    
+}
+
+public extension IInputListView {
+    
+    @inlinable
+    @discardableResult
+    func items(_ value: [IInputListViewItem]) -> Self {
+        self.items = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selectedItem(_ value: IInputListViewItem?) -> Self {
+        self.selectedItem = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textFont(_ value: Font) -> Self {
+        self.textFont = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textColor(_ value: Color) -> Self {
+        self.textColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textInset(_ value: InsetFloat) -> Self {
+        self.textInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: InputPlaceholder) -> Self {
+        self.placeholder = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderInset(_ value: InsetFloat?) -> Self {
+        self.placeholderInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: TextAlignment) -> Self {
+        self.alignment = value
+        return self
+    }
+        
+    #if os(iOS)
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: IInputToolbarView?) -> Self {
+        self.toolbar = value
+        return self
+    }
+    
+    #endif
     
 }

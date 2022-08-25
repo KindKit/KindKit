@@ -166,48 +166,6 @@ public final class GraphicsView : IGraphicsView {
     }
     
     @discardableResult
-    public func width(_ value: StaticSizeBehaviour) -> Self {
-        self.width = value
-        return self
-    }
-    
-    @discardableResult
-    public func height(_ value: StaticSizeBehaviour) -> Self {
-        self.height = value
-        return self
-    }
-    
-    @discardableResult
-    public func canvas(_ value: IGraphicsCanvas) -> Self {
-        self.canvas = value
-        return self
-    }
-    
-    @discardableResult
-    public func lock(_ value: Bool) -> Self {
-        self.isLocked = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self.isHidden = value
-        return self
-    }
-    
-    @discardableResult
     public func onAppear(_ value: (() -> Void)?) -> Self {
         self._onAppear = value
         return self

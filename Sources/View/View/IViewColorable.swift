@@ -10,20 +10,32 @@ public protocol IViewColorable : AnyObject {
     
     var color: Color? { set get }
     
-    @discardableResult
-    func color(_ value: Color?) -> Self
     
 }
 
-extension IWidgetView where Body : IViewColorable {
+public extension IViewColorable {
     
-    public var color: Color? {
+    @inlinable
+    @discardableResult
+    func color(_ value: Color?) -> Self {
+        self.color = value
+        return self
+    }
+    
+}
+
+
+public extension IWidgetView where Body : IViewColorable {
+    
+    @inlinable
+    var color: Color? {
         set(value) { self.body.color = value }
         get { return self.body.color }
     }
     
+    @inlinable
     @discardableResult
-    public func color(_ value: Color?) -> Self {
+    func color(_ value: Color?) -> Self {
         self.body.color(value)
         return self
     }

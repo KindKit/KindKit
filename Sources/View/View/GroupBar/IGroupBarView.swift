@@ -23,17 +23,37 @@ public protocol IGroupBarView : IBarView {
     var itemViews: [IBarItemView] { set get }
     
     var selectedItemView: IBarItemView? { set get }
-    
-    @discardableResult
-    func itemInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func itemSpacing(_ value: Float) -> Self
-    
-    @discardableResult
-    func itemViews(_ value: [IBarItemView]) -> Self
-    
-    @discardableResult
-    func selectedItemView(_ value: IBarItemView?) -> Self
 
+}
+
+public extension IGroupBarView {
+    
+    @inlinable
+    @discardableResult
+    func itemInset(_ value: InsetFloat) -> Self {
+        self.itemInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func itemSpacing(_ value: Float) -> Self {
+        self.itemSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func itemViews(_ value: [IBarItemView]) -> Self {
+        self.itemViews = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selectedItemView(_ value: IBarItemView?) -> Self {
+        self.selectedItemView = value
+        return self
+    }
+    
 }

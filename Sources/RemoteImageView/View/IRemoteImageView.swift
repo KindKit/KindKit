@@ -24,21 +24,6 @@ public protocol IRemoteImageView : IView, IViewColorable, IViewBorderable, IView
     func stopLoading() -> Self
     
     @discardableResult
-    func placeholderView(_ value: IImageView) -> Self
-    
-    @discardableResult
-    func progressView(_ value: IProgressView?) -> Self
-    
-    @discardableResult
-    func errorView(_ value: IView?) -> Self
-    
-    @discardableResult
-    func query(_ value: IRemoteImageQuery) -> Self
-    
-    @discardableResult
-    func filter(_ value: IRemoteImageFilter?) -> Self
-    
-    @discardableResult
     func onProgress(_ value: ((_ progress: Float) -> Void)?) -> Self
     
     @discardableResult
@@ -47,4 +32,43 @@ public protocol IRemoteImageView : IView, IViewColorable, IViewBorderable, IView
     @discardableResult
     func onError(_ value: ((_ error: Error) -> Void)?) -> Self
 
+}
+
+public extension IRemoteImageView {
+    
+    @inlinable
+    @discardableResult
+    func placeholderView(_ value: IImageView) -> Self {
+        self.placeholderView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func progressView(_ value: IProgressView?) -> Self {
+        self.progressView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func errorView(_ value: IView?) -> Self {
+        self.errorView = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func query(_ value: IRemoteImageQuery) -> Self {
+        self.query = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func filter(_ value: IRemoteImageFilter?) -> Self {
+        self.filter = value
+        return self
+    }
+    
 }

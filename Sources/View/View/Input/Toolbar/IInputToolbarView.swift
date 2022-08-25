@@ -28,20 +28,44 @@ public protocol IInputToolbarView : IAccessoryView, IViewColorable {
     
     var contentTintColor: Color { set get }
     
-    @discardableResult
-    func items(_ value: [IInputToolbarItem]) -> Self
+}
+
+public extension IInputToolbarView {
     
+    @inlinable
     @discardableResult
-    func size(available value: Float) -> Self
+    func items(_ value: [IInputToolbarItem]) -> Self {
+        self.items = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func translucent(_ value: Bool) -> Self
+    func size(available value: Float) -> Self {
+        self.size = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func barTintColor(_ value: Color?) -> Self
+    func translucent(_ value: Bool) -> Self {
+        self.isTranslucent = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func contentTintColor(_ value: Color) -> Self
+    func barTintColor(_ value: Color?) -> Self {
+        self.barTintColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentTintColor(_ value: Color) -> Self {
+        self.contentTintColor = value
+        return self
+    }
     
 }
 

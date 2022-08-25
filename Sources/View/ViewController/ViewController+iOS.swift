@@ -29,9 +29,6 @@ public final class ViewController : UIViewController {
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return self.container.supportedOrientations
     }
-    public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return self._interfaceOrientation()
-    }
     public override var shouldAutorotate: Bool {
         return true
     }

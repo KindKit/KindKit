@@ -12,8 +12,16 @@ public protocol IBlurView : IView, IViewColorable, IViewBorderable, IViewCornerR
     
     var style: UIBlurEffect.Style { set get }
     
+}
+
+public extension IBlurView {
+    
+    @inlinable
     @discardableResult
-    func style(_ value: UIBlurEffect.Style) -> Self
+    func style(_ value: UIBlurEffect.Style) -> Self {
+        self.style = value
+        return self
+    }
     
 }
 

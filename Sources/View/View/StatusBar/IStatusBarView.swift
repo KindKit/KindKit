@@ -10,7 +10,15 @@ public protocol IStatusBarView : IView, IViewColorable, IViewBorderable, IViewCo
     
     var height: Float { set get }
     
+}
+
+public extension IStatusBarView {
+    
+    @inlinable
     @discardableResult
-    func height(_ value: Float) -> Self
+    func height(_ value: Float) -> Self {
+        self.height = value
+        return self
+    }
     
 }

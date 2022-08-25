@@ -12,34 +12,50 @@ public protocol IViewStaticSizeBehavioural : AnyObject {
     
     var height: StaticSizeBehaviour { set get }
     
-    @discardableResult
-    func width(_ value: StaticSizeBehaviour) -> Self
+}
+
+public extension IViewStaticSizeBehavioural {
     
+    @inlinable
     @discardableResult
-    func height(_ value: StaticSizeBehaviour) -> Self
+    func width(_ value: StaticSizeBehaviour) -> Self {
+        self.width = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func height(_ value: StaticSizeBehaviour) -> Self {
+        self.height = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewStaticSizeBehavioural {
+public extension IWidgetView where Body : IViewStaticSizeBehavioural {
     
-    public var width: StaticSizeBehaviour {
+    @inlinable
+    var width: StaticSizeBehaviour {
         set(value) { self.body.width = value }
         get { return self.body.width }
     }
     
-    public var height: StaticSizeBehaviour {
+    @inlinable
+    var height: StaticSizeBehaviour {
         set(value) { self.body.height = value }
         get { return self.body.height }
     }
     
+    @inlinable
     @discardableResult
-    public func width(_ value: StaticSizeBehaviour) -> Self {
+    func width(_ value: StaticSizeBehaviour) -> Self {
         self.body.width(value)
         return self
     }
     
+    @inlinable
     @discardableResult
-    public func height(_ value: StaticSizeBehaviour) -> Self {
+    func height(_ value: StaticSizeBehaviour) -> Self {
         self.body.height(value)
         return self
     }

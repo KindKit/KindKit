@@ -10,20 +10,30 @@ public protocol IViewSelectable : IViewStyleable {
     
     var isSelected: Bool { set get }
     
+}
+
+public extension IViewSelectable {
+    
+    @inlinable
     @discardableResult
-    func select(_ value: Bool) -> Self
+    func select(_ value: Bool) -> Self {
+        self.isSelected = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewSelectable {
+public extension IWidgetView where Body : IViewSelectable {
     
-    public var isSelected: Bool {
+    @inlinable
+    var isSelected: Bool {
         set(value) { self.body.isSelected = value }
         get { return self.body.isSelected }
     }
     
+    @inlinable
     @discardableResult
-    public func select(_ value: Bool) -> Self {
+    func select(_ value: Bool) -> Self {
         self.body.select(value)
         return self
     }

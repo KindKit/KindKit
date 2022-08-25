@@ -14,28 +14,41 @@ public protocol IWidgetView : IView {
 
 }
 
-extension IWidgetView {
+public extension IWidgetView {
     
-    public var native: NativeView {
+    @inlinable
+    var native: NativeView {
         return self.body.native
     }
-    public var isLoaded: Bool {
+    
+    @inlinable
+    var isLoaded: Bool {
         return self.body.isLoaded
     }
-    public var bounds: RectFloat {
+    
+    @inlinable
+    var bounds: RectFloat {
         return self.body.bounds
     }
-    public var isVisible: Bool {
+    
+    @inlinable
+    var isVisible: Bool {
         return self.body.isVisible
     }
-    public var isHidden: Bool {
+    
+    @inlinable
+    var isHidden: Bool {
         set(value) { self.body.isHidden = value }
         get { return self.body.isHidden }
     }
-    public var layout: ILayout? {
+    
+    @inlinable
+    var layout: ILayout? {
         get { return self.body.layout }
     }
-    public unowned var item: LayoutItem? {
+    
+    @inlinable
+    unowned var item: LayoutItem? {
         set(value) { self.body.item = value }
         get { return self.body.item }
     }
@@ -51,78 +64,78 @@ extension IWidgetView {
     }
     
     @inlinable
-    public func loadIfNeeded() {
+    func loadIfNeeded() {
         self.body.loadIfNeeded()
     }
     
     @inlinable
-    public func size(available: SizeFloat) -> SizeFloat {
+    func size(available: SizeFloat) -> SizeFloat {
         return self.body.size(available: available)
     }
     
     @inlinable
-    public func appear(to layout: ILayout) {
+    func appear(to layout: ILayout) {
         self.body.appear(to: layout)
     }
     
     @inlinable
-    public func disappear() {
+    func disappear() {
         self.body.disappear()
     }
     
     @inlinable
-    public func visible() {
+    func visible() {
         self.body.visible()
     }
     
     @inlinable
-    public func visibility() {
+    func visibility() {
         self.body.visibility()
     }
     
     @inlinable
-    public func invisible() {
+    func invisible() {
         self.body.invisible()
     }
     
     @inlinable
     @discardableResult
-    public func hidden(_ value: Bool) -> Self {
+    func hidden(_ value: Bool) -> Self {
         self.body.hidden(value)
         return self
     }
     
     @inlinable
     @discardableResult
-    public func onAppear(_ value: (() -> Void)?) -> Self {
+    func onAppear(_ value: (() -> Void)?) -> Self {
         self.body.onAppear(value)
         return self
     }
     
     @inlinable
     @discardableResult
-    public func onDisappear(_ value: (() -> Void)?) -> Self {
+    func onDisappear(_ value: (() -> Void)?) -> Self {
         self.body.onDisappear(value)
         return self
     }
     
     @inlinable
     @discardableResult
-    public func onVisible(_ value: (() -> Void)?) -> Self {
+    func onVisible(_ value: (() -> Void)?) -> Self {
         self.body.onVisible(value)
         return self
     }
     
     @inlinable
     @discardableResult
-    public func onVisibility(_ value: (() -> Void)?) -> Self {
+    func onVisibility(_ value: (() -> Void)?) -> Self {
         self.body.onVisibility(value)
         return self
     }
     
     @inlinable
     @discardableResult
-    public func onInvisible(_ value: (() -> Void)?) -> Self {
+    func onInvisible(_ value: (() -> Void)?) -> Self {
         self.body.onInvisible(value)
         return self
     }

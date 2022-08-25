@@ -25,9 +25,11 @@ public struct ScrollViewDirection : OptionSet {
 }
 
 public enum ScrollViewScrollAlignment {
+    
     case leading
     case center
     case trailing
+    
 }
 
 public protocol IScrollViewObserver : AnyObject {
@@ -80,6 +82,8 @@ public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable
         vertical: ScrollViewScrollAlignment
     ) -> PointFloat?
     
+    func contentOffset(_ value: PointFloat, normalized: Bool) -> Self
+    
     #if os(iOS)
     
     @discardableResult
@@ -87,28 +91,6 @@ public protocol IScrollView : IView, IViewDynamicSizeBehavioural, IViewColorable
     
     @discardableResult
     func endRefresh() -> Self
-    
-    #endif
-    
-    @discardableResult
-    func direction(_ value: ScrollViewDirection) -> Self
-    
-    @discardableResult
-    func indicatorDirection(_ value: ScrollViewDirection) -> Self
-    
-    @discardableResult
-    func visibleInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func contentInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func contentOffset(_ value: PointFloat, normalized: Bool) -> Self
-    
-    #if os(iOS)
-    
-    @discardableResult
-    func refreshColor(_ value: Color?) -> Self
     
     @discardableResult
     func onTriggeredRefresh(_ value: (() -> Void)?) -> Self
@@ -148,11 +130,53 @@ public extension IScrollView {
         )
     }
     
+    @inlinable
     @discardableResult
     func contentOffset(_ value: PointFloat, normalized: Bool = false) -> Self {
         return self.contentOffset(value, normalized: normalized)
     }
     
+    @inlinable
+    @discardableResult
+    func direction(_ value: ScrollViewDirection) -> Self {
+        self.direction = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func indicatorDirection(_ value: ScrollViewDirection) -> Self {
+        self.indicatorDirection = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func visibleInset(_ value: InsetFloat) -> Self {
+        self.visibleInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: InsetFloat) -> Self {
+        self.contentInset = value
+        return self
+    }
+    
+    #if os(iOS)
+    
+    @available(iOS 10.0, *)
+    @inlinable
+    @discardableResult
+    func refreshColor(_ value: Color?) -> Self {
+        self.refreshColor = value
+        return self
+    }
+    
+    #endif
+    
+    @inlinable
     func scrollToTop(animated: Bool = true, completion: (() -> Void)? = nil) {
         self.scrollToTop(animated: animated, completion: completion)
     }

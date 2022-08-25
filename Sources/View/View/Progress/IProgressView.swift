@@ -14,13 +14,29 @@ public protocol IProgressView : IView, IViewStaticSizeBehavioural, IViewColorabl
     
     var progress: Float { set get }
     
-    @discardableResult
-    func progressColor(_ value: Color) -> Self
+}
+
+public extension IProgressView {
     
+    @inlinable
     @discardableResult
-    func trackColor(_ value: Color) -> Self
+    func progressColor(_ value: Color) -> Self {
+        self.progressColor = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func progress(_ value: Float) -> Self
+    func trackColor(_ value: Color) -> Self {
+        self.trackColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func progress(_ value: Float) -> Self {
+        self.progress = value
+        return self
+    }
     
 }

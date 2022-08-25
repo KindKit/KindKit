@@ -12,6 +12,15 @@ public struct GradientViewFill {
     public let points: [GradientViewPoint]
     public let start: PointFloat
     public let end: PointFloat
+    @inlinable
+    public var isOpaque: Bool {
+        for point in self.points {
+            if point.color.isOpaque == false {
+                return false
+            }
+        }
+        return true
+    }
     
     @inlinable
     public init(
@@ -29,8 +38,10 @@ public struct GradientViewFill {
 }
 
 public enum GradientViewMode {
+    
     case axial
     case radial
+    
 }
 
 public struct GradientViewPoint {
@@ -55,24 +66,22 @@ public protocol IGradientView : IView, IViewStaticSizeBehavioural, IViewColorabl
     
     var fill: GradientViewFill { set get }
     
-    @discardableResult
-    func aspectRatio(_ value: Float?) -> Self
-    
-    @discardableResult
-    func fill(_ value: GradientViewFill) -> Self
-    
 }
 
-public extension GradientViewFill {
+public extension IGradientView {
     
     @inlinable
-    var isOpaque: Bool {
-        for point in self.points {
-            if point.color.isOpaque == false {
-                return false
-            }
-        }
-        return true
+    @discardableResult
+    func aspectRatio(_ value: Float?) -> Self {
+        self.aspectRatio = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func fill(_ value: GradientViewFill) -> Self {
+        self.fill = value
+        return self
     }
     
 }

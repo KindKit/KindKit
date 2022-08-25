@@ -14,13 +14,29 @@ public protocol ISpinnerView : IView, IViewColorable, IViewBorderable, IViewCorn
     
     var isAnimating: Bool { set get }
     
-    @discardableResult
-    func size(_ value: StaticSizeBehaviour) -> Self
+}
+
+public extension ISpinnerView {
     
+    @inlinable
     @discardableResult
-    func activityColor(_ value: Color) -> Self
+    func size(_ value: StaticSizeBehaviour) -> Self {
+        self.size = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func animating(_ value: Bool) -> Self
+    func activityColor(_ value: Color) -> Self {
+        self.activityColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func animating(_ value: Bool) -> Self {
+        self.isAnimating = value
+        return self
+    }
     
 }

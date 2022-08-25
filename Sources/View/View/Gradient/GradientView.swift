@@ -169,66 +169,6 @@ public final class GradientView : IGradientView {
     }
     
     @discardableResult
-    public func width(_ value: StaticSizeBehaviour) -> Self {
-        self.width = value
-        return self
-    }
-    
-    @discardableResult
-    public func height(_ value: StaticSizeBehaviour) -> Self {
-        self.height = value
-        return self
-    }
-    
-    @discardableResult
-    public func aspectRatio(_ value: Float?) -> Self {
-        self.aspectRatio = value
-        return self
-    }
-    
-    @discardableResult
-    public func fill(_ value: GradientViewFill) -> Self {
-        self.fill = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self.border = value
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self.cornerRadius = value
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self.shadow = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self.isHidden = value
-        return self
-    }
-    
-    @discardableResult
     public func onAppear(_ value: (() -> Void)?) -> Self {
         self._onAppear = value
         return self

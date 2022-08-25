@@ -166,60 +166,6 @@ public final class SpinnerView : ISpinnerView {
         self._onInvisible?()
     }
     
-    @discardableResult
-    public func size(_ value: StaticSizeBehaviour) -> Self {
-        self.size = value
-        return self
-    }
-    
-    @discardableResult
-    public func activityColor(_ value: Color) -> Self {
-        self.activityColor = value
-        return self
-    }
-    
-    @discardableResult
-    public func animating(_ value: Bool) -> Self {
-        self.isAnimating = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self.border = value
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self.cornerRadius = value
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self.shadow = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self.isHidden = value
-        return self
-    }
-    
     public func onAppear(_ value: (() -> Void)?) -> Self {
         self._onAppear = value
         return self

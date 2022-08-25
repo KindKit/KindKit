@@ -15,20 +15,30 @@ public protocol IViewBorderable : AnyObject {
     
     var border: ViewBorder { set get }
     
+}
+
+public extension IViewBorderable {
+    
+    @inlinable
     @discardableResult
-    func border(_ value: ViewBorder) -> Self
+    func border(_ value: ViewBorder) -> Self {
+        self.border = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewBorderable {
+public extension IWidgetView where Body : IViewBorderable {
     
-    public var border: ViewBorder {
+    @inlinable
+    var border: ViewBorder {
         set(value) { self.body.border = value }
         get { return self.body.border }
     }
     
+    @inlinable
     @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
+    func border(_ value: ViewBorder) -> Self {
         self.body.border(value)
         return self
     }

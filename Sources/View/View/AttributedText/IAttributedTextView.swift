@@ -32,3 +32,35 @@ public protocol IAttributedTextView : IView, IViewDynamicSizeBehavioural, IViewC
     func onTap(_ value: ((_ attributes: [NSAttributedString.Key: Any]?) -> Void)?) -> Self
 
 }
+
+public extension IAttributedTextView {
+    
+    @inlinable
+    @discardableResult
+    func text(_ value: NSAttributedString) -> Self {
+        self.text = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: TextAlignment?) -> Self {
+        self.alignment = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func lineBreak(_ value: TextLineBreak) -> Self {
+        self.lineBreak = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func numberOfLines(_ value: UInt) -> Self {
+        self.numberOfLines = value
+        return self
+    }
+    
+}

@@ -35,7 +35,7 @@ extension ProgressView {
     
 }
 
-final class NativeProgressView : UIProgressView {
+final class NativeProgressView : UIView {
     
     private unowned var _view: ProgressView?
     private var _progress: UIProgressView!

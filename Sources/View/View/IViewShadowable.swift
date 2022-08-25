@@ -32,20 +32,30 @@ public protocol IViewShadowable : AnyObject {
     
     var shadow: ViewShadow? { set get }
     
+}
+
+public extension IViewShadowable {
+    
+    @inlinable
     @discardableResult
-    func shadow(_ value: ViewShadow?) -> Self
+    func shadow(_ value: ViewShadow?) -> Self {
+        self.shadow = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewShadowable {
+public extension IWidgetView where Body : IViewShadowable {
     
-    public var shadow: ViewShadow? {
+    @inlinable
+    var shadow: ViewShadow? {
         set(value) { self.body.shadow = value }
         get { return self.body.shadow }
     }
     
+    @inlinable
     @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
+    func shadow(_ value: ViewShadow?) -> Self {
         self.body.shadow(value)
         return self
     }

@@ -121,48 +121,6 @@ public final class PageBarView : BarView, IPageBarView {
         )
     }
     
-    @discardableResult
-    public func leadingView(_ value: IView?) -> Self {
-        self.leadingView = value
-        return self
-    }
-    
-    @discardableResult
-    public func trailingView(_ value: IView?) -> Self {
-        self.trailingView = value
-        return self
-    }
-    
-    @discardableResult
-    public func indicatorView(_ value: IView) -> Self {
-        self.indicatorView = value
-        return self
-    }
-    
-    @discardableResult
-    public func itemInset(_ value: InsetFloat) -> Self {
-        self.itemInset = value
-        return self
-    }
-    
-    @discardableResult
-    public func itemSpacing(_ value: Float) -> Self {
-        self.itemSpacing = value
-        return self
-    }
-    
-    @discardableResult
-    public func itemViews(_ value: [IBarItemView]) -> Self {
-        self.itemViews = value
-        return self
-    }
-    
-    @discardableResult
-    public func selectedItemView(_ value: IBarItemView?) -> Self {
-        self.selectedItemView = value
-        return self
-    }
-    
     public func beginTransition() {
         self._transitionContentOffset = self._contentView.contentOffset
         self._transitionSelectedView = self._selectedItemView

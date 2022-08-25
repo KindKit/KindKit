@@ -7,20 +7,26 @@ import KindKitCore
 import KindKitMath
 
 public enum ButtonViewAlignment {
+    
     case fill
     case center
+    
 }
 
 public enum ButtonViewSpinnerPosition {
+    
     case fill
     case secondary
+    
 }
 
 public enum ButtonViewSecondaryPosition {
+    
     case top
     case left
     case right
     case bottom
+    
 }
 
 public protocol IButtonView : IView, IViewDynamicSizeBehavioural, IViewHighlightable, IViewLockable, IViewSelectable, IViewColorable, IViewBorderable, IViewCornerRadiusable, IViewShadowable, IViewAlphable {
@@ -48,27 +54,59 @@ public protocol IButtonView : IView, IViewDynamicSizeBehavioural, IViewHighlight
     var primaryView: IView { set get }
     
     @discardableResult
-    func inset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func alignment(_ value: ButtonViewAlignment) -> Self
-    
-    @discardableResult
-    func spinnerPosition(_ value: ButtonViewSpinnerPosition) -> Self
-    
-    @discardableResult
-    func spinnerAnimating(_ value: Bool) -> Self
-    
-    @discardableResult
-    func secondaryPosition(_ value: ButtonViewSecondaryPosition) -> Self
-    
-    @discardableResult
-    func secondaryInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
-    func primaryInset(_ value: InsetFloat) -> Self
-    
-    @discardableResult
     func onPressed(_ value: (() -> Void)?) -> Self
 
+}
+
+public extension IButtonView {
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: InsetFloat) -> Self {
+        self.inset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: ButtonViewAlignment) -> Self {
+        self.alignment = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func spinnerPosition(_ value: ButtonViewSpinnerPosition) -> Self {
+        self.spinnerPosition = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func spinnerAnimating(_ value: Bool) -> Self {
+        self.spinnerAnimating = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func secondaryPosition(_ value: ButtonViewSecondaryPosition) -> Self {
+        self.secondaryPosition = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func secondaryInset(_ value: InsetFloat) -> Self {
+        self.secondaryInset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func primaryInset(_ value: InsetFloat) -> Self {
+        self.primaryInset = value
+        return self
+    }
+    
 }

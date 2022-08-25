@@ -137,66 +137,6 @@ public class BarView : IBarView {
     }
     
     @discardableResult
-    public func placement(_ value: BarViewPlacement) -> Self {
-        self.placement = value
-        return self
-    }
-    
-    @discardableResult
-    public func size(_ value: Float?) -> Self {
-        self.size = value
-        return self
-    }
-    
-    @discardableResult
-    public func safeArea(_ value: InsetFloat) -> Self {
-        self.safeArea = value
-        return self
-    }
-    
-    @discardableResult
-    public func separatorView(_ value: IView?) -> Self {
-        self.separatorView = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self._backgroundView.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self._backgroundView.border = value
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self._backgroundView.cornerRadius = value
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self._backgroundView.shadow = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self._backgroundView.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self._view.hidden(value)
-        return self
-    }
-    
-    @discardableResult
     public func onAppear(_ value: (() -> Void)?) -> Self {
         self._view.onAppear(value)
         return self

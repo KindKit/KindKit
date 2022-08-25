@@ -232,12 +232,6 @@ public final class CustomView< Layout : ILayout > : ICustomView {
     }
     
     @discardableResult
-    public func gestures(_ value: [IGesture]) -> Self {
-        self.gestures = value
-        return self
-    }
-    
-    @discardableResult
     public func add(gesture: IGesture) -> Self {
         if self._gestures.contains(where: { $0 === gesture }) == false {
             self._gestures.append(gesture)
@@ -260,74 +254,8 @@ public final class CustomView< Layout : ILayout > : ICustomView {
     }
     
     @discardableResult
-    public func width(_ value: DynamicSizeBehaviour) -> Self {
-        self.width = value
-        return self
-    }
-    
-    @discardableResult
-    public func height(_ value: DynamicSizeBehaviour) -> Self {
-        self.height = value
-        return self
-    }
-    
-    @discardableResult
     public func contentLayout(_ value: Layout) -> Self {
         self.contentLayout = value
-        return self
-    }
-    
-    @discardableResult
-    public func shouldHighlighting(_ value: Bool) -> Self {
-        self.shouldHighlighting = value
-        return self
-    }
-    
-    @discardableResult
-    public func highlight(_ value: Bool) -> Self {
-        self.isHighlighted = value
-        return self
-    }
-    
-    @discardableResult
-    public func lock(_ value: Bool) -> Self {
-        self.isLocked = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
-    public func cornerRadius(_ value: ViewCornerRadius) -> Self {
-        self.cornerRadius = value
-        return self
-    }
-    
-    @discardableResult
-    public func border(_ value: ViewBorder) -> Self {
-        self.border = value
-        return self
-    }
-    
-    @discardableResult
-    public func shadow(_ value: ViewShadow?) -> Self {
-        self.shadow = value
-        return self
-    }
-    
-    @discardableResult
-    public func alpha(_ value: Float) -> Self {
-        self.alpha = value
-        return self
-    }
-    
-    @discardableResult
-    public func hidden(_ value: Bool) -> Self {
-        self.isHidden = value
         return self
     }
     

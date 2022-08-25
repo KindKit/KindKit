@@ -10,20 +10,30 @@ public protocol IViewLockable : IViewStyleable {
     
     var isLocked: Bool { set get }
     
+}
+
+public extension IViewLockable {
+    
+    @inlinable
     @discardableResult
-    func lock(_ value: Bool) -> Self
+    func lock(_ value: Bool) -> Self {
+        self.isLocked = value
+        return self
+    }
     
 }
 
-extension IWidgetView where Body : IViewLockable {
+public extension IWidgetView where Body : IViewLockable {
     
-    public var isLocked: Bool {
+    @inlinable
+    var isLocked: Bool {
         set(value) { self.body.isLocked = value }
         get { return self.body.isLocked }
     }
     
+    @inlinable
     @discardableResult
-    public func lock(_ value: Bool) -> Self {
+    func lock(_ value: Bool) -> Self {
         self.body.lock(value)
         return self
     }

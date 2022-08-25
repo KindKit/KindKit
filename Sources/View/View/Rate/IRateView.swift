@@ -42,22 +42,50 @@ public protocol IRateView : IView, IViewColorable, IViewBorderable, IViewCornerR
     
     var rating: Float { set get }
     
-    @discardableResult
-    func itemSize(_ value: SizeFloat) -> Self
+}
+
+public extension IRateView {
     
+    @inlinable
     @discardableResult
-    func itemSpacing(_ value: Float) -> Self
+    func itemSize(_ value: SizeFloat) -> Self {
+        self.itemSize = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func numberOfItem(_ value: UInt) -> Self
+    func itemSpacing(_ value: Float) -> Self {
+        self.itemSpacing = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func rounding(_ value: RateViewRounding) -> Self
+    func numberOfItem(_ value: UInt) -> Self {
+        self.numberOfItem = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func states(_ value: [RateViewState]) -> Self
+    func rounding(_ value: RateViewRounding) -> Self {
+        self.rounding = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func rating(_ value: Float) -> Self
+    func states(_ value: [RateViewState]) -> Self {
+        self.states = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func rating(_ value: Float) -> Self {
+        self.rating = value
+        return self
+    }
     
 }

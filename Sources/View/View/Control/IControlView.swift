@@ -24,3 +24,21 @@ public protocol IControlView : IView, IViewHighlightable, IViewLockable, IViewCo
     func onPressed(_ value: (() -> Void)?) -> Self
     
 }
+
+public extension IControlView {
+    
+    @inlinable
+    @discardableResult
+    func shouldHighlighting(_ value: Bool) -> Self {
+        self.shouldHighlighting = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func shouldPressed(_ value: Bool) -> Self {
+        self.shouldPressed = value
+        return self
+    }
+    
+}

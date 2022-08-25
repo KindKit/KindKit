@@ -161,42 +161,6 @@ public final class InputToolbarView : IInputToolbarView {
     }
     
     @discardableResult
-    public func items(_ value: [IInputToolbarItem]) -> Self {
-        self.items = value
-        return self
-    }
-    
-    @discardableResult
-    public func size(available value: Float) -> Self {
-        self.size = value
-        return self
-    }
-    
-    @discardableResult
-    public func translucent(_ value: Bool) -> Self {
-        self.isTranslucent = value
-        return self
-    }
-    
-    @discardableResult
-    public func barTintColor(_ value: Color?) -> Self {
-        self.barTintColor = value
-        return self
-    }
-    
-    @discardableResult
-    public func contentTintColor(_ value: Color) -> Self {
-        self.contentTintColor = value
-        return self
-    }
-    
-    @discardableResult
-    public func color(_ value: Color?) -> Self {
-        self.color = value
-        return self
-    }
-    
-    @discardableResult
     public func onAppear(_ value: (() -> Void)?) -> Self {
         self._onAppear = value
         return self

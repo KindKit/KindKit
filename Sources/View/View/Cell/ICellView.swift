@@ -12,10 +12,22 @@ public protocol ICellView : IView, IViewHighlightable, IViewLockable, IViewSelec
     
     var shouldPressed: Bool { set get }
     
-    @discardableResult
-    func shouldHighlighting(_ value: Bool) -> Self
+}
+
+public extension ICellView {
     
+    @inlinable
     @discardableResult
-    func shouldPressed(_ value: Bool) -> Self
+    func shouldHighlighting(_ value: Bool) -> Self {
+        self.shouldHighlighting = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func shouldPressed(_ value: Bool) -> Self {
+        self.shouldPressed = value
+        return self
+    }
     
 }

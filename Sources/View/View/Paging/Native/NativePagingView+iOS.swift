@@ -8,15 +8,15 @@ import UIKit
 import KindKitCore
 import KindKitMath
 
-extension ScrollView {
+extension PagingView {
     
     struct Reusable : IReusable {
         
-        typealias Owner = ScrollView
-        typealias Content = NativeScrollView
+        typealias Owner = PagingView
+        typealias Content = NativePagingView
 
         static var reuseIdentificator: String {
-            return "ScrollView"
+            return "PagingView"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -35,11 +35,11 @@ extension ScrollView {
     
 }
 
-final class NativeScrollView : UIScrollView {
+final class NativePagingView : UIScrollView {
     
     typealias View = IView & IViewCornerRadiusable & IViewShadowable
     
-    unowned var customDelegate: ScrollViewDelegate?
+    unowned var customDelegate: PagingViewDelegate?
     var needLayoutContent: Bool {
         didSet(oldValue) {
             if self.needLayoutContent == true {
@@ -76,7 +76,6 @@ final class NativeScrollView : UIScrollView {
     
     private unowned var _view: View?
     private var _contentView: UIView!
-    private var _refreshView: UIRefreshControl!
     private var _layoutManager: LayoutManager!
     private var _visibleInset: InsetFloat {
         didSet(oldValue) {
@@ -96,17 +95,14 @@ final class NativeScrollView : UIScrollView {
         if #available(iOS 11.0, *) {
             self.contentInsetAdjustmentBehavior = .never
         }
+        self.showsHorizontalScrollIndicator = false
+        self.showsVerticalScrollIndicator = false
+        self.isPagingEnabled = true
         self.clipsToBounds = true
         self.delegate = self
         
         self._contentView = UIView(frame: .zero)
         self.addSubview(self._contentView)
-        
-        self._refreshView = UIRefreshControl()
-        self._refreshView.addTarget(self, action: #selector(self._triggeredRefresh(_:)), for: .valueChanged)
-        if #available(iOS 10.0, *) {
-            self.refreshControl = self._refreshView
-        }
         
         self._layoutManager = LayoutManager(contentView: self._contentView, delegate: self)
     }
@@ -127,63 +123,53 @@ final class NativeScrollView : UIScrollView {
         super.layoutSubviews()
         
         self._safeLayout({
-            let bounds = self.bounds
+            let bounds = RectFloat(self.bounds)
             if self.needLayoutContent == true {
                 self.needLayoutContent = false
                 
                 let layoutBounds: RectFloat
                 if #available(iOS 11.0, *) {
-                    let inset = self.adjustedContentInset
+                    let inset = InsetFloat(self.adjustedContentInset)
                     layoutBounds = RectFloat(
-                        x: 0,
-                        y: 0,
-                        width: Float(bounds.size.width - (inset.left + inset.right)),
-                        height: Float(bounds.size.height - (inset.top + inset.bottom))
+                        origin: .zero,
+                        size: bounds.size.inset(inset)
                     )
                 } else {
                     layoutBounds = RectFloat(
-                        x: 0,
-                        y: 0,
-                        width: Float(bounds.size.width),
-                        height: Float(bounds.size.height)
+                        origin: .zero,
+                        size: bounds.size
                     )
                 }
                 self._layoutManager.layout(bounds: layoutBounds)
                 let size = self._layoutManager.size
                 self.contentSize = size.cgSize
-                self.customDelegate?._update(contentSize: size)
+                self.customDelegate?._update(
+                    numberOfPages: self._numberOfPages(
+                        bounds: bounds,
+                        contentSize: size
+                    ),
+                    contentSize: size
+                )
             }
             self._layoutManager.visible(
-                bounds: RectFloat(bounds),
+                bounds: bounds,
                 inset: self._visibleInset
             )
         })
     }
     
-    @available(iOS 11.0, *)
-    override func safeAreaInsetsDidChange() {
-        super.safeAreaInsetsDidChange()
-        
-        self.scrollIndicatorInsets = self._scrollIndicatorInsets()
-    }
-    
 }
 
-extension NativeScrollView {
+extension NativePagingView {
     
-    func update< Layout : ILayout >(view: ScrollView< Layout >) {
+    func update< Layout : ILayout >(view: PagingView< Layout >) {
         self._view = view
         self.update(direction: view.direction)
-        self.update(indicatorDirection: view.indicatorDirection)
         self.update(visibleInset: view.visibleInset)
         self.update(contentInset: view.contentInset)
         self.update(contentSize: view.contentSize)
-        self.update(contentOffset: view.contentOffset, normalized: true)
+        self.update(direction: view.direction, currentPage: view.currentPage, numberOfPages: view.numberOfPages)
         self.update(contentLayout: view.contentLayout)
-        if #available(iOS 10.0, *) {
-            self.update(refreshColor: view.refreshColor)
-            self.update(isRefreshing: view.isRefreshing)
-        }
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -198,15 +184,16 @@ extension NativeScrollView {
         self.needLayoutContent = true
     }
     
-    func update(direction: ScrollViewDirection) {
-        self.alwaysBounceHorizontal = direction.contains(.horizontal) && direction.contains(.bounds)
-        self.alwaysBounceVertical = direction.contains(.vertical) && direction.contains(.bounds)
+    func update(direction: PagingViewDirection) {
+        switch direction {
+        case .horizontal(let bounds):
+            self.alwaysBounceHorizontal = bounds
+            self.alwaysBounceVertical = false
+        case .vertical(let bounds):
+            self.alwaysBounceHorizontal = false
+            self.alwaysBounceVertical = bounds
+        }
         self.needLayoutContent = true
-    }
-    
-    func update(indicatorDirection: ScrollViewDirection) {
-        self.showsHorizontalScrollIndicator = indicatorDirection.contains(.horizontal)
-        self.showsVerticalScrollIndicator = indicatorDirection.contains(.vertical)
     }
     
     func update(visibleInset: InsetFloat) {
@@ -215,49 +202,34 @@ extension NativeScrollView {
     
     func update(contentInset: InsetFloat) {
         self.contentInset = contentInset.uiEdgeInsets
-        self.scrollIndicatorInsets = self._scrollIndicatorInsets()
     }
     
     func update(contentSize: SizeFloat) {
         self.contentSize = contentSize.cgSize
     }
     
-    func update(contentOffset: PointFloat, normalized: Bool) {
-        let validContentOffset: CGPoint
-        if normalized == true {
-            let contentInset = self.contentInset
-            let contentSize = self.contentSize
-            let visibleSize = self.bounds.size
-            validContentOffset = CGPoint(
-                x: max(-contentInset.left, min(-contentInset.left + CGFloat(contentOffset.x), contentSize.width - visibleSize.width + contentInset.right)),
-                y: max(-contentInset.top, min(-contentInset.top + CGFloat(contentOffset.y), contentSize.height - visibleSize.height + contentInset.bottom))
-            )
-        } else {
-            validContentOffset = contentOffset.cgPoint
-        }
-        self.setContentOffset(validContentOffset, animated: false)
-    }
-    
-    @available(iOS 10.0, *)
-    func update(refreshColor: Color?) {
-        if let refreshColor = refreshColor {
-            self._refreshView.tintColor = refreshColor.native
-            if self.refreshControl != self._refreshView {
-                self.refreshControl = self._refreshView
+    func update(direction: PagingViewDirection, currentPage: Float, numberOfPages: UInt) {
+        if currentPage > .leastNonzeroMagnitude {
+            switch direction {
+            case .horizontal:
+                let s = self.contentSize.width
+                if s > .leastNonzeroMagnitude {
+                    let p = s / CGFloat(numberOfPages)
+                    self.contentOffset = CGPoint(x: p * CGFloat(currentPage), y: 0)
+                } else {
+                    self.contentOffset = .zero
+                }
+            case .vertical:
+                let s = self.contentSize.height
+                if s > .leastNonzeroMagnitude {
+                    let p = s / CGFloat(numberOfPages)
+                    self.contentOffset = CGPoint(x: 0, y: p * CGFloat(currentPage))
+                } else {
+                    self.contentOffset = .zero
+                }
             }
         } else {
-            if self.refreshControl == self._refreshView {
-                self.refreshControl = nil
-            }
-        }
-    }
-    
-    @available(iOS 10.0, *)
-    func update(isRefreshing: Bool) {
-        if isRefreshing == true {
-            self._refreshView.beginRefreshing()
-        } else {
-            self._refreshView.endRefreshing()
+            self.contentOffset = .zero
         }
     }
     
@@ -269,27 +241,27 @@ extension NativeScrollView {
     
 }
 
-private extension NativeScrollView {
+private extension NativePagingView {
     
-    @objc
-    func _triggeredRefresh(_ sender: Any) {
-        self.customDelegate?._triggeredRefresh()
+    func _currentPage() -> Float {
+        let bounds = self.bounds
+        let contentOffset = self.contentOffset
+        let contentSize = self.contentSize
+        if contentSize.width > bounds.width {
+            return Float(contentOffset.x / bounds.width)
+        } else if contentSize.height > bounds.height {
+            return Float(contentOffset.y / bounds.height)
+        }
+        return 0
     }
     
-    func _scrollIndicatorInsets() -> UIEdgeInsets {
-        let contentInset = self.contentInset
-        let safeArea: UIEdgeInsets
-        if #available(iOS 11.0, *) {
-            safeArea = self.safeAreaInsets
-        } else {
-            safeArea = .zero
+    func _numberOfPages(bounds: RectFloat, contentSize: SizeFloat) -> UInt {
+        if contentSize.width > bounds.width {
+            return UInt(contentSize.width / bounds.width)
+        } else if contentSize.height > bounds.height {
+            return UInt(contentSize.height / bounds.height)
         }
-        return UIEdgeInsets(
-            top: contentInset.top - safeArea.top,
-            left: contentInset.left - safeArea.left,
-            bottom: contentInset.bottom - safeArea.bottom,
-            right: contentInset.right - safeArea.right
-        )
+        return 1
     }
     
     func _safeLayout(_ action: () -> Void) {
@@ -302,18 +274,18 @@ private extension NativeScrollView {
     
 }
 
-extension NativeScrollView : UIScrollViewDelegate {
+extension NativePagingView : UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.customDelegate?._beginScrolling()
+        self.customDelegate?._beginPaginging()
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.customDelegate?._scrolling(contentOffset: PointFloat(scrollView.contentOffset))
+        self.customDelegate?._paginging(currentPage: self._currentPage())
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.customDelegate?._endScrolling(decelerate: decelerate)
+        self.customDelegate?._endPaginging(decelerate: decelerate)
         if decelerate == false {
             self.setNeedsLayout()
         }
@@ -328,13 +300,9 @@ extension NativeScrollView : UIScrollViewDelegate {
         self.setNeedsLayout()
     }
     
-    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-        self.customDelegate?._scrollToTop()
-    }
-    
 }
 
-extension NativeScrollView : ILayoutDelegate {
+extension NativePagingView : ILayoutDelegate {
     
     func setNeedUpdate(_ layout: ILayout) -> Bool {
         self.needLayoutContent = true

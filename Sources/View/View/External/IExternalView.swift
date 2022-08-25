@@ -12,10 +12,22 @@ public protocol IExternalView : IView, IViewStaticSizeBehavioural, IViewColorabl
     
     var external: NativeView { set get }
     
+}
+
+public extension IExternalView {
+
+    @inlinable
     @discardableResult
-    func aspectRatio(_ value: Float?) -> Self
+    func aspectRatio(_ value: Float?) -> Self {
+        self.aspectRatio = value
+        return self
+    }
     
+    @inlinable
     @discardableResult
-    func external(_ value: NativeView) -> Self
+    func external(_ value: NativeView) -> Self {
+        self.external = value
+        return self
+    }
     
 }
