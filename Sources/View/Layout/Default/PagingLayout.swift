@@ -113,15 +113,17 @@ public final class PagingLayout : ILayout {
         guard self._items.isEmpty == false else {
             return []
         }
-        let s, e: Int
+        let sf, ef: Float
         switch self.direction {
         case .horizontal:
-            s = Int(Float(bounds.left.x / bounds.width).roundNearest)
-            e = Int(Float(bounds.right.x / bounds.width).roundNearest)
+            sf = bounds.left.x / bounds.width
+            ef = bounds.right.x / bounds.width
         case .vertical:
-            s = Int(Float(bounds.top.y / bounds.height).roundNearest)
-            e = Int(Float(bounds.bottom.y / bounds.height).roundNearest)
+            sf = bounds.top.y / bounds.height
+            ef = bounds.bottom.y / bounds.height
         }
+        let s = max(0, Int(sf.roundDown))
+        let e = min(Int(ef.roundUp), self._items.count)
         return Array(self._items[s..<e])
     }
     

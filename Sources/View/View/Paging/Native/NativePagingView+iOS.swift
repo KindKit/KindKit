@@ -51,6 +51,8 @@ final class NativePagingView : UIScrollView {
         set(value) {
             let oldValue = super.frame
             if oldValue != value {
+                let oldContentOffset = self.contentOffset
+                let oldContentSize = self.contentSize
                 super.frame = value
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)
@@ -60,8 +62,8 @@ final class NativePagingView : UIScrollView {
                     if self._revalidatePage == nil {
                         self._revalidatePage = Self._currentPage(
                             viewportSize: oldValue.size,
-                            contentOffset: self.contentOffset,
-                            contentSize: self.contentSize
+                            contentOffset: oldContentOffset,
+                            contentSize: oldContentSize
                         )
                     }
                     self.needLayoutContent = true
