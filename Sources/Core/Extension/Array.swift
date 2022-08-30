@@ -16,6 +16,26 @@ public extension Array {
     }
     
     @inlinable
+    func appending(_ element: Element) -> Self {
+        if self.isEmpty == true {
+            return [ element ]
+        }
+        var result = self
+        result.append(element)
+        return result
+    }
+    
+    @inlinable
+    func appending< S : Sequence >(contentsOf contents: S) -> Self  where Element == S.Element {
+        if self.isEmpty == true {
+            return Array(contents)
+        }
+        var result = self
+        result.append(contentsOf: contents)
+        return result
+    }
+    
+    @inlinable
     func reorder(
         where block: (_ lhs: Element, _ rhs: Element) throws -> [Element]
     ) rethrows -> Self {

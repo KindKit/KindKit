@@ -7,6 +7,16 @@ import Foundation
 public extension Dictionary {
     
     @inlinable
+    func appending(key: Key, value: Value) -> Self {
+        if self.isEmpty == true {
+            return [ key : value ]
+        }
+        var result = self
+        result[key] = value
+        return result
+    }
+    
+    @inlinable
     func countValues(where: (_ element: Value) -> Bool) -> Int {
         var result = 0
         for element in self {
