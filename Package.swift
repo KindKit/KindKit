@@ -57,6 +57,11 @@ let package = Package(
             dependencies: [ .target(name: "KindKitCore") ],
             path: "Sources/Database"
         ),
+        .testTarget(
+            name: "KindKitDatabase-Tests",
+            dependencies: [ .target(name: "KindKitDatabase") ],
+            path: "Tests/Database"
+        ),
         .target(
             name: "KindKitDataSource",
             dependencies: [ .target(name: "KindKitCore"), .target(name: "KindKitApi") ],
