@@ -40,9 +40,20 @@ extension SpinnerView {
 
 final class NativeSpinnerView : UIActivityIndicatorView {
     
-    typealias View = IView & IViewCornerRadiusable & IViewShadowable
+    override var frame: CGRect {
+        set(value) {
+            if super.frame != value {
+                super.frame = value
+                if let view = self._view {
+                    self.update(cornerRadius: view.cornerRadius)
+                    self.updateShadowPath()
+                }
+            }
+        }
+        get { return super.frame }
+    }
     
-    private unowned var _view: View?
+    private unowned var _view: SpinnerView?
     
     override init(style: Style) {
         super.init(style: style)
