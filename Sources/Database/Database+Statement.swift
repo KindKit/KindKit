@@ -119,7 +119,7 @@ public extension Database.Statement {
     >(
         column: Database.Table.Column< Value >
     ) throws -> Database.CustomKeyPath< Value > {
-        return .init(index: try self.index(column: column))
+        return .init(try self.index(column: column))
     }
     
     func keyPath<
@@ -127,7 +127,7 @@ public extension Database.Statement {
     >(
         column: Database.Table.Column< Value >
     ) throws -> Database.KeyPath< Value > {
-        return .init(index: try self.index(column: column))
+        return .init(try self.index(column: column))
     }
     
     func decode<

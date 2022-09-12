@@ -84,6 +84,12 @@ extension Optional : IDatabaseValue where Wrapped : IDatabaseValue {
 
 extension IDatabaseValue where Self : RawRepresentable, RawValue : IDatabaseValue {
     
-    public typealias TypeDeclaration = Database.TypeDeclaration.Optional< RawValue.TypeDeclaration >
+    public typealias TypeDeclaration = RawValue.TypeDeclaration
+    
+}
+
+extension IDatabaseValue where Self : IEnumCodable, RealValue : IDatabaseValue {
+    
+    public typealias TypeDeclaration = RealValue.TypeDeclaration
     
 }

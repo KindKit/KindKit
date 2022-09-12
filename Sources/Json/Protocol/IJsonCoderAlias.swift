@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindKitCore
 
 public typealias IJsonCoderAlias = IJsonDecoderAlias & IJsonEncoderAlias
 

@@ -46,4 +46,8 @@ public extension Database {
         try self.set(userVersion: userVersion.rawValue)
     }
     
+    func set< Enum : IEnumEncodable >(userVersion: Enum.RealValue, _ type: Enum.Type) throws where Enum.RawValue == Int {
+        try self.set(userVersion: Enum(realValue: userVersion))
+    }
+    
 }
