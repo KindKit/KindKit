@@ -19,11 +19,23 @@ public struct EnumUserDefaultsDecoder< Enum : IEnumDecodable, Decoder : IUserDef
     
 }
 
+extension IUserDefaultsDecoderAlias where Self : IEnumDecodable, RawValue : IUserDefaultsDecoderAlias, RawValue == RawValue.UserDefaultsDecoder.Value {
+    
+    public typealias UserDefaultsDecoder = EnumUserDefaultsDecoder< Self, Self.RawValue.UserDefaultsDecoder >
+    
+}
+
 public struct EnumUserDefaultsEncoder< Enum : IEnumEncodable, Encoder : IUserDefaultsValueEncoder > : IUserDefaultsValueEncoder where Enum.RawValue == Encoder.Value {
     
     public static func encode(_ value: Enum.RealValue) throws -> IUserDefaultsValue {
         let encoded = Enum(realValue: value)
         return try Encoder.encode(encoded.rawValue)
     }
+    
+}
+
+extension IUserDefaultsEncoderAlias where Self : IEnumEncodable, RawValue : IUserDefaultsEncoderAlias, RawValue == RawValue.UserDefaultsEncoder.Value {
+    
+    public typealias UserDefaultsEncoder = EnumUserDefaultsEncoder< Self, Self.RawValue.UserDefaultsEncoder >
     
 }

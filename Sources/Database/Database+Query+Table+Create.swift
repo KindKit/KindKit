@@ -46,7 +46,7 @@ public extension Database.Query.Table.Create {
     func column< Value : IDatabaseValue >(
         _ column: Database.Table.Column< Value >
     ) -> Self {
-        let column = Database.Query.Column< Value >(column: column)
+        let column = Database.Query.Column(column: column)
         return .init(
             table: self._table,
             ifNotExists: self._ifNotExists,
@@ -59,7 +59,7 @@ public extension Database.Query.Table.Create {
         _ column: Database.Table.Column< Value >,
         on: (Database.Query.Column< Value >) -> Database.Query.Column< Value >
     ) -> Self {
-        let column = on(Database.Query.Column< Value >(column: column))
+        let column = on(Database.Query.Column(column: column))
         return .init(
             table: self._table,
             ifNotExists: self._ifNotExists,

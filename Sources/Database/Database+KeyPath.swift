@@ -13,11 +13,19 @@ public extension Database {
         
         public let index: Database.Index
         
+        public init(_ index: Database.Index) {
+            self.index = index
+        }
+        
     }
 
     struct CustomKeyPath< ValueDecoder : IDatabaseValueDecoder > : IDatabaseKeyPath {
         
         public let index: Database.Index
+        
+        public init(_ index: Database.Index) {
+            self.index = index
+        }
         
     }
 
