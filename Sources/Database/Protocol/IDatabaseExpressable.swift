@@ -60,7 +60,7 @@ extension Double : IDatabaseExpressable {}
 
 // MARK: String
 
-extension IDatabaseExpressable where Self : StringProtocol {
+extension String : IDatabaseExpressable {
     
     public var query: String {
         return "'\(self)'"
@@ -68,7 +68,13 @@ extension IDatabaseExpressable where Self : StringProtocol {
 
 }
 
-extension String : IDatabaseExpressable {}
+extension URL : IDatabaseExpressable {
+    
+    public var query: String {
+        return "'\(self.absoluteString)'"
+    }
+
+}
 
 // MARK: Blob
 

@@ -50,13 +50,17 @@ extension Double : IDatabaseValue {}
 
 // MARK: Text
 
-extension IDatabaseValue where Self : StringProtocol {
+extension String : IDatabaseValue {
     
     public typealias TypeDeclaration = Database.TypeDeclaration.Text
     
 }
 
-extension String : IDatabaseValue {}
+extension URL : IDatabaseValue {
+    
+    public typealias TypeDeclaration = Database.TypeDeclaration.Text
+    
+}
 
 // MARK: Blob
 
