@@ -63,7 +63,7 @@ extension Double : IDatabaseExpressable {}
 extension String : IDatabaseExpressable {
     
     public var query: String {
-        return "'\(self)'"
+        return "'\(self.replacingOccurrences(of: "'", with: "''"))'"
     }
 
 }
@@ -71,7 +71,7 @@ extension String : IDatabaseExpressable {
 extension URL : IDatabaseExpressable {
     
     public var query: String {
-        return "'\(self.absoluteString)'"
+        return self.absoluteString.query
     }
 
 }

@@ -105,11 +105,13 @@ public extension Database.Table.Column {
     }
 
     func `in`(_ to: [Value]) -> Database.Query.Operator.Default {
-        return .init(lhs: self.name, operator: " IN ", rhs: to.compactMap({ $0.query }).joined(separator: ", "))
+        let rhs = to.compactMap({ $0.query }).joined(separator: ", ")
+        return .init(lhs: self.name, operator: " IN ", rhs: "(\(rhs))")
     }
 
     func notIn(_ to: [Value]) -> Database.Query.Operator.Default {
-        return .init(lhs: self.name, operator: " NOT IN ", rhs: to.compactMap({ $0.query }).joined(separator: ", "))
+        let rhs = to.compactMap({ $0.query }).joined(separator: ", ")
+        return .init(lhs: self.name, operator: " NOT IN ", rhs: "(\(rhs))")
     }
 
 }
