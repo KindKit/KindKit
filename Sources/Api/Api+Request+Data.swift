@@ -1,10 +1,8 @@
 //
-//  KindKitApi
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
-import KindKitJson
 
 public extension Api.Request {
     

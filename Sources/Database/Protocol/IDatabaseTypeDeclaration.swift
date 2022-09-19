@@ -1,9 +1,8 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public protocol IDatabaseTypeDeclaration {
     

@@ -1,17 +1,8 @@
 //
-//  KindKitJson
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
-
-public enum JsonError : Error {
-    
-    case notJson
-    case access
-    case cast
-    
-}
 
 public final class Json {
 
@@ -52,12 +43,16 @@ public extension Json {
     }
     
     func dictionary() throws -> NSDictionary {
-        guard let dictionary = self.root as? NSDictionary else { throw JsonError.notJson }
+        guard let dictionary = self.root as? NSDictionary else {
+            throw Json.Error.notJson
+        }
         return dictionary
     }
     
     func array() throws -> NSArray {
-        guard let array = self.root as? NSArray else { throw JsonError.notJson }
+        guard let array = self.root as? NSArray else {
+            throw Json.Error.notJson
+        }
         return array
     }
     
@@ -75,7 +70,9 @@ public extension Json {
 public extension Json {
 
     func saveAsData(options: JSONSerialization.WritingOptions = []) throws -> Data {
-        guard let root = self.root else { throw JsonError.notJson }
+        guard let root = self.root else {
+            throw Json.Error.notJson
+        }
         return try JSONSerialization.data(withJSONObject: root, options: options)
     }
 

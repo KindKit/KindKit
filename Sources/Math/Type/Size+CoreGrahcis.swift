@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if canImport(CoreGraphics)
@@ -16,7 +16,6 @@ public extension Size {
         )
     }
     
-    @inlinable
     init(_ cgSize: CGSize) {
         self.width = Value(cgSize.width)
         self.height = Value(cgSize.height)

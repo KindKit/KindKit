@@ -1,9 +1,8 @@
 //
-//  KindKitUndoRedo
+//  KindKit
 //
 
 import Foundation
-import KindKitObserver
 
 public final class UndoRedo {
     

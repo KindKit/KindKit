@@ -1,5 +1,5 @@
 //
-//  KindKitKeychain
+//  KindKit
 //
 
 import Foundation

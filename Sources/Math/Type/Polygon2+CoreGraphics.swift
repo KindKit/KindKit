@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if canImport(CoreGraphics)

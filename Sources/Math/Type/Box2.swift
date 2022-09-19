@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -12,19 +12,16 @@ public struct Box2< Value : IScalar & Hashable > : Hashable {
     public var lower: Point< Value >
     public var upper: Point< Value >
     
-    @inlinable
     public init() {
         self.lower = .zero
         self.upper = .zero
     }
     
-    @inlinable
     public init(lower: Point< Value >, upper: Point< Value >) {
         self.lower = lower
         self.upper = upper
     }
     
-    @inlinable
     public init(point1: Point< Value >, point2: Point< Value >) {
         self.lower = point1.min(point2)
         self.upper = point1.max(point2)

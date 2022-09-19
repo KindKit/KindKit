@@ -1,14 +1,23 @@
 //
-//  KindKitUserDefaults
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public typealias IUserDefaultsValueCoder = IUserDefaultsValueDecoder & IUserDefaultsValueEncoder
 
-public protocol IUserDefaultsValueDecoder : IValueDecoder where Storage == IUserDefaultsValue {
+public protocol IUserDefaultsValueDecoder {
+    
+    associatedtype UserDefaultsDecoded
+    
+    static func decode(_ value: IUserDefaultsValue) throws -> UserDefaultsDecoded
+    
 }
 
-public protocol IUserDefaultsValueEncoder : IValueEncoder where Storage == IUserDefaultsValue {
+public protocol IUserDefaultsValueEncoder {
+    
+    associatedtype UserDefaultsEncoded
+
+    static func encode(_ value: UserDefaultsEncoded) throws -> IUserDefaultsValue
+    
 }

@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -12,7 +12,6 @@ public struct Point< Value : IScalar & Hashable > : Hashable {
     public var x: Value
     public var y: Value
     
-    @inlinable
     public init(
         x: Value,
         y: Value

@@ -1,9 +1,9 @@
 //
-//  KindKitDatabase-Test
+//  KindKit-Test
 //
 
 import XCTest
-import KindKitDatabase
+import KindKit
 
 class TestQuery : XCTestCase {
     

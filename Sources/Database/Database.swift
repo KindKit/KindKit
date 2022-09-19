@@ -1,9 +1,8 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public final class Database {
     
@@ -121,7 +120,7 @@ public extension Database {
     >(
         query: Query,
         decode: (Database.Statement) throws -> Decoder
-    ) throws -> [Decoder.Value] {
+    ) throws -> [Decoder.DatabaseDecoded] {
         let statement = try self._connection.statement(query: query.query)
         let decoder = try decode(statement)
         return try statement.perform(self._connection, {
@@ -135,7 +134,7 @@ public extension Database {
     >(
         query: Query,
         decoder: Decoder.Type
-    ) throws -> Decoder.Value? {
+    ) throws -> Decoder.DatabaseDecoded? {
         let statement = try self._connection.statement(query: query.query)
         let result = try statement.perform(self._connection, {
             try decoder.decode($0.get(at: 0))
@@ -149,7 +148,7 @@ public extension Database {
     >(
         query: Query,
         decoder: Alias.Type
-    ) throws -> Alias.DatabaseValueDecoder.Value? {
+    ) throws -> Alias.DatabaseValueDecoder.DatabaseDecoded? {
         return try self.run(query: query, decoder: Alias.DatabaseValueDecoder.self)
     }
 

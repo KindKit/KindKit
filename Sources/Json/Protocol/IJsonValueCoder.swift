@@ -1,14 +1,23 @@
 //
-//  KindKitJson
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public typealias IJsonValueCoder = IJsonValueDecoder & IJsonValueEncoder
 
-public protocol IJsonValueDecoder : IValueDecoder where Storage == IJsonValue {
+public protocol IJsonValueDecoder {
+    
+    associatedtype JsonDecoded
+    
+    static func decode(_ value: IJsonValue) throws -> JsonDecoded
+    
 }
 
-public protocol IJsonValueEncoder : IValueEncoder where Storage == IJsonValue {
+public protocol IJsonValueEncoder {
+    
+    associatedtype JsonEncoded
+
+    static func encode(_ value: JsonEncoded) throws -> IJsonValue
+    
 }

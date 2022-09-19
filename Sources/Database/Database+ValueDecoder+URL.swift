@@ -1,19 +1,16 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public extension Database.ValueDecoder {
     
     struct URL : IDatabaseValueDecoder {
         
-        public typealias Value = Foundation.URL
-        
-        public static func decode(_ value: Database.Value) throws -> Value {
+        public static func decode(_ value: Database.Value) throws -> Foundation.URL {
             let string = try Database.ValueDecoder.Text.decode(value)
-            guard let result = Value(string: string) else {
+            guard let result = Foundation.URL(string: string) else {
                 throw Database.Error.decode
             }
             return result

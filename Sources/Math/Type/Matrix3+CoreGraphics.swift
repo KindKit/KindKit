@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if canImport(CoreGraphics)
@@ -17,7 +17,6 @@ public extension Matrix3 {
         )
     }
     
-    @inlinable
     init(_ cgAffineTransform: CGAffineTransform) {
         self.init(
             Value(cgAffineTransform.a), Value(cgAffineTransform.b), 0,

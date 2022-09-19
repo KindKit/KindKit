@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -12,7 +12,6 @@ public struct Path2< Value : IScalar & Hashable > : Hashable {
     
     public var elements: [Element]
     
-    @inlinable
     public init(
         elements: [Element]
     ) {

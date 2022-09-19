@@ -1,25 +1,22 @@
 //
-//  KindKitLogUI
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
-import KindKitMath
-import KindKitView
 
 public struct LogUI {
     
     public static func container(
         target: Target
-    ) -> IModalContentContainer {
+    ) -> IUIModalContentContainer {
         let screen = Screen(target: target)
         let stackScreen = StackScreen()
         screen.onClose = { [unowned stackScreen] in
             stackScreen.dismiss()
         }
-        return StackContainer(
+        return UI.Container.Stack(
             screen: stackScreen,
-            rootContainer: ScreenContainer(screen: screen)
+            rootContainer: UI.Container.Screen(screen)
         )
     }
     
@@ -27,26 +24,23 @@ public struct LogUI {
 
 extension LogUI {
     
-    final class StackScreen : IStackScreen, IScreenModalable {
+    final class StackScreen : IUIStackScreen, IUIScreenModalable {
         
-        var container: IContainer?
-        var modalPresentation: ScreenModalPresentation {
+        var container: IUIContainer?
+        var modalPresentation: UI.Screen.Modal.Presentation {
             return .sheet(
-                info: ScreenModalPresentation.Sheet(
+                info: UI.Screen.Modal.Presentation.Sheet(
                     inset: InsetFloat(top: 80, left: 0, right: 0, bottom: 0),
                     backgroundView: self._backgroundView
                 )
             )
         }
         
-        private let _backgroundView: EmptyView
+        private let _backgroundView: UI.View.Empty
         
         init() {
-            self._backgroundView = EmptyView(
-                width: .fill,
-                height: .fill,
-                color: Color(rgba: 0x0000007a)
-            )
+            self._backgroundView = UI.View.Empty()
+                .color(Color(rgba: 0x0000007a))
         }
         
     }

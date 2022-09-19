@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if canImport(CoreGraphics)
@@ -16,7 +16,6 @@ public extension Point {
         )
     }
     
-    @inlinable
     init(_ cgPoint: CGPoint) {
         self.x = Value(cgPoint.x)
         self.y = Value(cgPoint.y)

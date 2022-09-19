@@ -1,9 +1,8 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public extension Database.ValueDecoder {
     
@@ -14,14 +13,14 @@ public extension Database.ValueDecoder {
             case .null:
                 throw Database.Error.decode
             case .integer(let value):
-                return Value(value)
+                return .init(value)
             case .real(let value):
-                return Value(value)
+                return .init(value)
             case .text(let value):
                 guard let number = NSNumber.number(from: value) else {
                     throw Database.Error.decode
                 }
-                return Value(number.intValue)
+                return .init(number.intValue)
             case .blob:
                 throw Database.Error.decode
             }

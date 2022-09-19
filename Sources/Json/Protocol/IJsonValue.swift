@@ -1,5 +1,5 @@
 //
-//  KindKitJson
+//  KindKit
 //
 
 import Foundation

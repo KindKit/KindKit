@@ -1,9 +1,13 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
-public protocol IDatabaseValueDecoder : IValueDecoder where Storage == Database.Value {
+public protocol IDatabaseValueDecoder {
+    
+    associatedtype DatabaseDecoded
+    
+    static func decode(_ value: Database.Value) throws -> DatabaseDecoded
+    
 }

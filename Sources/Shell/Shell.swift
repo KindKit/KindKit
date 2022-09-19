@@ -1,10 +1,9 @@
 //
-//  KindKitShell
+//  KindKit
 //
 
 import Foundation
 import Dispatch
-import KindKitCore
 
 #if os(macOS)
 

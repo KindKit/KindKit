@@ -1,12 +1,9 @@
 //
-//  KindKitQrCode
+//  KindKit
 //
 
 import Foundation
 import CoreImage
-import KindKitCore
-import KindKitMath
-import KindKitView
 
 public struct QrCode {
     

@@ -1,9 +1,8 @@
 //
-//  KindKitJson
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 protocol IJsonPath {
 

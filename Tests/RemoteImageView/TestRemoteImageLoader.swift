@@ -1,10 +1,9 @@
 //
-//  KindKitRemoteImageView-Test
+//  KindKit-Test
 //
 
 import XCTest
-import KindKitMath
-import KindKitRemoteImageView
+import KindKit
 
 class TestRemoteImageLoader : XCTestCase {
     

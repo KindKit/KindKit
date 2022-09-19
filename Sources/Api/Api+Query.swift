@@ -1,5 +1,5 @@
 //
-//  KindKitApi
+//  KindKit
 //
 
 import Foundation

@@ -1,10 +1,9 @@
 //
-//  KindKitApi-Test
+//  KindKit-Test
 //
 
 import XCTest
-import KindKitApi
-import KindKitFlow
+import KindKit
 
 class TestApiFlow : XCTestCase {
     

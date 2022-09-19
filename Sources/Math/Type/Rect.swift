@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -12,133 +12,111 @@ public struct Rect< Value : IScalar & Hashable > : Hashable {
     public var origin: Point< Value >
     public var size: Size< Value >
     
-    @inlinable
     public init(origin: Point< Value >, size: Size< Value >) {
         self.origin = origin
         self.size = size
     }
     
-    @inlinable
     public init(x: Value, y: Value, width: Value, height: Value) {
         self.origin = Point(x: x, y: y)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(x: Value, y: Value, size: Size< Value >) {
         self.origin = Point(x: x, y: y)
         self.size = size
     }
     
-    @inlinable
     public init(topLeft: Point< Value >, bottomRight: Point< Value >) {
         self.origin = topLeft
         self.size = Size(width: bottomRight.x - topLeft.x, height: bottomRight.y - topLeft.y)
     }
     
-    @inlinable
     public init(topLeft: Point< Value >, size: Size< Value >) {
         self.origin = topLeft
         self.size = size
     }
     
-    @inlinable
     public init(topLeft: Point< Value >, width: Value, height: Value) {
         self.origin = topLeft
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(top: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: top.x - size.width / 2, y: top.y)
         self.size = size
     }
     
-    @inlinable
     public init(top: Point< Value >, width: Value, height: Value) {
         self.origin = Point< Value >(x: top.x - width / 2, y: top.y)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(topRight: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: topRight.x - size.width, y: topRight.y)
         self.size = size
     }
     
-    @inlinable
     public init(topRight: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: topRight.x - width, y: topRight.y)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(left: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: left.x, y: left.y - size.height / 2)
         self.size = size
     }
     
-    @inlinable
     public init(left: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: left.x, y: left.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(center: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: center.x - size.width / 2, y: center.y - size.height / 2)
         self.size = size
     }
     
-    @inlinable
     public init(center: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: center.x - width / 2, y: center.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(right: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: right.x - size.width, y: right.y - size.height / 2)
         self.size = size
     }
     
-    @inlinable
     public init(right: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: right.x - width, y: right.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(bottomLeft: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - size.height)
         self.size = size
     }
     
-    @inlinable
     public init(bottomLeft: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - height)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(bottom: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottom.x - size.width / 2, y: bottom.y - size.height)
         self.size = size
     }
     
-    @inlinable
     public init(bottom: Point< Value >, width: Value, height: Value) {
         self.origin = Point< Value >(x: bottom.x - width / 2, y: bottom.y - height)
         self.size = Size(width: width, height: height)
     }
     
-    @inlinable
     public init(bottomRight: Point< Value >, size: Size< Value >) {
         self.origin = Point(x: bottomRight.x - size.width, y: bottomRight.y - size.height)
         self.size = size
     }
     
-    @inlinable
     public init(bottomRight: Point< Value >, width: Value, height: Value) {
         self.origin = Point(x: bottomRight.x - width, y: bottomRight.y - height)
         self.size = Size(width: width, height: height)

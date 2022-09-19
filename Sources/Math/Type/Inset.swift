@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -14,7 +14,6 @@ public struct Inset< Value : IScalar & Hashable > : Hashable {
     public var right: Value
     public var bottom: Value
     
-    @inlinable
     public init(top: Value, left: Value, right: Value, bottom: Value) {
         self.top = top
         self.left = left
@@ -22,7 +21,6 @@ public struct Inset< Value : IScalar & Hashable > : Hashable {
         self.bottom = bottom
     }
     
-    @inlinable
     public init(horizontal: Value, vertical: Value) {
         self.top = vertical
         self.left = horizontal
