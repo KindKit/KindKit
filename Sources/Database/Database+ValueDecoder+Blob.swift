@@ -1,14 +1,13 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public extension Database.ValueDecoder {
     
     struct Blob : IDatabaseValueDecoder {
-        
+                
         public static func decode(_ value: Database.Value) throws -> Data {
             switch value {
             case .null, .integer, .real:

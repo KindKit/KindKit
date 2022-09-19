@@ -1,5 +1,5 @@
 //
-//  KindKitUserDefaults
+//  KindKit
 //
 
 import Foundation

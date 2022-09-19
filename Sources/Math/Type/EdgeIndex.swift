@@ -1,10 +1,9 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
 import CoreGraphics
-import KindKitCore
 
 public struct EdgeIndex : Hashable {
     

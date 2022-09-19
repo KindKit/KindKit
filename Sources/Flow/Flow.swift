@@ -1,5 +1,5 @@
 //
-//  KindKitFlow
+//  KindKit
 //
 
 import Foundation

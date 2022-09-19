@@ -1,9 +1,8 @@
 //
-//  KindKitApi
+//  KindKit
 //
 
 import Foundation
-import KindKitFlow
 
 public extension Api.Flow {
     

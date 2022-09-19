@@ -1,10 +1,9 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
 import CoreGraphics
-import KindKitCore
 
 public typealias Polyline2Float = Polyline2< Float >
 public typealias Polyline2Double = Polyline2< Double >

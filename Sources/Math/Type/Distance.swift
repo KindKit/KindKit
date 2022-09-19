@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -14,12 +14,10 @@ public struct Distance< Value : IScalar & Hashable > : Hashable {
         return self.squared.sqrt
     }
     
-    @inlinable
     public init(real: Value) {
         self.squared = real * real
     }
     
-    @inlinable
     public init(squared: Value) {
         self.squared = squared
     }

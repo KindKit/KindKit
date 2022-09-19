@@ -1,14 +1,13 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public protocol IDatabaseDecoder {
     
-    associatedtype Value
+    associatedtype DatabaseDecoded
     
-    func decode(_ statement: Database.Statement) throws -> Value
+    func decode(_ statement: Database.Statement) throws -> DatabaseDecoded
     
 }

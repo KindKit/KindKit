@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -14,12 +14,10 @@ public struct Angle< Value : IScalar & Hashable > : Hashable {
     }
     public var radians: Value
     
-    @inlinable
     public init(radians: Value) {
         self.radians = radians
     }
     
-    @inlinable
     public init(degrees: Value) {
         self.radians = degrees.degreesToRadians
     }

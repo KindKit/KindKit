@@ -1,5 +1,5 @@
 //
-//  KindKitCode
+//  KindKit
 //
 
 #if DEBUG

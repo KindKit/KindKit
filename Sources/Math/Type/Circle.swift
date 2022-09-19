@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -12,7 +12,6 @@ public struct Circle< Value : IScalar & Hashable > : Hashable {
     public var origin: Point< Value >
     public var radius: Value
     
-    @inlinable
     public init(
         origin: Point< Value >,
         radius: Value
@@ -21,7 +20,6 @@ public struct Circle< Value : IScalar & Hashable > : Hashable {
         self.radius = radius
     }
     
-    @inlinable
     public init(
         origin: Point< Value >,
         radius: Distance< Value >

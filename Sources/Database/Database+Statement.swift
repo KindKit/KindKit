@@ -1,9 +1,8 @@
 //
-//  KindKitDatabase
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 import SQLite3
 
 public extension Database {
@@ -135,7 +134,7 @@ public extension Database.Statement {
     >(
         _ decoder: Decoder.Type,
         at index: Database.Index
-    ) throws -> Decoder.Value {
+    ) throws -> Decoder.DatabaseDecoded {
         return try Decoder.decode(self.get(at: index))
     }
     
@@ -143,7 +142,7 @@ public extension Database.Statement {
         Alias : IDatabaseValueDecoderAlias
     >(
         _ alias: Alias.Type, at index: Database.Index
-    ) throws -> Alias.DatabaseValueDecoder.Value {
+    ) throws -> Alias.DatabaseValueDecoder.DatabaseDecoded {
         return try self.decode(Alias.DatabaseValueDecoder.self, at: index)
     }
     
@@ -151,7 +150,7 @@ public extension Database.Statement {
         KeyPath : IDatabaseKeyPath
     >(
         _ keyPath: KeyPath
-    ) throws -> KeyPath.ValueDecoder.Value {
+    ) throws -> KeyPath.ValueDecoder.DatabaseDecoded {
         return try self.decode(KeyPath.ValueDecoder.self, at: keyPath.index)
     }
         

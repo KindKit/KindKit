@@ -1,9 +1,8 @@
 //
-//  KindKitUserDefaults
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public typealias IUserDefaultsCoderAlias = IUserDefaultsDecoderAlias & IUserDefaultsEncoderAlias
 

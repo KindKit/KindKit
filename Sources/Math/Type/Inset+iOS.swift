@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if os(iOS)
@@ -18,7 +18,6 @@ public extension Inset {
         )
     }
     
-    @inlinable
     init(_ uiEdgeInsets: UIEdgeInsets) {
         self.top = Value(uiEdgeInsets.top)
         self.left = Value(uiEdgeInsets.left)

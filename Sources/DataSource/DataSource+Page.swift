@@ -1,10 +1,8 @@
 //
-//  KindKitDataSource
+//  KindKit
 //
 
 import Foundation
-import KindKitApi
-import KindKitCore
 
 public extension DataSource {
 

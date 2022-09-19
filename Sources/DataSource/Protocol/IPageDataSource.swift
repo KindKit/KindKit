@@ -1,9 +1,8 @@
 //
-//  KindKitDataSource
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public protocol IPageDataSource : IDataSource where Success : Sequence {
     

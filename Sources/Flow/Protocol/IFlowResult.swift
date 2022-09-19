@@ -1,9 +1,8 @@
 //
-//  KindKitFlow
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public protocol IFlowResult {
     

@@ -1,10 +1,8 @@
 //
-//  KindKitLogUI
+//  KindKit
 //
 
 import Foundation
-import KindKitLog
-import KindKitObserver
 
 protocol ILogUITargetObserver : AnyObject {
     

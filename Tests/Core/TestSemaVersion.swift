@@ -1,9 +1,9 @@
 //
-//  KindKitCore-Test
+//  KindKit-Test
 //
 
 import XCTest
-@testable import KindKitCore
+import KindKit
 
 class TestSemaVersion : XCTestCase {
     

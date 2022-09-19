@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 #if canImport(CoreGraphics)
@@ -16,7 +16,6 @@ public extension Rect {
         )
     }
     
-    @inlinable
     init(_ cgRect: CGRect) {
         self.origin = Point(cgRect.origin)
         self.size = Size(cgRect.size)

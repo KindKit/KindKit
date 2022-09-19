@@ -1,9 +1,8 @@
 //
-//  KindKitApi
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
 
 public protocol IApiProvider : AnyObject {
 

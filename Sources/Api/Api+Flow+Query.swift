@@ -1,10 +1,8 @@
 //
-//  KindKitApi
+//  KindKit
 //
 
 import Foundation
-import KindKitCore
-import KindKitFlow
 
 public extension Api.Flow {
     
@@ -24,7 +22,7 @@ public extension Api.Flow {
         
         init(
             _ provider: Provider,
-            _ dispatch: KindKitFlow.Operator.DispatchMode,
+            _ dispatch: FlowOperator.DispatchMode,
             _ request: @escaping (Input.Success) throws -> Api.Request?,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation,
@@ -113,7 +111,7 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Output.Success) throws -> Api.Request?,
         response: @escaping (Output.Success) -> Response,
         validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
@@ -130,7 +128,7 @@ extension IFlowOperator {
         Failure : Swift.Error
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Output.Success) throws -> Api.Request?,
         response: @escaping (Output.Success) -> Response,
         validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
@@ -150,11 +148,11 @@ public extension Flow {
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
-    ) -> Builder.Head< Api.Flow.Query< Input, Provider, Response, Response.Success, Response.Failure > > {
+    ) -> FlowBuilder.Head< Api.Flow.Query< Input, Provider, Response, Response.Success, Response.Failure > > {
         return .init(head: .init(provider, dispatch, request, response, validation, { _, response in response }))
     }
     
@@ -165,29 +163,29 @@ public extension Flow {
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
         transform: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
-    ) -> Builder.Head< Api.Flow.Query< Input, Provider, Response, Success, Failure > > {
+    ) -> FlowBuilder.Head< Api.Flow.Query< Input, Provider, Response, Success, Failure > > {
         return .init(head: .init(provider, dispatch, request, response, validation, transform))
     }
     
 }
 
-public extension Builder.Head {
+public extension FlowBuilder.Head {
     
     func apiQuery<
         Provider : IApiProvider,
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
-    ) -> Builder.Chain< Head, Api.Flow.Query< Head.Output, Provider, Response, Response.Success, Response.Failure > > {
+    ) -> FlowBuilder.Chain< Head, Api.Flow.Query< Head.Output, Provider, Response, Response.Success, Response.Failure > > {
         return .init(head: self.head, tail: self.head.apiQuery(provider: provider, dispatch: dispatch, request: request, response: response, validation: validation, transform: { _, response in response }))
     }
     
@@ -198,28 +196,28 @@ public extension Builder.Head {
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
         transform: @escaping (Head.Output.Success, Response.Result) -> Result< Success, Failure >
-    ) -> Builder.Chain< Head, Api.Flow.Query< Head.Output, Provider, Response, Success, Failure > > {
+    ) -> FlowBuilder.Chain< Head, Api.Flow.Query< Head.Output, Provider, Response, Success, Failure > > {
         return .init(head: self.head, tail: self.head.apiQuery(provider: provider, dispatch: dispatch, request: request, response: response, validation: validation, transform: transform))
     }
 }
 
-public extension Builder.Chain {
+public extension FlowBuilder.Chain {
     
     func apiQuery<
         Provider : IApiProvider,
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
-    ) -> Builder.Chain< Head, Api.Flow.Query< Tail.Output, Provider, Response, Response.Success, Response.Failure > > {
+    ) -> FlowBuilder.Chain< Head, Api.Flow.Query< Tail.Output, Provider, Response, Response.Success, Response.Failure > > {
         return .init(head: self.head, tail: self.tail.apiQuery(provider: provider, dispatch: dispatch, request: request, response: response, validation: validation, transform: { _, response in response }))
     }
     
@@ -230,12 +228,12 @@ public extension Builder.Chain {
         Response : IApiResponse
     >(
         provider: Provider,
-        dispatch: KindKitFlow.Operator.DispatchMode,
+        dispatch: FlowOperator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
         transform: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
-    ) -> Builder.Chain< Head, Api.Flow.Query< Tail.Output, Provider, Response, Success, Failure > > {
+    ) -> FlowBuilder.Chain< Head, Api.Flow.Query< Tail.Output, Provider, Response, Success, Failure > > {
         return .init(head: self.head, tail: self.tail.apiQuery(provider: provider, dispatch: dispatch, request: request, response: response, validation: validation, transform: transform))
     }
     

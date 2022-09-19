@@ -1,9 +1,9 @@
 //
-//  KindKitMath-Test
+//  KindKit-Test
 //
 
 import XCTest
-@testable import KindKitMath
+import KindKit
 
 class TestPolyline2 : XCTestCase {
     

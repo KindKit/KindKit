@@ -1,5 +1,5 @@
 //
-//  KindKitMath
+//  KindKit
 //
 
 import Foundation
@@ -20,7 +20,6 @@ public struct Matrix3< Value : IScalar & Hashable > : Hashable {
     public var m32: Value
     public var m33: Value
     
-    @inlinable
     public init(
         _ m11: Value, _ m12: Value, _ m13: Value,
         _ m21: Value, _ m22: Value, _ m23: Value,
@@ -31,7 +30,6 @@ public struct Matrix3< Value : IScalar & Hashable > : Hashable {
         self.m31 = m31; self.m32 = m32; self.m33 = m33
     }
     
-    @inlinable
     public init(translation: Point< Value >) {
         self.init(
             1, 0, 0,
@@ -40,7 +38,6 @@ public struct Matrix3< Value : IScalar & Hashable > : Hashable {
         )
     }
     
-    @inlinable
     public init(rotation: Angle< Value >) {
         let radians = rotation.radians
         let cs = radians.cos
@@ -52,7 +49,6 @@ public struct Matrix3< Value : IScalar & Hashable > : Hashable {
         )
     }
     
-    @inlinable
     public init(scale: Point< Value >) {
         self.init(
             scale.x, 0, 0,
