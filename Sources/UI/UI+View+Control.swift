@@ -16,7 +16,7 @@ protocol KKControlViewDelegate : AnyObject {
 
 public extension UI.View {
     
-    final class Control : IUIView, IUIViewHighlightable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Control : IUIView, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public private(set) unowned var layout: IUILayout?
         public unowned var item: UI.Layout.Item?
