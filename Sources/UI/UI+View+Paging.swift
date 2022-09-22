@@ -53,7 +53,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var width: UI.Size.Dynamic = .static(.fill) {
+        public var width: UI.Size.Dynamic = .fill {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
@@ -434,17 +434,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
     }
     
     func isDynamicSize(_ view: KKPagingView) -> Bool {
-        switch (self.width, self.height) {
-        case (.static, .static): return false
-        case (.static, .morph): return true
-        case (.static, .fit): return true
-        case (.morph, .static): return true
-        case (.morph, .morph): return true
-        case (.morph, .fit): return true
-        case (.fit, .static): return true
-        case (.fit, .morph): return true
-        case (.fit, .fit): return true
-        }
+        return self.width.isStatic == true && self.height.isStatic == true
     }
     
 }

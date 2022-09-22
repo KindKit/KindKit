@@ -61,7 +61,7 @@ extension LogUI {
         
         private(set) lazy var _autoScrollButton = UI.View.Button()
             .inset(.init(horizontal: 12, vertical: 4))
-            .height(.static(.fixed(44)))
+            .height(.fixed(44))
             .backgroundView(UI.View.Empty()
                 .color(.init(rgb: 0xFFCF38))
                 .cornerRadius(.manual(radius: 4)))
@@ -84,7 +84,7 @@ extension LogUI {
         
         private(set) lazy var _closeButton = UI.View.Button()
             .inset(.init(horizontal: 12, vertical: 4))
-            .height(.static(.fixed(44)))
+            .height(.fixed(44))
             .backgroundView(UI.View.Empty()
                 .color(.init(rgb: 0xA9AEBA))
                 .cornerRadius(.manual(radius: 4)))
