@@ -8,10 +8,9 @@ public extension UI.Size {
 
     enum Static : Equatable {
         
-        case none
-        case fixed(_ value: Float)
-        case percent(_ value: PercentFloat)
         case fill
+        case percent(PercentFloat)
+        case fixed(Float)
         
     }
     
@@ -23,18 +22,16 @@ public extension UI.Size.Static {
     static func apply(
         available: Float,
         behaviour: UI.Size.Static
-    ) -> Float? {
+    ) -> Float {
         switch behaviour {
-        case .none:
-            return 0
+        case .fill:
+            guard available.isInfinite == false else { return 0 }
+            return max(0, available)
         case .fixed(let value):
             return max(0, value)
         case .percent(let value):
-            guard available.isInfinite == false else { return nil }
+            guard available.isInfinite == false else { return 0 }
             return max(0, available * value.value)
-        case .fill:
-            guard available.isInfinite == false else { return nil }
-            return max(0, available)
         }
     }
     
@@ -68,12 +65,14 @@ public extension UI.Size.Static {
         aspectRatio: Float
     ) -> SizeFloat {
         if let width = width {
-            if let v = Self.apply(available: available.width, behaviour: width) {
-                return Size(width: v, height: v / aspectRatio)
+            let w = Self.apply(available: available.width, behaviour: width)
+            if w > .leastNonzeroMagnitude {
+                return Size(width: w, height: w / aspectRatio)
             }
         } else if let height = height {
-            if let v = Self.apply(available: available.height, behaviour: height) {
-                return Size(width: v * aspectRatio, height: v)
+            let h = Self.apply(available: available.height, behaviour: height)
+            if h > .leastNonzeroMagnitude {
+                return Size(width: h * aspectRatio, height: h)
             }
         }
         return .zero
@@ -87,13 +86,13 @@ public extension UI.Size.Static {
     ) -> SizeFloat {
         let w: Float
         if let width = width {
-            w = Self.apply(available: available.width, behaviour: width) ?? 0
+            w = Self.apply(available: available.width, behaviour: width)
         } else {
             w = 0
         }
         let h: Float
         if let height = height {
-            h = Self.apply(available: available.height, behaviour: height) ?? 0
+            h = Self.apply(available: available.height, behaviour: height)
         } else {
             h = 0
         }
@@ -107,8 +106,8 @@ public extension UI.Size.Static {
         height: UI.Size.Static
     ) -> SizeFloat {
         return Size(
-            width: Self.apply(available: available.width, behaviour: width) ?? 0,
-            height: Self.apply(available: available.height, behaviour: height) ?? 0
+            width: Self.apply(available: available.width, behaviour: width),
+            height: Self.apply(available: available.height, behaviour: height)
         )
     }
     
