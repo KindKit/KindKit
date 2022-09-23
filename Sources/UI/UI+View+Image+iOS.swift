@@ -78,7 +78,7 @@ extension KKImageView {
         self.updateShadowPath()
     }
     
-    func update(image: Image) {
+    func update(image: UI.Image) {
         self.image = image.native
     }
     

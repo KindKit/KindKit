@@ -159,7 +159,7 @@ public extension String {
     }
     
     @inlinable
-    func size(font: Font, available: SizeFloat) -> SizeFloat {
+    func size(font: UI.Font, available: SizeFloat) -> SizeFloat {
         let attributed = NSAttributedString(string: self, attributes: [ .font : font.native ])
         return attributed.size(available: available)
     }

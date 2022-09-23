@@ -35,7 +35,7 @@ public extension UI.View {
                 self._view.update(style: self.style)
             }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)

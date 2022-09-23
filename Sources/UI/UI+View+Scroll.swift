@@ -121,7 +121,7 @@ public extension UI.View {
         public private(set) var isDecelerating: Bool = false
     #if os(iOS)
         @available(iOS 10.0, *)
-        public var refreshColor: Color? {
+        public var refreshColor: UI.Color? {
             set(value) {
                 guard self._refreshColor != value else { return }
                 self._refreshColor = value
@@ -141,7 +141,7 @@ public extension UI.View {
             get { return self._isRefreshing }
         }
     #endif
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet(oldValue) {
                 guard self.color != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -184,7 +184,7 @@ public extension UI.View {
             return self._reuse.content()
         }
         private var _contentOffset: PointFloat = .zero
-        private var _refreshColor: Color?
+        private var _refreshColor: UI.Color?
         private var _isRefreshing: Bool = false
         private var _observer: Observer< IUIScrollViewObserver >
         private var _onAppear: ((UI.View.Scroll) -> Void)?
@@ -402,7 +402,7 @@ public extension UI.View.Scroll {
     @available(iOS 10.0, *)
     @inlinable
     @discardableResult
-    func refreshColor(_ value: Color?) -> Self {
+    func refreshColor(_ value: UI.Color?) -> Self {
         self.refreshColor = value
         return self
     }

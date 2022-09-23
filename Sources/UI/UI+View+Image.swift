@@ -45,7 +45,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var image: KindKit.Image {
+        public var image: UI.Image {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(image: self.image)
@@ -59,13 +59,13 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
             }
         }
-        public var tintColor: Color? {
+        public var tintColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(tintColor: self.tintColor)
@@ -107,7 +107,7 @@ public extension UI.View {
         private var _onInvisible: ((UI.View.Image) -> Void)?
         
         public init(
-            _ image: KindKit.Image
+            _ image: UI.Image
         ) {
             self.image = image
             self._reuse = UI.Reuse.Item()
@@ -261,7 +261,7 @@ public extension UI.View.Image {
     
     @inlinable
     @discardableResult
-    func image(_ value: KindKit.Image) -> Self {
+    func image(_ value: UI.Image) -> Self {
         self.image = value
         return self
     }

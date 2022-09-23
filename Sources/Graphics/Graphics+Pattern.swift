@@ -8,11 +8,11 @@ public extension Graphics {
 
     struct Pattern : Equatable {
         
-        public let image: Image
+        public let image: UI.Image
         public let step: PointFloat
         
         public init(
-            image: Image,
+            image: UI.Image,
             step: PointFloat? = nil
         ) {
             self.image = image

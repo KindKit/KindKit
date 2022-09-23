@@ -6,7 +6,7 @@
 
 import UIKit
 
-public extension TextWritingDirection {
+public extension UI.Text.WritingDirection {
     
     var nsWritingDirection: NSWritingDirection {
         switch self {

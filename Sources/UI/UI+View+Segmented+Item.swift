@@ -11,7 +11,7 @@ public extension UI.View.Segmented {
     enum Item : Equatable {
         
         case string(String)
-        case image(Image)
+        case image(UI.Image)
         
     }
     

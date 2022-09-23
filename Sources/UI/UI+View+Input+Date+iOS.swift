@@ -139,11 +139,11 @@ extension KKInputDateView {
         self._applyText()
     }
     
-    func update(textFont: Font) {
+    func update(textFont: UI.Font) {
         self.font = textFont.native
     }
     
-    func update(textColor: Color) {
+    func update(textColor: UI.Color) {
         self.textColor = textColor.native
     }
     
@@ -166,7 +166,7 @@ extension KKInputDateView {
         self.setNeedsLayout()
     }
     
-    func update(alignment: TextAlignment) {
+    func update(alignment: UI.Text.Alignment) {
         self.textAlignment = alignment.nsTextAlignment
     }
     

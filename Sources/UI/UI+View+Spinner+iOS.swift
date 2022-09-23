@@ -82,7 +82,7 @@ extension KKSpinnerView {
         self.updateShadowPath()
     }
     
-    func update(activityColor: Color?) {
+    func update(activityColor: UI.Color?) {
         self.color = activityColor?.native
     }
     

@@ -35,7 +35,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var activityColor: Color? {
+        public var activityColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(activityColor: self.activityColor)
@@ -55,7 +55,7 @@ public extension UI.View {
             }
             get { return self._isAnimating }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -187,7 +187,7 @@ public extension UI.View.Spinner {
     
     @inlinable
     @discardableResult
-    func activityColor(_ value: Color?) -> Self {
+    func activityColor(_ value: UI.Color?) -> Self {
         self.activityColor = value
         return self
     }

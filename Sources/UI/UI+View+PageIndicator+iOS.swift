@@ -70,11 +70,11 @@ extension KKPageIndicatorView {
         self.kkDelegate = view
     }
     
-    func update(pageColor: Color?) {
+    func update(pageColor: UI.Color?) {
         self.pageIndicatorTintColor = pageColor?.native
     }
     
-    func update(currentPageColor: Color?) {
+    func update(currentPageColor: UI.Color?) {
         self.currentPageIndicatorTintColor = currentPageColor?.native
     }
     

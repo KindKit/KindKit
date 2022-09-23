@@ -8,13 +8,13 @@ public extension UI {
     
     struct Shadow : Equatable {
 
-        public let color: Color
+        public let color: UI.Color
         public let opacity: Float
         public let radius: Float
         public let offset: PointFloat
         
         public init(
-            color: Color,
+            color: UI.Color,
             opacity: Float,
             radius: Float,
             offset: PointFloat

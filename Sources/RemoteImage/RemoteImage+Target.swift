@@ -9,12 +9,12 @@ public extension RemoteImage {
     final class Target {
         
         public let onProgress: ((_ progress: Float) -> Void)?
-        public let onImage: ((_ image: Image) -> Void)?
+        public let onImage: ((_ image: UI.Image) -> Void)?
         public let onError: ((_ error: Error) -> Void)?
         
         public init(
             onProgress: ((_ progress: Float) -> Void)? = nil,
-            onImage: ((_ image: Image) -> Void)? = nil,
+            onImage: ((_ image: UI.Image) -> Void)? = nil,
             onError: ((_ error: Error) -> Void)? = nil
         ) {
             self.onProgress = onProgress
@@ -32,7 +32,7 @@ extension RemoteImage.Target : IRemoteImageTarget {
         self.onProgress?(progress)
     }
     
-    public func remoteImage(image: Image) {
+    public func remoteImage(image: UI.Image) {
         self.onImage?(image)
     }
     

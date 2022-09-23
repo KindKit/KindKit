@@ -86,7 +86,7 @@ extension KKImageView {
         self.updateShadowPath()
     }
     
-    func update(image: KindKit.Image) {
+    func update(image: UI.Image) {
         self.image = image.native
     }
     
@@ -98,7 +98,7 @@ extension KKImageView {
         }
     }
     
-    func update(tintColor: Color?) {
+    func update(tintColor: UI.Color?) {
         self.contentTintColor = tintColor?.native
     }
     

@@ -15,7 +15,7 @@ public protocol IRemoteImageQuery : AnyObject {
         provider: IApiProvider,
         queue: DispatchQueue,
         download: @escaping (_ progress: Progress) -> Void,
-        success: @escaping (_ data: Data, _ image: Image) -> Void,
+        success: @escaping (_ data: Data, _ image: UI.Image) -> Void,
         failure: @escaping (_ error: Error) -> Void
     ) -> ICancellable
     

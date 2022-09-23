@@ -72,7 +72,7 @@ public extension UI.View {
             }
         }
         public private(set) var state: State = .empty
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)

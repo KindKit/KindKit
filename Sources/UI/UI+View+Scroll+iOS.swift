@@ -235,7 +235,7 @@ extension KKScrollView {
     }
     
     @available(iOS 10.0, *)
-    func update(refreshColor: Color?) {
+    func update(refreshColor: UI.Color?) {
         if let refreshColor = refreshColor {
             self._refreshView.tintColor = refreshColor.native
             if self.refreshControl != self._refreshView {

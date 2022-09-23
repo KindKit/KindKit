@@ -87,15 +87,15 @@ extension KKSwitchView {
         self.kkDelegate = view
     }
     
-    func update(thumbColor: Color?) {
+    func update(thumbColor: UI.Color?) {
         self._switch.thumbTintColor = thumbColor?.native
     }
     
-    func update(offColor: Color?) {
+    func update(offColor: UI.Color?) {
         self._switch.tintColor = offColor?.native
     }
     
-    func update(onColor: Color?) {
+    func update(onColor: UI.Color?) {
         self._switch.onTintColor = onColor?.native
     }
     

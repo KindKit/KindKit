@@ -100,19 +100,19 @@ extension KKTextView {
         self.stringValue = text
     }
     
-    func update(textFont: Font) {
+    func update(textFont: UI.Font) {
         self.font = textFont.native
     }
     
-    func update(textColor: Color) {
+    func update(textColor: UI.Color) {
         self.textColor = textColor.native
     }
     
-    func update(alignment: TextAlignment) {
+    func update(alignment: UI.Text.Alignment) {
         self.alignment = alignment.nsTextAlignment
     }
     
-    func update(lineBreak: TextLineBreak) {
+    func update(lineBreak: UI.Text.LineBreak) {
         self.lineBreakMode = lineBreak.nsLineBreakMode
     }
     

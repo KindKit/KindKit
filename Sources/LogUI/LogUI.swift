@@ -40,7 +40,7 @@ extension LogUI {
         
         init() {
             self._backgroundView = UI.View.Empty()
-                .color(Color(rgba: 0x0000007a))
+                .color(.init(rgba: 0x0000007a))
         }
         
     }

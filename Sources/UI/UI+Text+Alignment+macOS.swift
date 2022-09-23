@@ -2,11 +2,11 @@
 //  KindKit
 //
 
-#if os(iOS)
+#if os(macOS)
 
-import UIKit
+import AppKit
 
-public extension TextAlignment {
+public extension UI.Text.Alignment {
     
     var nsTextAlignment: NSTextAlignment {
         switch self {

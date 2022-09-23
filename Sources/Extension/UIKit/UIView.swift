@@ -45,11 +45,11 @@ public extension UIView {
         self.isUserInteractionEnabled = locked == false
     }
     
-    func update(color: Color?) {
+    func update(color: UI.Color?) {
         self.backgroundColor = color?.native
     }
     
-    func update(tintColor: Color?) {
+    func update(tintColor: UI.Color?) {
         self.tintColor = tintColor?.native
     }
     

@@ -40,7 +40,7 @@ public extension UI.View {
         
         private var _layout: Layout
         private var _onProgress: ((UI.View.RemoteImage, Float) -> Void)?
-        private var _onFinish: ((UI.View.RemoteImage, KindKit.Image) -> UI.View.Image)?
+        private var _onFinish: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?
         private var _onError: ((UI.View.RemoteImage, Error) -> Void)?
         
         public init(
@@ -76,7 +76,7 @@ public extension UI.View {
         }
         
         @discardableResult
-        public func onFinish(_ value: ((UI.View.RemoteImage, KindKit.Image) -> UI.View.Image)?) -> Self {
+        public func onFinish(_ value: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?) -> Self {
             self._onFinish = value
             return self
         }
@@ -310,7 +310,7 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
         self._onProgress?(self, progress)
     }
     
-    public func remoteImage(image: Image) {
+    public func remoteImage(image: UI.Image) {
         self.isLoading = false
         self._layout.state = .loaded
         

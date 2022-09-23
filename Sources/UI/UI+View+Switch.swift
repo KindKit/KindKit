@@ -47,19 +47,19 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var thumbColor: Color? = nil {
+        public var thumbColor: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(thumbColor: self.thumbColor)
             }
         }
-        public var offColor: Color? = nil {
+        public var offColor: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(offColor: self.offColor)
             }
         }
-        public var onColor: Color? = nil {
+        public var onColor: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(onColor: self.onColor)
@@ -85,7 +85,7 @@ public extension UI.View {
             }
             get { return self._isLocked }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -231,21 +231,21 @@ public extension UI.View.Switch {
     
     @inlinable
     @discardableResult
-    func thumbColor(_ value: Color) -> Self {
+    func thumbColor(_ value: UI.Color) -> Self {
         self.thumbColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func offColor(_ value: Color) -> Self {
+    func offColor(_ value: UI.Color) -> Self {
         self.offColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func onColor(_ value: Color) -> Self {
+    func onColor(_ value: UI.Color) -> Self {
         self.onColor = value
         return self
     }

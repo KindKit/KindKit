@@ -55,7 +55,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var textFont: Font = Font(weight: .regular) {
+        public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
                 guard self.textFont != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -65,14 +65,14 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var textColor: Color = Color(rgb: 0x000000) {
+        public var textColor: UI.Color = .init(rgb: 0x000000) {
             didSet {
                 guard self.textColor != oldValue else { return }
                 guard self.isLoaded == true else { return }
                 self._view.update(textColor: self.textColor)
             }
         }
-        public var alignment: TextAlignment = .left {
+        public var alignment: UI.Text.Alignment = .left {
             didSet {
                 guard self.alignment != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -80,7 +80,7 @@ public extension UI.View {
                 self.setNeedLayout()
             }
         }
-        public var lineBreak: TextLineBreak = .wordWrapping {
+        public var lineBreak: UI.Text.LineBreak = .wordWrapping {
             didSet {
                 guard self.lineBreak != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -96,7 +96,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var color: Color? = Color(rgba: 0x00000000) {
+        public var color: UI.Color? = .init(rgba: 0x00000000) {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -250,28 +250,28 @@ public extension UI.View.Text {
     
     @inlinable
     @discardableResult
-    func textFont(_ value: Font) -> Self {
+    func textFont(_ value: UI.Font) -> Self {
         self.textFont = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func textColor(_ value: Color) -> Self {
+    func textColor(_ value: UI.Color) -> Self {
         self.textColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func alignment(_ value: TextAlignment) -> Self {
+    func alignment(_ value: UI.Text.Alignment) -> Self {
         self.alignment = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func lineBreak(_ value: TextLineBreak) -> Self {
+    func lineBreak(_ value: UI.Text.LineBreak) -> Self {
         self.lineBreak = value
         return self
     }

@@ -66,7 +66,7 @@ public extension UI.View {
             }
             get { return self._isLocked }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)

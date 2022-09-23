@@ -9,7 +9,7 @@ public extension RemoteImage {
     final class Cache {
 
         public private(set) var name: String
-        public private(set) var memory: [String: Image]
+        public private(set) var memory: [String: UI.Image]
         public private(set) var url: URL
         
         private var _fileManager: FileManager
@@ -68,23 +68,23 @@ public extension RemoteImage.Cache {
 
 public extension RemoteImage.Cache {
     
-    func image(query: IRemoteImageQuery) -> Image? {
+    func image(query: IRemoteImageQuery) -> UI.Image? {
         guard let key = self._key(query) else { return nil }
         return self.image(key: key)
     }
     
-    func image(query: IRemoteImageQuery, filter: IRemoteImageFilter) -> Image? {
+    func image(query: IRemoteImageQuery, filter: IRemoteImageFilter) -> UI.Image? {
         guard let key = self._key(query, filter) else { return nil }
         return self.image(key: key)
     }
 
-    func image(key: String) -> Image? {
+    func image(key: String) -> UI.Image? {
         let memoryImage = self._queue.sync(execute: { return self.memory[key] })
         if let image = memoryImage {
             return image
         }
         let url = self.url.appendingPathComponent(key)
-        if let image = Image(url: url) {
+        if let image = UI.Image(url: url) {
             self._queue.sync(flags: .barrier, execute: {
                 self.memory[key] = image
             })
@@ -97,17 +97,17 @@ public extension RemoteImage.Cache {
 
 public extension RemoteImage.Cache {
     
-    func set(data: Data, image: Image, query: IRemoteImageQuery) throws {
+    func set(data: Data, image: UI.Image, query: IRemoteImageQuery) throws {
         guard let key = self._key(query) else { return }
         try self.set(data: data, image: image, key: key)
     }
     
-    func set(data: Data, image: Image, query: IRemoteImageQuery, filter: IRemoteImageFilter) throws {
+    func set(data: Data, image: UI.Image, query: IRemoteImageQuery, filter: IRemoteImageFilter) throws {
         guard let key = self._key(query, filter) else { return }
         try self.set(data: data, image: image, key: key)
     }
 
-    func set(data: Data, image: Image, key: String) throws {
+    func set(data: Data, image: UI.Image, key: String) throws {
         let url = self.url.appendingPathComponent(key)
         try data.write(to: url, options: .atomic)
         self._queue.sync(flags: .barrier, execute: {

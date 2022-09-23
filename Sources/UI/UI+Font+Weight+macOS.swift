@@ -6,26 +6,7 @@
 
 import AppKit
 
-public struct Font : Hashable {
-
-    public var native: NSFont
-    
-    public init(
-        weight: FontWeight,
-        size: Float = Float(NSFont.systemFontSize)
-    ) {
-        self.native = NSFont.systemFont(ofSize: CGFloat(size), weight: weight.nsFontWeight)
-    }
-    
-    public init(
-        _ native: NSFont
-    ) {
-        self.native = native
-    }
-    
-}
-
-public extension FontWeight {
+public extension UI.Font.Weight {
     
     var nsFontWeight: NSFont.Weight {
         switch self {

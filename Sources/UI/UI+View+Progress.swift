@@ -41,13 +41,13 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var progressColor: Color? {
+        public var progressColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(progressColor: self.progressColor)
             }
         }
-        public var trackColor: Color? {
+        public var trackColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(trackColor: self.trackColor)
@@ -59,7 +59,7 @@ public extension UI.View {
                 self._view.update(progress: self.progress)
             }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -185,14 +185,14 @@ public extension UI.View.Progress {
     
     @inlinable
     @discardableResult
-    func progressColor(_ value: Color) -> Self {
+    func progressColor(_ value: UI.Color) -> Self {
         self.progressColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func trackColor(_ value: Color) -> Self {
+    func trackColor(_ value: UI.Color) -> Self {
         self.trackColor = value
         return self
     }

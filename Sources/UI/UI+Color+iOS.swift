@@ -2,21 +2,19 @@
 //  KindKit
 //
 
-#if os(macOS)
+#if os(iOS)
 
-import AppKit
+import UIKit
 
-public struct Color : Equatable {
+public extension UI.Color {
     
-    public var native: NSColor
-    
-    public init(
+    init(
         r: Float,
         g: Float,
         b: Float,
         a: Float = 1
     ) {
-        self.native = NSColor(
+        self.native = UIColor(
             red: CGFloat(r),
             green: CGFloat(g),
             blue: CGFloat(b),
@@ -24,13 +22,13 @@ public struct Color : Equatable {
         )
     }
     
-    public init(
+    init(
         r: UInt8,
         g: UInt8,
         b: UInt8,
         a: UInt8 = 255
     ) {
-        self.native = NSColor(
+        self.native = UIColor(
             red: CGFloat(r) / 255,
             green: CGFloat(g) / 255,
             blue: CGFloat(b) / 255,
@@ -38,10 +36,10 @@ public struct Color : Equatable {
         )
     }
     
-    public init(
+    init(
         rgb: UInt32
     ) {
-        self.native = NSColor(
+        self.native = UIColor(
             red: CGFloat((rgb >> 16) & 0xff) / 255.0,
             green: CGFloat((rgb >> 8) & 0xff) / 255.0,
             blue: CGFloat(rgb & 0xff) / 255.0,
@@ -49,10 +47,10 @@ public struct Color : Equatable {
         )
     }
     
-    public init(
+    init(
         rgba: UInt32
     ) {
-        self.native = NSColor(
+        self.native = UIColor(
             red: CGFloat((rgba >> 24) & 0xff) / 255.0,
             green: CGFloat((rgba >> 16) & 0xff) / 255.0,
             blue: CGFloat((rgba >> 8) & 0xff) / 255.0,
@@ -60,17 +58,36 @@ public struct Color : Equatable {
         )
     }
     
-    public init(_ native: NSColor) {
+    @available(iOS 11.0, *)
+    init(
+        name: String,
+        in bundle: Bundle? = nil,
+        compatibleWith traitCollection: UITraitCollection? = nil
+    ) {
+        guard let native = UIColor(named: name, in: bundle, compatibleWith: traitCollection) else {
+            fatalError("Not found color with '\(name)'")
+        }
         self.native = native
     }
     
-    public init(_ cgColor: CGColor) {
-        self.init(NSColor(cgColor: cgColor) ?? NSColor.black)
+    @available(iOS 13.0, *)
+    init(
+        dynamicProvider: @escaping (UITraitCollection) -> UI.Color
+    ) {
+        self.native = UIColor(dynamicProvider: { return dynamicProvider($0).native })
+    }
+    
+    init(_ native: UIColor) {
+        self.native = native
+    }
+    
+    init(_ cgColor: CGColor) {
+        self.init(UIColor(cgColor: cgColor))
     }
     
 }
 
-public extension Color {
+public extension UI.Color {
     
     @inlinable
     var cgColor: CGColor {
@@ -80,6 +97,14 @@ public extension Color {
     @inlinable
     var isOpaque: Bool {
         return self.native.isOpaque
+    }
+    
+}
+
+public extension UI.Color {
+    
+    func with(alpha: Float) -> UI.Color {
+        return .init(self.native.withAlphaComponent(CGFloat(alpha)))
     }
     
 }

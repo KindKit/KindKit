@@ -45,19 +45,19 @@ public extension UI.View.Input {
                 self._view.update(translucent: self.isTranslucent)
             }
         }
-        public var barTintColor: Color? = nil {
+        public var barTintColor: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(barTintColor: self.barTintColor)
             }
         }
-        public var contentTintColor: Color = .init(rgb: 0xffffff) {
+        public var contentTintColor: UI.Color = .init(rgb: 0xffffff) {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(contentTintColor: self.contentTintColor)
             }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -143,14 +143,14 @@ public extension UI.View.Input.Toolbar {
     
     @inlinable
     @discardableResult
-    func barTintColor(_ value: Color?) -> Self {
+    func barTintColor(_ value: UI.Color?) -> Self {
         self.barTintColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func contentTintColor(_ value: Color) -> Self {
+    func contentTintColor(_ value: UI.Color) -> Self {
         self.contentTintColor = value
         return self
     }

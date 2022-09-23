@@ -23,14 +23,14 @@ extension LogUI {
 #endif
             .trailingViews([ self._closeButton ])
             .trailingViewSpacing(4)
-            .color(Color(rgb: 0xffffff))
+            .color(.init(rgb: 0xffffff))
         
         private(set) lazy var layout = UI.Layout.List(direction: .vertical)
         
         private(set) lazy var view = UI.View.Scroll(self.layout)
             .direction(.vertical)
             .indicatorDirection(.vertical)
-            .color(Color(rgb: 0xffffff))
+            .color(.init(rgb: 0xffffff))
             .onBeginScrolling({ [unowned self] _ in
                 self._autoScrollButton.isSelected = false
             })
@@ -39,17 +39,17 @@ extension LogUI {
         
         private(set) lazy var _searchView = UI.View.Input.String()
             .height(.fixed(44))
-            .textFont(Font(weight: .regular, size: 16))
-            .textColor(Color(rgb: 0x000000))
+            .textFont(.init(weight: .regular, size: 16))
+            .textColor(.init(rgb: 0x000000))
             .textInset(InsetFloat(horizontal: 12, vertical: 4))
-            .editingColor(Color(rgb: 0x000000))
+            .editingColor(.init(rgb: 0x000000))
             .placeholder(UI.View.Input.Placeholder(
                 text: "Enter filter",
-                font: Font(weight: .regular, size: 16),
-                color: Color(rgb: 0xA9AEBA)
+                font: .init(weight: .regular, size: 16),
+                color: .init(rgb: 0xA9AEBA)
             ))
-            .color(Color(rgb: 0xffffff))
-            .border(.manual(width: 1, color: Color(rgb: 0xA9AEBA)))
+            .color(.init(rgb: 0xffffff))
+            .border(.manual(width: 1, color: .init(rgb: 0xA9AEBA)))
             .cornerRadius(.manual(radius: 4))
             .onPressedReturn({ [unowned self] in
                 $0.endEditing()
@@ -72,9 +72,9 @@ extension LogUI {
             .onChangeStyle({ button, _ in
                 guard let backgroundView = button.backgroundView as? IUIViewColorable else { return }
                 if button.isSelected == true {
-                    backgroundView.color = Color(rgb: 0xFFCF38)
+                    backgroundView.color = .init(rgb: 0xFFCF38)
                 } else {
-                    backgroundView.color = Color(rgb: 0xA9AEBA)
+                    backgroundView.color = .init(rgb: 0xA9AEBA)
                 }
             })
             .onPressed({ [unowned self] in
@@ -211,13 +211,13 @@ private extension LogUI.Screen {
                             entities: [
                                 .view(
                                     UI.View.Text(item.category)
-                                        .textFont(Font(weight: .regular, size: 16))
-                                        .textColor(Color(rgb: 0x000000))
+                                        .textFont(.init(weight: .regular, size: 16))
+                                        .textColor(.init(rgb: 0x000000))
                                 ),
                                 .view(
                                     UI.View.Text(item.message)
-                                        .textFont(Font(weight: .regular, size: 14))
-                                        .textColor(Color(rgb: 0x000000))
+                                        .textFont(.init(weight: .regular, size: 14))
+                                        .textColor(.init(rgb: 0x000000))
                                 )
                             ]
                         )
@@ -228,11 +228,11 @@ private extension LogUI.Screen {
         )
     }
     
-    func _color(_ item: LogUI.Target.Item) -> Color {
+    func _color(_ item: LogUI.Target.Item) -> UI.Color {
         switch item.level {
-        case .debug: return Color(rgb: 0x808080)
-        case .info: return Color(rgb: 0xffff00)
-        case .error: return Color(rgb: 0xff0000)
+        case .debug: return .init(rgb: 0x808080)
+        case .info: return .init(rgb: 0xffff00)
+        case .error: return .init(rgb: 0xff0000)
         }
     }
     

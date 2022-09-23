@@ -24,7 +24,7 @@ public extension NSView {
         return false
     }
     
-    func update(color: Color?) {
+    func update(color: UI.Color?) {
         let layer = self.layer!
         if let color = color {
             layer.backgroundColor = color.native.cgColor

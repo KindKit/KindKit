@@ -2,12 +2,12 @@
 //  KindKit
 //
 
-#if os(macOS)
+#if os(iOS)
 
-import AppKit
+import UIKit
 
-public extension TextLineBreak {
-    
+public extension UI.Text.LineBreak {
+
     var nsLineBreakMode: NSLineBreakMode {
         switch self {
         case .cliping: return .byClipping

@@ -19,7 +19,7 @@ public extension RemoteImage.Filter {
             self._filters = filters
         }
         
-        public func apply(_ image: Image) -> Image? {
+        public func apply(_ image: UI.Image) -> UI.Image? {
             var result = image
             for filter in self._filters {
                 guard let image = filter.apply(result) else {

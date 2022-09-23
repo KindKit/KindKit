@@ -121,11 +121,11 @@ extension KKInputTextView {
         self._input.text = text
     }
     
-    func update(textFont: Font) {
+    func update(textFont: UI.Font) {
         self._input.font = textFont.native
     }
     
-    func update(textColor: Color) {
+    func update(textColor: UI.Color) {
         self._input.textColor = textColor.native
     }
     
@@ -133,7 +133,7 @@ extension KKInputTextView {
         self._input.setNeedsLayout()
     }
     
-    func update(editingColor: Color?) {
+    func update(editingColor: UI.Color?) {
         self._input.tintColor = editingColor?.native
     }
     
@@ -152,7 +152,7 @@ extension KKInputTextView {
         self.setNeedsLayout()
     }
     
-    func update(alignment: TextAlignment) {
+    func update(alignment: UI.Text.Alignment) {
         self._input.textAlignment = alignment.nsTextAlignment
         self._placeholder.textAlignment = alignment.nsTextAlignment
     }
