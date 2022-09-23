@@ -26,6 +26,16 @@ public protocol IUIAnyView : AnyObject {
 
 public extension IUIAnyView {
     
+    @inlinable
+    func modify(_ block: (Self) -> Void) -> Self {
+        block(self)
+        return self
+    }
+    
+}
+
+public extension IUIAnyView {
+    
     func isChild(of view: IUIView, recursive: Bool) -> Bool {
         guard self.isLoaded == true && view.isLoaded == true else { return false }
         return self.native.isChild(of: view.native, recursive: recursive)
