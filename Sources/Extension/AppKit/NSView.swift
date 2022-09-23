@@ -25,7 +25,7 @@ public extension NSView {
     }
     
     func update(color: UI.Color?) {
-        let layer = self.layer!
+        guard let layer = self.layer else { return }
         if let color = color {
             layer.backgroundColor = color.native.cgColor
         } else {
@@ -34,7 +34,7 @@ public extension NSView {
     }
     
     func update(border: UI.Border) {
-        let layer = self.layer!
+        guard let layer = self.layer else { return }
         switch border {
         case .none:
             layer.borderWidth = 0
@@ -48,7 +48,7 @@ public extension NSView {
     }
 
     func update(shadow: UI.Shadow?) {
-        let layer = self.layer!
+        guard let layer = self.layer else { return }
         if let shadow = shadow {
             layer.shadowColor = shadow.color.cgColor
             layer.shadowOpacity = Float(shadow.opacity)
@@ -65,7 +65,7 @@ public extension NSView {
     }
     
     func update(cornerRadius: UI.CornerRadius) {
-        let layer = self.layer!
+        guard let layer = self.layer else { return }
         switch cornerRadius {
         case .none:
             layer.cornerRadius = 0
@@ -78,7 +78,7 @@ public extension NSView {
     }
 
     func updateShadowPath() {
-        let layer = self.layer!
+        guard let layer = self.layer else { return }
         if layer.shadowColor != nil {
             layer.shadowPath = CGPath(roundedRect: self.bounds, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius, transform: nil)
         } else {

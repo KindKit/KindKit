@@ -15,51 +15,51 @@ public extension UI.View {
     final class PageBar : IUIWidgetView, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public var delegate: IPageBarViewDelegate?
-        public var leadingView: IUIView? {
+        public var leading: IUIView? {
             didSet(oldValue) {
-                guard self.leadingView !== oldValue else { return }
-                self._contentLayout.leadingItem = self.leadingView.flatMap({ UI.Layout.Item($0) })
+                guard self.leading !== oldValue else { return }
+                self._contentLayout.leading = self.leading.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var trailingView: IUIView? {
+        public var trailing: IUIView? {
             didSet(oldValue) {
-                guard self.trailingView !== oldValue else { return }
-                self._contentLayout.trailingItem = self.trailingView.flatMap({ UI.Layout.Item($0) })
+                guard self.trailing !== oldValue else { return }
+                self._contentLayout.trailing = self.trailing.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var indicatorView: IUIView {
+        public var indicator: IUIView {
             didSet(oldValue) {
-                guard self.indicatorView !== oldValue else { return }
-                self._contentLayout.indicatorItem = UI.Layout.Item(self.indicatorView)
+                guard self.indicator !== oldValue else { return }
+                self._contentLayout.indicator = UI.Layout.Item(self.indicator)
             }
         }
-        public var itemInset: InsetFloat {
-            set(value) { self._contentLayout.itemInset = value }
-            get { return self._contentLayout.itemInset }
-        }
-        public var itemSpacing: Float {
-            set(value) { self._contentLayout.itemSpacing = value }
-            get { return self._contentLayout.itemSpacing }
-        }
-        public var itemViews: [UI.View.PageBar.Item] {
+        public var items: [UI.View.PageBar.Item] {
             set(value) {
-                for itemView in self._itemViews {
+                for itemView in self._items {
                     itemView.delegate = nil
                 }
-                self._itemViews = value
-                for itemView in self._itemViews {
+                self._items = value
+                for itemView in self._items {
                     itemView.delegate = self
                 }
-                self._contentLayout.items = self.itemViews.compactMap({ UI.Layout.Item($0) })
+                self._contentLayout.items = self.items.compactMap({ UI.Layout.Item($0) })
             }
-            get { return self._itemViews }
+            get { return self._items }
         }
-        public var selectedItemView: UI.View.PageBar.Item? {
+        public var itemsInset: InsetFloat {
+            set(value) { self._contentLayout.itemsInset = value }
+            get { return self._contentLayout.itemsInset }
+        }
+        public var itemsSpacing: Float {
+            set(value) { self._contentLayout.itemsSpacing = value }
+            get { return self._contentLayout.itemsSpacing }
+        }
+        public var selected: UI.View.PageBar.Item? {
             set(value) {
-                guard self._selectedItemView !== value else { return }
-                self._selectedItemView?.select(false)
-                self._selectedItemView = value
-                if let selectedView = self._selectedItemView {
+                guard self._selected !== value else { return }
+                self._selected?.select(false)
+                self._selected = value
+                if let selectedView = self._selected {
                     selectedView.select(true)
                     if let contentOffset = self._contentView.contentOffset(with: selectedView, horizontal: .center, vertical: .center) {
                         self._contentView.contentOffset(contentOffset, normalized: true)
@@ -71,35 +71,43 @@ public extension UI.View {
                     self._contentLayout.indicatorState = .empty
                 }
             }
-            get { return self._selectedItemView }
+            get { return self._selected }
         }
         public private(set) var body: UI.View.Bar
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Scroll
-        private var _itemViews: [UI.View.PageBar.Item] = []
-        private var _selectedItemView: UI.View.PageBar.Item?
+        private var _items: [UI.View.PageBar.Item] = []
+        private var _selected: UI.View.PageBar.Item?
         private var _transitionContentOffset: PointFloat?
         private var _transitionSelectedView: IUIView?
         
         public init(
-            indicatorView: IUIView
+            indicator: IUIView
         ) {
-            self.indicatorView = indicatorView
+            self.indicator = indicator
             self._contentLayout = ContentLayout(
-                indicatorView: indicatorView
+                indicator: indicator
             )
             self._contentView = UI.View.Scroll(self._contentLayout)
                 .direction(.horizontal)
             self.body = .init(
                 placement: .top,
-                contentView: self._contentView
+                content: self._contentView
             )
+        }
+        
+        public convenience init(
+            indicator: IUIView,
+            configure: (UI.View.PageBar) -> Void
+        ) {
+            self.init(indicator: indicator)
+            self.modify(configure)
         }
         
         public func beginTransition() {
             self._transitionContentOffset = self._contentView.contentOffset
-            self._transitionSelectedView = self._selectedItemView
+            self._transitionSelectedView = self._selected
         }
         
         public func transition(to view: UI.View.PageBar.Item, progress: PercentFloat) {
@@ -116,7 +124,7 @@ public extension UI.View {
         public func finishTransition(to view: UI.View.PageBar.Item) {
             self._transitionContentOffset = nil
             self._transitionSelectedView = nil
-            self.selectedItemView = view
+            self.selected = view
         }
         
         public func cancelTransition() {
@@ -132,50 +140,50 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
-    func leadingView(_ value: IUIView?) -> Self {
-        self.leadingView = value
+    func leading(_ value: IUIView?) -> Self {
+        self.leading = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func trailingView(_ value: IUIView?) -> Self {
-        self.trailingView = value
+    func trailing(_ value: IUIView?) -> Self {
+        self.trailing = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func indicatorView(_ value: IUIView) -> Self {
-        self.indicatorView = value
+    func indicator(_ value: IUIView) -> Self {
+        self.indicator = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func itemInset(_ value: InsetFloat) -> Self {
-        self.itemInset = value
+    func items(_ value: [UI.View.PageBar.Item]) -> Self {
+        self.items = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func itemSpacing(_ value: Float) -> Self {
-        self.itemSpacing = value
+    func itemsInset(_ value: InsetFloat) -> Self {
+        self.itemsInset = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func itemViews(_ value: [UI.View.PageBar.Item]) -> Self {
-        self.itemViews = value
+    func itemsSpacing(_ value: Float) -> Self {
+        self.itemsSpacing = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func selectedItemView(_ value: UI.View.PageBar.Item?) -> Self {
-        self.selectedItemView = value
+    func selected(_ value: UI.View.PageBar.Item?) -> Self {
+        self.selected = value
         return self
     }
     

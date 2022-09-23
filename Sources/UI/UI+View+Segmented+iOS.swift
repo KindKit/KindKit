@@ -71,7 +71,7 @@ extension KKSegmentedView {
     func update(view: UI.View.Segmented) {
         self._view = view
         self.update(items: view.items)
-        self.update(items: view.items, selectedItem: view.selectedItem)
+        self.update(items: view.items, selected: view.selected)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -91,9 +91,9 @@ extension KKSegmentedView {
         }
     }
     
-    func update(items: [UI.View.Segmented.Item], selectedItem: UI.View.Segmented.Item?) {
-        if let selectedItem = selectedItem {
-            if let index = items.firstIndex(of: selectedItem) {
+    func update(items: [UI.View.Segmented.Item], selected: UI.View.Segmented.Item?) {
+        if let selected = selected {
+            if let index = items.firstIndex(of: selected) {
                 self.selectedSegmentIndex = index
             } else {
                 self.selectedSegmentIndex = Self.noSegment

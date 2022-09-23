@@ -10,10 +10,10 @@ extension UI.Container.Sticky {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var contentItem: UI.Layout.Item {
+        var content: UI.Layout.Item {
             didSet { self.setNeedUpdate() }
         }
-        var overlayItem: UI.Layout.Item {
+        var overlay: UI.Layout.Item {
             didSet { self.setNeedUpdate() }
         }
         var overlayInset: Float {
@@ -28,24 +28,24 @@ extension UI.Container.Sticky {
         var overlaySize: SizeFloat?
         
         init(
-            contentItem: UI.Layout.Item,
-            overlayItem: UI.Layout.Item,
+            content: UI.Layout.Item,
+            overlay: UI.Layout.Item,
             overlayInset: Float = 0,
             overlayVisibility: Float = 0,
             overlayHidden: Bool
         ) {
-            self.contentItem = contentItem
-            self.overlayItem = overlayItem
+            self.content = content
+            self.overlay = overlay
             self.overlayInset = overlayInset
             self.overlayVisibility = overlayVisibility
             self.overlayHidden = overlayHidden
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            self.contentItem.frame = bounds
+            self.content.frame = bounds
             if self.overlayHidden == false {
-                let overlaySize = self.overlayItem.size(available: bounds.size)
-                self.overlayItem.frame = RectFloat(
+                let overlaySize = self.overlay.size(available: bounds.size)
+                self.overlay.frame = RectFloat(
                     bottomLeft: bounds.bottomLeft,
                     size: SizeFloat(
                         width: bounds.size.width,
@@ -63,9 +63,9 @@ extension UI.Container.Sticky {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             if self.overlayHidden == false {
-                return [ self.contentItem, self.overlayItem ]
+                return [ self.content, self.overlay ]
             }
-            return [ self.contentItem ]
+            return [ self.content ]
         }
         
     }

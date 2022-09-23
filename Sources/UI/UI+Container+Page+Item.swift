@@ -9,11 +9,11 @@ extension UI.Container.Page {
     final class Item {
         
         var container: IUIPageContentContainer
-        var barView: UI.View.PageBar.Item {
+        var bar: UI.View.PageBar.Item {
             return self.barItem.view as! UI.View.PageBar.Item
         }
         var barItem: UI.Layout.Item
-        var pageView: IUIView {
+        var page: IUIView {
             return self.pageItem.view
         }
         var pageItem: UI.Layout.Item

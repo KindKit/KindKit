@@ -100,7 +100,7 @@ extension KKControlView {
     
     func update(view: UI.View.Control) {
         self._view = view
-        self.update(contentLayout: view.contentLayout)
+        self.update(content: view.content)
         self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(border: view.border)
@@ -111,8 +111,8 @@ extension KKControlView {
         self.kkDelegate = view
     }
     
-    func update(contentLayout: IUILayout) {
-        self._layoutManager.layout = contentLayout
+    func update(content: IUILayout) {
+        self._layoutManager.layout = content
         self.setNeedsLayout()
     }
     

@@ -6,10 +6,10 @@ import Foundation
 
 public protocol IUIDialogContainer : IUIContainer, IUIContainerParentable {
     
-    var contentContainer: (IUIContainer & IUIContainerParentable)? { set get }
+    var content: (IUIContainer & IUIContainerParentable)? { set get }
     var containers: [IUIDialogContentContainer] { get }
-    var previousContainer: IUIDialogContentContainer? { get }
-    var currentContainer: IUIDialogContentContainer? { get }
+    var previous: IUIDialogContentContainer? { get }
+    var current: IUIDialogContentContainer? { get }
     var animationVelocity: Float { set get }
 #if os(iOS)
     var interactiveLimit: Float { set get }

@@ -6,13 +6,13 @@ import Foundation
 
 public protocol IUIPageContainer : IUIContainer, IUIContainerParentable {
     
-    var barView: UI.View.PageBar { get }
+    var bar: UI.View.PageBar { get }
     var barVisibility: Float { get }
     var barHidden: Bool { get }
     var containers: [IUIPageContentContainer] { get }
-    var backwardContainer: IUIPageContentContainer? { get }
-    var currentContainer: IUIPageContentContainer? { get }
-    var forwardContainer: IUIPageContentContainer? { get }
+    var backward: IUIPageContentContainer? { get }
+    var current: IUIPageContentContainer? { get }
+    var forward: IUIPageContentContainer? { get }
     var animationVelocity: Float { set get }
 #if os(iOS)
     var interactiveLimit: Float { set get }

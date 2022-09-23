@@ -47,13 +47,13 @@ final class KKExternalView : UIView {
         }
         get { return super.frame }
     }
-    var external: UIView? {
+    var content: UIView? {
         willSet {
-            self.external?.removeFromSuperview()
+            self.content?.removeFromSuperview()
         }
         didSet {
-            guard let external = self.external else { return }
-            self.addSubview(external)
+            guard let content = self.content else { return }
+            self.addSubview(content)
         }
     }
     
@@ -72,14 +72,14 @@ final class KKExternalView : UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if let external = self.external {
+        if let content = self.content {
             let bounds = self.bounds
-            let externalBounds = external.bounds
-            external.frame = CGRect(
-                x: (bounds.origin.x + (bounds.size.width / 2)) - (externalBounds.size.width / 2),
-                y: (bounds.origin.y + (bounds.size.height / 2)) - (externalBounds.size.height / 2),
-                width: externalBounds.size.width,
-                height: externalBounds.size.height
+            let contentBounds = content.bounds
+            content.frame = CGRect(
+                x: (bounds.origin.x + (bounds.size.width / 2)) - (contentBounds.size.width / 2),
+                y: (bounds.origin.y + (bounds.size.height / 2)) - (contentBounds.size.height / 2),
+                width: contentBounds.size.width,
+                height: contentBounds.size.height
             )
         }
     }
@@ -90,7 +90,7 @@ extension KKExternalView {
     
     func update(view: UI.View.External) {
         self._view = view
-        self.update(external: view.external)
+        self.update(content: view.content)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -99,12 +99,12 @@ extension KKExternalView {
         self.updateShadowPath()
     }
     
-    func update(external: UIView) {
-        self.external = external
+    func update(content: UIView) {
+        self.content = content
     }
     
     func cleanup() {
-        self.external = nil
+        self.content = nil
         self._view = nil
     }
     

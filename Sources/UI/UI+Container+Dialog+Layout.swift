@@ -10,10 +10,10 @@ extension UI.Container.Dialog {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var containerInset: InsetFloat {
+        var inset: InsetFloat {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item? {
+        var content: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
         var state: State {
@@ -35,12 +35,12 @@ extension UI.Container.Dialog {
         private var _dialogSize: SizeFloat?
         
         init(
-            containerInset: InsetFloat,
-            contentItem: UI.Layout.Item?,
+            inset: InsetFloat,
+            content: UI.Layout.Item?,
             state: State
         ) {
-            self.containerInset = containerInset
-            self.contentItem = contentItem
+            self.inset = inset
+            self.content = content
             self.state = state
         }
         
@@ -60,8 +60,8 @@ extension UI.Container.Dialog {
                 self._dialogSize = nil
                 self._lastBoundsSize = bounds.size
             }
-            if let contentItem = self.contentItem {
-                contentItem.frame = bounds
+            if let content = self.content {
+                content.frame = bounds
             }
             if let dialog = self.dialogItem {
                 if let backgroundItem = dialog.backgroundItem {
@@ -109,8 +109,8 @@ extension UI.Container.Dialog {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items: [UI.Layout.Item] = []
-            if let contentItem = self.contentItem {
-                items.append(contentItem)
+            if let content = self.content {
+                items.append(content)
             }
             if let dialogItem = self.dialogItem {
                 if let backgroundItem = dialogItem.backgroundItem {

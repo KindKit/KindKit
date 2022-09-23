@@ -27,36 +27,45 @@ public extension UI.View {
             }
         }
         public var color: UI.Color? {
-            set(value) { self._backgroundView.color = value }
-            get { return self._backgroundView.color }
+            set(value) { self._background.color = value }
+            get { return self._background.color }
         }
         public var cornerRadius: UI.CornerRadius {
-            set(value) { self._backgroundView.cornerRadius = value }
-            get { return self._backgroundView.cornerRadius }
+            set(value) { self._background.cornerRadius = value }
+            get { return self._background.cornerRadius }
         }
         public var border: UI.Border {
-            set(value) { self._backgroundView.border = value }
-            get { return self._backgroundView.border }
+            set(value) { self._background.border = value }
+            get { return self._background.border }
         }
         public var shadow: UI.Shadow? {
-            set(value) { self._backgroundView.shadow = value }
-            get { return self._backgroundView.shadow }
+            set(value) { self._background.shadow = value }
+            get { return self._background.shadow }
         }
         public private(set) var body: UI.View.Custom
         
         private var _layout: Layout
-        private var _backgroundView = UI.View.Empty()
+        private var _background = UI.View.Empty()
 
         public init(
             placement: Placement,
-            contentView: IUIView
+            content: IUIView
         ) {
             self._layout = Layout(
                 placement: placement,
-                backgroundView: self._backgroundView,
-                contentView: contentView
+                background: self._background,
+                content: content
             )
             self.body = .init(self._layout)
+        }
+        
+        public convenience init(
+            placement: Placement,
+            content: IUIView,
+            configure: (UI.View.Bar) -> Void
+        ) {
+            self.init(placement: placement, content: content)
+            self.modify(configure)
         }
         
     }

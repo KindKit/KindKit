@@ -8,31 +8,19 @@ extension UI.View.PageBar {
     
     final class ContentLayout : IUILayout {
         
-        enum IndicatorState {
-            case empty
-            case alias(current: UI.Layout.Item)
-            case transition(current: UI.Layout.Item, next: UI.Layout.Item, progress: PercentFloat)
-        }
-        
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var leadingItem: UI.Layout.Item? {
+        var leading: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
-        var trailingItem: UI.Layout.Item? {
+        var trailing: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
-        var indicatorItem: UI.Layout.Item {
+        var indicator: UI.Layout.Item {
             didSet { self.setNeedForceUpdate() }
         }
         var indicatorState: IndicatorState = .empty {
             didSet { self.setNeedUpdate() }
-        }
-        var itemInset: InsetFloat = InsetFloat(horizontal: 12, vertical: 0) {
-            didSet { self.setNeedForceUpdate() }
-        }
-        var itemSpacing: Float = 4 {
-            didSet { self.setNeedForceUpdate() }
         }
         var items: [UI.Layout.Item] = [] {
             didSet {
@@ -40,13 +28,19 @@ extension UI.View.PageBar {
                 self.setNeedForceUpdate()
             }
         }
+        var itemsInset: InsetFloat = InsetFloat(horizontal: 12, vertical: 0) {
+            didSet { self.setNeedForceUpdate() }
+        }
+        var itemsSpacing: Float = 4 {
+            didSet { self.setNeedForceUpdate() }
+        }
         
         private var _cache: [SizeFloat?] = []
 
         init(
-            indicatorView: IUIView
+            indicator: IUIView
         ) {
-            self.indicatorItem = UI.Layout.Item(indicatorView)
+            self.indicator = UI.Layout.Item(indicator)
         }
         
         func invalidate(item: UI.Layout.Item) {
@@ -57,7 +51,7 @@ extension UI.View.PageBar {
         
         func layout(bounds: RectFloat) -> SizeFloat {
             let leadingSize: SizeFloat
-            if let item = self.leadingItem {
+            if let item = self.leading {
                 leadingSize = item.size(available: bounds.size)
                 item.frame = RectFloat(
                     left: bounds.left,
@@ -67,7 +61,7 @@ extension UI.View.PageBar {
                 leadingSize = .zero
             }
             let trailingSize: SizeFloat
-            if let item = self.trailingItem {
+            if let item = self.trailing {
                 trailingSize = item.size(available: bounds.size)
                 item.frame = RectFloat(
                     right: bounds.right,
@@ -84,8 +78,8 @@ extension UI.View.PageBar {
                     bottom: 0
                 )),
                 direction: .horizontal,
-                inset: self.itemInset,
-                spacing: self.itemSpacing,
+                inset: self.itemsInset,
+                spacing: self.itemsSpacing,
                 maxSize: bounds.size.width,
                 items: self.items,
                 cache: &self._cache
@@ -98,13 +92,13 @@ extension UI.View.PageBar {
         
         func size(available: SizeFloat) -> SizeFloat {
             let leadingSize: SizeFloat
-            if let item = self.leadingItem {
+            if let item = self.leading {
                 leadingSize = item.size(available: available)
             } else {
                 leadingSize = .zero
             }
             let trailingSize: SizeFloat
-            if let item = self.trailingItem {
+            if let item = self.trailing {
                 trailingSize = item.size(available: available)
             } else {
                 trailingSize = .zero
@@ -117,8 +111,8 @@ extension UI.View.PageBar {
                     bottom: 0
                 )),
                 direction: .horizontal,
-                inset: self.itemInset,
-                spacing: self.itemSpacing,
+                inset: self.itemsInset,
+                spacing: self.itemsSpacing,
                 maxSize: available.width,
                 items: self.items
             )
@@ -134,20 +128,20 @@ extension UI.View.PageBar {
             case .empty:
                 break
             case .alias(let current):
-                self.indicatorItem.frame = current.frame
-                items.append(self.indicatorItem)
+                self.indicator.frame = current.frame
+                items.append(self.indicator)
             case .transition(let current, let next, let progress):
-                self.indicatorItem.frame = current.frame.lerp(next.frame, progress: progress)
-                items.append(self.indicatorItem)
+                self.indicator.frame = current.frame.lerp(next.frame, progress: progress)
+                items.append(self.indicator)
             }
-            if let item = self.leadingItem {
+            if let item = self.leading {
                 item.frame = RectFloat(
                     left: bounds.left,
                     size: item.frame.size
                 )
                 items.append(item)
             }
-            if let item = self.trailingItem {
+            if let item = self.trailing {
                 item.frame = RectFloat(
                     right: bounds.right,
                     size: item.frame.size

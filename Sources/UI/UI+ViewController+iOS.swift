@@ -17,14 +17,14 @@ public extension UI {
                 self._updateSafeArea()
             }
         }
-        public override var prefersStatusBarHidden: Bool {
-            return self.container.statusBarHidden
-        }
         public override var preferredStatusBarStyle: UIStatusBarStyle {
-            return self.container.statusBarStyle
+            return self.container.statusBar
         }
         public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
             return self.container.statusBarAnimation
+        }
+        public override var prefersStatusBarHidden: Bool {
+            return self.container.statusBarHidden
         }
         public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
             return self.container.supportedOrientations
@@ -68,7 +68,10 @@ public extension UI {
             self._virtualKeyboard.add(observer: self, priority: .public)
             UI.Container.BarController.shared.add(observer: self)
             
-            NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
+            if #available(iOS 13, *) {
+            } else {
+                NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
+            }
         }
         
         convenience init(
@@ -81,7 +84,7 @@ public extension UI {
             _ container: IUIRootContentContainer
         ) {
             self.init(UI.Container.Root(
-                contentContainer: container
+                content: container
             ))
         }
         
@@ -105,7 +108,7 @@ public extension UI {
         ) where Wireframe : AnyObject, Wireframe.Container : IUIRootContentContainer {
             self.init(
                 container: UI.Container.Root(
-                    contentContainer: wireframe.container
+                    content: wireframe.container
                 ),
                 owner: wireframe
             )
@@ -122,8 +125,8 @@ public extension UI {
         public override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
             self.container.safeArea = self._safeArea()
-            if let statusBarView = self.container.statusBarView {
-                statusBarView.height = .fixed(self._statusBarHeight())
+            if let substrate = self.container.statusBarSubstrate {
+                substrate.height = .fixed(self._statusBarHeight())
             }
             self._containerView = self.container.view.native
             if self.container.isPresented == false {
@@ -159,6 +162,11 @@ public extension UI {
         public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
             super.traitCollectionDidChange(previousTraitCollection)
             self.container.didChangeAppearance()
+        }
+        
+        public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+            super.viewWillTransition(to: size, with: coordinator)
+            self._updateStatusBarHeight()
         }
         
     }
@@ -235,8 +243,8 @@ private extension UI.ViewController {
     }
     
     func _updateStatusBarHeight() {
-        if let statusBarView = self.container.statusBarView {
-            statusBarView.height = .fixed(self._statusBarHeight())
+        if let substrate = self.container.statusBarSubstrate {
+            substrate.height = .fixed(self._statusBarHeight())
         }
     }
     
@@ -263,7 +271,7 @@ private extension UI.ViewController {
     func _safeArea() -> InsetFloat {
         let safeArea: InsetFloat
         if #available(iOS 11.0, *) {
-            safeArea = InsetFloat(self.view.safeAreaInsets)
+            safeArea = InsetFloat(self.additionalSafeAreaInsets)
         } else {
             safeArea = InsetFloat(
                 top: Float(self.topLayoutGuide.length),

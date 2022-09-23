@@ -25,14 +25,14 @@ public extension UI.Container {
             return self.screen.shouldInteractive
         }
     #if os(iOS)
-        public var statusBarHidden: Bool {
-            return self.current?.statusBarHidden ?? false
-        }
-        public var statusBarStyle: UIStatusBarStyle {
-            return self.current?.statusBarStyle ?? .default
+        public var statusBar: UIStatusBarStyle {
+            return self.current?.statusBar ?? .default
         }
         public var statusBarAnimation: UIStatusBarAnimation {
             return self.current?.statusBarAnimation ?? .fade
+        }
+        public var statusBarHidden: Bool {
+            return self.current?.statusBarHidden ?? false
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
             return self.current?.supportedOrientations ?? .portrait
@@ -201,7 +201,7 @@ public extension UI.Container {
 
 extension UI.Container.Book : IUIStackContentContainer where Screen : IUIScreenStackable {
     
-    public var stackBarView: UI.View.StackBar {
+    public var stackBar: UI.View.StackBar {
         return self.screen.stackBarView
     }
     
@@ -217,8 +217,8 @@ extension UI.Container.Book : IUIStackContentContainer where Screen : IUIScreenS
 
 extension UI.Container.Book : IUIGroupContentContainer where Screen : IUIScreenGroupable  {
     
-    public var groupItemView: UI.View.GroupBar.Item {
-        return self.screen.groupItemView
+    public var groupItem: UI.View.GroupBar.Item {
+        return self.screen.groupItem
     }
     
     public func pressedToGroupItem() -> Bool {

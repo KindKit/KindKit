@@ -10,32 +10,32 @@ extension UI.View.PageBar.Item {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var contentInset: InsetFloat = InsetFloat(horizontal: 8, vertical: 4) {
+        var inset: InsetFloat = InsetFloat(horizontal: 8, vertical: 4) {
             didSet { self.setNeedForceUpdate() }
         }
-        var contentItem: UI.Layout.Item {
-            didSet { self.setNeedForceUpdate(item: self.contentItem) }
+        var content: UI.Layout.Item {
+            didSet { self.setNeedForceUpdate(item: self.content) }
         }
         
         init(
-            _ contentView: IUIView
+            _ content: IUIView
         ) {
-            self.contentItem = UI.Layout.Item(contentView)
+            self.content = UI.Layout.Item(content)
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            self.contentItem.frame = bounds.inset(self.contentInset)
+            self.content.frame = bounds.inset(self.inset)
             return bounds.size
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            let contentSize = self.contentItem.size(available: available.inset(self.contentInset))
-            let contentBounds = contentSize.inset(-self.contentInset)
+            let contentSize = self.content.size(available: available.inset(self.inset))
+            let contentBounds = contentSize.inset(-self.inset)
             return contentBounds
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            return [ self.contentItem ]
+            return [ self.content ]
         }
         
     }

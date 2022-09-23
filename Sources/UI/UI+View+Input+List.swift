@@ -59,13 +59,13 @@ public extension UI.View.Input {
                 self._view.update(items: self.items)
             }
         }
-        public var selectedItem: IInputListItem? {
+        public var selected: IInputListItem? {
             set(value) {
-                self._selectedItem = value
+                self._selected = value
                 guard self.isLoaded == true else { return }
-                self._view.update(selectedItem: self._selectedItem, userInteraction: false)
+                self._view.update(selected: self._selected, userInteraction: false)
             }
-            get { return self._selectedItem }
+            get { return self._selected }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -73,7 +73,7 @@ public extension UI.View.Input {
                 self._view.update(textFont: self.textFont)
             }
         }
-        public var textColor: UI.Color = .init(rgb: 0x000000) {
+        public var textColor: UI.Color = .black {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(textColor: self.textColor)
@@ -146,7 +146,7 @@ public extension UI.View.Input {
         private var _view: Reusable.Content {
             return self._reuse.content()
         }
-        private var _selectedItem: IInputListItem?
+        private var _selected: IInputListItem?
         private var _onAppear: ((UI.View.Input.List) -> Void)?
         private var _onDisappear: ((UI.View.Input.List) -> Void)?
         private var _onVisible: ((UI.View.Input.List) -> Void)?
@@ -159,6 +159,13 @@ public extension UI.View.Input {
         public init() {
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            configure: (UI.View.Input.List) -> Void
+        ) {
+            self.init()
+            self.modify(configure)
         }
         
         deinit {
@@ -284,8 +291,8 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
-    func selectedItem(_ value: IInputListItem?) -> Self {
-        self.selectedItem = value
+    func selected(_ value: IInputListItem?) -> Self {
+        self.selected = value
         return self
     }
     
@@ -351,8 +358,8 @@ extension UI.View.Input.List : KKInputListViewDelegate {
     }
     
     func select(_ view: KKInputListView, item: IInputListItem) {
-        self._selectedItem = item
-        self._view.update(selectedItem: item, userInteraction: true)
+        self._selected = item
+        self._view.update(selected: item, userInteraction: true)
         self._onEditing?(self)
     }
     

@@ -8,7 +8,7 @@ public protocol IUIGroupContentContainer : IUIContainer, IUIContainerParentable 
     
     var groupContainer: IUIGroupContainer? { get }
     
-    var groupItemView: UI.View.GroupBar.Item { get }
+    var groupItem: UI.View.GroupBar.Item { get }
     
 }
 

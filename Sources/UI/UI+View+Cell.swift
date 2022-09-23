@@ -20,10 +20,10 @@ public extension UI.View {
             get { return self._isSelected }
         }
         public var shouldPressed: Bool = true
-        public private(set) var contentView: IUIView {
+        public private(set) var content: IUIView {
             didSet(oldValue) {
-                guard self.contentView !== oldValue else { return }
-                self._layout.contentItem = UI.Layout.Item(self.contentView)
+                guard self.content !== oldValue else { return }
+                self._layout.content = UI.Layout.Item(self.content)
             }
         }
         public private(set) var body: UI.View.Custom
@@ -36,10 +36,10 @@ public extension UI.View {
         private var _onPressed: ((UI.View.Cell) -> Void)?
         
         public init(
-            _ contentView: IUIView
+            _ content: IUIView
         ) {
-            self.contentView = contentView
-            self._layout = Layout(contentItem: UI.Layout.Item(contentView))
+            self.content = content
+            self._layout = Layout(content)
             self.body = UI.View.Custom(self._layout)
 #if os(iOS)
                 .gestures([ self._pressedGesture ])
@@ -48,8 +48,12 @@ public extension UI.View {
             self._init()
         }
         
-        public convenience init(customView: IUILayout) {
-            self.init(UI.View.Custom(customView))
+        public convenience init(
+            content: IUIView,
+            configure: (UI.View.Cell) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
         }
         
         @discardableResult
@@ -72,8 +76,8 @@ public extension UI.View.Cell {
     }
     
     @discardableResult
-    func contentView(_ value: IUIView) -> Self {
-        self.contentView = value
+    func content(_ value: IUIView) -> Self {
+        self.content = value
         return self
     }
     

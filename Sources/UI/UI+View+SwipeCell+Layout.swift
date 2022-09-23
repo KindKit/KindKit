@@ -13,16 +13,16 @@ extension UI.View.SwipeCell {
         var state: State = .idle {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item {
+        var content: UI.Layout.Item {
             didSet { self.setNeedForceUpdate() }
         }
-        var leadingItem: UI.Layout.Item? = nil {
+        var leading: UI.Layout.Item? = nil {
             didSet { self.setNeedForceUpdate() }
         }
         var leadingSize: Float = 0 {
             didSet { self.setNeedForceUpdate() }
         }
-        var trailingItem: UI.Layout.Item? = nil {
+        var trailing: UI.Layout.Item? = nil {
             didSet { self.setNeedForceUpdate() }
         }
         var trailingSize: Float = 0 {
@@ -30,17 +30,17 @@ extension UI.View.SwipeCell {
         }
 
         init(
-            _ contentView: IUIView
+            _ content: IUIView
         ) {
-            self.contentItem = UI.Layout.Item(contentView)
+            self.content = UI.Layout.Item(content)
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
             switch self.state {
             case .idle:
-                self.contentItem.frame = bounds
+                self.content.frame = bounds
             case .leading(let progress):
-                if let leadingItem = self.leadingItem {
+                if let leading = self.leading {
                     let contentBeginFrame = bounds
                     let contentEndedFrame = RectFloat(
                         x: bounds.origin.x + self.leadingSize,
@@ -60,13 +60,13 @@ extension UI.View.SwipeCell {
                         width: self.leadingSize,
                         height: bounds.size.height
                     )
-                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
-                    leadingItem.frame = leadingBeginFrame.lerp(leadingEndedFrame, progress: progress.value)
+                    self.content.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    leading.frame = leadingBeginFrame.lerp(leadingEndedFrame, progress: progress.value)
                 } else {
-                    self.contentItem.frame = bounds
+                    self.content.frame = bounds
                 }
             case .trailing(let progress):
-                if let trailingItem = self.trailingItem {
+                if let trailing = self.trailing {
                     let contentBeginFrame = bounds
                     let contentEndedFrame = RectFloat(
                         x: bounds.origin.x - self.trailingSize,
@@ -86,38 +86,38 @@ extension UI.View.SwipeCell {
                         width: self.trailingSize,
                         height: bounds.size.height
                     )
-                    self.contentItem.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
-                    trailingItem.frame = trailingBeginFrame.lerp(trailingEndedFrame, progress: progress.value)
+                    self.content.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    trailing.frame = trailingBeginFrame.lerp(trailingEndedFrame, progress: progress.value)
                 } else {
-                    self.contentItem.frame = bounds
+                    self.content.frame = bounds
                 }
             }
             return bounds.size
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            let contentSize = self.contentItem.size(available: available)
+            let contentSize = self.content.size(available: available)
             switch self.state {
             case .idle: break
             case .leading:
-                guard let leadingItem = self.leadingItem else { break }
-                let leadingSize = leadingItem.size(available: SizeFloat(width: self.leadingSize, height: contentSize.height))
+                guard let leading = self.leading else { break }
+                let leadingSize = leading.size(available: SizeFloat(width: self.leadingSize, height: contentSize.height))
                 return Size(width: available.width, height: max(contentSize.height, leadingSize.height))
             case .trailing:
-                guard let trailingItem = self.trailingItem else { break }
-                let trailingSize = trailingItem.size(available: SizeFloat(width: self.trailingSize, height: contentSize.height))
+                guard let trailing = self.trailing else { break }
+                let trailingSize = trailing.size(available: SizeFloat(width: self.trailingSize, height: contentSize.height))
                 return Size(width: available.width, height: max(contentSize.height, trailingSize.height))
             }
             return Size(width: available.width, height: contentSize.height)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            var items: [UI.Layout.Item] = [ self.contentItem ]
+            var items: [UI.Layout.Item] = [ self.content ]
             switch self.state {
-            case .leading where self.leadingItem != nil:
-                items.insert(self.leadingItem!, at: 0)
-            case .trailing where self.trailingItem != nil:
-                items.insert(self.trailingItem!, at: 0)
+            case .leading where self.leading != nil:
+                items.insert(self.leading!, at: 0)
+            case .trailing where self.trailing != nil:
+                items.insert(self.trailing!, at: 0)
             default:
                 break
             }

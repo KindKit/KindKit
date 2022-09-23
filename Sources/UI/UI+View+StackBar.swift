@@ -19,19 +19,19 @@ public extension UI.View {
             set(value) { self._contentLayout.inset = value }
             get { return self._contentLayout.inset }
         }
-        public var headerView: IUIView? {
+        public var header: IUIView? {
             didSet { self._relayout() }
         }
         public var headerSpacing: Float = 8 {
             didSet { self._relayout() }
         }
-        public var leadingViews: [IUIView] = [] {
+        public var leadings: [IUIView] = [] {
             didSet { self._relayout() }
         }
-        public var leadingViewSpacing: Float = 4 {
+        public var leadingsSpacing: Float = 4 {
             didSet { self._relayout() }
         }
-        public var centerView: IUIView? {
+        public var center: IUIView? {
             didSet { self._relayout() }
         }
         public var centerFilling: Bool = false {
@@ -40,13 +40,13 @@ public extension UI.View {
         public var centerSpacing: Float = 4 {
             didSet { self._relayout() }
         }
-        public var trailingViews: [IUIView] = [] {
+        public var trailings: [IUIView] = [] {
             didSet { self._relayout() }
         }
-        public var trailingViewSpacing: Float = 4 {
+        public var trailingsSpacing: Float = 4 {
             didSet { self._relayout() }
         }
-        public var footerView: IUIView? {
+        public var footer: IUIView? {
             didSet { self._relayout() }
         }
         public var footerSpacing: Float = 8 {
@@ -56,7 +56,7 @@ public extension UI.View {
 
         private var _contentLayout: UI.Layout.Composition {
             didSet {
-                self._contentView.contentLayout = self._contentLayout
+                self._contentView.content = self._contentLayout
             }
         }
         private var _contentView: UI.View.Custom
@@ -69,8 +69,15 @@ public extension UI.View {
             self._contentView = UI.View.Custom(self._contentLayout)
             self.body = .init(
                 placement: .top,
-                contentView: self._contentView
+                content: self._contentView
             )
+        }
+        
+        public convenience init(
+            configure: (UI.View.StackBar) -> Void
+        ) {
+            self.init()
+            self.modify(configure)
         }
         
     }
@@ -88,8 +95,8 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
-    func headerView(_ value: IUIView?) -> Self {
-        self.headerView = value
+    func header(_ value: IUIView?) -> Self {
+        self.header = value
         return self
     }
     
@@ -102,22 +109,22 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
-    func leadingViews(_ value: [IUIView]) -> Self {
-        self.leadingViews = value
+    func leadings(_ value: [IUIView]) -> Self {
+        self.leadings = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func leadingViewSpacing(_ value: Float) -> Self {
-        self.leadingViewSpacing = value
+    func leadingsSpacing(_ value: Float) -> Self {
+        self.leadingsSpacing = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func centerView(_ value: IUIView?) -> Self {
-        self.centerView = value
+    func center(_ value: IUIView?) -> Self {
+        self.center = value
         return self
     }
     
@@ -137,22 +144,22 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
-    func trailingViews(_ value: [IUIView]) -> Self {
-        self.trailingViews = value
+    func trailings(_ value: [IUIView]) -> Self {
+        self.trailings = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func trailingViewSpacing(_ value: Float) -> Self {
-        self.trailingViewSpacing = value
+    func trailingsSpacing(_ value: Float) -> Self {
+        self.trailingsSpacing = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func footerView(_ value: IUIView?) -> Self {
-        self.footerView = value
+    func footer(_ value: IUIView?) -> Self {
+        self.footer = value
         return self
     }
     
@@ -170,16 +177,16 @@ private extension UI.View.StackBar {
     func _relayout() {
         self._contentLayout = Self._layout(
             inset: self.inset,
-            headerView: self.headerView,
+            header: self.header,
             headerSpacing: self.headerSpacing,
-            leadingViews: self.leadingViews,
-            leadingViewSpacing: self.leadingViewSpacing,
-            centerView: self.centerView,
+            leadings: self.leadings,
+            leadingsSpacing: self.leadingsSpacing,
+            center: self.center,
             centerFilling: self.centerFilling,
             centerSpacing: self.centerSpacing,
-            trailingViews: self.trailingViews,
-            trailingViewSpacing: self.trailingViewSpacing,
-            footerView: self.footerView,
+            trailings: self.trailings,
+            trailingsSpacing: self.trailingsSpacing,
+            footer: self.footer,
             footerSpacing: self.footerSpacing,
             size: self.size
         )
@@ -187,38 +194,38 @@ private extension UI.View.StackBar {
     
     static func _layout(
         inset: InsetFloat,
-        headerView: IUIView?,
+        header: IUIView?,
         headerSpacing: Float,
-        leadingViews: [IUIView],
-        leadingViewSpacing: Float,
-        centerView: IUIView?,
+        leadings: [IUIView],
+        leadingsSpacing: Float,
+        center: IUIView?,
         centerFilling: Bool,
         centerSpacing: Float,
-        trailingViews: [IUIView],
-        trailingViewSpacing: Float,
-        footerView: IUIView?,
+        trailings: [IUIView],
+        trailingsSpacing: Float,
+        footer: IUIView?,
         footerSpacing: Float,
         size: Float?
     ) -> UI.Layout.Composition {
-        if headerView == nil && leadingViews.isEmpty == true && centerView == nil && trailingViews.isEmpty == true && footerView == nil {
-            return UI.Layout.Composition(
+        if header == nil && leadings.isEmpty == true && center == nil && trailings.isEmpty == true && footer == nil {
+            return .composition(
                 inset: inset,
-                entity: UI.Layout.Composition.None()
+                entity: .none()
             )
         }
-        return UI.Layout.Composition(
+        return .composition(
             inset: inset,
             entity: self._entity(
-                headerView: headerView,
+                header: header,
                 headerSpacing: headerSpacing,
-                leadingViews: leadingViews,
-                leadingViewSpacing: leadingViewSpacing,
-                centerView: centerView,
+                leadings: leadings,
+                leadingsSpacing: leadingsSpacing,
+                center: center,
                 centerFilling: centerFilling,
                 centerSpacing: centerSpacing,
-                trailingViews: trailingViews,
-                trailingViewSpacing: trailingViewSpacing,
-                footerView: footerView,
+                trailings: trailings,
+                trailingsSpacing: trailingsSpacing,
+                footer: footer,
                 footerSpacing: footerSpacing,
                 size: size
             )
@@ -226,118 +233,118 @@ private extension UI.View.StackBar {
     }
     
     static func _entity(
-        headerView: IUIView?,
+        header: IUIView?,
         headerSpacing: Float,
-        leadingViews: [IUIView],
-        leadingViewSpacing: Float,
-        centerView: IUIView?,
+        leadings: [IUIView],
+        leadingsSpacing: Float,
+        center: IUIView?,
         centerFilling: Bool,
         centerSpacing: Float,
-        trailingViews: [IUIView],
-        trailingViewSpacing: Float,
-        footerView: IUIView?,
+        trailings: [IUIView],
+        trailingsSpacing: Float,
+        footer: IUIView?,
         footerSpacing: Float,
         size: Float?
     ) -> IUICompositionLayoutEntity {
-        let content = Self._entity(
-            leadingViews: leadingViews,
-            leadingViewSpacing: leadingViewSpacing,
-            centerView: centerView,
+        let contentEntity = Self._entity(
+            leadings: leadings,
+            leadingsSpacing: leadingsSpacing,
+            center: center,
             centerFilling: centerFilling,
             centerSpacing: centerSpacing,
-            trailingViews: trailingViews,
-            trailingViewSpacing: trailingViewSpacing
+            trailings: trailings,
+            trailingsSpacing: trailingsSpacing
         )
-        let leading: IUICompositionLayoutEntity?
-        if let headerView = headerView {
-            leading = UI.Layout.Composition.Margin(
-                inset: InsetFloat(top: 0, left: 0, right: 0, bottom: headerSpacing),
-                entity: UI.Layout.Composition.View(headerView)
+        let leadingEntity: IUICompositionLayoutEntity?
+        if let header = header {
+            leadingEntity = .margin(
+                inset: .init(top: 0, left: 0, right: 0, bottom: headerSpacing),
+                entity: .view(header)
             )
         } else {
-            leading = nil
+            leadingEntity = nil
         }
-        let trailing: IUICompositionLayoutEntity?
-        if let footerView = footerView {
-            trailing = UI.Layout.Composition.Margin(
-                inset: InsetFloat(top: footerSpacing, left: 0, right: 0, bottom: 0),
-                entity: UI.Layout.Composition.View(footerView)
+        let trailingEntity: IUICompositionLayoutEntity?
+        if let footer = footer {
+            trailingEntity = .margin(
+                inset: .init(top: footerSpacing, left: 0, right: 0, bottom: 0),
+                entity: .view(footer)
             )
         } else {
-            trailing = nil
+            trailingEntity = nil
         }
-        if leading == nil && trailing == nil {
-            return content
+        if leadingEntity == nil && trailingEntity == nil {
+            return contentEntity
         }
         if size != nil {
             var stackEntities: [IUICompositionLayoutEntity] = []
-            if let leading = leading {
-                stackEntities.append(leading)
+            if let leadingEntity = leadingEntity {
+                stackEntities.append(leadingEntity)
             }
-            stackEntities.append(content)
-            if let trailing = trailing {
-                stackEntities.append(trailing)
+            stackEntities.append(contentEntity)
+            if let trailingEntity = trailingEntity {
+                stackEntities.append(trailingEntity)
             }
-            return UI.Layout.Composition.VStack(
+            return .vStack(
                 alignment: .fill,
                 entities: stackEntities
             )
         }
-        return UI.Layout.Composition.VAccessory(
-            leading: leading,
-            center: content,
-            trailing: trailing,
+        return .vAccessory(
+            leading: leadingEntity,
+            center: contentEntity,
+            trailing: trailingEntity,
             filling: true
         )
     }
     
     static func _entity(
-        leadingViews: [IUIView],
-        leadingViewSpacing: Float,
-        centerView: IUIView?,
+        leadings: [IUIView],
+        leadingsSpacing: Float,
+        center: IUIView?,
         centerFilling: Bool,
         centerSpacing: Float,
-        trailingViews: [IUIView],
-        trailingViewSpacing: Float
+        trailings: [IUIView],
+        trailingsSpacing: Float
     ) -> IUICompositionLayoutEntity {
-        let center: IUICompositionLayoutEntity
-        if let centerView = centerView {
-            center = UI.Layout.Composition.Margin(
+        let centerEntity: IUICompositionLayoutEntity
+        if let center = center {
+            centerEntity = .margin(
                 inset: InsetFloat(
                     top: 0,
-                    left: leadingViews.count > 0 ? centerSpacing : 0,
-                    right: trailingViews.count > 0 ? centerSpacing : 0,
+                    left: leadings.count > 0 ? centerSpacing : 0,
+                    right: trailings.count > 0 ? centerSpacing : 0,
                     bottom: 0
                 ),
-                entity: UI.Layout.Composition.View(centerView)
+                entity: .view(center)
             )
         } else {
-            center = UI.Layout.Composition.None()
+            centerEntity = .none()
         }
-        let leading: IUICompositionLayoutEntity?
-        if leadingViews.isEmpty == false {
-            leading = UI.Layout.Composition.HStack(
+        let leadingEntity: IUICompositionLayoutEntity?
+        if leadings.isEmpty == false {
+            leadingEntity = .hStack(
                 alignment: .fill,
-                spacing: leadingViewSpacing,
-                entities: leadingViews.map({ UI.Layout.Composition.View($0) })
+                spacing: leadingsSpacing,
+                entities: leadings.map({ UI.Layout.Composition.View($0) })
             )
         } else {
-            leading = nil
+            leadingEntity = nil
         }
-        let trailing: IUICompositionLayoutEntity?
-        if trailingViews.isEmpty == false {
-            trailing = UI.Layout.Composition.HStack(
+        let trailingEntity: IUICompositionLayoutEntity?
+        if trailings.isEmpty == false {
+            trailingEntity = .hStack(
                 alignment: .fill,
-                spacing: trailingViewSpacing,
-                entities: trailingViews.reversed().map({ UI.Layout.Composition.View($0) })
+                spacing: trailingsSpacing,
+                entities: trailings.reversed().map({ UI.Layout.Composition.View($0) })
             )
         } else {
-            trailing = nil
+            trailingEntity = nil
         }
-        return UI.Layout.Composition.HAccessory(
-            leading: leading,
-            center: center,
-            trailing: trailing,
+        return .hAccessory(
+            leading: leadingEntity,
+            center: centerEntity,
+            trailing: trailingEntity,
             filling: centerFilling
         )
     }

@@ -22,30 +22,30 @@ public extension UI.Container {
             }
         }
         public var shouldInteractive: Bool {
-            return self.contentContainer?.shouldInteractive ?? false
+            return self.content?.shouldInteractive ?? false
         }
 #if os(iOS)
-        public var statusBarHidden: Bool {
+        public var statusBar: UIStatusBarStyle {
             guard let current = self._current else {
-                return self.contentContainer?.statusBarHidden ?? false
+                return self.content?.statusBar ?? .default
             }
-            return current.container.statusBarHidden
-        }
-        public var statusBarStyle: UIStatusBarStyle {
-            guard let current = self._current else {
-                return self.contentContainer?.statusBarStyle ?? .default
-            }
-            return current.container.statusBarStyle
+            return current.container.statusBar
         }
         public var statusBarAnimation: UIStatusBarAnimation {
             guard let current = self._current else {
-                return self.contentContainer?.statusBarAnimation ?? .fade
+                return self.content?.statusBarAnimation ?? .fade
             }
             return current.container.statusBarAnimation
         }
+        public var statusBarHidden: Bool {
+            guard let current = self._current else {
+                return self.content?.statusBarHidden ?? false
+            }
+            return current.container.statusBarHidden
+        }
         public var supportedOrientations: UIInterfaceOrientationMask {
             guard let current = self._current else {
-                return self.contentContainer?.supportedOrientations ?? .all
+                return self.content?.supportedOrientations ?? .all
             }
             return current.container.supportedOrientations
         }
@@ -54,21 +54,21 @@ public extension UI.Container {
         public var view: IUIView {
             return self._view
         }
-        public var contentContainer: (IUIContainer & IUIContainerParentable)? {
+        public var content: (IUIContainer & IUIContainerParentable)? {
             didSet(oldValue) {
-                if let contentContainer = self.contentContainer {
+                if let content = self.content {
                     if self.isPresented == true {
-                        contentContainer.prepareHide(interactive: false)
-                        contentContainer.finishHide(interactive: false)
+                        content.prepareHide(interactive: false)
+                        content.finishHide(interactive: false)
                     }
-                    contentContainer.parent = nil
+                    content.parent = nil
                 }
-                self._layout.contentItem = self.contentContainer.flatMap({ UI.Layout.Item($0.view) })
-                if let contentContainer = self.contentContainer {
-                    contentContainer.parent = self
+                self._layout.content = self.content.flatMap({ UI.Layout.Item($0.view) })
+                if let content = self.content {
+                    content.parent = self
                     if self.isPresented == true {
-                        contentContainer.prepareHide(interactive: false)
-                        contentContainer.finishHide(interactive: false)
+                        content.prepareHide(interactive: false)
+                        content.finishHide(interactive: false)
                     }
                 }
             }
@@ -76,10 +76,10 @@ public extension UI.Container {
         public var containers: [IUIModalContentContainer] {
             return self._items.compactMap({ return $0.container })
         }
-        public var previousContainer: IUIModalContentContainer? {
+        public var previous: IUIModalContentContainer? {
             return self._previous?.container
         }
-        public var currentContainer: IUIModalContentContainer? {
+        public var current: IUIModalContentContainer? {
             return self._current?.container
         }
         public var animationVelocity: Float
@@ -104,11 +104,11 @@ public extension UI.Container {
         }
         
         public init(
-            _ contentContainer: (IUIContainer & IUIContainerParentable)? = nil
+            _ content: (IUIContainer & IUIContainerParentable)? = nil
         ) {
             self.isPresented = false
-            self.contentContainer = contentContainer
-            self._layout = Layout(contentContainer.flatMap({ UI.Layout.Item($0.view) }))
+            self.content = content
+            self._layout = Layout(content.flatMap({ UI.Layout.Item($0.view) }))
             self._view = UI.View.Custom(self._layout)
 #if os(macOS)
             self.animationVelocity = NSScreen.main!.animationVelocity
@@ -133,7 +133,7 @@ public extension UI.Container {
         
         public func didChangeInsets() {
             self._layout.inset = self.inheritedInsets(interactive: false)
-            self.contentContainer?.didChangeInsets()
+            self.content?.didChangeInsets()
             for container in self.containers {
                 container.didChangeInsets()
             }
@@ -145,8 +145,8 @@ public extension UI.Container {
                     return true
                 }
             }
-            if let contentContainer = self.contentContainer {
-                return contentContainer.activate()
+            if let content = self.content {
+                return content.activate()
             }
             return false
         }
@@ -155,41 +155,41 @@ public extension UI.Container {
             for container in self.containers {
                 container.didChangeAppearance()
             }
-            if let contentContainer = self.contentContainer {
-                contentContainer.didChangeAppearance()
+            if let content = self.content {
+                content.didChangeAppearance()
             }
         }
         
         public func prepareShow(interactive: Bool) {
-            self.contentContainer?.prepareShow(interactive: interactive)
-            self.currentContainer?.prepareShow(interactive: interactive)
+            self.content?.prepareShow(interactive: interactive)
+            self.current?.prepareShow(interactive: interactive)
         }
         
         public func finishShow(interactive: Bool) {
             self.isPresented = true
-            self.contentContainer?.finishShow(interactive: interactive)
-            self.currentContainer?.finishShow(interactive: interactive)
+            self.content?.finishShow(interactive: interactive)
+            self.current?.finishShow(interactive: interactive)
         }
         
         public func cancelShow(interactive: Bool) {
-            self.contentContainer?.cancelShow(interactive: interactive)
-            self.currentContainer?.cancelShow(interactive: interactive)
+            self.content?.cancelShow(interactive: interactive)
+            self.current?.cancelShow(interactive: interactive)
         }
         
         public func prepareHide(interactive: Bool) {
-            self.contentContainer?.prepareHide(interactive: interactive)
-            self.currentContainer?.prepareHide(interactive: interactive)
+            self.content?.prepareHide(interactive: interactive)
+            self.current?.prepareHide(interactive: interactive)
         }
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
-            self.contentContainer?.finishHide(interactive: interactive)
-            self.currentContainer?.finishHide(interactive: interactive)
+            self.content?.finishHide(interactive: interactive)
+            self.current?.finishHide(interactive: interactive)
         }
         
         public func cancelHide(interactive: Bool) {
-            self.contentContainer?.cancelHide(interactive: interactive)
-            self.currentContainer?.cancelHide(interactive: interactive)
+            self.content?.cancelHide(interactive: interactive)
+            self.current?.cancelHide(interactive: interactive)
         }
         
         public func present(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?) {
@@ -242,7 +242,7 @@ private extension UI.Container.Modal {
             return false
         }).onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let view = gesture.view else { return false }
-            if let container = self.contentContainer {
+            if let container = self.content {
                 return container.view.native.isChild(of: view, recursive: true)
             }
             return false
@@ -260,7 +260,7 @@ private extension UI.Container.Modal {
             self._endInteractiveGesture(false)
         })
 #endif
-        self.contentContainer?.parent = self
+        self.content?.parent = self
     }
     
     func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {

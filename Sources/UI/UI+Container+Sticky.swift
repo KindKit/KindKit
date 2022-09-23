@@ -22,20 +22,20 @@ public extension UI.Container {
             }
         }
         public var shouldInteractive: Bool {
-            return self.contentContainer.shouldInteractive
+            return self.content.shouldInteractive
         }
 #if os(iOS)
-        public var statusBarHidden: Bool {
-            return self.contentContainer.statusBarHidden
-        }
-        public var statusBarStyle: UIStatusBarStyle {
-            return self.contentContainer.statusBarStyle
+        public var statusBar: UIStatusBarStyle {
+            return self.content.statusBar
         }
         public var statusBarAnimation: UIStatusBarAnimation {
-            return self.contentContainer.statusBarAnimation
+            return self.content.statusBarAnimation
+        }
+        public var statusBarHidden: Bool {
+            return self.content.statusBarHidden
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
-            return self.contentContainer.supportedOrientations
+            return self.content.supportedOrientations
         }
 #endif
         public private(set) var isPresented: Bool
@@ -43,12 +43,12 @@ public extension UI.Container {
             return self._view
         }
         public private(set) var screen: IUIStickyScreen
-        public private(set) var overlayView: UI.View.Bar {
+        public private(set) var overlay: UI.View.Bar {
             set(value) {
-                guard self._overlayView !== value else { return }
-                self._layout.overlayItem = UI.Layout.Item(self._overlayView)
+                guard self._overlay !== value else { return }
+                self._layout.overlay = UI.Layout.Item(self._overlay)
             }
-            get { return self._overlayView }
+            get { return self._overlay }
         }
         public private(set) var overlayVisibility: Float {
             set(value) { self._layout.overlayVisibility = value }
@@ -59,20 +59,20 @@ public extension UI.Container {
             set(value) { self._layout.overlayHidden = value }
             get { return self._layout.overlayHidden }
         }
-        public var contentContainer: ContentContainer {
+        public var content: ContentContainer {
             set(value) {
-                guard self._contentContainer !== value else { return }
+                guard self._content !== value else { return }
                 if self.isPresented == true {
-                    self._contentContainer.prepareHide(interactive: false)
-                    self._contentContainer.finishHide(interactive: false)
+                    self._content.prepareHide(interactive: false)
+                    self._content.finishHide(interactive: false)
                 }
-                self._contentContainer.parent = nil
-                self._contentContainer = value
-                self._contentContainer.parent = self
-                self._layout.contentItem = UI.Layout.Item(self._contentContainer.view)
+                self._content.parent = nil
+                self._content = value
+                self._content.parent = self
+                self._layout.content = UI.Layout.Item(self._content.view)
                 if self.isPresented == true {
-                    self._contentContainer.prepareShow(interactive: false)
-                    self._contentContainer.finishShow(interactive: false)
+                    self._content.prepareShow(interactive: false)
+                    self._content.finishShow(interactive: false)
                 }
 #if os(iOS)
                 self.setNeedUpdateOrientations()
@@ -80,25 +80,25 @@ public extension UI.Container {
 #endif
                 self.didChangeInsets()
             }
-            get { return self._contentContainer }
+            get { return self._content }
         }
         
-        private var _overlayView: UI.View.Bar
-        private var _contentContainer: ContentContainer
+        private var _overlay: UI.View.Bar
+        private var _content: ContentContainer
         private var _layout: Layout
         private var _view: UI.View.Custom
         
         public init(
             screen: IUIStickyScreen,
-            contentContainer: ContentContainer
+            content: ContentContainer
         ) {
             self.screen = screen
             self.isPresented = false
-            self._overlayView = screen.stickyView
-            self._contentContainer = contentContainer
+            self._overlay = screen.stickyView
+            self._content = content
             self._layout = Layout(
-                contentItem: UI.Layout.Item(contentContainer.view),
-                overlayItem: UI.Layout.Item(screen.stickyView),
+                content: UI.Layout.Item(content.view),
+                overlay: UI.Layout.Item(screen.stickyView),
                 overlayVisibility: screen.stickyVisibility,
                 overlayHidden: screen.stickyHidden
             )
@@ -114,7 +114,7 @@ public extension UI.Container {
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
             let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if self._contentContainer === container, let overlaySize = self._layout.overlaySize {
+            if self._content === container, let overlaySize = self._layout.overlaySize {
                 let bottom: Float
                 if self.overlayHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
                     if interactive == true {
@@ -138,54 +138,54 @@ public extension UI.Container {
         public func didChangeInsets() {
             let inheritedInsets = self.inheritedInsets(interactive: true)
             if self.overlayHidden == false {
-                self._overlayView.alpha = self.overlayVisibility
+                self._overlay.alpha = self.overlayVisibility
             } else {
-                self._overlayView.alpha = 0
+                self._overlay.alpha = 0
             }
-            self._overlayView.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
+            self._overlay.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
             self._layout.overlayInset = inheritedInsets.bottom
-            self._contentContainer.didChangeInsets()
+            self._content.didChangeInsets()
         }
         
         public func activate() -> Bool {
-            return self._contentContainer.activate()
+            return self._content.activate()
         }
         
         public func didChangeAppearance() {
             self.screen.didChangeAppearance()
-            self._contentContainer.didChangeAppearance()
+            self._content.didChangeAppearance()
         }
         
         public func prepareShow(interactive: Bool) {
             self.screen.prepareShow(interactive: interactive)
-            self._contentContainer.prepareShow(interactive: interactive)
+            self._content.prepareShow(interactive: interactive)
         }
         
         public func finishShow(interactive: Bool) {
             self.isPresented = true
             self.screen.finishShow(interactive: interactive)
-            self._contentContainer.finishShow(interactive: interactive)
+            self._content.finishShow(interactive: interactive)
         }
         
         public func cancelShow(interactive: Bool) {
             self.screen.cancelShow(interactive: interactive)
-            self._contentContainer.cancelShow(interactive: interactive)
+            self._content.cancelShow(interactive: interactive)
         }
         
         public func prepareHide(interactive: Bool) {
             self.screen.prepareHide(interactive: interactive)
-            self._contentContainer.prepareHide(interactive: interactive)
+            self._content.prepareHide(interactive: interactive)
         }
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
             self.screen.finishHide(interactive: interactive)
-            self._contentContainer.finishHide(interactive: interactive)
+            self._content.finishHide(interactive: interactive)
         }
         
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
-            self._contentContainer.cancelHide(interactive: interactive)
+            self._content.cancelHide(interactive: interactive)
         }
         
         public func updateOverlay(animated: Bool, completion: (() -> Void)?) {
@@ -201,7 +201,7 @@ private extension UI.Container.Sticky {
     
     func _init() {
         self.screen.container = self
-        self._contentContainer.parent = self
+        self._content.parent = self
         self.screen.setup()
     }
     
@@ -212,24 +212,24 @@ extension UI.Container.Sticky : IUIRootContentContainer {
 
 extension UI.Container.Sticky : IUIGroupContentContainer where ContentContainer : IUIGroupContentContainer {
     
-    public var groupItemView: UI.View.GroupBar.Item {
-        return self.contentContainer.groupItemView
+    public var groupItem: UI.View.GroupBar.Item {
+        return self.content.groupItem
     }
     
 }
 
 extension UI.Container.Sticky : IUIStackContentContainer where ContentContainer : IUIStackContentContainer {
     
-    public var stackBarView: UI.View.StackBar {
-        return self.contentContainer.stackBarView
+    public var stackBar: UI.View.StackBar {
+        return self.content.stackBar
     }
     
     public var stackBarVisibility: Float {
-        return self.contentContainer.stackBarVisibility
+        return self.content.stackBarVisibility
     }
     
     public var stackBarHidden: Bool {
-        return self.contentContainer.stackBarHidden
+        return self.content.stackBarHidden
     }
     
 }
@@ -237,7 +237,7 @@ extension UI.Container.Sticky : IUIStackContentContainer where ContentContainer 
 extension UI.Container.Sticky : IUIPageContentContainer where ContentContainer : IUIPageContentContainer {
     
     public var pageItemView: UI.View.PageBar.Item {
-        return self.contentContainer.pageItemView
+        return self.content.pageItemView
     }
     
 }
@@ -245,23 +245,23 @@ extension UI.Container.Sticky : IUIPageContentContainer where ContentContainer :
 extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer : IUIDialogContentContainer {
     
     public var dialogInset: InsetFloat {
-        return self.contentContainer.dialogInset
+        return self.content.dialogInset
     }
     
     public var dialogWidth: DialogContentContainerSize {
-        return self.contentContainer.dialogWidth
+        return self.content.dialogWidth
     }
     
     public var dialogHeight: DialogContentContainerSize {
-        return self.contentContainer.dialogHeight
+        return self.content.dialogHeight
     }
     
     public var dialogAlignment: DialogContentContainerAlignment {
-        return self.contentContainer.dialogAlignment
+        return self.content.dialogAlignment
     }
     
     public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
-        return self.contentContainer.dialogBackgroundView
+        return self.content.dialogBackgroundView
     }
     
 }
@@ -269,11 +269,11 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
 extension UI.Container.Sticky : IUIModalContentContainer where ContentContainer : IUIModalContentContainer {
     
     public var modalSheetInset: InsetFloat? {
-        return self.contentContainer.modalSheetInset
+        return self.content.modalSheetInset
     }
     
-    public var modalSheetBackgroundView: (IUIView & IUIViewAlphable)? {
-        return self.contentContainer.modalSheetBackgroundView
+    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
+        return self.content.modalSheetBackground
     }
     
 }

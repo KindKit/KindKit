@@ -10,17 +10,17 @@ extension UI.View.GroupBar {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var itemInset: InsetFloat = Inset(horizontal: 12, vertical: 0) {
-            didSet { self.setNeedForceUpdate() }
-        }
-        var itemSpacing: Float = 4 {
-            didSet { self.setNeedForceUpdate() }
-        }
         var items: [UI.Layout.Item] = [] {
             didSet {
                 self._cache = Array< SizeFloat? >(repeating: nil, count: self.items.count)
                 self.setNeedForceUpdate()
             }
+        }
+        var itemsInset: InsetFloat = Inset(horizontal: 12, vertical: 0) {
+            didSet { self.setNeedForceUpdate() }
+        }
+        var itemsSpacing: Float = 4 {
+            didSet { self.setNeedForceUpdate() }
         }
         
         private var _cache: [SizeFloat?] = []
@@ -38,8 +38,8 @@ extension UI.View.GroupBar {
             return UI.Layout.List.Helper.layout(
                 bounds: bounds,
                 direction: .horizontal,
-                inset: self.itemInset,
-                spacing: self.itemSpacing,
+                inset: self.itemsInset,
+                spacing: self.itemsSpacing,
                 minSize: bounds.size.width / Float(self.items.count),
                 maxSize: bounds.size.width,
                 items: self.items,
@@ -51,8 +51,8 @@ extension UI.View.GroupBar {
             return UI.Layout.List.Helper.size(
                 available: available,
                 direction: .horizontal,
-                inset: self.itemInset,
-                spacing: self.itemSpacing,
+                inset: self.itemsInset,
+                spacing: self.itemsSpacing,
                 minSize: available.width / Float(self.items.count),
                 maxSize: available.width,
                 items: self.items

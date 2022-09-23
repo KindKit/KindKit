@@ -53,13 +53,13 @@ public extension UI.View {
                 self._view.update(items: self.items)
             }
         }
-        public var selectedItem: Item? {
+        public var selected: Item? {
             set(value) {
-                self._selectedItem = value
+                self._selected = value
                 guard self.isLoaded == true else { return }
-                self._view.update(items: self.items, selectedItem: self._selectedItem)
+                self._view.update(items: self.items, selected: self._selected)
             }
-            get { return self._selectedItem }
+            get { return self._selected }
         }
         public var isLocked: Bool = false {
             didSet {
@@ -102,7 +102,7 @@ public extension UI.View {
         private var _view: Reusable.Content {
             return self._reuse.content()
         }
-        private var _selectedItem: Item?
+        private var _selected: Item?
         private var _onAppear: ((UI.View.Segmented) -> Void)?
         private var _onDisappear: ((UI.View.Segmented) -> Void)?
         private var _onVisible: ((UI.View.Segmented) -> Void)?
@@ -114,6 +114,13 @@ public extension UI.View {
         public init() {
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            configure: (UI.View.Segmented) -> Void
+        ) {
+            self.init()
+            self.modify(configure)
         }
         
         deinit {
@@ -217,8 +224,8 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
-    func selectedItem(_ value: Item?) -> Self {
-        self.selectedItem = value
+    func selected(_ value: Item?) -> Self {
+        self.selected = value
         return self
     }
     
@@ -227,9 +234,9 @@ public extension UI.View.Segmented {
 extension UI.View.Segmented : KKSegmentedViewDelegate {
     
     func selected(_ view: KKSegmentedView, index: Int) {
-        let selectedItem = self.items[index]
-        self._selectedItem = selectedItem
-        self._onSelect?(self, selectedItem)
+        let selected = self.items[index]
+        self._selected = selected
+        self._onSelect?(self, selected)
     }
     
 }

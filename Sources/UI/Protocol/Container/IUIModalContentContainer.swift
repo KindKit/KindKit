@@ -9,7 +9,7 @@ public protocol IUIModalContentContainer : IUIContainer, IUIContainerParentable 
     var modalContainer: IUIModalContainer? { get }
     
     var modalSheetInset: InsetFloat? { get }
-    var modalSheetBackgroundView: (IUIView & IUIViewAlphable)? { get }
+    var modalSheetBackground: (IUIView & IUIViewAlphable)? { get }
     
 }
 

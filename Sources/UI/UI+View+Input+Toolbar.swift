@@ -51,7 +51,7 @@ public extension UI.View.Input {
                 self._view.update(barTintColor: self.barTintColor)
             }
         }
-        public var contentTintColor: UI.Color = .init(rgb: 0xffffff) {
+        public var contentTintColor: UI.Color = .white {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(contentTintColor: self.contentTintColor)
@@ -77,6 +77,14 @@ public extension UI.View.Input {
             self.items = items
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            items: [IInputToolbarItem],
+            configure: (UI.View.Input.Toolbar) -> Void
+        ) {
+            self.init(items)
+            self.modify(configure)
         }
         
         deinit {

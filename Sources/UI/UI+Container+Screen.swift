@@ -25,17 +25,17 @@ public extension UI.Container {
             return self.screen.shouldInteractive
         }
 #if os(iOS)
-        public var statusBarHidden: Bool {
-            guard let screen = self.screen as? IScreenStatusable else { return false }
-            return screen.statusBarHidden
-        }
-        public var statusBarStyle: UIStatusBarStyle {
+        public var statusBar: UIStatusBarStyle {
             guard let screen = self.screen as? IScreenStatusable else { return .default }
-            return screen.statusBarStyle
+            return screen.statusBar
         }
         public var statusBarAnimation: UIStatusBarAnimation {
             guard let screen = self.screen as? IScreenStatusable else { return .fade }
             return screen.statusBarAnimation
+        }
+        public var statusBarHidden: Bool {
+            guard let screen = self.screen as? IScreenStatusable else { return false }
+            return screen.statusBarHidden
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
             guard let screen = self.screen as? IScreenOrientable else { return .all }
@@ -130,7 +130,7 @@ extension UI.Container.Screen : IUIRootContentContainer {
 
 extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScreenStackable {
     
-    public var stackBarView: UI.View.StackBar {
+    public var stackBar: UI.View.StackBar {
         return self.screen.stackBarView
     }
     
@@ -146,8 +146,8 @@ extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScree
 
 extension UI.Container.Screen : IUIGroupContentContainer where Screen : IUIScreenGroupable {
     
-    public var groupItemView: UI.View.GroupBar.Item {
-        return self.screen.groupItemView
+    public var groupItem: UI.View.GroupBar.Item {
+        return self.screen.groupItem
     }
     
 }
@@ -192,10 +192,10 @@ extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScree
         }
     }
     
-    public var modalSheetBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
         switch self.screen.modalPresentation {
         case .simple: return nil
-        case .sheet(let info): return info.backgroundView
+        case .sheet(let info): return info.background
         }
     }
     

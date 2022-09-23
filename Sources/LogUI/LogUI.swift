@@ -8,7 +8,7 @@ public struct LogUI {
     
     public static func container(
         target: Target
-    ) -> IUIModalContentContainer {
+    ) -> UI.Container.Stack< StackScreen > {
         let screen = Screen(target: target)
         let stackScreen = StackScreen()
         screen.onClose = { [unowned stackScreen] in
@@ -16,33 +16,39 @@ public struct LogUI {
         }
         return UI.Container.Stack(
             screen: stackScreen,
-            rootContainer: UI.Container.Screen(screen)
+            root: UI.Container.Screen(screen)
         )
     }
     
 }
 
-extension LogUI {
+#if canImport(SwiftUI) && DEBUG
+
+import SwiftUI
+
+@available(macOS 10.15.0, *)
+@available(iOS 15.0, *)
+struct LogUI_Preview : PreviewProvider {
     
-    final class StackScreen : IUIStackScreen, IUIScreenModalable {
+    static var target: LogUI.Target = {
+        let target = LogUI.Target()
+        Log.shared.append(target: target)
         
-        var container: IUIContainer?
-        var modalPresentation: UI.Screen.Modal.Presentation {
-            return .sheet(
-                info: UI.Screen.Modal.Presentation.Sheet(
-                    inset: InsetFloat(top: 80, left: 0, right: 0, bottom: 0),
-                    backgroundView: self._backgroundView
-                )
+        Log.shared.log(level: .info, category: "Info", message: "Message #1")
+        Log.shared.log(level: .debug, category: "Debug", message: "Message #2")
+        Log.shared.log(level: .error, category: "Error", message: "Message #3")
+
+        return target
+    }()
+    
+    static var previews: some View {
+        UI.Container.Preview(
+            LogUI.container(
+                target: Self.target
             )
-        }
-        
-        private let _backgroundView: UI.View.Empty
-        
-        init() {
-            self._backgroundView = UI.View.Empty()
-                .color(.init(rgba: 0x0000007a))
-        }
-        
+        )
     }
     
 }
+
+#endif

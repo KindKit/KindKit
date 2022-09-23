@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIScreenGroupable : AnyObject {
     
-    var groupItemView: UI.View.GroupBar.Item { get }
+    var groupItem: UI.View.GroupBar.Item { get }
     
 }
 

@@ -10,31 +10,31 @@ extension UI.Container.Modal {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
+        var state: State = .empty {
+            didSet { self.setNeedUpdate() }
+        }
         var inset: InsetFloat = .zero {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
-        }
-        var state: State = .empty {
+        var content: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
 
         init(
-            _ contentItem: UI.Layout.Item?
+            _ content: UI.Layout.Item?
         ) {
-            self.contentItem = contentItem
+            self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            if let contentItem = self.contentItem {
-                contentItem.frame = bounds
+            if let content = self.content {
+                content.frame = bounds
             }
             switch self.state {
             case .empty:
                 break
             case .idle(let modal):
-                if let sheetInset = modal.sheetInset, let view = modal.sheetBackgroundView, let item = modal.sheetBackgroundItem {
+                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
                     let inset = InsetFloat(
                         top: self.inset.top + sheetInset.top,
                         left: sheetInset.left,
@@ -42,13 +42,13 @@ extension UI.Container.Modal {
                         bottom: sheetInset.bottom
                     )
                     modal.item.frame = bounds.inset(inset)
-                    view.alpha = 1
-                    item.frame = bounds
+                    sheetView.alpha = 1
+                    sheetItem.frame = bounds
                 } else {
                     modal.item.frame = bounds
                 }
             case .present(let modal, let progress):
-                if let sheetInset = modal.sheetInset, let view = modal.sheetBackgroundView, let item = modal.sheetBackgroundItem {
+                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
                     let inset = InsetFloat(
                         top: self.inset.top + sheetInset.top,
                         left: sheetInset.left,
@@ -58,15 +58,15 @@ extension UI.Container.Modal {
                     let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
                     let endRect = bounds.inset(inset)
                     modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    view.alpha = progress.value
-                    item.frame = bounds
+                    sheetView.alpha = progress.value
+                    sheetItem.frame = bounds
                 } else {
                     let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
                     let endRect = bounds
                     modal.item.frame = beginRect.lerp(endRect, progress: progress)
                 }
             case .dismiss(let modal, let progress):
-                if let sheetInset = modal.sheetInset, let view = modal.sheetBackgroundView, let item = modal.sheetBackgroundItem {
+                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
                     let inset = InsetFloat(
                         top: self.inset.top + sheetInset.top,
                         left: sheetInset.left,
@@ -76,8 +76,8 @@ extension UI.Container.Modal {
                     let beginRect = bounds.inset(inset)
                     let endRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
                     modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    view.alpha = progress.invert.value
-                    item.frame = bounds
+                    sheetView.alpha = progress.invert.value
+                    sheetItem.frame = bounds
                 } else {
                     let beginRect = bounds
                     let endRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
@@ -93,8 +93,8 @@ extension UI.Container.Modal {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items: [UI.Layout.Item] = []
-            if let contentItem = self.contentItem {
-                items.append(contentItem)
+            if let content = self.content {
+                items.append(content)
             }
             switch self.state {
             case .empty: break

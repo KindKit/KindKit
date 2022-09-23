@@ -10,7 +10,7 @@ let package = Package(
         .macOS(.v11)
     ],
     products: [
-        .library(name: "KindKit", type: .static, targets: [ "KindKit" ]),
+        .library(name: "KindKit", targets: [ "KindKit" ]),
     ],
     targets: [
         .target(

@@ -65,7 +65,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var textColor: UI.Color = .init(rgb: 0x000000) {
+        public var textColor: UI.Color = .black {
             didSet {
                 guard self.textColor != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -96,7 +96,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var color: UI.Color? = .init(rgba: 0x00000000) {
+        public var color: UI.Color? = .clear {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -147,6 +147,14 @@ public extension UI.View {
             self.text = text
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            text: String,
+            configure: (UI.View.Text) -> Void
+        ) {
+            self.init(text)
+            self.modify(configure)
         }
         
         deinit {

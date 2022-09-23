@@ -10,40 +10,36 @@ extension UI.Container.Push {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var additionalInset: InsetFloat {
+        var state: State = .empty {
             didSet { self.setNeedUpdate() }
         }
-        var containerInset: InsetFloat {
+        var inset: InsetFloat {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item? {
+        var inheritedInset: InsetFloat = .zero {
             didSet { self.setNeedUpdate() }
         }
-        var state: State {
+        var content: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
         
         init(
-            additionalInset: InsetFloat,
-            containerInset: InsetFloat,
-            contentItem: UI.Layout.Item?,
-            state: State
+            inset: InsetFloat,
+            content: UI.Layout.Item?
         ) {
-            self.additionalInset = additionalInset
-            self.containerInset = containerInset
-            self.contentItem = contentItem
-            self.state = state
+            self.inset = inset
+            self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            if let contentItem = self.contentItem {
-                contentItem.frame = bounds
+            if let content = self.content {
+                content.frame = bounds
             }
             switch self.state {
             case .empty:
                 break
             case .idle(let push):
-                let inset = self.additionalInset + self.containerInset
+                let inset = self.inset + self.inheritedInset
                 push.item.frame = RectFloat(
                     x: bounds.origin.x + inset.left,
                     y: bounds.origin.y + inset.top,
@@ -51,7 +47,7 @@ extension UI.Container.Push {
                     height: push.size.height
                 )
             case .present(let push, let progress):
-                let inset = self.additionalInset + self.containerInset
+                let inset = self.inset + self.inheritedInset
                 let beginRect = RectFloat(
                     x: bounds.origin.x + inset.left,
                     y: bounds.origin.y - push.size.height,
@@ -66,7 +62,7 @@ extension UI.Container.Push {
                 )
                 push.item.frame = beginRect.lerp(endRect, progress: progress)
             case .dismiss(let push, let progress):
-                let inset = self.additionalInset + self.containerInset
+                let inset = self.inset + self.inheritedInset
                 let beginRect = RectFloat(
                     x: bounds.origin.x + inset.left,
                     y: bounds.origin.y + inset.top,
@@ -90,8 +86,8 @@ extension UI.Container.Push {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items: [UI.Layout.Item] = []
-            if let contentItem = self.contentItem {
-                items.append(contentItem)
+            if let content = self.content {
+                items.append(content)
             }
             switch self.state {
             case .empty: break
@@ -103,7 +99,7 @@ extension UI.Container.Push {
         }
         
         func height(item: UI.Container.Push.Item) -> Float {
-            return item.size.height + self.additionalInset.top + self.containerInset.top
+            return item.size.height + self.inset.top + self.inheritedInset.top
         }
         
     }

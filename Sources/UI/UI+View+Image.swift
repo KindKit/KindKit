@@ -114,6 +114,14 @@ public extension UI.View {
             self._reuse.configure(owner: self)
         }
         
+        public convenience init(
+            image: UI.Image,
+            configure: (UI.View.Image) -> Void
+        ) {
+            self.init(image)
+            self.modify(configure)
+        }
+        
         deinit {
             self._reuse.destroy()
         }

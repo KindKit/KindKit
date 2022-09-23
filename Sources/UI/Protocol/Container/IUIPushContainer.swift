@@ -6,11 +6,11 @@ import Foundation
 
 public protocol IUIPushContainer : IUIContainer, IUIContainerParentable {
     
-    var additionalInset: InsetFloat { set get }
-    var contentContainer: (IUIContainer & IUIContainerParentable)? { set get }
+    var inset: InsetFloat { set get }
+    var content: (IUIContainer & IUIContainerParentable)? { set get }
     var containers: [IUIPushContentContainer] { get }
-    var previousContainer: IUIPushContentContainer? { get }
-    var currentContainer: IUIPushContentContainer? { get }
+    var previous: IUIPushContentContainer? { get }
+    var current: IUIPushContentContainer? { get }
     var animationVelocity: Float { set get }
 #if os(iOS)
     var interactiveLimit: Float { set get }

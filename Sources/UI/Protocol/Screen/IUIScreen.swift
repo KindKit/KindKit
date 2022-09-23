@@ -92,22 +92,24 @@ public extension IUIScreen {
 
 public protocol IScreenStatusable : AnyObject {
     
-    var statusBarHidden: Bool { get }
-    var statusBarStyle: UIStatusBarStyle { get }
+    var statusBar: UIStatusBarStyle { get }
     var statusBarAnimation: UIStatusBarAnimation { get }
+    var statusBarHidden: Bool { get }
     
 }
 
 public extension IScreenStatusable where Self : IUIScreen {
     
-    var statusBarHidden: Bool {
-        return false
-    }
-    var statusBarStyle: UIStatusBarStyle {
+    var statusBar: UIStatusBarStyle {
         return .default
     }
+    
     var statusBarAnimation: UIStatusBarAnimation {
         return .fade
+    }
+    
+    var statusBarHidden: Bool {
+        return false
     }
     
     func setNeedUpdateStatusBar() {
