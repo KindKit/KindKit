@@ -14,11 +14,30 @@ public extension UI.Layout.Composition {
         
         public init(
             alignment: Alignment,
-            spacing: Float = 0,
             entities: [IUICompositionLayoutEntity]
         ) {
             self.alignment = alignment
-            self.spacing = spacing
+            self.spacing = 0
+            self.entities = entities
+        }
+        
+        public init< Spacing : BinaryInteger >(
+            alignment: Alignment,
+            spacing: Spacing,
+            entities: [IUICompositionLayoutEntity]
+        ) {
+            self.alignment = alignment
+            self.spacing = Float(spacing)
+            self.entities = entities
+        }
+        
+        public init< Spacing : BinaryFloatingPoint >(
+            alignment: Alignment,
+            spacing: Spacing,
+            entities: [IUICompositionLayoutEntity]
+        ) {
+            self.alignment = alignment
+            self.spacing = Float(spacing)
             self.entities = entities
         }
         
@@ -151,7 +170,31 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func vStack(
         alignment: UI.Layout.Composition.VStack.Alignment,
-        spacing: Float = 0,
+        entities: [IUICompositionLayoutEntity]
+    ) -> UI.Layout.Composition.VStack {
+        return .init(
+            alignment: alignment,
+            entities: entities
+        )
+    }
+    
+    @inlinable
+    static func vStack< Spacing : BinaryInteger >(
+        alignment: UI.Layout.Composition.VStack.Alignment,
+        spacing: Spacing,
+        entities: [IUICompositionLayoutEntity]
+    ) -> UI.Layout.Composition.VStack {
+        return .init(
+            alignment: alignment,
+            spacing: spacing,
+            entities: entities
+        )
+    }
+    
+    @inlinable
+    static func vStack< Spacing : BinaryFloatingPoint >(
+        alignment: UI.Layout.Composition.VStack.Alignment,
+        spacing: Spacing,
         entities: [IUICompositionLayoutEntity]
     ) -> UI.Layout.Composition.VStack {
         return .init(

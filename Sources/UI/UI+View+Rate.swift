@@ -117,6 +117,13 @@ public extension UI.View {
             self._reuse.configure(owner: self)
         }
         
+        public convenience init(
+            configure: (UI.View.Rate) -> Void
+        ) {
+            self.init()
+            self.modify(configure)
+        }
+        
         deinit {
             self._reuse.destroy()
         }

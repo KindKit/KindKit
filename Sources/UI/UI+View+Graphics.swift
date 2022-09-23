@@ -100,6 +100,14 @@ public extension UI.View {
             self.canvas.attach(view: self)
         }
         
+        public convenience init(
+            canvas: IGraphicsCanvas,
+            configure: (UI.View.Graphics) -> Void
+        ) {
+            self.init(canvas)
+            self.modify(configure)
+        }
+        
         deinit {
             self._reuse.destroy()
         }

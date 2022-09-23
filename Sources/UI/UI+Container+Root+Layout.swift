@@ -10,43 +10,43 @@ extension UI.Container.Root {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var statusBarItem: UI.Layout.Item? {
+        var statusBar: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
-        var overlayItem: UI.Layout.Item? {
+        var overlay: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item {
+        var content: UI.Layout.Item {
             didSet { self.setNeedUpdate() }
         }
         
         init(
-            statusBarItem: UI.Layout.Item?,
-            overlayItem: UI.Layout.Item?,
-            contentItem: UI.Layout.Item
+            statusBar: UI.Layout.Item?,
+            overlay: UI.Layout.Item?,
+            content: UI.Layout.Item
         ) {
-            self.statusBarItem = statusBarItem
-            self.overlayItem = overlayItem
-            self.contentItem = contentItem
+            self.statusBar = statusBar
+            self.overlay = overlay
+            self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            if let overlayItem = self.overlayItem {
-                overlayItem.frame = bounds
+            if let overlay = self.overlay {
+                overlay.frame = bounds
             }
-            if let statusBarItem = self.statusBarItem {
-                let statusBarSize = statusBarItem.size(available: SizeFloat(
+            if let statusBar = self.statusBar {
+                let statusBarSize = statusBar.size(available: SizeFloat(
                     width: bounds.size.width,
                     height: .infinity
                 ))
-                statusBarItem.frame = RectFloat(
+                statusBar.frame = RectFloat(
                     x: bounds.origin.x,
                     y: bounds.origin.y,
                     width: statusBarSize.width,
                     height: statusBarSize.height
                 )
             }
-            self.contentItem.frame = bounds
+            self.content.frame = bounds
             return bounds.size
         }
         
@@ -56,13 +56,13 @@ extension UI.Container.Root {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items = [
-                self.contentItem
+                self.content
             ]
-            if let statusBarItem = self.statusBarItem {
-                items.append(statusBarItem)
+            if let statusBar = self.statusBar {
+                items.append(statusBar)
             }
-            if let overlayItem = self.overlayItem {
-                items.append(overlayItem)
+            if let overlay = self.overlay {
+                items.append(overlay)
             }
             return items
         }

@@ -22,20 +22,20 @@ public extension UI.Container {
             }
         }
         public var shouldInteractive: Bool {
-            return self._currentItem.container.shouldInteractive
+            return self._current.container.shouldInteractive
         }
 #if os(iOS)
-        public var statusBarHidden: Bool {
-            return self._currentItem.container.statusBarHidden
-        }
-        public var statusBarStyle: UIStatusBarStyle {
-            return self._currentItem.container.statusBarStyle
+        public var statusBar: UIStatusBarStyle {
+            return self._current.container.statusBar
         }
         public var statusBarAnimation: UIStatusBarAnimation {
-            return self._currentItem.container.statusBarAnimation
+            return self._current.container.statusBarAnimation
+        }
+        public var statusBarHidden: Bool {
+            return self._current.container.statusBarHidden
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
-            return self._currentItem.container.supportedOrientations
+            return self._current.container.supportedOrientations
         }
 #endif
         public private(set) var isPresented: Bool
@@ -43,14 +43,14 @@ public extension UI.Container {
         public var view: IUIView {
             return self._view
         }
-        public var rootContainer: IUIStackContentContainer {
-            return self._rootItem.container
+        public var root: IUIStackContentContainer {
+            return self._root.container
         }
         public var containers: [IUIStackContentContainer] {
             return self._items.compactMap({ $0.container })
         }
-        public var currentContainer: IUIStackContentContainer {
-            return self._currentItem.container
+        public var current: IUIStackContentContainer {
+            return self._current.container
         }
         public var hidesGroupBarWhenPushed: Bool
         public var animationVelocity: Float
@@ -58,7 +58,7 @@ public extension UI.Container {
         public var interactiveLimit: Float
 #endif
         
-        private var _rootItem: Item
+        private var _root: Item
         private var _items: [Item]
         private var _layout: Layout
         private var _view: UI.View.Custom
@@ -72,13 +72,13 @@ public extension UI.Container {
         private var _interactiveCurrent: Item?
 #endif
         @inline(__always)
-        private var _currentItem: Item {
-            return self._items.last ?? self._rootItem
+        private var _current: Item {
+            return self._items.last ?? self._root
         }
         
         public init(
             screen: Screen,
-            rootContainer: IUIStackContentContainer,
+            root: IUIStackContentContainer,
             hidesGroupBarWhenPushed: Bool = false
         ) {
             self.isPresented = false
@@ -90,12 +90,12 @@ public extension UI.Container {
             self.animationVelocity = UIScreen.main.animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.45)
 #endif
-            self._rootItem = Item(
-                container: rootContainer,
+            self._root = Item(
+                container: root,
                 insets: .zero
             )
             self._layout = Layout(
-                state: .idle(current: self._rootItem.item)
+                state: .idle(current: self._root.item)
             )
             self._view = UI.View.Custom(self._layout)
 #if os(iOS)
@@ -115,7 +115,7 @@ public extension UI.Container {
         ) {
             self.init(
                 screen: screen,
-                rootContainer: UI.Container.Screen(rootScreen),
+                root: UI.Container.Screen(rootScreen),
                 hidesGroupBarWhenPushed: hidesGroupBarWhenPushed
             )
         }
@@ -128,8 +128,8 @@ public extension UI.Container {
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
             let inheritedInsets = self.inheritedInsets(interactive: interactive)
             let item: Item?
-            if self._rootItem.container === container {
-                item = self._rootItem
+            if self._root.container === container {
+                item = self._root
             } else {
                 item = self._items.first(where: { $0.container === container })
             }
@@ -156,8 +156,8 @@ public extension UI.Container {
         
         public func didChangeInsets() {
             let inheritedInsets = self.inheritedInsets(interactive: true)
-            self._rootItem.set(insets: inheritedInsets)
-            self._rootItem.container.didChangeInsets()
+            self._root.set(insets: inheritedInsets)
+            self._root.container.didChangeInsets()
             for item in self._items {
                 item.set(insets: inheritedInsets)
                 item.container.didChangeInsets()
@@ -172,7 +172,7 @@ public extension UI.Container {
                 self.popToRoot()
                 return true
             }
-            return self._rootItem.container.activate()
+            return self._root.container.activate()
         }
         
         public func didChangeAppearance() {
@@ -180,45 +180,45 @@ public extension UI.Container {
             for item in self._items.reversed() {
                 item.container.didChangeAppearance()
             }
-            self._rootItem.container.didChangeAppearance()
+            self._root.container.didChangeAppearance()
         }
         
         public func prepareShow(interactive: Bool) {
             self.screen.prepareShow(interactive: interactive)
-            self._currentItem.container.prepareShow(interactive: interactive)
+            self._current.container.prepareShow(interactive: interactive)
         }
         
         public func finishShow(interactive: Bool) {
             self.isPresented = true
             self.screen.finishShow(interactive: interactive)
-            self._currentItem.container.finishShow(interactive: interactive)
+            self._current.container.finishShow(interactive: interactive)
         }
         
         public func cancelShow(interactive: Bool) {
             self.screen.cancelShow(interactive: interactive)
-            self._currentItem.container.cancelShow(interactive: interactive)
+            self._current.container.cancelShow(interactive: interactive)
         }
         
         public func prepareHide(interactive: Bool) {
             self.screen.prepareHide(interactive: interactive)
-            self._currentItem.container.prepareHide(interactive: interactive)
+            self._current.container.prepareHide(interactive: interactive)
         }
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
             self.screen.finishHide(interactive: interactive)
-            self._currentItem.container.finishHide(interactive: interactive)
+            self._current.container.finishHide(interactive: interactive)
         }
         
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
-            self._currentItem.container.cancelHide(interactive: interactive)
+            self._current.container.cancelHide(interactive: interactive)
         }
         
         public func update(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?) {
             let item: Item?
-            if self._rootItem.container === container {
-                item = self._rootItem
+            if self._root.container === container {
+                item = self._root
             } else {
                 item = self._items.first(where: { $0.container === container })
             }
@@ -229,12 +229,12 @@ public extension UI.Container {
             completion?()
         }
         
-        public func set(rootContainer: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?) {
+        public func set(root: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?) {
             let inheritedInsets = self.inheritedInsets(interactive: true)
-            let newRootItem = Item(container: rootContainer, insets: inheritedInsets)
+            let newRootItem = Item(container: root, insets: inheritedInsets)
             newRootItem.container.parent = self
-            let oldRootItem = self._rootItem
-            self._rootItem = newRootItem
+            let oldRootItem = self._root
+            self._root = newRootItem
             if self._items.isEmpty == true {
                 self._push(current: oldRootItem, forward: newRootItem, animated: animated, completion: {
                     oldRootItem.container.parent = nil
@@ -247,7 +247,7 @@ public extension UI.Container {
         }
         
         public func set(containers: [IUIStackContentContainer], animated: Bool, completion: (() -> Void)?) {
-            let current = self._currentItem
+            let current = self._current
             let removeItems = self._items.filter({ item in
                 return containers.contains(where: { item.container === $0 }) == false
             })
@@ -284,7 +284,7 @@ public extension UI.Container {
             }
             let inheritedInsets = self.inheritedInsets(interactive: true)
             let forward = Item(container: container, insets: inheritedInsets)
-            let current = self._currentItem
+            let current = self._current
             self._items.append(forward)
             container.parent = self
             self._push(current: current, forward: forward, animated: animated, completion: completion)
@@ -295,7 +295,7 @@ public extension UI.Container {
                 return self._items.contains(where: { container === $0.container }) == false
             })
             if newContainers.count > 0 {
-                let current = self._currentItem
+                let current = self._current
                 let inheritedInsets = self.inheritedInsets(interactive: true)
                 let items: [Item] = newContainers.compactMap({ Item(container: $0, insets: inheritedInsets) })
                 for item in items {
@@ -315,7 +315,7 @@ public extension UI.Container {
             }
             let inheritedInsets = self.inheritedInsets(interactive: true)
             let forward = Item(container: wireframe.container, owner: wireframe, insets: inheritedInsets)
-            let current = self._currentItem
+            let current = self._current
             self._items.append(forward)
             wireframe.container.parent = self
             self._push(current: current, forward: forward, animated: animated, completion: completion)
@@ -324,7 +324,7 @@ public extension UI.Container {
         public func pop(animated: Bool, completion: (() -> Void)?) {
             if self._items.count > 0 {
                 let current = self._items.removeLast()
-                let backward = self._items.last ?? self._rootItem
+                let backward = self._items.last ?? self._root
                 self._pop(current: current, backward: backward, animated: animated, completion: {
                     current.container.parent = nil
                     completion?()
@@ -335,7 +335,7 @@ public extension UI.Container {
         }
         
         public func popTo(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?) {
-            if self._rootItem.container === container {
+            if self._root.container === container {
                 self.popToRoot(animated: animated, completion: completion)
             } else {
                 guard let index = self._items.firstIndex(where: { $0.container === container }) else {
@@ -365,7 +365,7 @@ public extension UI.Container {
                 let current = self._items.last
                 let removing = self._items
                 self._items.removeAll()
-                self._pop(current: current, backward: self._rootItem, animated: animated, completion: {
+                self._pop(current: current, backward: self._root, animated: animated, completion: {
                     for item in removing {
                         item.container.parent = nil
                     }
@@ -385,8 +385,8 @@ extension UI.Container.Stack : IUIRootContentContainer {
 
 extension UI.Container.Stack : IUIGroupContentContainer where Screen : IUIScreenGroupable {
     
-    public var groupItemView: UI.View.GroupBar.Item {
-        return self.screen.groupItemView
+    public var groupItem: UI.View.GroupBar.Item {
+        return self.screen.groupItem
     }
     
 }
@@ -424,10 +424,10 @@ extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreen
         }
     }
     
-    public var modalSheetBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
         switch self.screen.modalPresentation {
         case .simple: return nil
-        case .sheet(let info): return info.backgroundView
+        case .sheet(let info): return info.background
         }
     }
     
@@ -466,7 +466,7 @@ private extension UI.Container.Stack {
         })
 #else
 #endif
-        self._rootItem.container.parent = self
+        self._root.container.parent = self
         self.screen.container = self
         self.screen.setup()
     }
@@ -480,7 +480,7 @@ private extension UI.Container.Stack {
         let hideBar: Bool
         let groupBarOldVisibility = UI.Container.BarController.shared.visibility(.group)
         let groupBarNewVisibility: Float = 0.0
-        if current === self._rootItem && self.hidesGroupBarWhenPushed == true && groupBarOldVisibility > groupBarNewVisibility {
+        if current === self._root && self.hidesGroupBarWhenPushed == true && groupBarOldVisibility > groupBarNewVisibility {
             hideBar = true
         } else {
             hideBar = false
@@ -628,7 +628,7 @@ private extension UI.Container.Stack {
         let hideBar: Bool
         let groupBarOldVisibility = UI.Container.BarController.shared.visibility(.group)
         let groupBarNewVisibility: Float = 1.0
-        if backward === self._rootItem && self.hidesGroupBarWhenPushed == true && groupBarOldVisibility < groupBarNewVisibility {
+        if backward === self._root && self.hidesGroupBarWhenPushed == true && groupBarOldVisibility < groupBarNewVisibility {
             hideBar = true
         } else {
             hideBar = false
@@ -775,13 +775,13 @@ private extension UI.Container.Stack {
     
     func _beginInteractiveGesture() {
         self._interactiveBeginLocation = self._interactiveGesture.location(in: self._view)
-        let backward = self._items.count > 1 ? self._items[self._items.count - 2] : self._rootItem
+        let backward = self._items.count > 1 ? self._items[self._items.count - 2] : self._root
         backward.container.prepareShow(interactive: true)
         self._interactiveBackward = backward
         let current = self._items[self._items.count - 1]
         current.container.prepareHide(interactive: true)
         self._interactiveCurrent = current
-        if backward === self._rootItem && self.hidesGroupBarWhenPushed == true {
+        if backward === self._root && self.hidesGroupBarWhenPushed == true {
             self._interactiveGroupBottomBar = true
             self._interactiveGroupBarOldVisibility = UI.Container.BarController.shared.visibility(.group)
             self._interactiveGroupBarNewVisibility = 1

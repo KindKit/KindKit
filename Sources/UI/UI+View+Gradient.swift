@@ -104,6 +104,14 @@ public extension UI.View {
             self._reuse.configure(owner: self)
         }
         
+        public convenience init(
+            fill: Fill,
+            configure: (UI.View.Gradient) -> Void
+        ) {
+            self.init(fill)
+            self.modify(configure)
+        }
+        
         deinit {
             self._reuse.destroy()
         }

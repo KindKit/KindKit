@@ -27,6 +27,7 @@ public protocol IUIAnyView : AnyObject {
 public extension IUIAnyView {
     
     @inlinable
+    @discardableResult
     func modify(_ block: (Self) -> Void) -> Self {
         block(self)
         return self

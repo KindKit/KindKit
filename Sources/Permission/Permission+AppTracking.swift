@@ -29,15 +29,15 @@ public extension Permission {
         private var _observer: Observer< IPermissionObserver >
         private var _resignSource: Any?
         private var _resignState: Permission.Status?
-        #if os(iOS)
+#if os(iOS)
         private var _becomeActiveObserver: NSObjectProtocol?
         private var _resignActiveObserver: NSObjectProtocol?
-        #endif
+#endif
         
         public init() {
             self._observer = Observer()
             
-            #if os(iOS)
+#if os(iOS)
             self._becomeActiveObserver = NotificationCenter.default.addObserver(
                 forName: UIApplication.didBecomeActiveNotification,
                 object: nil,
@@ -50,20 +50,20 @@ public extension Permission {
                 queue: OperationQueue.main,
                 using: { [unowned self] in self._didResignActive($0) }
             )
-            #endif
+#endif
         }
         
         deinit {
-            #if os(iOS)
+#if os(iOS)
             if let observer = self._becomeActiveObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
             if let observer = self._resignActiveObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
-            #endif
+#endif
         }
-
+        
         public func add(observer: IPermissionObserver, priority: ObserverPriority) {
             self._observer.add(observer, priority: priority)
         }
@@ -85,14 +85,14 @@ public extension Permission {
                         }
                     )
                 case .denied:
-                    #if os(iOS)
+#if os(iOS)
                     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                     if UIApplication.shared.canOpenURL(url) == true {
                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
                         self._resignSource = source
                         self._didRedirectToSettings(source: source)
                     }
-                    #endif
+#endif
                 default:
                     break
                 }

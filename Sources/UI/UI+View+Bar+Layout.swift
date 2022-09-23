@@ -19,11 +19,11 @@ extension UI.View.Bar {
         var safeArea: InsetFloat = .zero {
             didSet { self.setNeedForceUpdate() }
         }
-        var backgroundItem: UI.Layout.Item {
-            didSet { self.setNeedForceUpdate(item: self.backgroundItem) }
+        var background: UI.Layout.Item {
+            didSet { self.setNeedForceUpdate(item: self.background) }
         }
-        var contentItem: UI.Layout.Item {
-            didSet { self.setNeedForceUpdate(item: self.contentItem) }
+        var content: UI.Layout.Item {
+            didSet { self.setNeedForceUpdate(item: self.content) }
         }
         var separatorItem: UI.Layout.Item? = nil {
             didSet { self.setNeedForceUpdate(item: self.separatorItem) }
@@ -31,12 +31,12 @@ extension UI.View.Bar {
         
         init(
             placement: UI.View.Bar.Placement,
-            backgroundView: IUIView,
-            contentView: IUIView
+            background: IUIView,
+            content: IUIView
         ) {
             self.placement = placement
-            self.backgroundItem = UI.Layout.Item(backgroundView)
-            self.contentItem = UI.Layout.Item(contentView)
+            self.background = UI.Layout.Item(background)
+            self.content = UI.Layout.Item(content)
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
@@ -61,20 +61,20 @@ extension UI.View.Bar {
                 if let size = self.size {
                     contentHeight = size
                 } else {
-                    let contentSize = self.contentItem.size(available: SizeFloat(
+                    let contentSize = self.content.size(available: SizeFloat(
                         width: bounds.width - self.safeArea.horizontal,
                         height: .infinity
                     ))
                     contentHeight = contentSize.height
                 }
-                self.contentItem.frame = RectFloat(
+                self.content.frame = RectFloat(
                     bottom: safeBounds.bottom - PointFloat(x: 0, y: separatorHeight),
                     width: safeBounds.width,
                     height: contentHeight
                 )
-                self.backgroundItem.frame = RectFloat(
+                self.background.frame = RectFloat(
                     topLeft: bounds.topLeft,
-                    bottomRight: contentItem.frame.bottomRight
+                    bottomRight: self.content.frame.bottomRight
                 )
                 return Size(
                     width: bounds.width,
@@ -99,19 +99,19 @@ extension UI.View.Bar {
                 if let size = self.size {
                     contentHeight = size
                 } else {
-                    let contentSize = self.contentItem.size(available: SizeFloat(
+                    let contentSize = self.content.size(available: SizeFloat(
                         width: bounds.width - self.safeArea.horizontal,
                         height: .infinity
                     ))
                     contentHeight = contentSize.height
                 }
-                self.contentItem.frame = RectFloat(
+                self.content.frame = RectFloat(
                     top: safeBounds.top + PointFloat(x: 0, y: separatorHeight),
                     width: safeBounds.width,
                     height: contentHeight
                 )
-                self.backgroundItem.frame = RectFloat(
-                    topLeft: contentItem.frame.topLeft,
+                self.background.frame = RectFloat(
+                    topLeft: self.content.frame.topLeft,
                     bottomRight: bounds.bottomRight
                 )
                 return Size(
@@ -126,7 +126,7 @@ extension UI.View.Bar {
             if let size = self.size {
                 height = size
             } else {
-                let contentSize = self.contentItem.size(available: SizeFloat(
+                let contentSize = self.content.size(available: SizeFloat(
                     width: available.width - self.safeArea.horizontal,
                     height: .infinity
                 ))
@@ -147,12 +147,12 @@ extension UI.View.Bar {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items: [UI.Layout.Item] = [
-                self.backgroundItem
+                self.background
             ]
             if let separatorItem = self.separatorItem {
                 items.append(separatorItem)
             }
-            items.append(self.contentItem)
+            items.append(self.content)
             return items
         }
         

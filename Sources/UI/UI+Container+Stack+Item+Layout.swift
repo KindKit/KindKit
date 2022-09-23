@@ -10,43 +10,42 @@ extension UI.Container.Stack.Item {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var barOffset: Float {
+        var bar: UI.Layout.Item {
             didSet { self.setNeedUpdate() }
         }
-        var barSize: Float
         var barVisibility: Float {
             didSet { self.setNeedUpdate() }
         }
         var barHidden: Bool {
             didSet { self.setNeedUpdate() }
         }
-        var barItem: UI.Layout.Item {
+        var barOffset: Float = 0 {
             didSet { self.setNeedUpdate() }
         }
-        var contentItem: UI.Layout.Item
+        var barSize: Float = 0
+        var content: UI.Layout.Item
         
         init(
-            barOffset: Float,
+            bar: UI.Layout.Item,
             barVisibility: Float,
             barHidden: Bool,
-            barItem: UI.Layout.Item,
-            contentItem: UI.Layout.Item
+            barOffset: Float,
+            content: UI.Layout.Item
         ) {
-            self.barOffset = barOffset
-            self.barSize = 0
+            self.bar = bar
             self.barVisibility = barVisibility
             self.barHidden = barHidden
-            self.barItem = barItem
-            self.contentItem = contentItem
+            self.barOffset = barOffset
+            self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
             if self.barHidden == false {
-                let barSize = self.barItem.size(available: SizeFloat(
+                let barSize = self.bar.size(available: SizeFloat(
                     width: bounds.width,
                     height: .infinity
                 ))
-                self.barItem.frame = RectFloat(
+                self.bar.frame = RectFloat(
                     x: bounds.x,
                     y: bounds.y,
                     width: bounds.width,
@@ -54,7 +53,7 @@ extension UI.Container.Stack.Item {
                 )
                 self.barSize = barSize.height
             }
-            self.contentItem.frame = bounds
+            self.content.frame = bounds
             return bounds.size
         }
         
@@ -63,9 +62,9 @@ extension UI.Container.Stack.Item {
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            var items: [UI.Layout.Item] = [ self.contentItem ]
+            var items: [UI.Layout.Item] = [ self.content ]
             if self.barHidden == false {
-                items.append(self.barItem)
+                items.append(self.bar)
             }
             return items
         }

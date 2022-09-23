@@ -6,13 +6,13 @@ import Foundation
 
 public protocol IUIGroupContainer : IUIContainer, IUIContainerParentable {
     
-    var barView: UI.View.GroupBar { get }
+    var bar: UI.View.GroupBar { get }
     var barVisibility: Float { get }
     var barHidden: Bool { get }
     var containers: [IUIGroupContentContainer] { get }
-    var backwardContainer: IUIGroupContentContainer? { get }
-    var currentContainer: IUIGroupContentContainer? { get }
-    var forwardContainer: IUIGroupContentContainer? { get }
+    var backward: IUIGroupContentContainer? { get }
+    var current: IUIGroupContentContainer? { get }
+    var forward: IUIGroupContentContainer? { get }
     var animationVelocity: Float { set get }
     
     func updateBar(animated: Bool, completion: (() -> Void)?)

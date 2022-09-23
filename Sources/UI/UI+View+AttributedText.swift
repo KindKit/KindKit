@@ -86,7 +86,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var color: UI.Color? = .init(rgba: 0x00000000) {
+        public var color: UI.Color? = .clear {
             didSet(oldValue) {
                 guard self.color != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -143,6 +143,14 @@ public extension UI.View {
             self.text = text
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            text: NSAttributedString,
+            configure: (UI.View.AttributedText) -> Void
+        ) {
+            self.init(text)
+            self.modify(configure)
         }
         
         deinit {

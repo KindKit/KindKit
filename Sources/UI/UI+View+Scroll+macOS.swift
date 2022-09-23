@@ -204,7 +204,7 @@ extension KKScrollView {
         self.update(contentInset: view.contentInset)
         self.update(contentSize: view.contentSize)
         self.update(contentOffset: view.contentOffset, normalized: true)
-        self.update(contentLayout: view.contentLayout)
+        self.update(content: view.content)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -214,8 +214,8 @@ extension KKScrollView {
         self.kkDelegate = view
     }
     
-    func update(contentLayout: IUILayout) {
-        self._layoutManager.layout = contentLayout
+    func update(content: IUILayout) {
+        self._layoutManager.layout = content
         self.needLayoutContent = true
     }
     

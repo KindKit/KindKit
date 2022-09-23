@@ -45,10 +45,10 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var external: NativeView {
+        public var content: NativeView {
             didSet {
                 guard self.isLoaded == true else { return }
-                self._view.update(external: self.external)
+                self._view.update(content: self.content)
             }
         }
         public var color: UI.Color? = nil {
@@ -95,11 +95,19 @@ public extension UI.View {
         private var _onInvisible: ((UI.View.External) -> Void)?
         
         public init(
-            _ external: NativeView
+            _ content: NativeView
         ) {
-            self.external = external
+            self.content = content
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            content: NativeView,
+            configure: (UI.View.External) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
         }
         
         deinit {
@@ -190,8 +198,8 @@ public extension UI.View.External {
     
     @inlinable
     @discardableResult
-    func external(_ value: NativeView) -> Self {
-        self.external = value
+    func content(_ value: NativeView) -> Self {
+        self.content = value
         return self
     }
     

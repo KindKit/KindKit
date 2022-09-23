@@ -10,7 +10,7 @@ import CoreLocation
 import UserNotifications
 
 public extension Permission {
-
+    
     final class Location : IPermission {
         
         public let preferedWhen: When
@@ -36,10 +36,10 @@ public extension Permission {
         private var _locationManager: CLLocationManager
         private var _resignSource: Any?
         private var _resignState: Permission.Status?
-        #if os(iOS)
+#if os(iOS)
         private var _becomeActiveObserver: NSObjectProtocol?
         private var _resignActiveObserver: NSObjectProtocol?
-        #endif
+#endif
         
         public init(
             preferedWhen: When
@@ -47,7 +47,7 @@ public extension Permission {
             self.preferedWhen = preferedWhen
             self._observer = Observer()
             self._locationManager = CLLocationManager()
-            #if os(iOS)
+#if os(iOS)
             self._becomeActiveObserver = NotificationCenter.default.addObserver(
                 forName: UIApplication.didBecomeActiveNotification,
                 object: nil,
@@ -60,18 +60,18 @@ public extension Permission {
                 queue: OperationQueue.main,
                 using: { [unowned self] in self._didResignActive($0) }
             )
-            #endif
+#endif
         }
         
         deinit {
-            #if os(iOS)
+#if os(iOS)
             if let observer = self._becomeActiveObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
             if let observer = self._resignActiveObserver {
                 NotificationCenter.default.removeObserver(observer)
             }
-            #endif
+#endif
         }
         
         public func add(observer: IPermissionObserver, priority: ObserverPriority) {
@@ -91,28 +91,23 @@ public extension Permission {
                 case .inUse: self._locationManager.requestWhenInUseAuthorization()
                 }
             case .denied:
-                #if os(iOS)
+#if os(iOS)
                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                 if UIApplication.shared.canOpenURL(url) == true {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    if #available(iOS 10.0, *) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        UIApplication.shared.openURL(url)
+                    }
                     self._resignSource = source
                     self._didRedirectToSettings(source: source)
                 }
-                #endif
+#endif
             default:
                 break
             }
         }
         
-    }
-    
-}
-
-public extension Permission.Location {
-    
-    enum When {
-        case always
-        case inUse
     }
     
 }

@@ -23,25 +23,25 @@ public extension UI.View {
             get { return self._isSelected }
         }
         public var shouldPressed: Bool = true
-        public var contentView: IUIView {
+        public var content: IUIView {
             didSet(oldValue) {
-                guard self.contentView !== oldValue else { return }
-                self._layout.contentItem = UI.Layout.Item(self.contentView)
+                guard self.content !== oldValue else { return }
+                self._layout.content = UI.Layout.Item(self.content)
             }
         }
-        public var isShowedLeadingView: Bool {
+        public var isShowedLeading: Bool {
             switch self._layout.state {
             case .leading: return true
             default: return false
             }
         }
-        public private(set) var leadingView: IUIView? {
+        public private(set) var leading: IUIView? {
             didSet(oldValue) {
-                guard self.leadingView !== oldValue else { return }
-                if let view = self.leadingView {
-                    self._layout.leadingItem = UI.Layout.Item(view)
+                guard self.leading !== oldValue else { return }
+                if let view = self.leading {
+                    self._layout.leading = UI.Layout.Item(view)
                 } else {
-                    self._layout.leadingItem = nil
+                    self._layout.leading = nil
                 }
             }
         }
@@ -50,19 +50,19 @@ public extension UI.View {
             get { return self._layout.leadingSize }
         }
         public var leadingLimit: Float = 0
-        public var isShowedTrailingView: Bool {
+        public var isShowedTrailing: Bool {
             switch self._layout.state {
             case .trailing: return true
             default: return false
             }
         }
-        public var trailingView: IUIView? {
+        public var trailing: IUIView? {
             didSet(oldValue) {
-                guard self.trailingView !== oldValue else { return }
-                if let view = self.trailingView {
-                    self._layout.trailingItem = UI.Layout.Item(view)
+                guard self.trailing !== oldValue else { return }
+                if let view = self.trailing {
+                    self._layout.trailing = UI.Layout.Item(view)
                 } else {
-                    self._layout.trailingItem = nil
+                    self._layout.trailing = nil
                 }
             }
         }
@@ -89,15 +89,15 @@ public extension UI.View {
         private var _onPressed: ((UI.View.SwipeCell) -> Void)?
         
         public init(
-            _ contentView: IUIView
+            _ content: IUIView
         ) {
-            self.contentView = contentView
+            self.content = content
             #if os(macOS)
             self.animationVelocity = Float(NSScreen.main!.frame.width * 2)
             #elseif os(iOS)
             self.animationVelocity = Float(UIScreen.main.bounds.width * 2)
             #endif
-            self._layout = Layout(contentView)
+            self._layout = Layout(content)
             self.body = UI.View.Custom(self._layout)
             #if os(iOS)
                 .gestures([ self._pressedGesture, self._interactiveGesture ])
@@ -106,11 +106,19 @@ public extension UI.View {
             self._init()
         }
         
+        public convenience init(
+            content: IUIView,
+            configure: (UI.View.SwipeCell) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
+        }
+        
         public convenience init(customView: IUILayout) {
             self.init(UI.View.Custom(customView))
         }
         
-        public func showLeadingView(animated: Bool, completion: (() -> Void)? = nil) {
+        public func showLeading(animated: Bool, completion: (() -> Void)? = nil) {
             switch self._layout.state {
             case .idle:
                 if animated == true {
@@ -139,13 +147,13 @@ public extension UI.View {
                 completion?()
                 break
             case .trailing:
-                self.hideTrailingView(animated: animated, completion: { [weak self] in
-                    self?.showLeadingView(animated: animated, completion: completion)
+                self.hideTrailing(animated: animated, completion: { [weak self] in
+                    self?.showLeading(animated: animated, completion: completion)
                 })
             }
         }
         
-        public func hideLeadingView(animated: Bool, completion: (() -> Void)? = nil) {
+        public func hideLeading(animated: Bool, completion: (() -> Void)? = nil) {
             switch self._layout.state {
             case .leading:
                 if animated == true {
@@ -176,7 +184,7 @@ public extension UI.View {
             }
         }
         
-        public func showTrailingView(animated: Bool, completion: (() -> Void)? = nil) {
+        public func showTrailing(animated: Bool, completion: (() -> Void)? = nil) {
             switch self._layout.state {
             case .idle:
                 if animated == true {
@@ -201,8 +209,8 @@ public extension UI.View {
                     completion?()
                 }
             case .leading:
-                self.hideLeadingView(animated: animated, completion: { [weak self] in
-                    self?.showTrailingView(animated: animated, completion: completion)
+                self.hideLeading(animated: animated, completion: { [weak self] in
+                    self?.showTrailing(animated: animated, completion: completion)
                 })
             case .trailing:
                 completion?()
@@ -211,7 +219,7 @@ public extension UI.View {
             }
         }
         
-        public func hideTrailingView(animated: Bool, completion: (() -> Void)? = nil) {
+        public func hideTrailing(animated: Bool, completion: (() -> Void)? = nil) {
             switch self._layout.state {
             case .trailing:
                 if animated == true {
@@ -243,20 +251,20 @@ public extension UI.View {
         }
         
         @discardableResult
-        public func contentView(_ value: IUIView) -> Self {
-            self.contentView = value
+        public func content(_ value: IUIView) -> Self {
+            self.content = value
             return self
         }
         
         @discardableResult
-        public func leadingView(_ value: IUIView?) -> Self {
-            self.leadingView = value
+        public func leading(_ value: IUIView?) -> Self {
+            self.leading = value
             return self
         }
         
         @discardableResult
-        public func trailingView(_ value: IUIView?) -> Self {
-            self.trailingView = value
+        public func trailing(_ value: IUIView?) -> Self {
+            self.trailing = value
             return self
         }
         
@@ -343,8 +351,8 @@ private extension UI.View.SwipeCell {
             self._pressed()
         })
         self._interactiveGesture.onShouldBegin({ [unowned self] _ in
-            guard self.leadingView != nil || self.trailingView != nil else { return false }
-            let translation = self._interactiveGesture.translation(in: self.contentView)
+            guard self.leading != nil || self.trailing != nil else { return false }
+            let translation = self._interactiveGesture.translation(in: self.content)
             guard abs(translation.x) >= abs(translation.y) else { return false }
             return true
         }).onBegin({ [unowned self] _ in
@@ -364,8 +372,8 @@ private extension UI.View.SwipeCell {
     func _pressed() {
         switch self._layout.state {
         case .idle: self._onPressed?(self)
-        case .leading: self.hideLeadingView(animated: true, completion: nil)
-        case .trailing: self.hideTrailingView(animated: true, completion: nil)
+        case .leading: self.hideLeading(animated: true, completion: nil)
+        case .trailing: self.hideTrailing(animated: true, completion: nil)
         }
     }
     
@@ -380,11 +388,11 @@ private extension UI.View.SwipeCell {
         let deltaLocation = currentLocation - beginLocation
         switch beginState {
         case .idle:
-            if deltaLocation.x > 0 && self.leadingView != nil {
+            if deltaLocation.x > 0 && self.leading != nil {
                 let delta = min(deltaLocation.x, self.leadingSize)
                 let progress = Percent(delta / self.leadingSize)
                 self._layout.state = .leading(progress: progress)
-            } else if deltaLocation.x < 0 && self.trailingView != nil {
+            } else if deltaLocation.x < 0 && self.trailing != nil {
                 let delta = min(-deltaLocation.x, self.trailingSize)
                 let progress = Percent(delta / self.trailingSize)
                 self._layout.state = .trailing(progress: progress)
@@ -416,7 +424,7 @@ private extension UI.View.SwipeCell {
         let deltaLocation = currentLocation - beginLocation
         switch beginState {
         case .idle:
-            if deltaLocation.x > 0 && self.leadingView != nil {
+            if deltaLocation.x > 0 && self.leading != nil {
                 let delta = min(deltaLocation.x, self.leadingSize)
                 if delta >= self.leadingLimit && canceled == false {
                     Animation.default.run(
@@ -450,7 +458,7 @@ private extension UI.View.SwipeCell {
                         }
                     )
                 }
-            } else if deltaLocation.x < 0 && self.trailingView != nil {
+            } else if deltaLocation.x < 0 && self.trailing != nil {
                 let delta = min(-deltaLocation.x, self.trailingSize)
                 if delta >= self.trailingLimit && canceled == false {
                     Animation.default.run(
@@ -528,7 +536,7 @@ private extension UI.View.SwipeCell {
                 self._resetInteractiveAnimation()
             }
         case .trailing:
-            if deltaLocation.x > 0 && self.trailingView != nil {
+            if deltaLocation.x > 0 && self.trailing != nil {
                 let delta = min(deltaLocation.x, self.trailingSize)
                 if delta >= self.trailingLimit && canceled == false {
                     Animation.default.run(

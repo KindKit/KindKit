@@ -50,13 +50,13 @@ final class KKExternalView : NSView {
     override var isFlipped: Bool {
         return true
     }
-    var external: NSView? {
+    var content: NSView? {
         willSet {
-            self.external?.removeFromSuperview()
+            self.content?.removeFromSuperview()
         }
         didSet {
-            guard let external = self.external else { return }
-            self.addSubview(external)
+            guard let content = self.content else { return }
+            self.addSubview(content)
         }
     }
     
@@ -69,14 +69,14 @@ final class KKExternalView : NSView {
     override func layout() {
         super.layout()
         
-        if let external = self.external {
+        if let content = self.content {
             let bounds = self.bounds
-            let externalBounds = external.bounds
-            external.frame = CGRect(
-                x: (bounds.origin.x + (bounds.size.width / 2)) - (externalBounds.size.width / 2),
-                y: (bounds.origin.y + (bounds.size.height / 2)) - (externalBounds.size.height / 2),
-                width: externalBounds.size.width,
-                height: externalBounds.size.height
+            let contentBounds = content.bounds
+            content.frame = CGRect(
+                x: (bounds.origin.x + (bounds.size.width / 2)) - (contentBounds.size.width / 2),
+                y: (bounds.origin.y + (bounds.size.height / 2)) - (contentBounds.size.height / 2),
+                width: contentBounds.size.width,
+                height: contentBounds.size.height
             )
         }
     }
@@ -95,8 +95,8 @@ extension KKExternalView {
         self.updateShadowPath()
     }
     
-    func update(external: NSView) {
-        self.external = external
+    func update(content: NSView) {
+        self.content = content
     }
     
     func cleanup() {

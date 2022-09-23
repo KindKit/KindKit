@@ -55,15 +55,15 @@ public extension UI.View {
             }
             get { return self._gestures }
         }
-        public var contentLayout: IUILayout {
+        public var content: IUILayout {
             willSet {
-                self.contentLayout.view = nil
+                self.content.view = nil
             }
             didSet(oldValue) {
-                self.contentLayout.view = self
+                self.content.view = self
                 guard self.isLoaded == true else { return }
-                self._view.update(contentLayout: self.contentLayout)
-                self.contentLayout.setNeedForceUpdate()
+                self._view.update(content: self.content)
+                self.content.setNeedForceUpdate()
                 self.setNeedForceLayout()
             }
         }
@@ -147,12 +147,20 @@ public extension UI.View {
         private var _onChangeStyle: ((UI.View.Custom, Bool) -> Void)?
         
         public init(
-            _ contentLayout: IUILayout
+            _ content: IUILayout
         ) {
-            self.contentLayout = contentLayout
+            self.content = content
             self._reuse = UI.Reuse.Item()
-            self.contentLayout.view = self
+            self.content.view = self
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            content: IUILayout,
+            configure: (UI.View.Custom) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
         }
         
         deinit {
@@ -169,9 +177,9 @@ public extension UI.View {
                 available: available,
                 width: self.width,
                 height: self.height,
-                sizeWithWidth: { self.contentLayout.size(available: Size(width: $0, height: available.height)) },
-                sizeWithHeight: { self.contentLayout.size(available: Size(width: available.width, height: $0)) },
-                size: { self.contentLayout.size(available: available) }
+                sizeWithWidth: { self.content.size(available: Size(width: $0, height: available.height)) },
+                sizeWithHeight: { self.content.size(available: Size(width: available.width, height: $0)) },
+                size: { self.content.size(available: available) }
             )
         }
         
@@ -283,8 +291,8 @@ public extension UI.View.Custom {
     }
     
     @discardableResult
-    func contentLayout(_ value: IUILayout) -> Self {
-        self.contentLayout = value
+    func content(_ value: IUILayout) -> Self {
+        self.content = value
         return self
     }
     

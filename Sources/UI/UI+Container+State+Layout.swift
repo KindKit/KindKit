@@ -10,16 +10,16 @@ extension UI.Container.State {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var item: UI.Layout.Item? {
+        var content: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
         
-        init(item: UI.Layout.Item?) {
-            self.item = item
+        init(_ content: UI.Layout.Item?) {
+            self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            self.item?.frame = bounds
+            self.content?.frame = bounds
             return bounds.size
         }
         
@@ -28,8 +28,8 @@ extension UI.Container.State {
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            guard let item = self.item else { return [] }
-            return [ item ]
+            guard let content = self.content else { return [] }
+            return [ content ]
         }
         
     }

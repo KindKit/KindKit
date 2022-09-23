@@ -6,9 +6,9 @@ import Foundation
 
 public protocol IUIStackContainer : IUIContainer, IUIContainerParentable {
     
-    var rootContainer: IUIStackContentContainer { get }
+    var root: IUIStackContentContainer { get }
     var containers: [IUIStackContentContainer] { get }
-    var currentContainer: IUIStackContentContainer { get }
+    var current: IUIStackContentContainer { get }
     var hidesGroupBarWhenPushed: Bool { set get }
     var animationVelocity: Float { set get }
 #if os(iOS)
@@ -17,7 +17,7 @@ public protocol IUIStackContainer : IUIContainer, IUIContainerParentable {
     
     func update(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?)
     
-    func set(rootContainer: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?)
+    func set(root: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?)
     func set(containers: [IUIStackContentContainer], animated: Bool, completion: (() -> Void)?)
     func push(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?)
     func push(containers: [IUIStackContentContainer], animated: Bool, completion: (() -> Void)?)
@@ -36,8 +36,8 @@ public extension IUIStackContainer {
     }
     
     @inlinable
-    func set(rootContainer: IUIStackContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.set(rootContainer: rootContainer, animated: animated, completion: completion)
+    func set(root: IUIStackContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.set(root: root, animated: animated, completion: completion)
     }
     
     @inlinable

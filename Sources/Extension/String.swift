@@ -57,6 +57,7 @@ public extension String {
     }
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
+    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var md2: String? {
         if let data = self.data(using: .utf8) {
             return data.md2.hexString
@@ -65,6 +66,7 @@ public extension String {
     }
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
+    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var md4: String? {
         if let data = self.data(using: .utf8) {
             return data.md4.hexString
@@ -73,6 +75,7 @@ public extension String {
     }
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
+    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var md5: String? {
         if let data = self.data(using: .utf8) {
             return data.md5.hexString

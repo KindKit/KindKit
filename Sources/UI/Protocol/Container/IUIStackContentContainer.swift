@@ -8,7 +8,7 @@ public protocol IUIStackContentContainer : IUIContainer, IUIContainerParentable 
     
     var stackContainer: IUIStackContainer? { get }
     
-    var stackBarView: UI.View.StackBar { get }
+    var stackBar: UI.View.StackBar { get }
     var stackBarVisibility: Float { get }
     var stackBarHidden: Bool { get }
     

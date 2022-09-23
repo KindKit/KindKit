@@ -22,20 +22,20 @@ public extension UI.Container {
             }
         }
         public var shouldInteractive: Bool {
-            return self.currentContainer?.shouldInteractive ?? false
+            return self.current?.shouldInteractive ?? false
         }
 #if os(iOS)
-        public var statusBarHidden: Bool {
-            return self.currentContainer?.statusBarHidden ?? false
-        }
-        public var statusBarStyle: UIStatusBarStyle {
-            return self.currentContainer?.statusBarStyle ?? .default
+        public var statusBar: UIStatusBarStyle {
+            return self.current?.statusBar ?? .default
         }
         public var statusBarAnimation: UIStatusBarAnimation {
-            return self.currentContainer?.statusBarAnimation ?? .fade
+            return self.current?.statusBarAnimation ?? .fade
+        }
+        public var statusBarHidden: Bool {
+            return self.current?.statusBarHidden ?? false
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
-            return self.currentContainer?.supportedOrientations ?? .portrait
+            return self.current?.supportedOrientations ?? .portrait
         }
 #endif
         public private(set) var isPresented: Bool
@@ -43,15 +43,15 @@ public extension UI.Container {
             return self._view
         }
         public private(set) var screen: Screen
-        public private(set) var barView: UI.View.GroupBar {
+        public private(set) var bar: UI.View.GroupBar {
             set(value) {
-                guard self._barView !== value else { return }
-                self._barView.delegate = nil
-                self._barView = value
-                self._barView.delegate = self
-                self._layout.barItem = UI.Layout.Item(self._barView)
+                guard self._bar !== value else { return }
+                self._bar.delegate = nil
+                self._bar = value
+                self._bar.delegate = self
+                self._layout.bar = UI.Layout.Item(self._bar)
             }
-            get { return self._barView }
+            get { return self._bar }
         }
         public var barSize: Float {
             get { return self._layout.barSize }
@@ -67,22 +67,22 @@ public extension UI.Container {
         public var containers: [IUIGroupContentContainer] {
             return self._items.compactMap({ $0.container })
         }
-        public var backwardContainer: IUIGroupContentContainer? {
+        public var backward: IUIGroupContentContainer? {
             guard let current = self._current else { return nil }
             guard let index = self._items.firstIndex(where: { $0 === current }) else { return nil }
             return index > 0 ? self._items[index - 1].container : nil
         }
-        public var currentContainer: IUIGroupContentContainer? {
+        public var current: IUIGroupContentContainer? {
             return self._current?.container
         }
-        public var forwardContainer: IUIGroupContentContainer? {
+        public var forward: IUIGroupContentContainer? {
             guard let current = self._current else { return nil }
             guard let index = self._items.firstIndex(where: { $0 === current }) else { return nil }
             return index < self._items.count - 1 ? self._items[index + 1].container : nil
         }
         public var animationVelocity: Float
         
-        private var _barView: UI.View.GroupBar
+        private var _bar: UI.View.GroupBar
         private var _layout: Layout
         private var _view: UI.View.Custom
         private var _items: [Item]
@@ -100,9 +100,9 @@ public extension UI.Container {
 #elseif os(iOS)
             self.animationVelocity = UIScreen.main.animationVelocity
 #endif
-            self._barView = screen.groupBarView
+            self._bar = screen.groupBarView
             self._layout = .init(
-                barItem: UI.Layout.Item(self._barView),
+                bar: UI.Layout.Item(self._bar),
                 barVisibility: screen.groupBarVisibility,
                 barHidden: screen.groupBarHidden
             )
@@ -154,11 +154,11 @@ public extension UI.Container {
         public func didChangeInsets() {
             let inheritedInsets = self.inheritedInsets(interactive: true)
             if self.barHidden == false {
-                self._barView.alpha = self.barVisibility
+                self._bar.alpha = self.barVisibility
             } else {
-                self._barView.alpha = 0
+                self._bar.alpha = 0
             }
-            self._barView.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
+            self._bar.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
             self._layout.barOffset = inheritedInsets.bottom
             for item in self._items {
                 item.container.didChangeInsets()
@@ -185,38 +185,38 @@ public extension UI.Container {
         public func prepareShow(interactive: Bool) {
             self.didChangeInsets()
             self.screen.prepareShow(interactive: interactive)
-            self.currentContainer?.prepareShow(interactive: interactive)
+            self.current?.prepareShow(interactive: interactive)
         }
         
         public func finishShow(interactive: Bool) {
             self.isPresented = true
             self.screen.finishShow(interactive: interactive)
-            self.currentContainer?.finishShow(interactive: interactive)
+            self.current?.finishShow(interactive: interactive)
         }
         
         public func cancelShow(interactive: Bool) {
             self.screen.cancelShow(interactive: interactive)
-            self.currentContainer?.cancelShow(interactive: interactive)
+            self.current?.cancelShow(interactive: interactive)
         }
         
         public func prepareHide(interactive: Bool) {
             self.screen.prepareHide(interactive: interactive)
-            self.currentContainer?.prepareHide(interactive: interactive)
+            self.current?.prepareHide(interactive: interactive)
         }
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
             self.screen.finishHide(interactive: interactive)
-            self.currentContainer?.finishHide(interactive: interactive)
+            self.current?.finishHide(interactive: interactive)
         }
         
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
-            self.currentContainer?.cancelHide(interactive: interactive)
+            self.current?.cancelHide(interactive: interactive)
         }
         
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
-            self.barView = self.screen.groupBarView
+            self.bar = self.screen.groupBarView
             self.barVisibility = self.screen.groupBarVisibility
             self.barHidden = self.screen.groupBarHidden
             self.didChangeInsets()
@@ -229,7 +229,7 @@ public extension UI.Container {
                 return
             }
             item.update()
-            self._barView.itemViews(self._items.compactMap({ $0.barView }))
+            self._bar.items(self._items.compactMap({ $0.bar }))
         }
         
         public func set(containers: [IUIGroupContentContainer], current: IUIGroupContentContainer?, animated: Bool, completion: (() -> Void)?) {
@@ -245,7 +245,7 @@ public extension UI.Container {
             for item in self._items {
                 item.container.parent = self
             }
-            self._barView.itemViews(self._items.compactMap({ $0.barView }))
+            self._bar.items(self._items.compactMap({ $0.bar }))
             let newCurrent: Item?
             if current != nil {
                 if let exist = self._items.first(where: { $0.container === current }) {
@@ -294,7 +294,7 @@ public extension UI.Container {
 extension UI.Container.Group : IGroupBarViewDelegate {
     
     func pressed(groupBar: UI.View.GroupBar, itemView: UI.View.GroupBar.Item) {
-        guard let item = self._items.first(where: { $0.barView === itemView }) else { return }
+        guard let item = self._items.first(where: { $0.bar === itemView }) else { return }
         if self._current === item {
             _ = self.activate()
         } else {
@@ -309,7 +309,7 @@ extension UI.Container.Group : IUIRootContentContainer {
 
 extension UI.Container.Group : IUIStackContentContainer where Screen : IUIScreenStackable {
     
-    public var stackBarView: UI.View.StackBar {
+    public var stackBar: UI.View.StackBar {
         return self.screen.stackBarView
     }
     
@@ -362,13 +362,13 @@ private extension UI.Container.Group {
     
     func _init() {
         self.screen.container = self
-        self._barView.delegate = self
+        self._bar.delegate = self
         for item in self._items {
             item.container.parent = self
         }
-        self._barView.itemViews(self._items.compactMap({ $0.barView }))
+        self._bar.items(self._items.compactMap({ $0.bar }))
         if let current = self._current {
-            self._barView.selectedItemView(current.barView)
+            self._bar.selected(current.bar)
             self._layout.state = .idle(current: current.groupItem)
         }
         self.screen.setup()
@@ -395,7 +395,7 @@ private extension UI.Container.Group {
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._barView.selectedItemView(forward.barView)
+                        self._bar.selected(forward.bar)
                         self._layout.state = .idle(current: forward.groupItem)
                         if self.isPresented == true {
                             current.container.finishHide(interactive: false)
@@ -412,7 +412,7 @@ private extension UI.Container.Group {
                 if self.isPresented == true {
                     forward.container.prepareShow(interactive: false)
                 }
-                self._barView.selectedItemView(forward.barView)
+                self._bar.selected(forward.bar)
                 self._layout.state = .idle(current: forward.groupItem)
                 if self.isPresented == true {
                     forward.container.finishShow(interactive: false)
@@ -426,7 +426,7 @@ private extension UI.Container.Group {
                 if self.isPresented == true {
                     current.container.prepareHide(interactive: false)
                 }
-                self._barView.selectedItemView(nil)
+                self._bar.selected(nil)
                 self._layout.state = .empty
                 if self.isPresented == true {
                     current.container.finishHide(interactive: false)
@@ -449,7 +449,7 @@ private extension UI.Container.Group {
                 current.container.prepareHide(interactive: false)
                 forward.container.prepareShow(interactive: false)
             }
-            self._barView.selectedItemView(forward.barView)
+            self._bar.selected(forward.bar)
             self._layout.state = .idle(current: forward.groupItem)
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
@@ -464,7 +464,7 @@ private extension UI.Container.Group {
             if self.isPresented == true {
                 forward.container.prepareShow(interactive: false)
             }
-            self._barView.selectedItemView(forward.barView)
+            self._bar.selected(forward.bar)
             self._layout.state = .idle(current: forward.groupItem)
             if self.isPresented == true {
                 forward.container.finishShow(interactive: false)
@@ -478,7 +478,7 @@ private extension UI.Container.Group {
             if self.isPresented == true {
                 current.container.prepareHide(interactive: false)
             }
-            self._barView.selectedItemView(nil)
+            self._bar.selected(nil)
             self._layout.state = .empty
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
@@ -489,7 +489,7 @@ private extension UI.Container.Group {
 #endif
             completion?()
         } else {
-            self._barView.selectedItemView(nil)
+            self._bar.selected(nil)
             self._layout.state = .empty
 #if os(iOS)
             self.setNeedUpdateOrientations()
@@ -520,7 +520,7 @@ private extension UI.Container.Group {
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._barView.selectedItemView(backward.barView)
+                        self._bar.selected(backward.bar)
                         self._layout.state = .idle(current: backward.groupItem)
                         if self.isPresented == true {
                             current.container.finishHide(interactive: false)
@@ -537,7 +537,7 @@ private extension UI.Container.Group {
                 if self.isPresented == true {
                     backward.container.prepareShow(interactive: false)
                 }
-                self._barView.selectedItemView(backward.barView)
+                self._bar.selected(backward.bar)
                 self._layout.state = .idle(current: backward.groupItem)
                 if self.isPresented == true {
                     backward.container.finishShow(interactive: false)
@@ -551,7 +551,7 @@ private extension UI.Container.Group {
                 if self.isPresented == true {
                     current.container.prepareHide(interactive: false)
                 }
-                self._barView.selectedItemView(nil)
+                self._bar.selected(nil)
                 self._layout.state = .empty
                 if self.isPresented == true {
                     current.container.finishHide(interactive: false)
@@ -574,7 +574,7 @@ private extension UI.Container.Group {
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
             }
-            self._barView.selectedItemView(backward.barView)
+            self._bar.selected(backward.bar)
             self._layout.state = .idle(current: backward.groupItem)
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
@@ -589,7 +589,7 @@ private extension UI.Container.Group {
             if self.isPresented == true {
                 backward.container.prepareShow(interactive: false)
             }
-            self._barView.selectedItemView(nil)
+            self._bar.selected(nil)
             self._layout.state = .idle(current: backward.groupItem)
             if self.isPresented == true {
                 backward.container.finishShow(interactive: false)
@@ -603,7 +603,7 @@ private extension UI.Container.Group {
             if self.isPresented == true {
                 current.container.prepareHide(interactive: false)
             }
-            self._barView.selectedItemView(nil)
+            self._bar.selected(nil)
             self._layout.state = .empty
             if self.isPresented == true {
                 current.container.finishHide(interactive: false)
@@ -614,7 +614,7 @@ private extension UI.Container.Group {
 #endif
             completion?()
         } else {
-            self._barView.selectedItemView(nil)
+            self._bar.selected(nil)
             self._layout.state = .empty
 #if os(iOS)
             self.setNeedUpdateOrientations()

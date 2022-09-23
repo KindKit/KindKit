@@ -11,9 +11,9 @@ public protocol IUIContainer : AnyObject {
     
     var shouldInteractive: Bool { get }
 #if os(iOS)
-    var statusBarHidden: Bool { get }
-    var statusBarStyle: UIStatusBarStyle { get }
+    var statusBar: UIStatusBarStyle { get }
     var statusBarAnimation: UIStatusBarAnimation { get }
+    var statusBarHidden: Bool { get }
     var supportedOrientations: UIInterfaceOrientationMask { get }
     var viewController: UIViewController? { get }
 #endif

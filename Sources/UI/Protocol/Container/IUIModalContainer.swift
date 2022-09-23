@@ -6,10 +6,10 @@ import Foundation
 
 public protocol IUIModalContainer : IUIContainer, IUIContainerParentable {
     
-    var contentContainer: (IUIContainer & IUIContainerParentable)? { set get }
+    var content: (IUIContainer & IUIContainerParentable)? { set get }
     var containers: [IUIModalContentContainer] { get }
-    var previousContainer: IUIModalContentContainer? { get }
-    var currentContainer: IUIModalContentContainer? { get }
+    var previous: IUIModalContentContainer? { get }
+    var current: IUIModalContentContainer? { get }
     var animationVelocity: Float { set get }
 #if os(iOS)
     var interactiveLimit: Float { set get }

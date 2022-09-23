@@ -86,6 +86,14 @@ public extension UI.View {
             self._reuse.configure(owner: self)
         }
         
+        public convenience init(
+            style: UIBlurEffect.Style,
+            configure: (UI.View.Blur) -> Void
+        ) {
+            self.init(style)
+            self.modify(configure)
+        }
+        
         deinit {
             self._reuse.destroy()
         }

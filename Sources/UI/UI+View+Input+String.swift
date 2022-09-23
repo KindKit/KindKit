@@ -68,7 +68,7 @@ public extension UI.View.Input {
                 self._view.update(textFont: self.textFont)
             }
         }
-        public var textColor: UI.Color = .init(rgb: 0x000000) {
+        public var textColor: UI.Color = .black {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(textColor: self.textColor)
@@ -167,6 +167,13 @@ public extension UI.View.Input {
         public init() {
             self._reuse = UI.Reuse.Item()
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            configure: (UI.View.Input.String) -> Void
+        ) {
+            self.init()
+            self.modify(configure)
         }
         
         deinit {

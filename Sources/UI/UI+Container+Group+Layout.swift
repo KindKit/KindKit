@@ -10,43 +10,43 @@ extension UI.Container.Group {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var barOffset: Float {
+        var state: State {
             didSet { self.setNeedUpdate() }
         }
-        var barSize: Float
+        var bar: UI.Layout.Item {
+            didSet { self.setNeedUpdate() }
+        }
         var barVisibility: Float {
             didSet { self.setNeedUpdate() }
         }
         var barHidden: Bool {
             didSet { self.setNeedUpdate() }
         }
-        var barItem: UI.Layout.Item {
+        var barOffset: Float {
             didSet { self.setNeedUpdate() }
         }
-        var state: State {
-            didSet { self.setNeedUpdate() }
-        }
+        var barSize: Float
 
         init(
-            barItem: UI.Layout.Item,
+            state: State = .empty,
+            bar: UI.Layout.Item,
             barVisibility: Float,
-            barHidden: Bool,
-            state: State = .empty
+            barHidden: Bool
         ) {
-            self.barOffset = 0
-            self.barSize = 0
-            self.barItem = barItem
+            self.state = state
+            self.bar = bar
             self.barVisibility = barVisibility
             self.barHidden = barHidden
-            self.state = state
+            self.barOffset = 0
+            self.barSize = 0
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            let barSize = self.barItem.size(available: SizeFloat(
+            let barSize = self.bar.size(available: SizeFloat(
                 width: bounds.width,
                 height: .infinity
             ))
-            self.barItem.frame = RectFloat(
+            self.bar.frame = RectFloat(
                 bottom: bounds.bottom,
                 width: bounds.width,
                 height: self.barOffset + (barSize.height * self.barVisibility)
@@ -77,7 +77,7 @@ extension UI.Container.Group {
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items: [UI.Layout.Item] = []
             if self.barHidden == false {
-                items.append(self.barItem)
+                items.append(self.bar)
             }
             switch self.state {
             case .empty: break

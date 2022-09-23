@@ -92,7 +92,7 @@ extension KKInputListView {
     func update(view: UI.View.Input.List) {
         self._view = view
         self.update(items: view.items)
-        self.update(selectedItem: view.selectedItem, userInteraction: false)
+        self.update(selected: view.selected, userInteraction: false)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -114,11 +114,11 @@ extension KKInputListView {
         self._applyText()
     }
     
-    func update(selectedItem: IInputListItem?, userInteraction: Bool) {
+    func update(selected: IInputListItem?, userInteraction: Bool) {
         if userInteraction == false {
             let animated = self.isFirstResponder
-            if let view = self._view, let selectedItem = selectedItem {
-                if let index = view.items.firstIndex(where: { $0 === selectedItem }) {
+            if let view = self._view, let selected = selected {
+                if let index = view.items.firstIndex(where: { $0 === selected }) {
                     self._picker.selectRow(index, inComponent: 0, animated: animated)
                 } else {
                     self._picker.selectRow(0, inComponent: 0, animated: animated)
@@ -175,8 +175,8 @@ extension KKInputListView {
 private extension KKInputListView {
     
     func _applyText() {
-        if let view = self._view, let selectedItem = view.selectedItem {
-            self.text = selectedItem.title
+        if let view = self._view, let selected = view.selected {
+            self.text = selected.title
         } else {
             self.text = nil
         }
@@ -188,7 +188,7 @@ extension KKInputListView : UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         self.kkDelegate?.beginEditing(self)
-        if self._view?.selectedItem == nil, let firstItem = self._view?.items.first {
+        if self._view?.selected == nil, let firstItem = self._view?.items.first {
             self.kkDelegate?.select(self, item: firstItem)
         }
     }
@@ -225,9 +225,9 @@ extension KKInputListView : UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         guard let view = self._view else { return }
-        let selectedItem = view.items[row]
-        if view.selectedItem !== selectedItem {
-            self.kkDelegate?.select(self, item: selectedItem)
+        let selected = view.items[row]
+        if view.selected !== selected {
+            self.kkDelegate?.select(self, item: selected)
         }
     }
     

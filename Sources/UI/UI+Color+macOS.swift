@@ -82,4 +82,12 @@ public extension UI.Color {
     
 }
 
+public extension UI.Color {
+    
+    func with(alpha: Float) -> UI.Color {
+        return .init(self.native.withAlphaComponent(CGFloat(alpha)))
+    }
+    
+}
+
 #endif

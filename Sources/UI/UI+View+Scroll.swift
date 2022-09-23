@@ -107,14 +107,14 @@ public extension UI.View {
             get { return self._contentOffset }
         }
         public private(set) var contentSize: SizeFloat = .zero
-        public var contentLayout: IUILayout {
+        public var content: IUILayout {
             willSet {
-                self.contentLayout.view = nil
+                self.content.view = nil
             }
             didSet(oldValue) {
-                self.contentLayout.view = self
+                self.content.view = self
                 guard self.isLoaded == true else { return }
-                self._view.update(contentLayout: self.contentLayout)
+                self._view.update(content: self.content)
             }
         }
         public private(set) var isScrolling: Bool = false
@@ -201,14 +201,22 @@ public extension UI.View {
         private var _onScrollToTop: ((UI.View.Scroll) -> Void)?
         
         public init(
-            _ contentLayout: IUILayout
+            _ content: IUILayout
         ) {
-            self.contentLayout = contentLayout
+            self.content = content
             self._reuse = UI.Reuse.Item()
             self._observer = Observer()
             self._contentOffset = contentOffset
-            self.contentLayout.view = self
+            self.content.view = self
             self._reuse.configure(owner: self)
+        }
+        
+        public convenience init(
+            content: IUILayout,
+            configure: (UI.View.Scroll) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
         }
         
         deinit {
@@ -225,9 +233,9 @@ public extension UI.View {
                 available: available,
                 width: self.width,
                 height: self.height,
-                sizeWithWidth: { self.contentLayout.size(available: Size(width: $0, height: available.height)) },
-                sizeWithHeight: { self.contentLayout.size(available: Size(width: available.width, height: $0)) },
-                size: { self.contentLayout.size(available: available) }
+                sizeWithWidth: { self.content.size(available: Size(width: $0, height: available.height)) },
+                sizeWithHeight: { self.content.size(available: Size(width: available.width, height: $0)) },
+                size: { self.content.size(available: available) }
             )
         }
         
@@ -364,8 +372,8 @@ public extension UI.View.Scroll {
     }
     
     @discardableResult
-    func contentLayout(_ value: IUILayout) -> Self {
-        self.contentLayout = value
+    func content(_ value: IUILayout) -> Self {
+        self.content = value
         return self
     }
     

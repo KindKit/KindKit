@@ -6,72 +6,72 @@ import Foundation
 
 public protocol IUIHamburgerContainer : IUIContainer, IUIContainerParentable {
     
-    var contentContainer: IUIHamburgerContentContainer { set get }
-    var isShowedLeadingContainer: Bool { get }
-    var leadingContainer: IHamburgerMenuContainer? { set get }
-    var isShowedTrailingContainer: Bool { get }
-    var trailingContainer: IHamburgerMenuContainer? { set get }
+    var content: IUIHamburgerContentContainer { set get }
+    var leading: IHamburgerMenuContainer? { set get }
+    var isShowedLeading: Bool { get }
+    var trailing: IHamburgerMenuContainer? { set get }
+    var isShowedTrailing: Bool { get }
     var animationVelocity: Float { set get }
     
-    func showLeadingContainer(animated: Bool, completion: (() -> Void)?)
-    func hideLeadingContainer(animated: Bool, completion: (() -> Void)?)
+    func showLeading(animated: Bool, completion: (() -> Void)?)
+    func hideLeading(animated: Bool, completion: (() -> Void)?)
     
-    func showTrailingContainer(animated: Bool, completion: (() -> Void)?)
-    func hideTrailingContainer(animated: Bool, completion: (() -> Void)?)
+    func showTrailing(animated: Bool, completion: (() -> Void)?)
+    func hideTrailing(animated: Bool, completion: (() -> Void)?)
 
 }
 
 public extension IUIHamburgerContainer {
     
     @inlinable
-    func showLeadingContainer(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.showLeadingContainer(animated: animated, completion: completion)
+    func showLeading(animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.showLeading(animated: animated, completion: completion)
     }
     
     @inlinable
-    func hideLeadingContainer(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.hideLeadingContainer(animated: animated, completion: completion)
+    func hideLeading(animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.hideLeading(animated: animated, completion: completion)
     }
     
     @inlinable
-    func showTrailingContainer(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.showTrailingContainer(animated: animated, completion: completion)
+    func showTrailing(animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.showTrailing(animated: animated, completion: completion)
     }
     
     @inlinable
-    func hideTrailingContainer(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.hideTrailingContainer(animated: animated, completion: completion)
+    func hideTrailing(animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.hideTrailing(animated: animated, completion: completion)
     }
     
-    func set(leadingContainer: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
+    func set(leading: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
         if animated == true {
-            if self.isShowedLeadingContainer == true {
-                self.hideLeadingContainer(animated: animated, completion: { [weak self] in
+            if self.isShowedLeading == true {
+                self.hideLeading(animated: animated, completion: { [weak self] in
                     guard let self = self else { return }
-                    self.leadingContainer = leadingContainer
-                    self.showLeadingContainer(animated: animated, completion: completion)
+                    self.leading = leading
+                    self.showLeading(animated: animated, completion: completion)
                 })
             } else {
-                self.leadingContainer = leadingContainer
+                self.leading = leading
             }
         } else {
-            self.leadingContainer = leadingContainer
+            self.leading = leading
         }
     }
     
-    func set(trailingContainer: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
+    func set(trailing: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
         if animated == true {
-            if self.isShowedTrailingContainer == true {
-                self.hideTrailingContainer(animated: animated, completion: { [weak self] in
+            if self.isShowedTrailing == true {
+                self.hideTrailing(animated: animated, completion: { [weak self] in
                     guard let self = self else { return }
-                    self.trailingContainer = trailingContainer
-                    self.showTrailingContainer(animated: animated, completion: completion)
+                    self.trailing = trailing
+                    self.showTrailing(animated: animated, completion: completion)
                 })
             } else {
-                self.trailingContainer = trailingContainer
+                self.trailing = trailing
             }
         } else {
-            self.trailingContainer = trailingContainer
+            self.trailing = trailing
         }
     }
     
