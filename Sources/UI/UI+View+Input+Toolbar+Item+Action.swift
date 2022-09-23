@@ -22,7 +22,7 @@ public extension UI.View.Input.Toolbar.Item {
         }
         
         public init(
-            image: Image,
+            image: UI.Image,
             callback: @escaping () -> Void
         ) {
             self.callback = callback
@@ -57,7 +57,7 @@ public extension IInputToolbarItem {
     
     @inlinable
     static func action(
-        image: Image,
+        image: UI.Image,
         callback: @escaping () -> Void
     ) -> UI.View.Input.Toolbar.Item.Action {
         return UI.View.Input.Toolbar.Item.Action(image: image, callback: callback)

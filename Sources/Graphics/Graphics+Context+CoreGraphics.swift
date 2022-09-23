@@ -210,7 +210,7 @@ public extension Graphics.Context {
     }
     
     func draw(
-        image: Image,
+        image: UI.Image,
         positioning: Graphics.Context.Positioning
     ) {
         guard let cgImage = image.cgImage else { return }

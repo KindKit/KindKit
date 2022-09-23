@@ -8,15 +8,9 @@
 import AppKit
 import ImageIO
 
-public struct Image : Equatable {
-
-    public var native: NSImage
-    public var size: SizeFloat
-    public var scale: Float {
-        return 1
-    }
+public extension UI.Image {
     
-    public init(
+    init(
         name: String,
         in bundle: Bundle? = nil
     ) {
@@ -33,45 +27,49 @@ public struct Image : Equatable {
         }
     }
     
-    public init?(
+    init?(
         data: Data
     ) {
         guard let image = NSImage(data: data) else { return nil }
         self.native = image
         self.size = SizeFloat(image.size)
+        self.scale = 1
     }
     
-    public init?(
+    init?(
         url: URL
     ) {
         guard let image = NSImage(contentsOf: url) else { return nil }
         self.native = image
         self.size = SizeFloat(image.size)
+        self.scale = 1
     }
     
-    public init(
+    init(
         _ native: NSImage
     ) {
         self.native = native
         self.size = SizeFloat(native.size)
+        self.scale = 1
     }
     
-    public init(
+    init(
         _ cgImage: CGImage
     ) {
         self.native = NSImage(cgImage: cgImage, size: .zero)
         self.size = SizeFloat(self.native.size)
+        self.scale = 1
     }
     
 }
 
-public extension Image {
+public extension UI.Image {
     
     var cgImage: CGImage? {
         return self.native.cgImage(forProposedRect: nil, context: nil, hints: nil)
     }
     
-    var grayscale: Image? {
+    var grayscale: UI.Image? {
         let context = CIContext(options: nil)
         guard let cgImage = self.cgImage else {
             return nil
@@ -81,14 +79,14 @@ public extension Image {
         }
         filter.setValue(CIImage(cgImage: cgImage), forKey: kCIInputImageKey)
         if let output = filter.outputImage, let outputCgImage = context.createCGImage(output, from: output.extent) {
-            return Image(outputCgImage)
+            return .init(outputCgImage)
         }
         return nil
     }
     
 }
 
-public extension Image {
+public extension UI.Image {
     
     func pngData() -> Data? {
         guard let data = self.native.tiffRepresentation else { return nil }
@@ -96,13 +94,13 @@ public extension Image {
         return representation.representation(using: .png, properties: [:])
     }
     
-    func scaleTo(size: SizeFloat) -> Image? {
+    func scaleTo(size: SizeFloat) -> UI.Image? {
         let targetSize = self.size.aspectFit(size).cgSize
         let rect = NSRect(origin: .zero, size: targetSize)
         guard let representation = self.native.bestRepresentation(for: rect, context: nil, hints: nil) else {
             return nil
         }
-        return Image(NSImage(
+        return .init(NSImage(
             size: targetSize,
             flipped: false,
             drawingHandler: { _ in representation.draw(in: rect) }

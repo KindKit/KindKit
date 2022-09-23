@@ -93,7 +93,7 @@ extension RemoteImage.Loader.Task {
         })
     }
     
-    func finish(image: Image) {
+    func finish(image: UI.Image) {
         self.task = nil
         self.syncQueue.async(execute: {
             self.delegate?.didFinish(self)

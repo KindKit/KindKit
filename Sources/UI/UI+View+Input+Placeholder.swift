@@ -9,13 +9,13 @@ public extension UI.View.Input {
     struct Placeholder {
         
         public var text: Swift.String
-        public var font: Font
-        public var color: Color
+        public var font: UI.Font
+        public var color: UI.Color
         
         public init(
             text: Swift.String,
-            font: Font,
-            color: Color
+            font: UI.Font,
+            color: UI.Color
         ) {
             self.text = text
             self.font = font

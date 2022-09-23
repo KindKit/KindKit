@@ -17,7 +17,7 @@ public extension RemoteImage.Filter {
             self.size = size
         }
         
-        public func apply(_ image: Image) -> Image? {
+        public func apply(_ image: UI.Image) -> UI.Image? {
             return image.scaleTo(size: self.size)
         }
         

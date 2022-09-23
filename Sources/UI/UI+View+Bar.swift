@@ -26,7 +26,7 @@ public extension UI.View {
                 self._layout.separatorItem = self.separatorView.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var color: Color? {
+        public var color: UI.Color? {
             set(value) { self._backgroundView.color = value }
             get { return self._backgroundView.color }
         }

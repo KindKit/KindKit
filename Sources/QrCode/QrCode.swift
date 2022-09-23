@@ -26,11 +26,11 @@ public struct QrCode {
     }
     
     public func generate(
-        color: Color,
-        backgroundColor: Color,
+        color: UI.Color,
+        backgroundColor: UI.Color,
         insets: InsetFloat,
         size: SizeFloat
-    ) -> Image? {
+    ) -> UI.Image? {
         guard let qrFilter = CIFilter(name: "CIRCodeGenerator") else {
             return nil
         }
@@ -65,7 +65,7 @@ public struct QrCode {
         guard let cgImage = context.makeImage() else {
             return nil
         }
-        return Image(cgImage)
+        return .init(cgImage)
     }
     
 }

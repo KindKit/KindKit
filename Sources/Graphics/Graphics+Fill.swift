@@ -8,7 +8,7 @@ public extension Graphics {
 
     enum Fill : Equatable {
         
-        case color(Color)
+        case color(UI.Color)
         case pattern(Graphics.Pattern)
         
     }

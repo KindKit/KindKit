@@ -31,7 +31,7 @@ public extension RemoteImage {
             provider: IApiProvider,
             queue: DispatchQueue,
             download: @escaping (_ progress: Progress) -> Void,
-            success: @escaping (_ data: Data, _ image: Image) -> Void,
+            success: @escaping (_ data: Data, _ image: UI.Image) -> Void,
             failure: @escaping (_ error: Error) -> Void
         ) -> ICancellable {
             return provider.send(
@@ -56,14 +56,14 @@ private extension RemoteImage.Query {
     
     struct Response : IApiResponse {
         
-        typealias Success = (Data, Image)
+        typealias Success = (Data, UI.Image)
         typealias Failure = Error
         
         func parse(meta: Api.Response.Meta, data: Data?) -> Result< Success, Failure > {
             guard let data = data else {
                 return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorDataNotAllowed))
             }
-            guard let image = Image(data: data) else {
+            guard let image = UI.Image(data: data) else {
                 return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorDataNotAllowed))
             }
             return .success((data, image))

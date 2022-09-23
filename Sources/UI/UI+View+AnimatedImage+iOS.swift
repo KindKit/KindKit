@@ -87,7 +87,7 @@ extension KKAnimatedImageView {
         self.updateShadowPath()
     }
     
-    func update(images: [KindKit.Image]) {
+    func update(images: [UI.Image]) {
         self.animationImages = images.compactMap({ $0.native })
         self.image = self.animationImages?.first
     }

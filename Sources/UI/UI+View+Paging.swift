@@ -131,7 +131,7 @@ public extension UI.View {
         }
         public private(set) var isPaging: Bool = false
         public private(set) var isDecelerating: Bool = false
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet(oldValue) {
                 guard self.color != oldValue else { return }
                 guard self.isLoaded == true else { return }

@@ -10,11 +10,11 @@ public extension UI.View.Gradient.Fill {
     
     struct Point {
         
-        public let color: Color
+        public let color: UI.Color
         public let location: Float
         
         public init(
-            color: Color,
+            color: UI.Color,
             location: Float
         ) {
             self.color = color

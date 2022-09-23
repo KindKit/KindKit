@@ -10,11 +10,11 @@ public extension UI.View.Rate {
     
     struct State {
         
-        public let image: Image
+        public let image: UI.Image
         public let rate: Float
         
         public init(
-            image: Image,
+            image: UI.Image,
             rate: Float
         ) {
             self.image = image

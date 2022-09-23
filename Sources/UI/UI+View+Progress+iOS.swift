@@ -82,11 +82,11 @@ extension KKProgressView {
         self.updateShadowPath()
     }
     
-    func update(progressColor: Color?) {
+    func update(progressColor: UI.Color?) {
         self._progress.progressTintColor = progressColor?.native
     }
     
-    func update(trackColor: Color?) {
+    func update(trackColor: UI.Color?) {
         self._progress.trackTintColor = trackColor?.native
     }
     

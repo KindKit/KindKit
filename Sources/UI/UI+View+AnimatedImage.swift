@@ -47,7 +47,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var images: [KindKit.Image] = [] {
+        public var images: [UI.Image] = [] {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(images: self.images)
@@ -77,13 +77,13 @@ public extension UI.View {
             guard self.isLoaded == true else { return false }
             return self._view.isAnimating
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
             }
         }
-        public var tintColor: Color? = nil {
+        public var tintColor: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(tintColor: self.tintColor)
@@ -289,7 +289,7 @@ public extension UI.View.AnimatedImage {
     
     @inlinable
     @discardableResult
-    func images(_ value: [KindKit.Image]) -> Self {
+    func images(_ value: [UI.Image]) -> Self {
         self.images = value
         return self
     }

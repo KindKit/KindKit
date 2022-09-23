@@ -47,13 +47,13 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var pageColor: Color? {
+        public var pageColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(pageColor: self.pageColor)
             }
         }
-        public var currentPageColor: Color? {
+        public var currentPageColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(currentPageColor: self.currentPageColor)
@@ -87,7 +87,7 @@ public extension UI.View {
                 self.linkedPageable?.linkedPageable = self
             }
         }
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -219,14 +219,14 @@ public extension UI.View.PageIndicator {
     
     @inlinable
     @discardableResult
-    func pageColor(_ value: Color?) -> Self {
+    func pageColor(_ value: UI.Color?) -> Self {
         self.pageColor = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func currentPageColor(_ value: Color?) -> Self {
+    func currentPageColor(_ value: UI.Color?) -> Self {
         self.currentPageColor = value
         return self
     }

@@ -92,11 +92,11 @@ extension KKInputToolbarView {
         self.isTranslucent = translucent
     }
     
-    func update(barTintColor: Color?) {
+    func update(barTintColor: UI.Color?) {
         self.barTintColor = barTintColor?.native
     }
     
-    func update(contentTintColor: Color) {
+    func update(contentTintColor: UI.Color) {
         self.tintColor = contentTintColor.native
     }
     

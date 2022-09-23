@@ -2,11 +2,11 @@
 //  KindKit
 //
 
-#if os(iOS)
+#if os(macOS)
 
-import UIKit
+import AppKit
 
-public extension TextLineBreak {
+public extension UI.Text.LineBreak {
     
     var nsLineBreakMode: NSLineBreakMode {
         switch self {

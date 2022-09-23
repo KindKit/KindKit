@@ -6,6 +6,8 @@
 
 import UIKit
 
+public typealias NativeColor = UIColor
+
 public extension UIColor {
     
     @inlinable

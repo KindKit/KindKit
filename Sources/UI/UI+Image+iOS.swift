@@ -8,13 +8,9 @@
 import UIKit
 import ImageIO
 
-public struct Image : Equatable {
-
-    public var native: UIImage
-    public var size: SizeFloat
-    public var scale: Float
+public extension UI.Image {
     
-    public init(
+    init(
         name: String,
         in bundle: Bundle? = nil,
         compatibleWith traitCollection: UITraitCollection? = nil,
@@ -32,7 +28,7 @@ public struct Image : Equatable {
         self.scale = Float(image.scale)
     }
     
-    public init(
+    init(
         names: [String],
         in bundle: Bundle? = nil,
         compatibleWith traitCollection: UITraitCollection? = nil,
@@ -51,7 +47,7 @@ public struct Image : Equatable {
         self.scale = Float(image.scale)
     }
     
-    public init?(
+    init?(
         data: Data,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
@@ -61,7 +57,7 @@ public struct Image : Equatable {
         self.scale = Float(image.scale)
     }
     
-    public init?(
+    init?(
         url: URL,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
@@ -72,7 +68,7 @@ public struct Image : Equatable {
         self.scale = Float(image.scale)
     }
     
-    public init(
+    init(
         _ uiImage: UIImage
     ) {
         self.native = uiImage
@@ -80,7 +76,7 @@ public struct Image : Equatable {
         self.scale = Float(uiImage.scale)
     }
     
-    public init(
+    init(
         uiImages: [UIImage],
         duration: TimeInterval,
         renderingMode: UIImage.RenderingMode? = nil
@@ -97,7 +93,7 @@ public struct Image : Equatable {
         self.scale = Float(image.scale)
     }
     
-    public init(
+    init(
         _ cgImage: CGImage
     ) {
         self.native = UIImage(cgImage: cgImage)
@@ -105,7 +101,7 @@ public struct Image : Equatable {
         self.scale = Float(self.native.scale)
     }
     
-    public init?(size: SizeFloat, scale: Float? = nil, color: Color) {
+    init?(size: SizeFloat, scale: Float? = nil, color: UI.Color) {
         let realScale = scale ?? Float(UIScreen.main.scale)
         UIGraphicsBeginImageContextWithOptions(size.cgSize, false, CGFloat(realScale))
         defer {
@@ -126,37 +122,37 @@ public struct Image : Equatable {
     
 }
 
-public extension Image {
+public extension UI.Image {
     
     var cgImage: CGImage? {
         return self.native.cgImage
     }
     
-    var grayscale: Image? {
+    var grayscale: UI.Image? {
         let context = CIContext(options: nil)
         guard let filter = CIFilter(name: "CIPhotoEffectNoir") else {
             return nil
         }
         filter.setValue(CIImage(image: self.native), forKey: kCIInputImageKey)
         if let output = filter.outputImage, let cgImage = context.createCGImage(output, from: output.extent) {
-            return Image(UIImage(cgImage: cgImage, scale: self.native.scale, orientation: self.native.imageOrientation))
+            return .init(UIImage(cgImage: cgImage, scale: self.native.scale, orientation: self.native.imageOrientation))
         }
         return nil
     }
     
 }
 
-public extension Image {
+public extension UI.Image {
     
     func pngData() -> Data? {
         return self.native.pngData()
     }
     
-    func withRenderingMode(renderingMode: UIImage.RenderingMode) -> Image {
-        return Image(self.native.withRenderingMode(renderingMode))
+    func withRenderingMode(renderingMode: UIImage.RenderingMode) -> UI.Image {
+        return .init(self.native.withRenderingMode(renderingMode))
     }
     
-    func unrotate(maxResolution: Float) -> Image {
+    func unrotate(maxResolution: Float) -> UI.Image {
         guard let imgRef = self.native.cgImage else {
             return self
         }
@@ -229,10 +225,10 @@ public extension Image {
             return self
         }
         UIGraphicsEndImageContext()
-        return Image(imageCopy)
+        return .init(imageCopy)
     }
     
-    func scaleTo(size: SizeFloat) -> Image? {
+    func scaleTo(size: SizeFloat) -> UI.Image? {
         guard let cgImage = self.native.cgImage else {
             return nil
         }
@@ -247,7 +243,7 @@ public extension Image {
             context.scaleBy(x: 1.0, y: -1.0)
             context.draw(cgImage, in: CGRect(origin: .zero, size: aspectSize.cgSize))
             if let image = context.makeImage() {
-                return Image(UIImage(cgImage: image, scale: scale, orientation: .up))
+                return .init(UIImage(cgImage: image, scale: scale, orientation: .up))
             }
         }
         return nil
@@ -255,7 +251,7 @@ public extension Image {
     
 }
 
-private extension Image {
+public extension UI.Image {
     
     static func _create(
         data: Data,

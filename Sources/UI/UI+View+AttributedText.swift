@@ -62,7 +62,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var alignment: TextAlignment? = nil {
+        public var alignment: UI.Text.Alignment? = nil {
             didSet(oldValue) {
                 guard self.alignment != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -70,7 +70,7 @@ public extension UI.View {
                 self.setNeedLayout()
             }
         }
-        public var lineBreak: TextLineBreak = .wordWrapping {
+        public var lineBreak: UI.Text.LineBreak = .wordWrapping {
             didSet(oldValue) {
                 guard self.lineBreak != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -86,7 +86,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var color: Color? = Color(rgba: 0x00000000) {
+        public var color: UI.Color? = .init(rgba: 0x00000000) {
             didSet(oldValue) {
                 guard self.color != oldValue else { return }
                 guard self.isLoaded == true else { return }
@@ -252,14 +252,14 @@ public extension UI.View.AttributedText {
     
     @inlinable
     @discardableResult
-    func alignment(_ value: TextAlignment?) -> Self {
+    func alignment(_ value: UI.Text.Alignment?) -> Self {
         self.alignment = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func lineBreak(_ value: TextLineBreak) -> Self {
+    func lineBreak(_ value: UI.Text.LineBreak) -> Self {
         self.lineBreak = value
         return self
     }

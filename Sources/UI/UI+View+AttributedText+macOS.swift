@@ -95,20 +95,20 @@ extension KKAttributedTextView {
         self.kkDelegate = view
     }
     
-    func update(text: NSAttributedString, alignment: TextAlignment?) {
+    func update(text: NSAttributedString, alignment: UI.Text.Alignment?) {
         self.attributedStringValue = text
         if let alignment = alignment {
             self.alignment = alignment.nsTextAlignment
         }
     }
     
-    func update(alignment: TextAlignment?) {
+    func update(alignment: UI.Text.Alignment?) {
         if let alignment = alignment {
             self.alignment = alignment.nsTextAlignment
         }
     }
     
-    func update(lineBreak: TextLineBreak) {
+    func update(lineBreak: UI.Text.LineBreak) {
         self.lineBreakMode = lineBreak.nsLineBreakMode
     }
     

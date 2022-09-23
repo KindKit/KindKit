@@ -62,13 +62,13 @@ public extension UI.View.Input {
             }
             get { return self._text }
         }
-        public var textFont: Font = Font(weight: .regular) {
+        public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(textFont: self.textFont)
             }
         }
-        public var textColor: Color = .init(rgb: 0x000000) {
+        public var textColor: UI.Color = .init(rgb: 0x000000) {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(textColor: self.textColor)
@@ -80,7 +80,7 @@ public extension UI.View.Input {
                 self._view.update(textInset: self.textInset)
             }
         }
-        public var editingColor: Color? {
+        public var editingColor: UI.Color? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(editingColor: self.editingColor)
@@ -98,7 +98,7 @@ public extension UI.View.Input {
                 self._view.update(placeholderInset: self.placeholderInset)
             }
         }
-        public var alignment: TextAlignment = .left {
+        public var alignment: UI.Text.Alignment = .left {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(alignment: self.alignment)
@@ -118,7 +118,7 @@ public extension UI.View.Input {
             }
         }
         #endif
-        public var color: Color? = nil {
+        public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(color: self.color)
@@ -298,14 +298,14 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func textFont(_ value: Font) -> Self {
+    func textFont(_ value: UI.Font) -> Self {
         self.textFont = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func textColor(_ value: Color) -> Self {
+    func textColor(_ value: UI.Color) -> Self {
         self.textColor = value
         return self
     }
@@ -318,7 +318,7 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func editingColor(_ value: Color?) -> Self {
+    func editingColor(_ value: UI.Color?) -> Self {
         self.editingColor = value
         return self
     }
@@ -339,7 +339,7 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func alignment(_ value: TextAlignment) -> Self {
+    func alignment(_ value: UI.Text.Alignment) -> Self {
         self.alignment = value
         return self
     }

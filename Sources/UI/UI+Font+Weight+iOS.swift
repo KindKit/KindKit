@@ -6,48 +6,7 @@
 
 import UIKit
 
-public struct Font : Equatable {
-
-    public var native: UIFont
-    
-    public init(
-        weight: FontWeight,
-        size: Float = Float(UIFont.systemFontSize)
-    ) {
-        self.native = UIFont.systemFont(ofSize: CGFloat(size), weight: weight.uiFontWeight)
-        
-    }
-    
-    public init(
-        name: String,
-        size: Float = Float(UIFont.systemFontSize)
-    ) {
-        self.native = UIFont(name: name, size: CGFloat(size))!
-    }
-    
-    public init(
-        _ native: UIFont
-    ) {
-        self.native = native
-    }
-    
-}
-
-public extension Font {
-    
-    @inlinable
-    var lineHeight: Float {
-        return Float(self.native.lineHeight)
-    }
-    
-    @inlinable
-    func withSize(_ size: Float) -> Font {
-        return Font(self.native.withSize(CGFloat(size)))
-    }
-    
-}
-
-public extension FontWeight {
+public extension UI.Font.Weight {
     
     var uiFontWeight: UIFont.Weight {
         switch self {

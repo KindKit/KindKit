@@ -45,7 +45,7 @@ private extension RemoteImage.Loader.LoadTask {
             } else if self.query.isLocal == true {
                 do {
                     let data = try self.query.local()
-                    if let image = Image(data: data) {
+                    if let image = UI.Image(data: data) {
                         try self.cache.set(data: data, image: image, query: self.query)
                         self.finish(image: image)
                     } else {
