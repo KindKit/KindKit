@@ -2,14 +2,14 @@
 //  KindKit
 //
 
-#if swift(>=5.7) && os(iOS) && canImport(SwiftUI)
+#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI)
 
 import UIKit
 import SwiftUI
 
 public extension UI.View {
 
-    @available(iOS 13, *)
+    @available(iOS 13, tvOS 13.0, *)
     @available(macOS, unavailable)
     @available(watchOS, unavailable)
     struct Preview< View : IUIView > : UIViewRepresentable {
