@@ -147,10 +147,10 @@ public extension UI {
         
         public override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
-            self._updateSafeArea()
             if let containerView = self._containerView {
                 containerView.frame = self.view.bounds
             }
+            self._updateSafeArea()
         }
         
         @available(iOS 11.0, *)
@@ -271,7 +271,7 @@ private extension UI.ViewController {
     func _safeArea() -> InsetFloat {
         let safeArea: InsetFloat
         if #available(iOS 11.0, *) {
-            safeArea = InsetFloat(self.additionalSafeAreaInsets)
+            safeArea = InsetFloat(self.view.safeAreaInsets) + InsetFloat(self.additionalSafeAreaInsets)
         } else {
             safeArea = InsetFloat(
                 top: Float(self.topLayoutGuide.length),
