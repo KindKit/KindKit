@@ -22,7 +22,7 @@ public struct LogUI {
     
 }
 
-#if canImport(SwiftUI) && DEBUG
+#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI) && DEBUG
 
 import SwiftUI
 
