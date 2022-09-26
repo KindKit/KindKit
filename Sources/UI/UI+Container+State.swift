@@ -84,7 +84,7 @@ public extension UI.Container {
             self._content = content
             self._layout = .init(content.flatMap({ UI.Layout.Item($0.view) }))
             self._view = UI.View.Custom(self._layout)
-            self._init()
+            self._setup()
         }
         
         public convenience init<
@@ -147,7 +147,7 @@ extension UI.Container.State : IUIRootContentContainer {
 
 private extension UI.Container.State {
     
-    func _init() {
+    func _setup() {
         self.content?.parent = self
     }
     

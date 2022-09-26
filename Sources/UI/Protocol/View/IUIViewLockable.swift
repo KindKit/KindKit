@@ -13,6 +13,16 @@ public protocol IUIViewLockable : IUIViewStyleable {
 public extension IUIViewLockable {
     
     @inlinable
+    var locked: Bool {
+        set(value) { self.isLocked = value }
+        get { return self.isLocked }
+    }
+    
+}
+
+public extension IUIViewLockable {
+    
+    @inlinable
     @discardableResult
     func locked(_ value: Bool) -> Self {
         self.isLocked = value
@@ -27,6 +37,12 @@ public extension IUIViewLockable where Self : IUIWidgetView, Body : IUIViewLocka
     var isLocked: Bool {
         set(value) { self.body.isLocked = value }
         get { return self.body.isLocked }
+    }
+    
+    @inlinable
+    var locked: Bool {
+        set(value) { self.isLocked = value }
+        get { return self.isLocked }
     }
     
 }

@@ -45,7 +45,7 @@ extension UI.Container.Dialog {
         }
         
         func invalidate(item: UI.Layout.Item) {
-            if self.dialogItem?.item === item {
+            if self.dialogItem?.item == item {
                 self._dialogSize = nil
             }
         }

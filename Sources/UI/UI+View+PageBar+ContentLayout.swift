@@ -44,7 +44,7 @@ extension UI.View.PageBar {
         }
         
         func invalidate(item: UI.Layout.Item) {
-            if let index = self.items.firstIndex(where: { $0 === item }) {
+            if let index = self.items.firstIndex(of: item) {
                 self._cache[index] = nil
             }
         }

@@ -46,25 +46,23 @@ public extension UI.Container {
         public var view: IUIView {
             return self._view
         }
-        public private(set) var screen: Screen
+        public let screen: Screen
         
-        private var _layout: Layout
-        private var _view: UI.View.Custom
+        private let _layout: Layout
+        private let _view: UI.View.Custom
         
         public init(
             _ screen: Screen
         ) {
             self.isPresented = false
             self.screen = screen
-            self._layout = Layout(
-                fit: (screen is IUIScreenPushable) || (screen is IUIScreenDialogable)
-            )
+            self._layout = Layout()
             self._view = UI.View.Custom(self._layout)
-            self._init()
+            self._setup()
         }
         
         deinit {
-            self.screen.destroy()
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -116,11 +114,16 @@ public extension UI.Container {
 
 private extension UI.Container.Screen {
     
-    func _init() {
+    func _setup() {
         self.screen.container = self
         self.screen.setup()
         
         self._layout.item = UI.Layout.Item(self.screen.view)
+    }
+    
+    func _destroy() {
+        self.screen.container = nil
+        self.screen.destroy()
     }
     
 }
@@ -131,7 +134,7 @@ extension UI.Container.Screen : IUIRootContentContainer {
 extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScreenStackable {
     
     public var stackBar: UI.View.StackBar {
-        return self.screen.stackBarView
+        return self.screen.stackBar
     }
     
     public var stackBarVisibility: Float {
@@ -154,8 +157,8 @@ extension UI.Container.Screen : IUIGroupContentContainer where Screen : IUIScree
 
 extension UI.Container.Screen : IUIPageContentContainer where Screen : IUIScreenPageable {
     
-    public var pageItemView: UI.View.PageBar.Item {
-        return self.screen.pageItemView
+    public var pageItem: UI.View.PageBar.Item {
+        return self.screen.pageItem
     }
     
 }
@@ -219,7 +222,7 @@ extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScre
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     

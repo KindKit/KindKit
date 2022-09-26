@@ -16,7 +16,7 @@ extension UI.Container.Dialog {
         init(container: IUIDialogContentContainer, available: SizeFloat) {
             self.container = container
             self.item = UI.Layout.Item(container.view)
-            if let backgroundView = container.dialogBackgroundView {
+            if let backgroundView = container.dialogBackground {
                 self.backgroundView = backgroundView
                 self.backgroundItem = UI.Layout.Item(backgroundView)
             }

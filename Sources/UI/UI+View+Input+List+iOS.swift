@@ -189,7 +189,7 @@ extension KKInputListView : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         self.kkDelegate?.beginEditing(self)
         if self._view?.selected == nil, let firstItem = self._view?.items.first {
-            self.kkDelegate?.select(self, item: firstItem)
+            self.kkDelegate?.select(self, appearedItem: firstItem)
         }
     }
     
@@ -227,7 +227,7 @@ extension KKInputListView : UIPickerViewDelegate {
         guard let view = self._view else { return }
         let selected = view.items[row]
         if view.selected !== selected {
-            self.kkDelegate?.select(self, item: selected)
+            self.kkDelegate?.select(self, appearedItem: selected)
         }
     }
     

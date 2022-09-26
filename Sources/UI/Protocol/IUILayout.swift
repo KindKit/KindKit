@@ -45,8 +45,8 @@ public extension IUILayout {
             forceParent = true
         }
         if forceParent == true {
-            if let view = self.view, let item = view.item {
-                if let layout = view.layout {
+            if let view = self.view, let item = view.appearedItem {
+                if let layout = view.appearedLayout {
                     layout.setNeedForceUpdate(item: item)
                 } else {
                     item.setNeedForceUpdate()

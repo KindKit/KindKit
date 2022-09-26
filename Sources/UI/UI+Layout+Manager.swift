@@ -56,7 +56,7 @@ extension UI.Layout {
                     )
                 )
                 let disappearing = self.items.filter({ item in
-                    return items.contains(where: { return item === $0 }) == false
+                    return items.contains(item) == false
                 })
                 if disappearing.count > 0 {
                     for item in disappearing {

@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIScreenStackable : AnyObject {
     
-    var stackBarView: UI.View.StackBar { get }
+    var stackBar: UI.View.StackBar { get }
     var stackBarVisibility: Float { get }
     var stackBarHidden: Bool { get }
     

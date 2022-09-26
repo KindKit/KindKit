@@ -135,10 +135,10 @@ public extension FlowBuilder.Chain {
     func condition<
         Then : IFlowPipeline
     >(
-        `if`: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Bool,
+        `if`: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Bool,
         then: Then
     ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThen< Then > > where
-        Head.Output == Then.Input,
+        Tail.Output == Then.Input,
         Then.Input == Then.Output
     {
         return .init(head: self.head, tail: self.tail.condition(if: `if`, then: then))

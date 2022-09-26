@@ -94,22 +94,20 @@ public extension UI.Container {
         ) {
             self.screen = screen
             self.isPresented = false
-            self._overlay = screen.stickyView
+            self._overlay = screen.sticky
             self._content = content
             self._layout = Layout(
                 content: UI.Layout.Item(content.view),
-                overlay: UI.Layout.Item(screen.stickyView),
+                overlay: UI.Layout.Item(screen.sticky),
                 overlayVisibility: screen.stickyVisibility,
                 overlayHidden: screen.stickyHidden
             )
             self._view = UI.View.Custom(self._layout)
-            self._init()
-            UI.Container.BarController.shared.add(observer: self)
+            self._setup()
         }
         
         deinit {
-            UI.Container.BarController.shared.remove(observer: self)
-            self.screen.destroy()
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -199,10 +197,19 @@ public extension UI.Container {
 
 private extension UI.Container.Sticky {
     
-    func _init() {
+    func _setup() {
         self.screen.container = self
         self._content.parent = self
         self.screen.setup()
+        
+        UI.Container.BarController.shared.add(observer: self)
+    }
+    
+    func _destroy() {
+        UI.Container.BarController.shared.remove(observer: self)
+        
+        self.screen.container = nil
+        self.screen.destroy()
     }
     
 }
@@ -236,8 +243,8 @@ extension UI.Container.Sticky : IUIStackContentContainer where ContentContainer 
 
 extension UI.Container.Sticky : IUIPageContentContainer where ContentContainer : IUIPageContentContainer {
     
-    public var pageItemView: UI.View.PageBar.Item {
-        return self.content.pageItemView
+    public var pageItem: UI.View.PageBar.Item {
+        return self.content.pageItem
     }
     
 }
@@ -260,8 +267,8 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
         return self.content.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
-        return self.content.dialogBackgroundView
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
+        return self.content.dialogBackground
     }
     
 }

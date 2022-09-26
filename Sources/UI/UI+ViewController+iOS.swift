@@ -50,7 +50,9 @@ public extension UI {
             }
         }
         private var _virtualKeyboard: VirtualKeyboard
-        private var _virtualKeyboardAnimationTask: IAnimationTask?
+        private var _virtualKeyboardAnimation: IAnimationTask? {
+            willSet { self._virtualKeyboardAnimation?.cancel() }
+        }
         private var _owner: AnyObject?
         
         private init(
@@ -232,7 +234,7 @@ private extension UI.ViewController {
     
     func _free() {
         self._virtualKeyboard.remove(observer: self)
-        self._virtualKeyboardAnimationTask?.cancel()
+        self._virtualKeyboardAnimation?.cancel()
         UI.Container.BarController.shared.remove(observer: self)
         NotificationCenter.default.removeObserver(self)
     }
@@ -290,15 +292,15 @@ private extension UI.ViewController {
     
     func _updateVirtualKeyboardHeight(duration: TimeInterval, height: Float) {
         guard abs(self.virtualKeyboardHeight - height) > .leastNonzeroMagnitude else { return }
-        self._virtualKeyboardAnimationTask?.cancel()
-        self._virtualKeyboardAnimationTask = Animation.default.run(
+        self._virtualKeyboardAnimation?.cancel()
+        self._virtualKeyboardAnimation = Animation.default.run(
             duration: duration,
             processing: { [unowned self] progress in
                 self.virtualKeyboardHeight = self.virtualKeyboardHeight.lerp(height, progress: progress)
             },
             completion: { [unowned self] in
+                self._virtualKeyboardAnimation = nil
                 self.virtualKeyboardHeight = height
-                self._virtualKeyboardAnimationTask = nil
             }
         )
     }

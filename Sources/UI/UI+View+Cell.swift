@@ -20,20 +20,20 @@ public extension UI.View {
             get { return self._isSelected }
         }
         public var shouldPressed: Bool = true
-        public private(set) var content: IUIView {
+        public var content: IUIView {
             didSet(oldValue) {
                 guard self.content !== oldValue else { return }
                 self._layout.content = UI.Layout.Item(self.content)
             }
         }
+#if os(iOS)
+        public let pressedGesture = UI.Gesture.Tap()
+#endif
         public private(set) var body: UI.View.Custom
+        public var onPressed: ((UI.View.Cell) -> Void)?
         
         private var _layout: Layout
         private var _isSelected: Bool = false
-#if os(iOS)
-        private var _pressedGesture = UI.Gesture.Tap()
-#endif
-        private var _onPressed: ((UI.View.Cell) -> Void)?
         
         public init(
             _ content: IUIView
@@ -41,11 +41,11 @@ public extension UI.View {
             self.content = content
             self._layout = Layout(content)
             self.body = UI.View.Custom(self._layout)
-#if os(iOS)
-                .gestures([ self._pressedGesture ])
-#endif
                 .shouldHighlighting(true)
-            self._init()
+#if os(iOS)
+                .gestures([ self.pressedGesture ])
+#endif
+            self._setup()
         }
         
         public convenience init(
@@ -54,12 +54,6 @@ public extension UI.View {
         ) {
             self.init(content)
             self.modify(configure)
-        }
-        
-        @discardableResult
-        public func onPressed(_ value: ((UI.View.Cell) -> Void)?) -> Self {
-            self._onPressed = value
-            return self
         }
         
     }
@@ -75,6 +69,7 @@ public extension UI.View.Cell {
         return self
     }
     
+    @inlinable
     @discardableResult
     func content(_ value: IUIView) -> Self {
         self.content = value
@@ -83,24 +78,27 @@ public extension UI.View.Cell {
     
 }
 
+public extension UI.View.Cell {
+    
+    @inlinable
+    @discardableResult
+    func onPressed(_ value: ((UI.View.Cell) -> Void)?) -> Self {
+        self.onPressed = value
+        return self
+    }
+    
+}
+
 private extension UI.View.Cell {
     
-    func _init() {
+    func _setup() {
 #if os(iOS)
-        self._pressedGesture.onShouldBegin({ [unowned self] _ in
+        self.pressedGesture.onShouldBegin({ [unowned self] _ in
             return self.shouldPressed
         }).onTriggered({ [unowned self] _ in
-            self._pressed()
+            self.onPressed?(self)
         })
 #endif
     }
-    
-#if os(iOS)
-    
-    func _pressed() {
-        self._onPressed?(self)
-    }
-    
-#endif
     
 }

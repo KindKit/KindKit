@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI)
+#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI) && DEBUG
 
 import UIKit
 import SwiftUI

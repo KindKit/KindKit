@@ -4,6 +4,9 @@
 
 import Foundation
 
+extension DispatchWorkItem : ICancellable {
+}
+
 public extension DispatchWorkItem {
     
     static func async(block: @escaping () -> Void, queue: DispatchQueue) -> DispatchWorkItem {
@@ -14,11 +17,8 @@ public extension DispatchWorkItem {
     
     static func async(block: @escaping () -> Void, queue: DispatchQueue, delay: TimeInterval) -> DispatchWorkItem {
         let workItem = DispatchWorkItem(block: block)
-        queue.asyncAfter(deadline: .now() + delay, execute: block)
+        queue.asyncAfter(deadline: .now() + delay, execute: workItem)
         return workItem
     }
     
-}
-
-extension DispatchWorkItem : ICancellable {
 }

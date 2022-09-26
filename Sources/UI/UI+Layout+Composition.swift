@@ -68,6 +68,9 @@ public extension UI.Layout {
         }
         
         public func items(bounds: RectFloat) -> [UI.Layout.Item] {
+            guard bounds.size.isZero == false else {
+                return []
+            }
             return self.entity.items(bounds: bounds)
         }
         

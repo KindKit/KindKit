@@ -12,8 +12,7 @@ public protocol IUIViewPageable : AnyObject {
     
     var linkedPageable: IUIViewPageable? { set get }
     
-    @discardableResult
-    func currentPage(_ value: Float, animated: Bool, completion: (() -> Void)?) -> Self
+    func animate(currentPage: Float, completion: (() -> Void)?)
     
 }
 
@@ -29,6 +28,13 @@ public extension IUIViewPageable {
     var isLastPage: Bool {
         guard self.numberOfPages > 0 else { return false }
         return UInt(self.currentPage.roundNearest) == self.numberOfPages - 1
+    }
+    
+    @inlinable
+    @discardableResult
+    func currentPage(_ value: Float) -> Self {
+        self.currentPage = value
+        return self
     }
     
     @inlinable
@@ -69,9 +75,14 @@ public extension IUIViewPageable where Self : IUIWidgetView, Body : IUIViewPagea
     
     @inlinable
     @discardableResult
-    func currentPage(_ value: Float, animated: Bool, completion: (() -> Void)?) -> Self {
-        self.body.currentPage(value, animated: animated, completion: completion)
+    func currentPage(_ value: Float) -> Self {
+        self.body.currentPage(value)
         return self
+    }
+    
+    @inlinable
+    func animate(currentPage: Float, completion: (() -> Void)?) {
+        self.body.animate(currentPage: currentPage, completion: completion)
     }
     
 }

@@ -6,13 +6,13 @@ import Foundation
 
 public protocol IUIScrollViewObserver : AnyObject {
     
-    func beginScrolling(scrollView: UI.View.Scroll)
-    func scrolling(scrollView: UI.View.Scroll)
-    func endScrolling(scrollView: UI.View.Scroll, decelerate: Bool)
-    func beginDecelerating(scrollView: UI.View.Scroll)
-    func endDecelerating(scrollView: UI.View.Scroll)
+    func beginDragging(scroll: UI.View.Scroll)
+    func dragging(scroll: UI.View.Scroll)
+    func endDragging(scroll: UI.View.Scroll, decelerate: Bool)
+    func beginDecelerating(scroll: UI.View.Scroll)
+    func endDecelerating(scroll: UI.View.Scroll)
     
-    func scrollToTop(scrollView: UI.View.Scroll)
+    func scrollToTop(scroll: UI.View.Scroll)
     
 }
 
@@ -22,9 +22,9 @@ protocol KKScrollViewDelegate : AnyObject {
     
     func triggeredRefresh(_ view: KKScrollView)
     
-    func beginScrolling(_ view: KKScrollView)
-    func scrolling(_ view: KKScrollView, contentOffset: PointFloat)
-    func endScrolling(_ view: KKScrollView, decelerate: Bool)
+    func beginDragging(_ view: KKScrollView)
+    func dragging(_ view: KKScrollView, contentOffset: PointFloat)
+    func endDragging(_ view: KKScrollView, decelerate: Bool)
     func beginDecelerating(_ view: KKScrollView)
     func endDecelerating(_ view: KKScrollView)
     
@@ -36,10 +36,10 @@ protocol KKScrollViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Scroll : IUIView, IUIViewDynamicSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Scroll : IUIView, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var layout: IUILayout?
-        public unowned var item: UI.Layout.Item?
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -83,6 +83,15 @@ public extension UI.View {
                 self._view.update(indicatorDirection: self.indicatorDirection)
             }
         }
+#if os(iOS)
+        public var delaysContentTouches: Bool = true {
+            didSet(oldValue) {
+                guard self.delaysContentTouches != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(delaysContentTouches: self.delaysContentTouches)
+            }
+        }
+#endif
         public var visibleInset: InsetFloat = .zero {
             didSet(oldValue) {
                 guard self.visibleInset != oldValue else { return }
@@ -117,10 +126,9 @@ public extension UI.View {
                 self._view.update(content: self.content)
             }
         }
-        public private(set) var isScrolling: Bool = false
+        public private(set) var isDragging: Bool = false
         public private(set) var isDecelerating: Bool = false
     #if os(iOS)
-        @available(iOS 10.0, *)
         public var refreshColor: UI.Color? {
             set(value) {
                 guard self._refreshColor != value else { return }
@@ -130,7 +138,6 @@ public extension UI.View {
             }
             get { return self._refreshColor }
         }
-        @available(iOS 10.0, *)
         public var isRefreshing: Bool {
             set(value) {
                 guard self._isRefreshing != value else { return }
@@ -141,6 +148,18 @@ public extension UI.View {
             get { return self._isRefreshing }
         }
     #endif
+        public var isLocked: Bool {
+            set(value) {
+                if self._isLocked != value {
+                    self._isLocked = value
+                    if self.isLoaded == true {
+                        self._view.update(locked: self._isLocked)
+                    }
+                    self.triggeredChangeStyle(false)
+                }
+            }
+            get { return self._isLocked }
+        }
         public var color: UI.Color? = nil {
             didSet(oldValue) {
                 guard self.color != oldValue else { return }
@@ -178,6 +197,19 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var onAppear: ((UI.View.Scroll) -> Void)?
+        public var onDisappear: ((UI.View.Scroll) -> Void)?
+        public var onVisible: ((UI.View.Scroll) -> Void)?
+        public var onVisibility: ((UI.View.Scroll) -> Void)?
+        public var onInvisible: ((UI.View.Scroll) -> Void)?
+        public var onChangeStyle: ((UI.View.Scroll, Bool) -> Void)?
+        public var onTriggeredRefresh: ((UI.View.Scroll) -> Void)?
+        public var onBeginDragging: ((UI.View.Scroll) -> Void)?
+        public var onDragging: ((UI.View.Scroll) -> Void)?
+        public var onEndDragging: ((UI.View.Scroll, Bool) -> Void)?
+        public var onBeginDecelerating: ((UI.View.Scroll) -> Void)?
+        public var onEndDecelerating: ((UI.View.Scroll) -> Void)?
+        public var onScrollToTop: ((UI.View.Scroll) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
@@ -186,19 +218,11 @@ public extension UI.View {
         private var _contentOffset: PointFloat = .zero
         private var _refreshColor: UI.Color?
         private var _isRefreshing: Bool = false
+        private var _isLocked: Bool = false
         private var _observer: Observer< IUIScrollViewObserver >
-        private var _onAppear: ((UI.View.Scroll) -> Void)?
-        private var _onDisappear: ((UI.View.Scroll) -> Void)?
-        private var _onVisible: ((UI.View.Scroll) -> Void)?
-        private var _onVisibility: ((UI.View.Scroll) -> Void)?
-        private var _onInvisible: ((UI.View.Scroll) -> Void)?
-        private var _onTriggeredRefresh: ((UI.View.Scroll) -> Void)?
-        private var _onBeginScrolling: ((UI.View.Scroll) -> Void)?
-        private var _onScrolling: ((UI.View.Scroll) -> Void)?
-        private var _onEndScrolling: ((UI.View.Scroll, Bool) -> Void)?
-        private var _onBeginDecelerating: ((UI.View.Scroll) -> Void)?
-        private var _onEndDecelerating: ((UI.View.Scroll) -> Void)?
-        private var _onScrollToTop: ((UI.View.Scroll) -> Void)?
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             _ content: IUILayout
@@ -220,7 +244,7 @@ public extension UI.View {
         }
         
         deinit {
-            self._reuse.destroy()
+            self._destroy()
         }
         
         public func loadIfNeeded() {
@@ -240,28 +264,32 @@ public extension UI.View {
         }
         
         public func appear(to layout: IUILayout) {
-            self.layout = layout
-            self._onAppear?(self)
+            self.appearedLayout = layout
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
-            self.layout = nil
-            self._onDisappear?(self)
+            self.appearedLayout = nil
+            self.onDisappear?(self)
         }
         
         public func visible() {
             self.isVisible = true
-            self._onVisible?(self)
+            self.onVisible?(self)
         }
         
         public func visibility() {
-            self._onVisibility?(self)
+            self.onVisibility?(self)
         }
         
         public func invisible() {
             self.isVisible = false
-            self._onInvisible?(self)
+            self.onInvisible?(self)
+        }
+        
+        public func triggeredChangeStyle(_ userInteraction: Bool) {
+            self.onChangeStyle?(self, userInteraction)
         }
         
         public func add(observer: IUIScrollViewObserver) {
@@ -270,79 +298,6 @@ public extension UI.View {
         
         public func remove(observer: IUIScrollViewObserver) {
             self._observer.remove(observer)
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisible(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onVisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisibility(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onVisibility = value
-            return self
-        }
-        
-        @discardableResult
-        public func onInvisible(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onInvisible = value
-            return self
-        }
-        
-        @available(iOS 10.0, *)
-        @discardableResult
-        public func onTriggeredRefresh(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onTriggeredRefresh = value
-            return self
-        }
-        
-        @discardableResult
-        public func onBeginScrolling(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onBeginScrolling = value
-            return self
-        }
-        
-        @discardableResult
-        public func onScrolling(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onScrolling = value
-            return self
-        }
-        
-        @discardableResult
-        public func onEndScrolling(_ value: ((UI.View.Scroll, Bool) -> Void)?) -> Self {
-            self._onEndScrolling = value
-            return self
-        }
-        
-        @discardableResult
-        public func onBeginDecelerating(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onBeginDecelerating = value
-            return self
-        }
-        
-        @discardableResult
-        public func onEndDecelerating(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onEndDecelerating = value
-            return self
-        }
-        
-        @discardableResult
-        public func onScrollToTop(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
-            self._onScrollToTop = value
-            return self
         }
         
     }
@@ -407,7 +362,6 @@ public extension UI.View.Scroll {
     
 #if os(iOS)
     
-    @available(iOS 10.0, *)
     @inlinable
     @discardableResult
     func refreshColor(_ value: UI.Color?) -> Self {
@@ -421,12 +375,107 @@ public extension UI.View.Scroll {
 
 public extension UI.View.Scroll {
     
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onVisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onVisibility = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onInvisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChangeStyle(_ value: ((UI.View.Scroll, Bool) -> Void)?) -> Self {
+        self.onChangeStyle = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTriggeredRefresh(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onTriggeredRefresh = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginDragging(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onBeginDragging = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDragging(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onDragging = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndDragging(_ value: ((UI.View.Scroll, Bool) -> Void)?) -> Self {
+        self.onEndDragging = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginDecelerating(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onBeginDecelerating = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndDecelerating(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onEndDecelerating = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onScrollToTop(_ value: ((UI.View.Scroll) -> Void)?) -> Self {
+        self.onScrollToTop = value
+        return self
+    }
+    
+}
+
+public extension UI.View.Scroll {
+    
     func contentOffset(
         with view: IUIView,
         horizontal: ScrollAlignment,
         vertical: ScrollAlignment
     ) -> PointFloat? {
-        guard let item = view.item else { return nil }
+        guard let item = view.appearedItem else { return nil }
         let contentInset = self.contentInset
         let contentSize = self.contentSize
         let visibleSize = self.bounds.size
@@ -478,7 +527,7 @@ public extension UI.View.Scroll {
         let deltaContentOffset = beginContentOffset.distance(endContentOffset).real.abs
         if animated == true && deltaContentOffset > 0 {
             let velocity = max(self.bounds.width, self.bounds.height) * 5
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(deltaContentOffset / velocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 processing: { [unowned self] progress in
@@ -486,6 +535,7 @@ public extension UI.View.Scroll {
                     self.contentOffset(contentOffset)
                 },
                 completion: { [unowned self] in
+                    self._animation = nil
                     self._scrollToTop()
                     completion?()
                 }
@@ -500,10 +550,15 @@ public extension UI.View.Scroll {
 }
 
 private extension UI.View.Scroll {
+    
+    func _destroy() {
+        self._reuse.destroy()
+        self._animation = nil
+    }
 
     func _scrollToTop() {
-        self._onScrollToTop?(self)
-        self._observer.notify({ $0.scrollToTop(scrollView: self) })
+        self.onScrollToTop?(self)
+        self._observer.notify({ $0.scrollToTop(scroll: self) })
     }
 
 }
@@ -516,46 +571,46 @@ extension UI.View.Scroll : KKScrollViewDelegate {
     }
     
     func triggeredRefresh(_ view: KKScrollView) {
-        self._onTriggeredRefresh?(self)
+        self.onTriggeredRefresh?(self)
     }
     
-    func beginScrolling(_ view: KKScrollView) {
-        if self.isScrolling == false {
-            self.isScrolling = true
-            self._onBeginScrolling?(self)
-            self._observer.notify({ $0.beginScrolling(scrollView: self) })
+    func beginDragging(_ view: KKScrollView) {
+        if self.isDragging == false {
+            self.isDragging = true
+            self.onBeginDragging?(self)
+            self._observer.notify({ $0.beginDragging(scroll: self) })
         }
     }
     
-    func scrolling(_ view: KKScrollView, contentOffset: PointFloat) {
+    func dragging(_ view: KKScrollView, contentOffset: PointFloat) {
         if self._contentOffset != contentOffset {
             self._contentOffset = contentOffset
-            self._onScrolling?(self)
-            self._observer.notify({ $0.scrolling(scrollView: self) })
+            self.onDragging?(self)
+            self._observer.notify({ $0.dragging(scroll: self) })
         }
     }
     
-    func endScrolling(_ view: KKScrollView, decelerate: Bool) {
-        if self.isScrolling == true {
-            self.isScrolling = false
-            self._onEndScrolling?(self, decelerate)
-            self._observer.notify({ $0.endScrolling(scrollView: self, decelerate: decelerate) })
+    func endDragging(_ view: KKScrollView, decelerate: Bool) {
+        if self.isDragging == true {
+            self.isDragging = false
+            self.onEndDragging?(self, decelerate)
+            self._observer.notify({ $0.endDragging(scroll: self, decelerate: decelerate) })
         }
     }
     
     func beginDecelerating(_ view: KKScrollView) {
         if self.isDecelerating == false {
             self.isDecelerating = true
-            self._onBeginDecelerating?(self)
-            self._observer.notify({ $0.beginDecelerating(scrollView: self) })
+            self.onBeginDecelerating?(self)
+            self._observer.notify({ $0.beginDecelerating(scroll: self) })
         }
     }
     
     func endDecelerating(_ view: KKScrollView) {
         if self.isDecelerating == true {
             self.isDecelerating = false
-            self._onEndDecelerating?(self)
-            self._observer.notify({ $0.endDecelerating(scrollView: self) })
+            self.onEndDecelerating?(self)
+            self._observer.notify({ $0.endDecelerating(scroll: self) })
         }
     }
     

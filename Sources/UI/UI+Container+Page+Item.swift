@@ -23,12 +23,12 @@ extension UI.Container.Page {
             insets: InsetFloat = .zero
         ) {
             self.container = container
-            self.barItem = UI.Layout.Item(container.pageItemView)
+            self.barItem = UI.Layout.Item(container.pageItem)
             self.pageItem = UI.Layout.Item(container.view)
         }
         
         func update() {
-            self.barItem = UI.Layout.Item(self.container.pageItemView)
+            self.barItem = UI.Layout.Item(self.container.pageItem)
         }
         
     }

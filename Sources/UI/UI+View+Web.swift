@@ -21,8 +21,8 @@ public extension UI.View {
 
     final class Web : IUIView, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var layout: IUILayout?
-        public unowned var item: UI.Layout.Item?
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -104,20 +104,20 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var onAppear: ((UI.View.Web) -> Void)?
+        public var onDisappear: ((UI.View.Web) -> Void)?
+        public var onVisible: ((UI.View.Web) -> Void)?
+        public var onVisibility: ((UI.View.Web) -> Void)?
+        public var onInvisible: ((UI.View.Web) -> Void)?
+        public var onContentSize: ((UI.View.Web) -> Void)?
+        public var onBeginLoading: ((UI.View.Web) -> Void)?
+        public var onEndLoading: ((UI.View.Web) -> Void)?
+        public var onDecideNavigation: ((UI.View.Web, URLRequest) -> NavigationPolicy)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
             return self._reuse.content()
         }
-        private var _onAppear: ((UI.View.Web) -> Void)?
-        private var _onDisappear: ((UI.View.Web) -> Void)?
-        private var _onVisible: ((UI.View.Web) -> Void)?
-        private var _onVisibility: ((UI.View.Web) -> Void)?
-        private var _onInvisible: ((UI.View.Web) -> Void)?
-        private var _onContentSize: ((UI.View.Web) -> Void)?
-        private var _onBeginLoading: ((UI.View.Web) -> Void)?
-        private var _onEndLoading: ((UI.View.Web) -> Void)?
-        private var _onDecideNavigation: ((UI.View.Web, URLRequest) -> NavigationPolicy)?
         
         public init() {
             self._reuse = UI.Reuse.Item(unloadBehaviour: .whenDestroy)
@@ -149,92 +149,42 @@ public extension UI.View {
         }
         
         public func appear(to layout: IUILayout) {
-            self.layout = layout
-            self._onAppear?(self)
+            self.appearedLayout = layout
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
-            self.layout = nil
-            self._onDisappear?(self)
+            self.appearedLayout = nil
+            self.onDisappear?(self)
         }
         
         public func visible() {
             self.isVisible = true
-            self._onVisible?(self)
+            self.onVisible?(self)
         }
         
         public func visibility() {
-            self._onVisibility?(self)
+            self.onVisibility?(self)
         }
         
         public func invisible() {
             self.isVisible = false
-            self._onInvisible?(self)
+            self.onInvisible?(self)
         }
         
-        public func evaluate< Result >(
-            javaScript: String,
-            success: @escaping (Result) -> Void,
-            failure: @escaping (Error) -> Void
-        ) {
-            self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onVisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisibility(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onVisibility = value
-            return self
-        }
-        
-        @discardableResult
-        public func onInvisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onInvisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onContentSize(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onContentSize = value
-            return self
-        }
-        
-        @discardableResult
-        public func onBeginLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onBeginLoading = value
-            return self
-        }
-        
-        @discardableResult
-        public func onEndLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
-            self._onEndLoading = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDecideNavigation(_ value: ((UI.View.Web, URLRequest) -> NavigationPolicy)?) -> Self {
-            self._onDecideNavigation = value
-            return self
-        }
-        
+    }
+    
+}
+
+public extension UI.View.Web {
+    
+    var canGoBack: Bool {
+        return self._view.canGoBack
+    }
+    
+    var canGoForward: Bool {
+        return self._view.canGoForward
     }
     
 }
@@ -262,6 +212,97 @@ public extension UI.View.Web {
         return self
     }
     
+    @discardableResult
+    func goBack() -> Self {
+        self._view.goBack()
+        return self
+    }
+    
+    @discardableResult
+    func goForward() -> Self {
+        self._view.goForward()
+        return self
+    }
+    
+}
+
+public extension UI.View.Web {
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onVisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onVisibility = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onInvisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onContentSize(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onContentSize = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onBeginLoading = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
+        self.onEndLoading = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(_ value: ((UI.View.Web, URLRequest) -> NavigationPolicy)?) -> Self {
+        self.onDecideNavigation = value
+        return self
+    }
+    
+}
+
+public extension UI.View.Web {
+    
+    func evaluate< Result >(
+        javaScript: String,
+        success: @escaping (Result) -> Void,
+        failure: @escaping (Error) -> Void
+    ) {
+        self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
+    }
+    
 }
 
 extension UI.View.Web : KKWebViewDelegate {
@@ -269,22 +310,22 @@ extension UI.View.Web : KKWebViewDelegate {
     func update(_ view: KKWebView, contentSize: SizeFloat) {
         if self.contentSize != contentSize {
             self.contentSize = contentSize
-            self._onContentSize?(self)
+            self.onContentSize?(self)
         }
     }
     
     func beginLoading(_ view: KKWebView) {
         self.state = .loading
-        self._onBeginLoading?(self)
+        self.onBeginLoading?(self)
     }
     
     func endLoading(_ view: KKWebView, error: Error?) {
         self.state = .loaded(error)
-        self._onEndLoading?(self)
+        self.onEndLoading?(self)
     }
     
     func onDecideNavigation(_ view: KKWebView, request: URLRequest) -> NavigationPolicy {
-        self._onDecideNavigation?(self, request) ?? .allow
+        self.onDecideNavigation?(self, request) ?? .allow
     }
     
 }

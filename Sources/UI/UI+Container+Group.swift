@@ -87,6 +87,9 @@ public extension UI.Container {
         private var _view: UI.View.Custom
         private var _items: [Item]
         private var _current: Item?
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             screen: Screen,
@@ -100,7 +103,7 @@ public extension UI.Container {
 #elseif os(iOS)
             self.animationVelocity = UIScreen.main.animationVelocity
 #endif
-            self._bar = screen.groupBarView
+            self._bar = screen.groupBar
             self._layout = .init(
                 bar: UI.Layout.Item(self._bar),
                 barVisibility: screen.groupBarVisibility,
@@ -117,13 +120,11 @@ public extension UI.Container {
             } else {
                 self._current = self._items.first
             }
-            self._init()
-            UI.Container.BarController.shared.add(observer: self)
+            self._setup()
         }
         
         deinit {
-            UI.Container.BarController.shared.remove(observer: self)
-            self.screen.destroy()
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -216,7 +217,7 @@ public extension UI.Container {
         }
         
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
-            self.bar = self.screen.groupBarView
+            self.bar = self.screen.groupBar
             self.barVisibility = self.screen.groupBarVisibility
             self.barHidden = self.screen.groupBarHidden
             self.didChangeInsets()
@@ -293,8 +294,8 @@ public extension UI.Container {
 
 extension UI.Container.Group : IGroupBarViewDelegate {
     
-    func pressed(groupBar: UI.View.GroupBar, itemView: UI.View.GroupBar.Item) {
-        guard let item = self._items.first(where: { $0.bar === itemView }) else { return }
+    public func pressed(groupBar: UI.View.GroupBar, item: UI.View.GroupBar.Item) {
+        guard let item = self._items.first(where: { $0.bar === item }) else { return }
         if self._current === item {
             _ = self.activate()
         } else {
@@ -310,7 +311,7 @@ extension UI.Container.Group : IUIRootContentContainer {
 extension UI.Container.Group : IUIStackContentContainer where Screen : IUIScreenStackable {
     
     public var stackBar: UI.View.StackBar {
-        return self.screen.stackBarView
+        return self.screen.stackBar
     }
     
     public var stackBarVisibility: Float {
@@ -341,7 +342,7 @@ extension UI.Container.Group : IUIDialogContentContainer where Screen : IUIScree
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     
@@ -360,7 +361,7 @@ extension UI.Container.Group : IContainerBarControllerObserver {
 
 private extension UI.Container.Group {
     
-    func _init() {
+    func _setup() {
         self.screen.container = self
         self._bar.delegate = self
         for item in self._items {
@@ -372,6 +373,17 @@ private extension UI.Container.Group {
             self._layout.state = .idle(current: current.groupItem)
         }
         self.screen.setup()
+        
+        UI.Container.BarController.shared.add(observer: self)
+    }
+    
+    func _destroy() {
+        UI.Container.BarController.shared.remove(observer: self)
+        
+        self.screen.container = nil
+        self.screen.destroy()
+        
+        self._animation = nil
     }
     
     func _set(
@@ -382,19 +394,18 @@ private extension UI.Container.Group {
     ) {
         if animated == true {
             if let current = current, let forward = forward {
-                Animation.default.run(
+                self._animation = Animation.default.run(
                     duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [weak self] progress in
-                        guard let self = self else { return }
+                    processing: { [unowned self] progress in
                         self._layout.state = .forward(current: current.groupItem, next: forward.groupItem, progress: progress)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             forward.container.prepareShow(interactive: false)
                         }
                     },
-                    completion: { [weak self] in
-                        guard let self = self else { return }
+                    completion: { [unowned self] in
+                        self._animation = nil
                         self._bar.selected(forward.bar)
                         self._layout.state = .idle(current: forward.groupItem)
                         if self.isPresented == true {
@@ -507,19 +518,18 @@ private extension UI.Container.Group {
     ) {
         if animated == true {
             if let current = current, let backward = backward {
-                Animation.default.run(
+                self._animation = Animation.default.run(
                     duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [weak self] progress in
-                        guard let self = self else { return }
+                    processing: { [unowned self] progress in
                         self._layout.state = .backward(current: current.groupItem, next: backward.groupItem, progress: progress)
                         if self.isPresented == true {
                             current.container.prepareHide(interactive: false)
                             backward.container.prepareShow(interactive: false)
                         }
                     },
-                    completion: { [weak self] in
-                        guard let self = self else { return }
+                    completion: { [unowned self] in
+                        self._animation = nil
                         self._bar.selected(backward.bar)
                         self._layout.state = .idle(current: backward.groupItem)
                         if self.isPresented == true {

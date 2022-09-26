@@ -104,6 +104,9 @@ public extension UI.Container {
 #endif
             }
         }
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             content: (IUIContainer & IUIContainerParentable)? = nil
@@ -126,7 +129,11 @@ public extension UI.Container {
             self._view.gestures([ self._interactiveGesture ])
 #endif
             self._items = []
-            self._init()
+            self._setup()
+        }
+        
+        deinit {
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -234,7 +241,7 @@ extension UI.Container.Dialog : IUIRootContentContainer {
 
 extension UI.Container.Dialog {
     
-    func _init() {
+    func _setup() {
 #if os(iOS)
         self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let content = self.content else { return true }
@@ -258,6 +265,10 @@ extension UI.Container.Dialog {
         self.content?.parent = self
     }
     
+    func _destroy() {
+        self._animation = nil
+    }
+    
     func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
             self._dismiss(dialog: current, animated: animated, completion: { [weak self] in
@@ -277,18 +288,17 @@ extension UI.Container.Dialog {
             dialog.container.prepareShow(interactive: false)
             if animated == true {
                 let size = self._layout._size(dialog: dialog, size: dialogSize)
-                Animation.default.run(
+                self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [weak self] progress in
-                        guard let self = self else { return }
+                    processing: { [unowned self] progress in
                         self._layout.state = .present(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [weak self] in
-                        guard let self = self else { return }
-                        dialog.container.finishShow(interactive: false)
+                    completion: { [unowned self] in
+                        self._animation = nil
                         self._layout.state = .idle
+                        dialog.container.finishShow(interactive: false)
 #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
@@ -335,19 +345,18 @@ extension UI.Container.Dialog {
             dialog.container.prepareHide(interactive: false)
             if animated == true {
                 let size = self._layout._size(dialog: dialog, size: dialogSize)
-                Animation.default.run(
+                self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [weak self] progress in
-                        guard let self = self else { return }
+                    processing: { [unowned self] progress in
                         self._layout.state = .dismiss(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [weak self] in
-                        guard let self = self else { return }
-                        dialog.container.finishHide(interactive: false)
+                    completion: { [unowned self] in
+                        self._animation = nil
                         self._layout.state = .idle
                         self._layout.dialogItem = nil
+                        dialog.container.finishHide(interactive: false)
 #if os(iOS)
                         self.setNeedUpdateOrientations()
                         self.setNeedUpdateStatusBar()
@@ -411,18 +420,16 @@ private extension UI.Container.Dialog {
         let baseProgress = self._layout._progress(dialog: dialogItem, size: dialogSize, delta: deltaLocation)
         if offset > self.interactiveLimit {
             let viewAlphable = self._layout.dialogItem?.container.view as? IUIViewAlphable
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(size / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     if let view = viewAlphable {
                         view.alpha(progress.invert.value)
                     }
                     self._layout.state = .dismiss(progress: baseProgress + progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     if let view = viewAlphable {
                         view.alpha(1)
                     }
@@ -430,15 +437,13 @@ private extension UI.Container.Dialog {
                 }
             )
         } else {
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval((size * abs(baseProgress.value)) / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .dismiss(progress: baseProgress * progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     self._cancelInteractiveAnimation()
                 }
             )
@@ -486,6 +491,7 @@ private extension UI.Container.Dialog {
         self._interactiveBeginLocation = nil
         self._interactiveDialogItem = nil
         self._interactiveDialogSize = nil
+        self._animation = nil
     }
     
 }

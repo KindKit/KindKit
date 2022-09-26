@@ -38,14 +38,15 @@ final class KKSwitchView : UIView {
     unowned var kkDelegate: KKSwitchViewDelegate?
     
     private unowned var _view: UI.View.Switch?
-    private var _switch: UISwitch!
+    private var _switch: UISwitch
     
     override init(frame: CGRect) {
+        self._switch = UISwitch()
+        
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self._switch = UISwitch()
         self._switch.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
         self.addSubview(self._switch)
     }

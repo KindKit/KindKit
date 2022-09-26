@@ -12,6 +12,15 @@ public extension UI.Screen.Modal.Presentation {
         public let background: IUIView & IUIViewAlphable
         
         public init(
+            _ background: IUIView & IUIViewAlphable
+        ) {
+            self.init(
+                inset: .zero,
+                background: background
+            )
+        }
+        
+        public init(
             inset: InsetFloat,
             background: IUIView & IUIViewAlphable
         ) {

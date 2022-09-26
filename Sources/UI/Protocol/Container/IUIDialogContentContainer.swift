@@ -34,7 +34,7 @@ public protocol IUIDialogContentContainer : IUIContainer, IUIContainerParentable
     var dialogWidth: DialogContentContainerSize { get }
     var dialogHeight: DialogContentContainerSize { get }
     var dialogAlignment: DialogContentContainerAlignment { get }
-    var dialogBackgroundView: (IUIView & IUIViewAlphable)? { get }
+    var dialogBackground: (IUIView & IUIViewAlphable)? { get }
     
 }
 

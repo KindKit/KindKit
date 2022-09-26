@@ -49,6 +49,19 @@ final class KKSegmentedView : UISegmentedControl {
         }
         get { return super.frame }
     }
+    var items: [UI.View.Segmented.Item] = [] {
+        willSet {
+            self.removeAllSegments()
+        }
+        didSet {
+            for item in self.items {
+                switch item {
+                case .string(let string): self.insertSegment(withTitle: string, at: self.numberOfSegments, animated: false)
+                case .image(let image): self.insertSegment(with: image.native, at: self.numberOfSegments, animated: false)
+                }
+            }
+        }
+    }
     
     private unowned var _view: UI.View.Segmented?
     
@@ -71,7 +84,7 @@ extension KKSegmentedView {
     func update(view: UI.View.Segmented) {
         self._view = view
         self.update(items: view.items)
-        self.update(items: view.items, selected: view.selected)
+        self.update(selected: view.selected)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -82,24 +95,18 @@ extension KKSegmentedView {
     }
     
     func update(items: [UI.View.Segmented.Item]) {
-        self.removeAllSegments()
-        for item in items {
-            switch item {
-            case .string(let string): self.insertSegment(withTitle: string, at: self.numberOfSegments - 1, animated: false)
-            case .image(let image): self.insertSegment(with: image.native, at: self.numberOfSegments - 1, animated: false)
-            }
-        }
+        self.items = items
     }
     
-    func update(items: [UI.View.Segmented.Item], selected: UI.View.Segmented.Item?) {
+    func update(selected: UI.View.Segmented.Item?) {
         if let selected = selected {
-            if let index = items.firstIndex(of: selected) {
-                self.selectedSegmentIndex = index
+            if let index = self.items.firstIndex(of: selected) {
+                self._update(selected: index)
             } else {
-                self.selectedSegmentIndex = Self.noSegment
+                self._update(selected: Self.noSegment)
             }
         } else {
-            self.selectedSegmentIndex = Self.noSegment
+            self._update(selected: Self.noSegment)
         }
     }
     
@@ -111,6 +118,17 @@ extension KKSegmentedView {
 }
 
 private extension KKSegmentedView {
+    
+    func _update(selected: Int) {
+        if self.superview == nil {
+            UIView.performWithoutAnimation({
+                self.selectedSegmentIndex = selected
+                self.layoutIfNeeded()
+            })
+        } else {
+            self.selectedSegmentIndex = selected
+        }
+    }
     
     @objc
     func _changed(_ sender: Any) {

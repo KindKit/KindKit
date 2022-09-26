@@ -16,8 +16,8 @@ public extension UI.View {
 
     final class Stepper : IUIView, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
             
-        public private(set) unowned var layout: IUILayout?
-        public unowned var item: UI.Layout.Item?
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -127,6 +127,13 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var onAppear: ((UI.View.Stepper) -> Void)?
+        public var onDisappear: ((UI.View.Stepper) -> Void)?
+        public var onVisible: ((UI.View.Stepper) -> Void)?
+        public var onVisibility: ((UI.View.Stepper) -> Void)?
+        public var onInvisible: ((UI.View.Stepper) -> Void)?
+        public var onChangeStyle: ((UI.View.Stepper, Bool) -> Void)?
+        public var onChangeValue: ((UI.View.Stepper) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
@@ -134,13 +141,6 @@ public extension UI.View {
         }
         private var _isLocked: Bool = false
         private var _value: Float = 0
-        private var _onAppear: ((UI.View.Stepper) -> Void)?
-        private var _onDisappear: ((UI.View.Stepper) -> Void)?
-        private var _onVisible: ((UI.View.Stepper) -> Void)?
-        private var _onVisibility: ((UI.View.Stepper) -> Void)?
-        private var _onInvisible: ((UI.View.Stepper) -> Void)?
-        private var _onChangeStyle: ((UI.View.Stepper, Bool) -> Void)?
-        private var _onChangeValue: ((UI.View.Stepper) -> Void)?
         
         public init() {
             self._reuse = UI.Reuse.Item()
@@ -172,74 +172,32 @@ public extension UI.View {
         }
         
         public func appear(to layout: IUILayout) {
-            self.layout = layout
-            self._onAppear?(self)
+            self.appearedLayout = layout
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
-            self.layout = nil
-            self._onDisappear?(self)
+            self.appearedLayout = nil
+            self.onDisappear?(self)
         }
         
         public func visible() {
             self.isVisible = true
-            self._onVisible?(self)
+            self.onVisible?(self)
         }
         
         public func visibility() {
-            self._onVisibility?(self)
+            self.onVisibility?(self)
         }
         
         public func invisible() {
             self.isVisible = false
-            self._onInvisible?(self)
+            self.onInvisible?(self)
         }
         
         public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self._onChangeStyle?(self, userInteraction)
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisible(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onVisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisibility(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onVisibility = value
-            return self
-        }
-        
-        @discardableResult
-        public func onInvisible(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onInvisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onChangeStyle(_ value: ((UI.View.Stepper, Bool) -> Void)?) -> Self {
-            self._onChangeStyle = value
-            return self
-        }
-        
-        @discardableResult
-        public func onChangeValue(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
-            self._onChangeValue = value
-            return self
+            self.onChangeStyle?(self, userInteraction)
         }
         
     }
@@ -292,11 +250,64 @@ public extension UI.View.Stepper {
     
 }
 
+public extension UI.View.Stepper {
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onVisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onVisibility = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onInvisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChangeStyle(_ value: ((UI.View.Stepper, Bool) -> Void)?) -> Self {
+        self.onChangeStyle = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChangeValue(_ value: ((UI.View.Stepper) -> Void)?) -> Self {
+        self.onChangeValue = value
+        return self
+    }
+    
+}
+
 extension UI.View.Stepper : KKStepperViewDelegate {
     
     func changed(_ view: KKStepperView, value: Float) {
         self._value = value
-        self._onChangeValue?(self)
+        self.onChangeValue?(self)
     }
     
 }

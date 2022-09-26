@@ -13,7 +13,7 @@ extension LogUI {
         
         var container: IUIContainer?
         
-        private(set) lazy var stackBarView = UI.View.StackBar(configure: {
+        private(set) lazy var stackBar = UI.View.StackBar(configure: {
             $0.inset = .init(horizontal: 12, vertical: 8)
             $0.leadings = [ self._autoScrollButton ]
             $0.leadingsSpacing = 4
@@ -35,7 +35,7 @@ extension LogUI {
                 $0.indicatorDirection = .vertical
                 $0.color = .white
             }
-        ).onBeginScrolling({ [unowned self] _ in
+        ).onBeginDragging({ [unowned self] _ in
             self._autoScrollButton.isSelected = false
         })
         

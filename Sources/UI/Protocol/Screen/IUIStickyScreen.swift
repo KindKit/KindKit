@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIStickyScreen : IUIScreen {
     
-    var stickyView: UI.View.Bar { get }
+    var sticky: UI.View.Bar { get }
     var stickyVisibility: Float { get }
     var stickyHidden: Bool { get }
     

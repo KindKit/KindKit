@@ -60,6 +60,9 @@ public extension UI.Layout {
         private var _operations: [Helper.Operation]
         private var _cache: [SizeFloat?]
         private var _firstVisible: Int?
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
 
         public init(
             direction: Direction,
@@ -95,108 +98,12 @@ public extension UI.Layout {
             )
         }
         
-        public func contains(view: IUIView) -> Bool {
-            guard let item = view.item else { return false }
-            return self.contains(item: item)
-        }
-        
-        public func contains(item: UI.Layout.Item) -> Bool {
-            return self.items.contains(where: { $0 === item })
-        }
-        
-        public func index(view: IUIView) -> Int? {
-            guard let item = view.item else { return nil }
-            return self.index(item: item)
-        }
-        
-        public func index(item: UI.Layout.Item) -> Int? {
-            return self.items.firstIndex(where: { $0 === item })
-        }
-        
-        public func indices(items: [UI.Layout.Item]) -> [Int] {
-            return items.compactMap({ item in self.items.firstIndex(where: { $0 === item }) })
-        }
-        
-        public func animate(
-            delay: TimeInterval = 0,
-            duration: TimeInterval,
-            ease: IAnimationEase = Animation.Ease.Linear(),
-            perform: @escaping (_ layout: UI.Layout.List) -> Void,
-            completion: (() -> Void)? = nil
-        ) {
-            let animation = AnimationContext(delay: delay, duration: duration, ease: ease, perform: perform, completion: completion)
-            self._animations.append(animation)
-            if self._animations.count == 1 {
-                self._animate(animation: animation)
-            }
-        }
-        
-        public func insert(index: Int, items: [UI.Layout.Item]) {
-            let safeIndex = max(0, min(index, self._items.count))
-            self._items.insert(contentsOf: items, at: safeIndex)
-            self._cache.insert(contentsOf: Array< SizeFloat? >(repeating: nil, count: items.count), at: safeIndex)
-            self._firstVisible = nil
-            if self._animations.isEmpty == false {
-                self._operations.append(Helper.Operation(
-                    type: .insert,
-                    indices: Array(range: safeIndex ..< safeIndex + items.count),
-                    progress: .zero
-                ))
-            } else {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func insert(index: Int, views: [IUIView]) {
-            self.insert(
-                index: index,
-                items: views.compactMap({ return UI.Layout.Item($0) })
-            )
-        }
-        
-        public func delete(range: Range< Int >) {
-            self._firstVisible = nil
-            if self._animations.isEmpty == false {
-                self._operations.append(Helper.Operation(
-                    type: .delete,
-                    indices: Array(range: range),
-                    progress: .zero
-                ))
-            } else {
-                self._items.removeSubrange(range)
-                self._cache.removeSubrange(range)
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func delete(items: [UI.Layout.Item]) {
-            let indices = items.compactMap({ item in self.items.firstIndex(where: { $0 === item }) }).sorted()
-            if indices.count > 0 {
-                self._firstVisible = nil
-                if self._animations.isEmpty == false {
-                    self._operations.append(Helper.Operation(
-                        type: .delete,
-                        indices: indices,
-                        progress: .zero
-                    ))
-                } else {
-                    for index in indices.reversed() {
-                        self._items.remove(at: index)
-                        self._cache.remove(at: index)
-                    }
-                    self.setNeedForceUpdate()
-                }
-            }
-        }
-        
-        public func delete(views: [IUIView]) {
-            self.delete(
-                items: views.compactMap({ return $0.item })
-            )
+        deinit {
+            self._destroy()
         }
         
         public func invalidate(item: UI.Layout.Item) {
-            if let index = self._items.firstIndex(where: { $0 === item }) {
+            if let index = self._items.firstIndex(of: item) {
                 self._cache[index] = nil
             }
         }
@@ -227,6 +134,9 @@ public extension UI.Layout {
         }
         
         public func items(bounds: RectFloat) -> [UI.Layout.Item] {
+            guard bounds.size.isZero == false else {
+                return []
+            }
             guard let firstVisible = self._visibleIndex(bounds: bounds) else {
                 return []
             }
@@ -248,7 +158,115 @@ public extension UI.Layout {
     
 }
 
+public extension UI.Layout.List {
+    
+    func contains(view: IUIView) -> Bool {
+        guard let item = view.appearedItem else { return false }
+        return self.contains(item: item)
+    }
+    
+    func contains(item: UI.Layout.Item) -> Bool {
+        return self.items.contains(item)
+    }
+    
+    func index(view: IUIView) -> Int? {
+        guard let item = view.appearedItem else { return nil }
+        return self.index(item: item)
+    }
+    
+    func index(item: UI.Layout.Item) -> Int? {
+        return self.items.firstIndex(of: item)
+    }
+    
+    func indices(items: [UI.Layout.Item]) -> [Int] {
+        return items.compactMap({ item in self.items.firstIndex(of: item) }).sorted()
+    }
+    
+    func animate(
+        delay: TimeInterval = 0,
+        duration: TimeInterval,
+        ease: IAnimationEase = Animation.Ease.Linear(),
+        perform: @escaping (_ layout: UI.Layout.List) -> Void,
+        completion: (() -> Void)? = nil
+    ) {
+        let animation = AnimationContext(delay: delay, duration: duration, ease: ease, perform: perform, completion: completion)
+        self._animations.append(animation)
+        if self._animations.count == 1 {
+            self._animate(animation: animation)
+        }
+    }
+    
+    func insert(index: Int, items: [UI.Layout.Item]) {
+        let safeIndex = max(0, min(index, self._items.count))
+        self._items.insert(contentsOf: items, at: safeIndex)
+        self._cache.insert(contentsOf: Array< SizeFloat? >(repeating: nil, count: items.count), at: safeIndex)
+        self._firstVisible = nil
+        if self._animations.isEmpty == false {
+            self._operations.append(Helper.Operation(
+                type: .insert,
+                indices: Array(range: safeIndex ..< safeIndex + items.count),
+                progress: .zero
+            ))
+        } else {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func insert(index: Int, views: [IUIView]) {
+        self.insert(
+            index: index,
+            items: views.compactMap({ return UI.Layout.Item($0) })
+        )
+    }
+    
+    func delete(range: Range< Int >) {
+        self._firstVisible = nil
+        if self._animations.isEmpty == false {
+            self._operations.append(Helper.Operation(
+                type: .delete,
+                indices: Array(range: range),
+                progress: .zero
+            ))
+        } else {
+            self._items.removeSubrange(range)
+            self._cache.removeSubrange(range)
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func delete(items: [UI.Layout.Item]) {
+        let indices = self.indices(items: items)
+        if indices.count > 0 {
+            self._firstVisible = nil
+            if self._animations.isEmpty == false {
+                self._operations.append(Helper.Operation(
+                    type: .delete,
+                    indices: indices,
+                    progress: .zero
+                ))
+            } else {
+                for index in indices.reversed() {
+                    self._items.remove(at: index)
+                    self._cache.remove(at: index)
+                }
+                self.setNeedForceUpdate()
+            }
+        }
+    }
+    
+    func delete(views: [IUIView]) {
+        self.delete(
+            items: views.compactMap({ return $0.appearedItem })
+        )
+    }
+    
+}
+
 private extension UI.Layout.List {
+    
+    func _destroy() {
+        self._animation = nil
+    }
     
     @inline(__always)
     func _visibleIndex(bounds: RectFloat) -> Int? {
@@ -302,7 +320,7 @@ private extension UI.Layout.List {
     func _animate(animation: AnimationContext) {
         self.isAnimating = true
         animation.perform(self)
-        Animation.default.run(
+        self._animation = Animation.default.run(
             delay: animation.delay,
             duration: animation.duration,
             ease: animation.ease,
@@ -330,6 +348,7 @@ private extension UI.Layout.List {
                     self._animations.remove(at: index)
                 }
                 if self._animations.isEmpty == true {
+                    self._animation = nil
                     self.isAnimating = false
                 }
                 self.setNeedForceUpdate()

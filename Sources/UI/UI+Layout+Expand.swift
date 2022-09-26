@@ -29,19 +29,16 @@ public extension UI.Layout {
             didSet { self.setNeedForceUpdate(item: self.detailItem) }
         }
         public var isAnimating: Bool {
-            return self._animationTask != nil
+            return self._animation != nil
         }
         
         private var _contentSize: SizeFloat?
         private var _detailSize: SizeFloat?
-        private var _state: State {
+        private var _state: State = .collapsed {
             didSet { self.setNeedForceUpdate() }
         }
-        private var _animationTask: IAnimationTask? {
-            willSet {
-                guard let animationTask = self._animationTask else { return }
-                animationTask.cancel()
-            }
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
         }
         
         public init(
@@ -56,7 +53,10 @@ public extension UI.Layout {
             self.detailInset = detailInset
             self.detailView = detailView
             self.detailItem = UI.Layout.Item(detailView)
-            self._state = .collapsed
+        }
+        
+        deinit {
+            self._destroy()
         }
         
         public func collapse(
@@ -64,7 +64,7 @@ public extension UI.Layout {
             ease: IAnimationEase = Animation.Ease.Linear(),
             completion: (() -> Void)? = nil
         ) {
-            self._animationTask = Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: duration,
                 ease: ease,
                 processing: { [unowned self] progress in
@@ -72,8 +72,8 @@ public extension UI.Layout {
                     self.updateIfNeeded()
                 },
                 completion: { [unowned self] in
+                    self._animation = nil
                     self._state = .collapsed
-                    self._animationTask = nil
                     self.setNeedForceUpdate()
                     self.updateIfNeeded()
                     completion?()
@@ -86,7 +86,7 @@ public extension UI.Layout {
             ease: IAnimationEase = Animation.Ease.Linear(),
             completion: (() -> Void)? = nil
         ) {
-            self._animationTask = Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: duration,
                 ease: ease,
                 processing: { [unowned self] progress in
@@ -94,8 +94,8 @@ public extension UI.Layout {
                     self.updateIfNeeded()
                 },
                 completion: { [unowned self] in
+                    self._animation = nil
                     self._state = .expanded
-                    self._animationTask = nil
                     self.setNeedForceUpdate()
                     self.updateIfNeeded()
                     completion?()
@@ -104,9 +104,9 @@ public extension UI.Layout {
         }
         
         public func invalidate(item: UI.Layout.Item) {
-            if self.contentItem === item {
+            if self.contentItem == item {
                 self._contentSize = nil
-            } else if self.detailItem === item {
+            } else if self.detailItem == item {
                 self._detailSize = nil
             }
         }
@@ -210,6 +210,14 @@ public extension UI.Layout {
             }
         }
         
+    }
+    
+}
+
+private extension UI.Layout.Expand {
+    
+    func _destroy() {
+        self._animation = nil
     }
     
 }

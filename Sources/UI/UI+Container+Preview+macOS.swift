@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-#if os(macOS) && canImport(SwiftUI)
+#if os(macOS) && canImport(SwiftUI) && DEBUG
 
 import AppKit
 import SwiftUI

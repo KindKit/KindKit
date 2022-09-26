@@ -11,7 +11,20 @@ extension UI.Container.Modal {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State = .empty {
-            didSet { self.setNeedUpdate() }
+            didSet(oldValue) {
+                guard self.state != oldValue else { return }
+                switch oldValue {
+                case .empty:
+                    break
+                case .idle(let modal):
+                    self._cache[modal.item] = nil
+                case .present(let modal, _):
+                    self._cache[modal.item] = nil
+                case .dismiss(let modal, _):
+                    self._cache[modal.item] = nil
+                }
+                self.setNeedUpdate()
+            }
         }
         var inset: InsetFloat = .zero {
             didSet { self.setNeedUpdate() }
@@ -19,11 +32,16 @@ extension UI.Container.Modal {
         var content: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
+        private var _cache: [UI.Layout.Item : SizeFloat] = [:]
 
         init(
             _ content: UI.Layout.Item?
         ) {
             self.content = content
+        }
+        
+        public func invalidate(item: UI.Layout.Item) {
+            self._cache[item] = nil
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
@@ -34,55 +52,45 @@ extension UI.Container.Modal {
             case .empty:
                 break
             case .idle(let modal):
-                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
-                    let inset = InsetFloat(
-                        top: self.inset.top + sheetInset.top,
-                        left: sheetInset.left,
-                        right: sheetInset.right,
-                        bottom: sheetInset.bottom
-                    )
-                    modal.item.frame = bounds.inset(inset)
-                    sheetView.alpha = 1
+                let modalInset: InsetFloat
+                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
+                    modalInset = InsetFloat(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
+                    sheet.alpha = 1
                     sheetItem.frame = bounds
                 } else {
-                    modal.item.frame = bounds
+                    modalInset = .zero
                 }
+                let modalBounds = bounds.inset(modalInset)
+                let modalSize = self._size(item: modal.item, available: modalBounds.size)
+                modal.item.frame = Rect(bottom: modalBounds.bottom, size: modalSize)
             case .present(let modal, let progress):
-                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
-                    let inset = InsetFloat(
-                        top: self.inset.top + sheetInset.top,
-                        left: sheetInset.left,
-                        right: sheetInset.right,
-                        bottom: sheetInset.bottom
-                    )
-                    let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
-                    let endRect = bounds.inset(inset)
-                    modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    sheetView.alpha = progress.value
+                let modalInset: InsetFloat
+                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
+                    modalInset = InsetFloat(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
+                    sheet.alpha = progress.value
                     sheetItem.frame = bounds
                 } else {
-                    let beginRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
-                    let endRect = bounds
-                    modal.item.frame = beginRect.lerp(endRect, progress: progress)
+                    modalInset = .zero
                 }
+                let modalBounds = bounds.inset(modalInset)
+                let modalSize = self._size(item: modal.item, available: modalBounds.size)
+                let beginRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
+                let endRect = Rect(bottom: modalBounds.bottom, size: modalSize)
+                modal.item.frame = beginRect.lerp(endRect, progress: progress)
             case .dismiss(let modal, let progress):
-                if let sheetInset = modal.sheetInset, let sheetView = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
-                    let inset = InsetFloat(
-                        top: self.inset.top + sheetInset.top,
-                        left: sheetInset.left,
-                        right: sheetInset.right,
-                        bottom: sheetInset.bottom
-                    )
-                    let beginRect = bounds.inset(inset)
-                    let endRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
-                    modal.item.frame = beginRect.lerp(endRect, progress: progress)
-                    sheetView.alpha = progress.invert.value
+                let modalInset: InsetFloat
+                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
+                    modalInset = InsetFloat(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
+                    sheet.alpha = progress.invert.value
                     sheetItem.frame = bounds
                 } else {
-                    let beginRect = bounds
-                    let endRect = RectFloat(topLeft: bounds.bottomLeft, size: bounds.size)
-                    modal.item.frame = beginRect.lerp(endRect, progress: progress)
+                    modalInset = .zero
                 }
+                let modalBounds = bounds.inset(modalInset)
+                let modalSize = self._size(item: modal.item, available: modalBounds.size)
+                let beginRect = Rect(bottom: modalBounds.bottom, size: modalSize)
+                let endRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
+                modal.item.frame = beginRect.lerp(endRect, progress: progress)
             }
             return bounds.size
         }
@@ -117,6 +125,20 @@ extension UI.Container.Modal {
             return items
         }
         
+    }
+    
+}
+
+private extension UI.Container.Modal.Layout {
+    
+    @inline(__always)
+    func _size(item: UI.Layout.Item, available: SizeFloat) -> SizeFloat {
+        if let cacheSize = self._cache[item] {
+            return cacheSize
+        }
+        let itemSize = item.size(available: available)
+        self._cache[item] = itemSize
+        return itemSize
     }
     
 }

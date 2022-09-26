@@ -18,10 +18,3 @@ public extension IUIHamburgerContentContainer {
     }
     
 }
-
-public protocol IHamburgerMenuContainer : IUIHamburgerContentContainer {
-    
-    var hamburgerSize: Float { get }
-    var hamburgerLimit: Float { get }
-    
-}

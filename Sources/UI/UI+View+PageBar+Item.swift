@@ -6,7 +6,7 @@ import Foundation
 
 protocol IPageBarItemViewDelegate : AnyObject {
     
-    func pressed(_ itemView: UI.View.PageBar.Item)
+    func pressed(_ item: UI.View.PageBar.Item)
     
 }
 
@@ -35,10 +35,10 @@ public extension UI.View.PageBar {
             }
             get { return self._isSelected }
         }
-        public private(set) var body: UI.View.Custom
+        public let tapGesture = UI.Gesture.Tap()
+        public let body: UI.View.Custom
         
         private var _layout: UI.View.PageBar.Item.Layout
-        private var _tapGesture = UI.Gesture.Tap()
         private var _isSelected: Bool = false
         
         public init(
@@ -47,9 +47,9 @@ public extension UI.View.PageBar {
             self.content = content
             self._layout = UI.View.PageBar.Item.Layout(content)
             self.body = UI.View.Custom(self._layout)
-                .gestures([ self._tapGesture ])
+                .gestures([ self.tapGesture ])
                 .shouldHighlighting(true)
-            self._init()
+            self._setup()
         }
         
         public convenience init(
@@ -83,8 +83,8 @@ public extension UI.View.PageBar.Item {
 
 private extension UI.View.PageBar.Item {
     
-    func _init() {
-        self._tapGesture.onTriggered({ [weak self] _ in
+    func _setup() {
+        self.tapGesture.onTriggered({ [weak self] _ in
             guard let self = self else { return }
             self.delegate?.pressed(self)
         })

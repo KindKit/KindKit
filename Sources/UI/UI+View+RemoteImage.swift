@@ -36,12 +36,12 @@ public extension UI.View {
         public private(set) var loader: KindKit.RemoteImage.Loader
         public var query: IRemoteImageQuery
         public var filter: IRemoteImageFilter?
-        public private(set) var body: UI.View.Custom
+        public let body: UI.View.Custom
+        public var onProgress: ((UI.View.RemoteImage, Float) -> Void)?
+        public var onFinish: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?
+        public var onError: ((UI.View.RemoteImage, Error) -> Void)?
         
         private var _layout: Layout
-        private var _onProgress: ((UI.View.RemoteImage, Float) -> Void)?
-        private var _onFinish: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?
-        private var _onError: ((UI.View.RemoteImage, Error) -> Void)?
         
         public init(
             loader: KindKit.RemoteImage.Loader = .shared,
@@ -76,24 +76,6 @@ public extension UI.View {
         @discardableResult
         public func stopLoading() -> Self {
             self._stop()
-            return self
-        }
-        
-        @discardableResult
-        public func onProgress(_ value: ((UI.View.RemoteImage, Float) -> Void)?) -> Self {
-            self._onProgress = value
-            return self
-        }
-        
-        @discardableResult
-        public func onFinish(_ value: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?) -> Self {
-            self._onFinish = value
-            return self
-        }
-        
-        @discardableResult
-        public func onError(_ value: ((UI.View.RemoteImage, Error) -> Void)?) -> Self {
-            self._onError = value
             return self
         }
         
@@ -140,6 +122,31 @@ public extension UI.View.RemoteImage {
     
 }
 
+public extension UI.View.RemoteImage {
+    
+    @inlinable
+    @discardableResult
+    func onProgress(_ value: ((UI.View.RemoteImage, Float) -> Void)?) -> Self {
+        self.onProgress = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(_ value: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?) -> Self {
+        self.onFinish = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError(_ value: ((UI.View.RemoteImage, Error) -> Void)?) -> Self {
+        self.onError = value
+        return self
+    }
+    
+}
+
 private extension UI.View.RemoteImage {
     
     func _start() {
@@ -164,160 +171,11 @@ private extension UI.View.RemoteImage {
 
 }
 
-private extension UI.View.RemoteImage {
-    
-    final class Layout : IUILayout {
-        
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
-        var state: State = .loading {
-            didSet(oldValue) {
-                guard self.state != oldValue else { return }
-                self.setNeedForceUpdate()
-            }
-        }
-        var placeholder: UI.Layout.Item? {
-            didSet { self.setNeedForceUpdate(item: self.placeholder) }
-        }
-        var image: UI.Layout.Item? {
-            didSet { self.setNeedForceUpdate(item: self.image) }
-        }
-        var progress: UI.Layout.Item? {
-            didSet { self.setNeedForceUpdate(item: self.progress) }
-        }
-        var error: UI.Layout.Item? {
-            didSet { self.setNeedForceUpdate(item: self.error) }
-        }
-
-        init() {
-        }
-        
-        func layout(bounds: RectFloat) -> SizeFloat {
-            switch self.state {
-            case .loading:
-                let placeholderSize: SizeFloat
-                if let placeholder = self.placeholder {
-                    placeholderSize = placeholder.size(available: bounds.size)
-                    placeholder.frame = RectFloat(center: bounds.center, size: placeholderSize)
-                } else {
-                    placeholderSize = .zero
-                }
-                if let progress = self.progress {
-                    let progressSize = progress.size(available: bounds.size)
-                    progress.frame = RectFloat(center: bounds.center, size: progressSize)
-                    return Size(
-                        width: max(progressSize.width, placeholderSize.height),
-                        height: max(progressSize.height, placeholderSize.height)
-                    )
-                }
-                return placeholderSize
-            case .loaded:
-                if let image = self.image {
-                    let imageSize = image.size(available: bounds.size)
-                    image.frame = RectFloat(center: bounds.center, size: imageSize)
-                    return imageSize
-                } else if let placeholder = self.placeholder {
-                    let placeholderSize = placeholder.size(available: bounds.size)
-                    placeholder.frame = RectFloat(center: bounds.center, size: placeholderSize)
-                    return placeholderSize
-                }
-                return .zero
-            case .error:
-                if let error = self.error {
-                    let errorSize = error.size(available: bounds.size)
-                    error.frame = RectFloat(center: bounds.center, size: errorSize)
-                    return errorSize
-                } else if let placeholder = self.placeholder {
-                    let placeholderSize = placeholder.size(available: bounds.size)
-                    placeholder.frame = RectFloat(center: bounds.center, size: placeholderSize)
-                    return placeholderSize
-                }
-                return .zero
-            }
-        }
-        
-        func size(available: SizeFloat) -> SizeFloat {
-            switch self.state {
-            case .loading:
-                let placeholderSize: SizeFloat
-                if let placeholder = self.placeholder {
-                    placeholderSize = placeholder.size(available: available)
-                } else {
-                    placeholderSize = .zero
-                }
-                if let progress = self.progress {
-                    let progressSize = progress.size(available: available)
-                    return Size(
-                        width: max(progressSize.width, placeholderSize.height),
-                        height: max(progressSize.height, placeholderSize.height)
-                    )
-                }
-                return placeholderSize
-            case .loaded:
-                if let image = self.image {
-                    return image.size(available: available)
-                } else if let placeholder = self.placeholder {
-                    return placeholder.size(available: available)
-                }
-                return .zero
-            case .error:
-                if let error = self.error {
-                    return error.size(available: available)
-                } else if let placeholder = self.placeholder {
-                    return placeholder.size(available: available)
-                }
-                return .zero
-            }
-        }
-        
-        func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            switch self.state {
-            case .loading:
-                if let placeholder = self.placeholder {
-                    if let progress = self.progress {
-                        return [ placeholder, progress ]
-                    }
-                } else if let progress = self.progress {
-                    return [ progress ]
-                }
-
-            case .loaded:
-                if let image = self.image {
-                    return [ image ]
-                }
-                if let placeholder = self.placeholder {
-                    return [ placeholder ]
-                }
-            case .error:
-                if let error = self.error {
-                    return [ error ]
-                }
-            }
-            if let placeholder = self.placeholder {
-                return [ placeholder ]
-            }
-            return []
-        }
-        
-    }
-    
-}
-
-private extension UI.View.RemoteImage.Layout {
-    
-    enum State {
-        case loading
-        case loaded
-        case error
-    }
-    
-}
-
 extension UI.View.RemoteImage : IRemoteImageTarget {
     
     public func remoteImage(progress: Float) {
         self.progress?.progress(progress)
-        self._onProgress?(self, progress)
+        self.onProgress?(self, progress)
     }
     
     public func remoteImage(image: UI.Image) {
@@ -325,7 +183,7 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
         self._layout.state = .loaded
         
         let imageView: UI.View.Image
-        if let onFinish = self._onFinish {
+        if let onFinish = self.onFinish {
             imageView = onFinish(self, image)
         } else {
             imageView = UI.View.Image(image)
@@ -336,7 +194,7 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
     public func remoteImage(error: Error) {
         self.isLoading = false
         self._layout.state = .error
-        self._onError?(self, error)
+        self.onError?(self, error)
     }
     
 }
