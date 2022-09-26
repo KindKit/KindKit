@@ -100,7 +100,7 @@ public extension UI.Container {
 #elseif os(iOS)
             self.animationVelocity = UIScreen.main.animationVelocity
 #endif
-            self._bar = screen.groupBarView
+            self._bar = screen.groupBar
             self._layout = .init(
                 bar: UI.Layout.Item(self._bar),
                 barVisibility: screen.groupBarVisibility,
@@ -216,7 +216,7 @@ public extension UI.Container {
         }
         
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
-            self.bar = self.screen.groupBarView
+            self.bar = self.screen.groupBar
             self.barVisibility = self.screen.groupBarVisibility
             self.barHidden = self.screen.groupBarHidden
             self.didChangeInsets()
@@ -310,7 +310,7 @@ extension UI.Container.Group : IUIRootContentContainer {
 extension UI.Container.Group : IUIStackContentContainer where Screen : IUIScreenStackable {
     
     public var stackBar: UI.View.StackBar {
-        return self.screen.stackBarView
+        return self.screen.stackBar
     }
     
     public var stackBarVisibility: Float {
@@ -341,7 +341,7 @@ extension UI.Container.Group : IUIDialogContentContainer where Screen : IUIScree
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     

@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIPageScreen : IUIScreen {
     
-    var pageBarView: UI.View.PageBar { get }
+    var pageBar: UI.View.PageBar { get }
     var pageBarVisibility: Float { get }
     var pageBarHidden: Bool { get }
     

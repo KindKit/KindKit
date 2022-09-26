@@ -8,7 +8,7 @@ public protocol IUIPageContentContainer : IUIContainer, IUIContainerParentable {
     
     var pageContainer: IUIPageContainer? { get }
     
-    var pageItemView: UI.View.PageBar.Item { get }
+    var pageItem: UI.View.PageBar.Item { get }
     
 }
 

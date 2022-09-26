@@ -8,7 +8,7 @@ import Foundation
 
 public extension UI.View {
 
-    final class Spinner : IUIView, IUIViewAnimatable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Spinner : IUIView, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public private(set) unowned var layout: IUILayout?
         public unowned var item: UI.Layout.Item?
@@ -40,20 +40,6 @@ public extension UI.View {
                 guard self.isLoaded == true else { return }
                 self._view.update(activityColor: self.activityColor)
             }
-        }
-        public var scaleFactor: Float = 1 {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(scaleFactor: self.scaleFactor)
-            }
-        }
-        public var isAnimating: Bool {
-            set(value) {
-                self._isAnimating = value
-                guard self.isLoaded == true else { return }
-                self._view.update(isAnimating: value)
-            }
-            get { return self._isAnimating }
         }
         public var color: UI.Color? = nil {
             didSet {
@@ -182,7 +168,7 @@ public extension UI.View {
     }
     
 }
-
+/*
 public extension UI.View.Spinner {
     
     @inlinable
@@ -197,6 +183,32 @@ public extension UI.View.Spinner {
     func activityColor(_ value: UI.Color?) -> Self {
         self.activityColor = value
         return self
+    }
+    
+}
+*/
+#endif
+
+#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI) && DEBUG
+
+import SwiftUI
+
+@available(macOS 10.15.0, *)
+@available(iOS 13.0, *)
+struct UI_View_Spinner_Preview : PreviewProvider {
+    
+    static var previews: some View {
+        UI.View.Preview(
+            UI.View.Custom(.composition(
+                entity: .position(
+                    mode: .center,
+                    entity: .view(UI.View.Spinner(configure: {
+                        $0.size = .fixed(40)
+                        $0.color = .alabaster
+                    }))
+                )
+            ))
+        )
     }
     
 }
