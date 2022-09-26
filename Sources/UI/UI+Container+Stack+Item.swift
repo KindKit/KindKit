@@ -35,7 +35,7 @@ extension UI.Container.Stack {
         init(
             container: IUIStackContentContainer,
             owner: AnyObject? = nil,
-            insets: InsetFloat
+            insets: InsetFloat = .zero
         ) {
             container.stackBar.safeArea(InsetFloat(top: 0, left: insets.left, right: insets.right, bottom: 0))
             self._layout = Layout(

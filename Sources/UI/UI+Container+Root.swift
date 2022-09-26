@@ -124,7 +124,11 @@ public extension UI.Container {
                 content: UI.Layout.Item(content.view)
             )
             self._view = UI.View.Custom(self._layout)
-            self._init()
+            self._setup()
+        }
+        
+        deinit {
+            self._destroy()
         }
         
 #if os(iOS)
@@ -207,9 +211,12 @@ public extension UI.Container {
 
 private extension UI.Container.Root {
     
-    func _init() {
+    func _setup() {
         self.overlay?.parent = self
         self.content.parent = self
+    }
+    
+    func _destroy() {
     }
     
 }

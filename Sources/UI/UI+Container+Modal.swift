@@ -102,6 +102,9 @@ public extension UI.Container {
 #endif
             }
         }
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             _ content: (IUIContainer & IUIContainerParentable)? = nil
@@ -118,13 +121,17 @@ public extension UI.Container {
             self._view.gestures([ self._interactiveGesture ])
 #endif
             self._items = []
-            self._init()
+            self._setup()
+        }
+        
+        deinit {
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
             let inheritedInsets = self.inheritedInsets(interactive: interactive)
             if let current = self._current?.container {
-                if current.modalSheetInset != nil {
+                if current.modalSheetBackground != nil {
                     return InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: inheritedInsets.bottom)
                 }
             }
@@ -232,7 +239,7 @@ extension UI.Container.Modal : IUIRootContentContainer {
 
 private extension UI.Container.Modal {
     
-    func _init() {
+    func _setup() {
 #if os(iOS)
         self._interactiveGesture.onShouldRequireFailure({ [unowned self] _, gesture -> Bool in
             guard let view = gesture.view else { return false }
@@ -263,10 +270,13 @@ private extension UI.Container.Modal {
         self.content?.parent = self
     }
     
+    func _destroy() {
+        self._animation = nil
+    }
+    
     func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
-            self._dismiss(modal: current, animated: animated, completion: { [weak self] in
-                guard let self = self else { return }
+            self._dismiss(modal: current, animated: animated, completion: { [unowned self] in
                 self._present(modal: next, animated: animated, completion: completion)
             })
         } else {
@@ -279,18 +289,17 @@ private extension UI.Container.Modal {
         if animated == true {
             self._layout.state = .present(modal: modal, progress: .zero)
             modal.container.prepareShow(interactive: false)
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .present(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    modal.container.finishShow(interactive: false)
+                completion: { [unowned self] in
+                    self._animation = nil
                     self._layout.state = .idle(modal: modal)
+                    modal.container.finishShow(interactive: false)
                     completion?()
                 }
             )
@@ -303,8 +312,7 @@ private extension UI.Container.Modal {
     }
     
     func _dismiss(current: Item, previous: Item?, animated: Bool, completion: (() -> Void)?) {
-        self._dismiss(modal: current, animated: animated, completion: { [weak self] in
-            guard let self = self else { return }
+        self._dismiss(modal: current, animated: animated, completion: { [unowned self] in
             self._current = previous
             if let previous = previous {
                 self._present(modal: previous, animated: animated, completion: completion)
@@ -317,18 +325,17 @@ private extension UI.Container.Modal {
     func _dismiss(modal: Item, animated: Bool, completion: (() -> Void)?) {
         modal.container.prepareHide(interactive: false)
         if animated == true {
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .dismiss(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    modal.container.finishHide(interactive: false)
+                completion: { [unowned self] in
+                    self._animation = nil
                     self._layout.state = .empty
+                    modal.container.finishHide(interactive: false)
                     completion?()
                 }
             )
@@ -369,31 +376,27 @@ private extension UI.Container.Modal {
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation > self.interactiveLimit {
             let height = self._view.bounds.size.height
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(height / self.animationVelocity),
                 elapsed: TimeInterval(deltaLocation / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .dismiss(modal: current, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     self._finishInteractiveAnimation()
                 }
             )
         } else if deltaLocation > 0 {
             let height = self._view.bounds.size.height
             let baseProgress = Percent(deltaLocation / pow(height, 1.5))
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .present(modal: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     self._cancelInteractiveAnimation()
                 }
             )
@@ -405,6 +408,7 @@ private extension UI.Container.Modal {
     
     func _finishInteractiveAnimation() {
         self._interactiveBeginLocation = nil
+        self._animation = nil
         if let current = self._current {
             current.container.finishHide(interactive: true)
             current.container.parent = nil
@@ -426,6 +430,7 @@ private extension UI.Container.Modal {
     
     func _cancelInteractiveAnimation() {
         self._interactiveBeginLocation = nil
+        self._animation = nil
         if let current = self._current {
             current.container.cancelHide(interactive: true)
             self._layout.state = .idle(modal: current)

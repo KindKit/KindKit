@@ -32,6 +32,22 @@ public struct Rect< Value : IScalar & Hashable > : Hashable {
         self.size = Size(width: bottomRight.x - topLeft.x, height: bottomRight.y - topLeft.y)
     }
     
+    public init(top: Rect< Value >) {
+        self.init(bottomLeft: top.topLeft, size: top.size)
+    }
+    
+    public init(left: Rect< Value >) {
+        self.init(topRight: left.topLeft, size: left.size)
+    }
+    
+    public init(right: Rect< Value >) {
+        self.init(topLeft: right.topRight, size: right.size)
+    }
+    
+    public init(bottom: Rect< Value >) {
+        self.init(topLeft: bottom.bottomLeft, size: bottom.size)
+    }
+    
     public init(topLeft: Point< Value >, size: Size< Value >) {
         self.origin = topLeft
         self.size = size

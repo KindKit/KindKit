@@ -52,21 +52,21 @@ public extension UI.Layout {
         }
         
         public func contains(view: IUIView) -> Bool {
-            guard let item = view.item else { return false }
+            guard let item = view.appearedItem else { return false }
             return self.contains(item: item)
         }
         
         public func contains(item: UI.Layout.Item) -> Bool {
-            return self.items.contains(where: { $0 === item })
+            return self.items.contains(item)
         }
         
         public func index(view: IUIView) -> Int? {
-            guard let item = view.item else { return nil }
+            guard let item = view.appearedItem else { return nil }
             return self.index(item: item)
         }
         
         public func index(item: UI.Layout.Item) -> Int? {
-            return self.items.firstIndex(where: { $0 === item })
+            return self.items.firstIndex(of: item)
         }
         
         public func layout(bounds: RectFloat) -> SizeFloat {
@@ -95,22 +95,37 @@ public extension UI.Layout {
         }
         
         public func size(available: SizeFloat) -> SizeFloat {
+            guard self._items.isEmpty == false && available.isZero == false else {
+                return .zero
+            }
             switch self.direction {
             case .horizontal:
+                var accumulate: Float = 0
+                for index in 0 ..< self._items.count {
+                    let item = self._items[index]
+                    let itemSize = item.size(available: available)
+                    accumulate = max(accumulate, itemSize.height)
+                }
                 return Size(
                     width: available.width * Float(self._items.count),
-                    height: available.height
+                    height: accumulate
                 )
             case .vertical:
+                var accumulate: Float = 0
+                for index in 0 ..< self._items.count {
+                    let item = self._items[index]
+                    let itemSize = item.size(available: available)
+                    accumulate = max(accumulate, itemSize.width)
+                }
                 return Size(
-                    width: available.width,
+                    width: accumulate,
                     height: available.height * Float(self._items.count)
                 )
             }
         }
         
         public func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            guard self._items.isEmpty == false else {
+            guard self._items.isEmpty == false && bounds.size.isZero == false else {
                 return []
             }
             let sf, ef: Float

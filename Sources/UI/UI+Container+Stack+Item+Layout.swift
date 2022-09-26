@@ -58,7 +58,7 @@ extension UI.Container.Stack.Item {
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            return available
+            return self.content.size(available: available)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {

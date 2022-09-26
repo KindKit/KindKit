@@ -10,6 +10,12 @@ public extension UI.Layout {
         
         public unowned var delegate: IUILayoutDelegate?
         public unowned var view: IUIView?
+        public var inset: InsetFloat = .zero {
+            didSet(oldValue) {
+                guard self.inset != oldValue else { return }
+                self.setNeedForceUpdate()
+            }
+        }
         public var state: State {
             set(value) {
                 self._internalState = .idle(state: value)
@@ -46,6 +52,9 @@ public extension UI.Layout {
                 guard self._internalState != oldValue else { return }
                 self.setNeedForceUpdate()
             }
+        }
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
         }
 
         public init(
@@ -96,6 +105,10 @@ public extension UI.Layout {
             views.forEach({
                 self.set(state: $0.key, view: $0.value)
             })
+        }
+        
+        deinit {
+            self._destroy()
         }
         
         public func set(state: State, inset: InsetFloat) {
@@ -162,7 +175,7 @@ public extension UI.Layout {
             completion: (() -> Void)? = nil
         ) {
             let fromState = self.state
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 delay: delay,
                 duration: duration,
                 ease: ease,
@@ -172,6 +185,7 @@ public extension UI.Layout {
                     self.updateIfNeeded()
                 },
                 completion: { [unowned self] in
+                    self._animation = nil
                     self._internalState = .idle(state: state)
                     self.setNeedForceUpdate()
                     self.updateIfNeeded()
@@ -250,6 +264,10 @@ private extension UI.Layout.State {
 
 private extension UI.Layout.State {
     
+    func _destroy() {
+        self._animation = nil
+    }
+    
     @inline(__always)
     func _data(state: State, update: (_ data: inout Data) -> Void) {
         if var data = self.data[state] {
@@ -296,47 +314,65 @@ private extension UI.Layout.State {
     func _layout(bounds: RectFloat, state: State) -> SizeFloat {
         guard let data = self.data[state] else { return .zero }
         guard let item = data.item else { return .zero }
-        let availableBounds = bounds.inset(data.inset)
         switch data.alignment {
         case .topLeft:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(topLeft: availableBounds.topLeft, size: size)
-            return size
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(topLeft: bounds.topLeft, size: size)
+            return size.inset(-inset)
         case .top:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(top: availableBounds.top, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(top: bounds.top, size: size)
             return size
         case .topRight:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(topRight: availableBounds.topRight, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(topRight: bounds.topRight, size: size)
             return size
         case .left:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(left: availableBounds.left, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(left: bounds.left, size: size)
             return size
         case .center:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(center: availableBounds.center, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(center: bounds.center, size: size)
             return size
         case .right:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(right: availableBounds.right, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(right: bounds.right, size: size)
             return size
         case .bottomLeft:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(bottomLeft: availableBounds.bottomLeft, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(bottomLeft: bounds.bottomLeft, size: size)
             return size
         case .bottom:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(bottom: availableBounds.bottom, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(bottom: bounds.bottom, size: size)
             return size
         case .bottomRight:
-            let size = item.size(available: availableBounds.size)
-            item.frame = RectFloat(bottomRight: availableBounds.bottomRight, size: size)
+            let inset = self.inset + data.inset
+            let bounds = bounds.inset(inset)
+            let size = item.size(available: bounds.size)
+            item.frame = RectFloat(bottomRight: bounds.bottomRight, size: size)
             return size
         case .fill:
-            item.frame = availableBounds
-            return availableBounds.size
+            let inset = self.inset + data.inset
+            item.frame = bounds.inset(inset)
+            return bounds.size
         }
     }
     
@@ -344,13 +380,14 @@ private extension UI.Layout.State {
     func _size(available: SizeFloat, state: State) -> SizeFloat {
         guard let data = self.data[state] else { return .zero }
         guard let item = data.item else { return .zero }
-        let availableSize = available.inset(data.inset)
         switch data.alignment {
         case .topLeft, .top, .topRight, .left, .center, .right, .bottomLeft, .bottom, .bottomRight:
+            let inset = self.inset + data.inset
+            let availableSize = available.inset(inset)
             let size = item.size(available: availableSize)
-            return size.inset(-data.inset)
+            return size.inset(-inset)
         case .fill:
-            return availableSize
+            return available
         }
     }
     

@@ -6,7 +6,7 @@ import Foundation
 
 extension UI.Container.Modal.Layout {
     
-    enum State {
+    enum State : Equatable {
         
         case empty
         case idle(modal: UI.Container.Modal.Item)

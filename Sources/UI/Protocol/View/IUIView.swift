@@ -6,11 +6,11 @@ import Foundation
 
 public protocol IUIView : IUIAnyView {
     
+    var appearedLayout: IUILayout? { get }
+    var appearedItem: UI.Layout.Item? { set get }
     var isAppeared: Bool { get }
     var isVisible: Bool { get }
     var isHidden: Bool { set get }
-    var layout: IUILayout? { get }
-    var item: UI.Layout.Item? { set get }
     
     func loadIfNeeded()
     
@@ -39,8 +39,18 @@ public extension IUIView {
     
     @inlinable
     var isAppeared: Bool {
-        return self.layout != nil
+        return self.appearedLayout != nil
     }
+    
+    @inlinable
+    var hidden: Bool {
+        set(value) { self.isHidden = value }
+        get { return self.isHidden }
+    }
+    
+}
+
+public extension IUIView {
     
     @inlinable
     @discardableResult
@@ -51,29 +61,33 @@ public extension IUIView {
     
     @inlinable
     func setNeedForceLayout() {
-        if let layout = self.layout {
-            if let item = self.item {
+        if let layout = self.appearedLayout {
+            if let item = self.appearedItem {
                 layout.setNeedForceUpdate(item: item)
             } else {
                 layout.setNeedForceUpdate()
             }
-        } else if let item = self.item {
+        } else if let item = self.appearedItem {
             item.setNeedForceUpdate()
         }
     }
     
     @inlinable
     func setNeedLayout() {
-        self.layout?.setNeedUpdate()
+        self.appearedLayout?.setNeedUpdate()
     }
     
     @inlinable
     func layoutIfNeeded() {
-        self.layout?.updateIfNeeded()
+        self.appearedLayout?.updateIfNeeded()
     }
     
+}
+
+public extension IUIView {
+    
     func parent< View >(of type: View.Type) -> View? {
-        guard let layout = self.layout else { return nil }
+        guard let layout = self.appearedLayout else { return nil }
         guard let view = layout.view else { return nil }
         if let view = view as? View {
             return view

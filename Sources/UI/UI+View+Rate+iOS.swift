@@ -179,12 +179,12 @@ private extension KKRateView {
         return .zero
     }
     
-    func _state(item: UInt) -> UI.View.Rate.State? {
+    func _state(appearedItem: UInt) -> UI.View.Rate.State? {
         guard let firstState = self._states.first else { return nil }
         guard let lastState = self._states.last else { return nil }
-        if self._rating <= Float(item) {
+        if self._rating <= Float(appearedItem) {
             return firstState
-        } else if self._rating >= Float(item + 1) {
+        } else if self._rating >= Float(appearedItem + 1) {
             return lastState
         }
         let rate = self._rating - self._rating.rounded(.towardZero)
@@ -242,7 +242,7 @@ private extension KKRateView {
                 width: CGFloat(self._itemSize.width),
                 height: CGFloat(self._itemSize.height)
             )
-            if let state = self._state(item: UInt(index)) {
+            if let state = self._state(appearedItem: UInt(index)) {
                 self._update(layer: layer, state: state)
             }
             origin.x += self._itemSize.width + self._itemSpacing
@@ -251,7 +251,7 @@ private extension KKRateView {
     
     func _update() {
         for (index, layer) in self._layers.enumerated() {
-            if let state = self._state(item: UInt(index)) {
+            if let state = self._state(appearedItem: UInt(index)) {
                 self._update(layer: layer, state: state)
             }
         }
@@ -271,12 +271,12 @@ private extension KKRateView {
 
 extension KKRateView : IUILayoutDelegate {
     
-    func setNeedUpdate(_ layout: IUILayout) -> Bool {
+    func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
         self.setNeedsLayout()
         return true
     }
     
-    func updateIfNeeded(_ layout: IUILayout) {
+    func updateIfNeeded(_ appearedLayout: IUILayout) {
         self.layoutIfNeeded()
     }
     

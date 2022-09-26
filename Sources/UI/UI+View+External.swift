@@ -8,8 +8,8 @@ public extension UI.View {
 
     final class External : IUIView, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var layout: IUILayout?
-        public unowned var item: UI.Layout.Item?
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -83,16 +83,16 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var onAppear: ((UI.View.External) -> Void)?
+        public var onDisappear: ((UI.View.External) -> Void)?
+        public var onVisible: ((UI.View.External) -> Void)?
+        public var onVisibility: ((UI.View.External) -> Void)?
+        public var onInvisible: ((UI.View.External) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
             return self._reuse.content()
         }
-        private var _onAppear: ((UI.View.External) -> Void)?
-        private var _onDisappear: ((UI.View.External) -> Void)?
-        private var _onVisible: ((UI.View.External) -> Void)?
-        private var _onVisibility: ((UI.View.External) -> Void)?
-        private var _onInvisible: ((UI.View.External) -> Void)?
         
         public init(
             _ content: NativeView
@@ -129,58 +129,28 @@ public extension UI.View {
         }
         
         public func appear(to layout: IUILayout) {
-            self.layout = layout
-            self._onAppear?(self)
+            self.appearedLayout = layout
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
-            self.layout = nil
-            self._onDisappear?(self)
+            self.appearedLayout = nil
+            self.onDisappear?(self)
         }
         
         public func visible() {
             self.isVisible = true
-            self._onVisible?(self)
+            self.onVisible?(self)
         }
         
         public func visibility() {
-            self._onVisibility?(self)
+            self.onVisibility?(self)
         }
         
         public func invisible() {
             self.isVisible = false
-            self._onInvisible?(self)
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.External) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.External) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisible(_ value: ((UI.View.External) -> Void)?) -> Self {
-            self._onVisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisibility(_ value: ((UI.View.External) -> Void)?) -> Self {
-            self._onVisibility = value
-            return self
-        }
-        
-        @discardableResult
-        public func onInvisible(_ value: ((UI.View.External) -> Void)?) -> Self {
-            self._onInvisible = value
-            return self
+            self.onInvisible?(self)
         }
         
     }
@@ -200,6 +170,45 @@ public extension UI.View.External {
     @discardableResult
     func content(_ value: NativeView) -> Self {
         self.content = value
+        return self
+    }
+    
+}
+
+public extension UI.View.External {
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.External) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.External) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ value: ((UI.View.External) -> Void)?) -> Self {
+        self.onVisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ value: ((UI.View.External) -> Void)?) -> Self {
+        self.onVisibility = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ value: ((UI.View.External) -> Void)?) -> Self {
+        self.onInvisible = value
         return self
     }
     

@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IPageBarViewDelegate : AnyObject {
     
-    func pressed(pageBar: UI.View.PageBar, itemView: UI.View.PageBar.Item)
+    func pressed(pageBar: UI.View.PageBar, item: UI.View.PageBar.Item)
     
 }
 
@@ -14,7 +14,8 @@ public extension UI.View {
 
     final class PageBar : IUIWidgetView, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public var delegate: IPageBarViewDelegate?
+        public unowned var delegate: IPageBarViewDelegate?
+        
         public var leading: IUIView? {
             didSet(oldValue) {
                 guard self.leading !== oldValue else { return }
@@ -64,7 +65,7 @@ public extension UI.View {
                     if let contentOffset = self._contentView.contentOffset(with: selectedView, horizontal: .center, vertical: .center) {
                         self._contentView.contentOffset(contentOffset, normalized: true)
                     }
-                    if let item = selectedView.item {
+                    if let item = selectedView.appearedItem {
                         self._contentLayout.indicatorState = .alias(current: item)
                     }
                 } else {
@@ -116,7 +117,7 @@ public extension UI.View {
                     self._contentView.contentOffset(currentContentOffset.lerp(targetContentOffset, progress: progress), normalized: true)
                 }
             }
-            if let currentView = self._transitionSelectedView, let currentItem = currentView.item, let nextItem = view.item {
+            if let currentView = self._transitionSelectedView, let currentItem = currentView.appearedItem, let nextItem = view.appearedItem {
                 self._contentLayout.indicatorState = .transition(current: currentItem, next: nextItem, progress: progress)
             }
         }
@@ -192,8 +193,8 @@ public extension UI.View.PageBar {
 
 extension UI.View.PageBar : IPageBarItemViewDelegate {
     
-    func pressed(_ itemView: UI.View.PageBar.Item) {
-        self.delegate?.pressed(pageBar: self, itemView: itemView)
+    func pressed(_ item: UI.View.PageBar.Item) {
+        self.delegate?.pressed(pageBar: self, item: item)
     }
     
 }

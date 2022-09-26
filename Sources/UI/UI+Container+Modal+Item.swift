@@ -39,3 +39,19 @@ extension UI.Container.Modal {
     }
     
 }
+
+extension UI.Container.Modal.Item : Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+    
+}
+
+extension UI.Container.Modal.Item : Equatable {
+    
+    static func == (lhs: UI.Container.Modal.Item, rhs: UI.Container.Modal.Item) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+}

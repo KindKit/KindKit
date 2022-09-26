@@ -171,6 +171,7 @@ extension KKScrollView {
         self._view = view
         self.update(direction: view.direction)
         self.update(indicatorDirection: view.indicatorDirection)
+        self.update(delaysContentTouches: view.delaysContentTouches)
         self.update(visibleInset: view.visibleInset)
         self.update(contentInset: view.contentInset)
         self.update(contentSize: view.contentSize)
@@ -203,6 +204,10 @@ extension KKScrollView {
     func update(indicatorDirection: UI.View.Scroll.Direction) {
         self.showsHorizontalScrollIndicator = indicatorDirection.contains(.horizontal)
         self.showsVerticalScrollIndicator = indicatorDirection.contains(.vertical)
+    }
+    
+    func update(delaysContentTouches: Bool) {
+        self.delaysContentTouches = delaysContentTouches
     }
     
     func update(visibleInset: InsetFloat) {
@@ -301,15 +306,15 @@ private extension KKScrollView {
 extension KKScrollView : UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.kkDelegate?.beginScrolling(self)
+        self.kkDelegate?.beginDragging(self)
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        self.kkDelegate?.scrolling(self, contentOffset: PointFloat(scrollView.contentOffset))
+        self.kkDelegate?.dragging(self, contentOffset: PointFloat(scrollView.contentOffset))
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.kkDelegate?.endScrolling(self, decelerate: decelerate)
+        self.kkDelegate?.endDragging(self, decelerate: decelerate)
         if decelerate == false {
             self.setNeedsLayout()
         }
@@ -332,7 +337,7 @@ extension KKScrollView : UIScrollViewDelegate {
 
 extension KKScrollView : IUILayoutDelegate {
     
-    func setNeedUpdate(_ layout: IUILayout) -> Bool {
+    func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
         self.needLayoutContent = true
         self.setNeedsLayout()
         if let kkDelegate = self.kkDelegate {
@@ -341,7 +346,7 @@ extension KKScrollView : IUILayoutDelegate {
         return false
     }
     
-    func updateIfNeeded(_ layout: IUILayout) {
+    func updateIfNeeded(_ appearedLayout: IUILayout) {
         self.layoutIfNeeded()
     }
     

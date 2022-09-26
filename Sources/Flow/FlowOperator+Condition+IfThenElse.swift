@@ -166,11 +166,11 @@ public extension FlowBuilder.Chain {
         Then : IFlowPipeline,
         Else : IFlowPipeline
     >(
-        `if`: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Bool,
+        `if`: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Bool,
         then: Then,
         `else`: Else
     ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThenElse< Then, Else > > where
-        Head.Output == Then.Input,
+        Tail.Output == Then.Input,
         Then.Input == Else.Input,
         Then.Output == Else.Output
     {

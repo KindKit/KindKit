@@ -18,8 +18,8 @@ public extension UI.View {
     
     final class Control : IUIView, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var layout: IUILayout?
-        public unowned var item: UI.Layout.Item?
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -127,6 +127,13 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var onAppear: ((UI.View.Control) -> Void)?
+        public var onDisappear: ((UI.View.Control) -> Void)?
+        public var onVisible: ((UI.View.Control) -> Void)?
+        public var onVisibility: ((UI.View.Control) -> Void)?
+        public var onInvisible: ((UI.View.Control) -> Void)?
+        public var onChangeStyle: ((UI.View.Control, Bool) -> Void)?
+        public var onPressed: ((UI.View.Control) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
@@ -134,13 +141,6 @@ public extension UI.View {
         }
         private var _isHighlighted: Bool = false
         private var _isLocked: Bool = false
-        private var _onAppear: ((UI.View.Control) -> Void)?
-        private var _onDisappear: ((UI.View.Control) -> Void)?
-        private var _onVisible: ((UI.View.Control) -> Void)?
-        private var _onVisibility: ((UI.View.Control) -> Void)?
-        private var _onInvisible: ((UI.View.Control) -> Void)?
-        private var _onChangeStyle: ((UI.View.Control, Bool) -> Void)?
-        private var _onPressed: ((UI.View.Control) -> Void)?
         
         public init(
             _ content: IUILayout
@@ -180,80 +180,32 @@ public extension UI.View {
         }
         
         public func appear(to layout: IUILayout) {
-            self.layout = layout
-            self._onAppear?(self)
+            self.appearedLayout = layout
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
-            self.layout = nil
-            self._onDisappear?(self)
+            self.appearedLayout = nil
+            self.onDisappear?(self)
         }
         
         public func visible() {
             self.isVisible = true
-            self._onVisible?(self)
+            self.onVisible?(self)
         }
         
         public func visibility() {
-            self._onVisibility?(self)
+            self.onVisibility?(self)
         }
         
         public func invisible() {
             self.isVisible = false
-            self._onInvisible?(self)
+            self.onInvisible?(self)
         }
         
         public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self._onChangeStyle?(self, userInteraction)
-        }
-        
-        @discardableResult
-        public func content(_ value: IUILayout) -> Self {
-            self.content = value
-            return self
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisible(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onVisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onVisibility(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onVisibility = value
-            return self
-        }
-        
-        @discardableResult
-        public func onInvisible(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onInvisible = value
-            return self
-        }
-        
-        @discardableResult
-        public func onChangeStyle(_ value: ((UI.View.Control, Bool) -> Void)?) -> Self {
-            self._onChangeStyle = value
-            return self
-        }
-        
-        @discardableResult
-        public func onPressed(_ value: ((UI.View.Control) -> Void)?) -> Self {
-            self._onPressed = value
-            return self
+            self.onChangeStyle?(self, userInteraction)
         }
         
     }
@@ -276,6 +228,66 @@ public extension UI.View.Control {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: IUILayout) -> Self {
+        self.content = value
+        return self
+    }
+    
+}
+
+public extension UI.View.Control {
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onVisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onVisibility = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onInvisible = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChangeStyle(_ value: ((UI.View.Control, Bool) -> Void)?) -> Self {
+        self.onChangeStyle = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPressed(_ value: ((UI.View.Control) -> Void)?) -> Self {
+        self.onPressed = value
+        return self
+    }
+    
 }
 
 extension UI.View.Control : KKControlViewDelegate {
@@ -287,7 +299,7 @@ extension UI.View.Control : KKControlViewDelegate {
     func set(_ view: KKControlView, highlighted: Bool) {
         if self._isHighlighted != highlighted {
             self._isHighlighted = highlighted
-            self._onChangeStyle?(self, true)
+            self.onChangeStyle?(self, true)
         }
     }
     
@@ -296,7 +308,7 @@ extension UI.View.Control : KKControlViewDelegate {
     }
     
     func pressed(_ view: KKControlView) {
-        self._onPressed?(self)
+        self.onPressed?(self)
     }
     
 }

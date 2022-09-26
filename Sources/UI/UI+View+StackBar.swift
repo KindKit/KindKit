@@ -11,6 +11,7 @@ public extension UI.View {
         public var size: Float? {
             set(value) {
                 guard self.body.size != value else { return }
+                self.body.size = value
                 self._relayout()
             }
             get { return self.body.size }

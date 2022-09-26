@@ -5,7 +5,7 @@
 import Foundation
 
 public extension UI.Layout {
-
+    
     final class Item {
         
         public var frame: RectFloat
@@ -17,15 +17,31 @@ public extension UI.Layout {
             self.view = view
             self.isNeedForceUpdate = false
             
-            self.view.item = self
+            self.view.appearedItem = self
         }
         
         deinit {
-            self.view.item = nil
+            self.view.appearedItem = nil
         }
         
     }
+    
+}
 
+extension UI.Layout.Item : Hashable {
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+    
+}
+
+extension UI.Layout.Item : Equatable {
+    
+    public static func == (lhs: UI.Layout.Item, rhs: UI.Layout.Item) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
 }
 
 public extension UI.Layout.Item {

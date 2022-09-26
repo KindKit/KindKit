@@ -15,6 +15,17 @@ public protocol IUIWidgetView : IUIView {
 public extension IUIWidgetView {
     
     @inlinable
+    var appearedLayout: IUILayout? {
+        get { return self.body.appearedLayout }
+    }
+    
+    @inlinable
+    unowned var appearedItem: UI.Layout.Item? {
+        set(value) { self.body.appearedItem = value }
+        get { return self.body.appearedItem }
+    }
+    
+    @inlinable
     var native: NativeView {
         return self.body.native
     }
@@ -38,17 +49,6 @@ public extension IUIWidgetView {
     var isHidden: Bool {
         set(value) { self.body.isHidden = value }
         get { return self.body.isHidden }
-    }
-    
-    @inlinable
-    var layout: IUILayout? {
-        get { return self.body.layout }
-    }
-    
-    @inlinable
-    unowned var item: UI.Layout.Item? {
-        set(value) { self.body.item = value }
-        get { return self.body.item }
     }
     
     @inlinable

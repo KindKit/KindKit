@@ -19,7 +19,9 @@ public extension UI.Container {
         
         private var _visibility: [Target : Float]
         private var _observer: Observer< IContainerBarControllerObserver >
-        private var _animation: IAnimationTask?
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             visibility: [Target : Float] = [:]
@@ -30,6 +32,10 @@ public extension UI.Container {
                 guard self._visibility[target] == nil else { continue }
                 self._visibility[target] = 1
             }
+        }
+        
+        deinit {
+            self._destroy()
         }
         
     }
@@ -77,16 +83,14 @@ public extension UI.Container.BarController {
         self._animation = Animation.default.run(
             duration: duration,
             ease: ease,
-            processing: { [weak self] progress in
-                guard let self = self else { return }
+            processing: { [unowned self] progress in
                 for new in visibility {
                     guard let begin = beginVisibility[new.key] else { continue }
                     self._visibility[new.key] = begin.lerp(new.value, progress: progress)
                 }
                 self._notify()
             },
-            completion: { [weak self] in
-                guard let self = self else { return }
+            completion: { [unowned self] in
                 self._animation = nil
                 for new in visibility {
                     self._visibility[new.key] = new.value
@@ -99,6 +103,10 @@ public extension UI.Container.BarController {
 }
 
 private extension UI.Container.BarController {
+    
+    func _destroy() {
+        self._animation = nil
+    }
     
     func _notify() {
         self._observer.notify({ $0.changed(self) })

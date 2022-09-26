@@ -51,11 +51,11 @@ extension UI.View.Button {
         }
         
         public func invalidate(item: UI.Layout.Item) {
-            if self.spinner === item {
+            if self.spinner == item {
                 self._cacheSpinnerSize = nil
-            } else if self.secondary === item {
+            } else if self.secondary == item {
                 self._cacheSecondarySize = nil
-            } else if self.primary === item {
+            } else if self.primary == item {
                 self._cachePrimarySize = nil
             }
         }
@@ -119,8 +119,8 @@ extension UI.View.Button {
         func size(available: SizeFloat) -> SizeFloat {
             var size = SizeFloat(width: 0, height: 0)
             let spinnerSize = self.spinner.flatMap({ return $0.size(available: available) })
-            let secondarySize = self.secondary.flatMap({ return $0.size(available: available) })
             let primarySize = self.primary.flatMap({ return $0.size(available: available) })
+            let secondarySize = self.secondary.flatMap({ return $0.size(available: available) })
             if self.spinnerAnimating == true, let spinnerSize = spinnerSize {
                 switch self.spinnerPosition {
                 case .fill:

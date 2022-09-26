@@ -91,9 +91,9 @@ final class KKScrollView : NSScrollView {
         self.contentView = KKScrollContentView(owner: self)
         self.documentView = KKScrollDocumentView(owner: self)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self._startScrolling(_:)), name: Self.willStartLiveScrollNotification, object: self)
-        NotificationCenter.default.addObserver(self, selector: #selector(self._scrolling(_:)), name: Self.didLiveScrollNotification, object: self)
-        NotificationCenter.default.addObserver(self, selector: #selector(self._endScrolling(_:)), name: Self.didEndLiveScrollNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._startDragging(_:)), name: Self.willStartLiveScrollNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._dragging(_:)), name: Self.didLiveScrollNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._endDragging(_:)), name: Self.didEndLiveScrollNotification, object: self)
     }
     
     required init?(coder: NSCoder) {
@@ -277,18 +277,18 @@ private extension KKScrollView {
     }
     
     @objc
-    func _startScrolling(_ sender: Any) {
-        self.kkDelegate?.beginScrolling(self)
+    func _startDragging(_ sender: Any) {
+        self.kkDelegate?.beginDragging(self)
     }
     
     @objc
-    func _scrolling(_ sender: Any) {
-        self.kkDelegate?.scrolling(self, contentOffset: Point(self.contentView.documentRect.origin))
+    func _dragging(_ sender: Any) {
+        self.kkDelegate?.dragging(self, contentOffset: Point(self.contentView.documentRect.origin))
     }
     
     @objc
-    func _endScrolling(_ sender: Any) {
-        self.kkDelegate?.endScrolling(self, decelerate: false)
+    func _endDragging(_ sender: Any) {
+        self.kkDelegate?.endDragging(self, decelerate: false)
     }
     
 }

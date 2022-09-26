@@ -19,7 +19,7 @@ extension UI.View.Web {
         }
         
         static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+            return Content(frame: UIScreen.main.bounds)
         }
         
         static func configureReuse(owner: Owner, content: Content) {
@@ -144,6 +144,7 @@ extension KKWebView {
         self.load(URLRequest(url: URL(string: "about:blank")!))
         self.frame = .zero
         self.scrollView.removeObserver(self, forKeyPath: "contentSize")
+        self.frame = UIScreen.main.bounds
     }
     
 }

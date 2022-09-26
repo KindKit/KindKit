@@ -6,7 +6,7 @@ import Foundation
 
 protocol IGroupBarItemViewDelegate : AnyObject {
     
-    func pressed(_ itemView: UI.View.GroupBar.Item)
+    func pressed(_ item: UI.View.GroupBar.Item)
     
 }
 
@@ -49,7 +49,7 @@ public extension UI.View.GroupBar {
             self.body = UI.View.Custom(self._layout)
                 .gestures([ self._tapGesture ])
                 .shouldHighlighting(true)
-            self._init()
+            self._setup()
         }
         
         public convenience init(
@@ -83,7 +83,7 @@ public extension UI.View.GroupBar.Item {
 
 private extension UI.View.GroupBar.Item {
     
-    func _init() {
+    func _setup() {
         self._tapGesture.onTriggered({ [weak self] _ in
             guard let self = self else { return }
             self.delegate?.pressed(self)

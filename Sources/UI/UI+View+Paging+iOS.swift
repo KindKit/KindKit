@@ -322,7 +322,7 @@ private extension KKPagingView {
 extension KKPagingView : UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.kkDelegate?.beginPaginging(self)
+        self.kkDelegate?.beginDragging(self)
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -331,11 +331,11 @@ extension KKPagingView : UIScrollViewDelegate {
             contentOffset: self.contentOffset,
             contentSize: self.contentSize
         )
-        self.kkDelegate?.paginging(self, currentPage: currentPage)
+        self.kkDelegate?.dragging(self, currentPage: currentPage)
     }
 
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.kkDelegate?.endPaginging(self, decelerate: decelerate)
+        self.kkDelegate?.endDragging(self, decelerate: decelerate)
         if decelerate == false {
             self.setNeedsLayout()
         }
@@ -354,7 +354,7 @@ extension KKPagingView : UIScrollViewDelegate {
 
 extension KKPagingView : IUILayoutDelegate {
     
-    func setNeedUpdate(_ layout: IUILayout) -> Bool {
+    func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
         self.needLayoutContent = true
         self.setNeedsLayout()
         if let kkDelegate = self.kkDelegate {
@@ -363,7 +363,7 @@ extension KKPagingView : IUILayoutDelegate {
         return false
     }
     
-    func updateIfNeeded(_ layout: IUILayout) {
+    func updateIfNeeded(_ appearedLayout: IUILayout) {
         self.layoutIfNeeded()
     }
     

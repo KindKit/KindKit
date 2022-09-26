@@ -35,7 +35,7 @@ extension LogUI {
                 $0.indicatorDirection = .vertical
                 $0.color = .white
             }
-        ).onBeginScrolling({ [unowned self] _ in
+        ).onBeginDragging({ [unowned self] _ in
             self._autoScrollButton.isSelected = false
         })
         

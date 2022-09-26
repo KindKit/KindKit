@@ -107,6 +107,9 @@ public extension UI.Container {
             }
         }
         private var _timer: Timer?
+        private var _animation: IAnimationTask? {
+            willSet { self._animation?.cancel() }
+        }
         
         public init(
             inset: InsetFloat = InsetFloat(horizontal: 8, vertical: 8),
@@ -129,11 +132,11 @@ public extension UI.Container {
             self._view.gestures([ self._interactiveGesture ])
 #endif
             self._items = []
-            self._init()
+            self._setup()
         }
         
         deinit {
-            self._timerReset()
+            self._destroy()
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -241,7 +244,7 @@ extension UI.Container.Push : IUIRootContentContainer {
 
 private extension UI.Container.Push {
     
-    func _init() {
+    func _setup() {
 #if os(iOS)
         self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let content = self.content else { return true }
@@ -265,13 +268,13 @@ private extension UI.Container.Push {
         self.content?.parent = self
     }
     
-    func _timerReset() {
-        self._timer?.stop()
+    func _destroy() {
+        self._animation = nil
         self._timer = nil
     }
     
     func _timerTriggered() {
-        self._timerReset()
+        self._timer = nil
         if let currentItem = self._current {
             if let index = self._items.firstIndex(where: { $0 === currentItem }) {
                 self._items.remove(at: index)
@@ -298,19 +301,18 @@ private extension UI.Container.Push {
         self._current = push
         push.container.prepareShow(interactive: false)
         if animated == true {
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(push.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .present(push: push, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
+                    self._animation = nil
+                    self._layout.state = .idle(push: push)
                     self._didPresent(push: push)
                     push.container.finishShow(interactive: false)
-                    self._layout.state = .idle(push: push)
 #if os(iOS)
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
@@ -353,18 +355,17 @@ private extension UI.Container.Push {
     func _dismiss(push: Item, animated: Bool, completion: (() -> Void)?) {
         push.container.prepareHide(interactive: false)
         if animated == true {
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(push.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .dismiss(push: push, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    push.container.finishHide(interactive: false)
+                completion: { [unowned self] in
+                    self._animation = nil
                     self._layout.state = .empty
+                    push.container.finishHide(interactive: false)
 #if os(iOS)
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
@@ -418,31 +419,27 @@ private extension UI.Container.Push {
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation < -self.interactiveLimit {
             let height = self._layout.height(item: current)
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval(height / self.animationVelocity),
                 elapsed: TimeInterval(-deltaLocation / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .dismiss(push: current, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     self._finishInteractiveAnimation()
                 }
             )
         } else if deltaLocation > 0 {
             let height = self._layout.height(item: current)
             let baseProgress = Percent(deltaLocation / pow(height, 1.5))
-            Animation.default.run(
+            self._animation = Animation.default.run(
                 duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
+                processing: { [unowned self] progress in
                     self._layout.state = .present(push: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._layout.updateIfNeeded()
                 },
-                completion: { [weak self] in
-                    guard let self = self else { return }
+                completion: { [unowned self] in
                     self._cancelInteractiveAnimation()
                 }
             )
@@ -453,8 +450,9 @@ private extension UI.Container.Push {
     }
     
     func _finishInteractiveAnimation() {
-        self._timerReset()
         self._interactiveBeginLocation = nil
+        self._timer = nil
+        self._animation = nil
         if let current = self._current {
             current.container.finishHide(interactive: true)
             current.container.parent = nil
@@ -480,6 +478,7 @@ private extension UI.Container.Push {
     
     func _cancelInteractiveAnimation() {
         self._interactiveBeginLocation = nil
+        self._animation = nil
         self._timer?.resume()
         if let current = self._current {
             current.container.cancelHide(interactive: true)

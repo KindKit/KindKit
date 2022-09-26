@@ -63,13 +63,13 @@ public extension UI.View.Input {
                 self._view.update(color: self.color)
             }
         }
+        public var onAppear: ((UI.View.Input.Toolbar) -> Void)?
+        public var onDisappear: ((UI.View.Input.Toolbar) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
             return self._reuse.content()
         }
-        private var _onAppear: ((UI.View.Input.Toolbar) -> Void)?
-        private var _onDisappear: ((UI.View.Input.Toolbar) -> Void)?
         
         public init(
             _ items: [IInputToolbarItem]
@@ -101,25 +101,13 @@ public extension UI.View.Input {
         
         public func appear(to view: IUIView) {
             self.parentView = view
-            self._onAppear?(self)
+            self.onAppear?(self)
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.parentView = nil
-            self._onDisappear?(self)
-        }
-        
-        @discardableResult
-        public func onAppear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
-            self._onAppear = value
-            return self
-        }
-        
-        @discardableResult
-        public func onDisappear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
-            self._onDisappear = value
-            return self
+            self.onDisappear?(self)
         }
         
     }
@@ -165,11 +153,29 @@ public extension UI.View.Input.Toolbar {
     
 }
 
+public extension UI.View.Input.Toolbar {
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
+        self.onAppear = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
+        self.onDisappear = value
+        return self
+    }
+    
+}
+
 extension UI.View.Input.Toolbar : KKInputToolbarViewDelegate {
     
     func pressed(_ view: KKInputToolbarView, barItem: UIBarButtonItem) {
-        guard let item = self.items.first(where: { return $0.barItem == barItem }) else { return }
-        item.pressed()
+        guard let appearedItem = self.items.first(where: { return $0.barItem == barItem }) else { return }
+        appearedItem.pressed()
     }
     
 }

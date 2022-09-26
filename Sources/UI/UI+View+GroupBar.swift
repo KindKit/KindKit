@@ -4,9 +4,9 @@
 
 import Foundation
 
-protocol IGroupBarViewDelegate : AnyObject {
+public protocol IGroupBarViewDelegate : AnyObject {
     
-    func pressed(groupBar: UI.View.GroupBar, itemView: UI.View.GroupBar.Item)
+    func pressed(groupBar: UI.View.GroupBar, item: UI.View.GroupBar.Item)
     
 }
 
@@ -14,6 +14,7 @@ public extension UI.View {
 
     final class GroupBar : IUIWidgetView, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
+        public unowned var delegate: IGroupBarViewDelegate?
         public var items: [UI.View.GroupBar.Item] {
             set(value) {
                 for itemView in self._items {
@@ -45,8 +46,6 @@ public extension UI.View {
             get { return self._selected }
         }
         public private(set) var body: UI.View.Bar
-        
-        unowned var delegate: IGroupBarViewDelegate?
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Custom
@@ -109,7 +108,7 @@ public extension UI.View.GroupBar {
 extension UI.View.GroupBar : IGroupBarItemViewDelegate {
     
     func pressed(_ itemView: UI.View.GroupBar.Item) {
-        self.delegate?.pressed(groupBar: self, itemView: itemView)
+        self.delegate?.pressed(groupBar: self, item: itemView)
     }
     
 }

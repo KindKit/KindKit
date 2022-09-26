@@ -162,12 +162,12 @@ private extension KKControlView {
 
 extension KKControlView : IUILayoutDelegate {
     
-    func setNeedUpdate(_ layout: IUILayout) -> Bool {
+    func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
         self.setNeedsLayout()
         return true
     }
     
-    func updateIfNeeded(_ layout: IUILayout) {
+    func updateIfNeeded(_ appearedLayout: IUILayout) {
         self.layoutIfNeeded()
     }
     

@@ -13,35 +13,24 @@ extension UI.Container.Screen {
         var item: UI.Layout.Item? {
             didSet { self.setNeedUpdate() }
         }
-        let fit: Bool
         
-        init(
-            fit: Bool
-        ) {
-            self.fit = fit
+        init() {
+            
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            if self.fit == true {
-                if let item = self.item {
-                    item.frame = bounds
-                }
+            guard let item = self.item else {
                 return .zero
             }
-            if let item = self.item {
-                item.frame = bounds
-            }
+            item.frame = bounds
             return bounds.size
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            if self.fit == true {
-                if let item = self.item {
-                    return item.size(available: available)
-                }
+            guard let item = self.item else {
                 return .zero
             }
-            return available
+            return item.size(available: available)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
