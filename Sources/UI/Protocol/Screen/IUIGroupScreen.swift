@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIGroupScreen : IUIScreen {
     
-    var groupBarView: UI.View.GroupBar { get }
+    var groupBar: UI.View.GroupBar { get }
     var groupBarVisibility: Float { get }
     var groupBarHidden: Bool { get }
     

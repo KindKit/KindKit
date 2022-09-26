@@ -131,7 +131,7 @@ extension UI.Container.Screen : IUIRootContentContainer {
 extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScreenStackable {
     
     public var stackBar: UI.View.StackBar {
-        return self.screen.stackBarView
+        return self.screen.stackBar
     }
     
     public var stackBarVisibility: Float {
@@ -154,8 +154,8 @@ extension UI.Container.Screen : IUIGroupContentContainer where Screen : IUIScree
 
 extension UI.Container.Screen : IUIPageContentContainer where Screen : IUIScreenPageable {
     
-    public var pageItemView: UI.View.PageBar.Item {
-        return self.screen.pageItemView
+    public var pageItem: UI.View.PageBar.Item {
+        return self.screen.pageItem
     }
     
 }
@@ -219,7 +219,7 @@ extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScre
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     

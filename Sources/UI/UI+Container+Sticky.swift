@@ -94,11 +94,11 @@ public extension UI.Container {
         ) {
             self.screen = screen
             self.isPresented = false
-            self._overlay = screen.stickyView
+            self._overlay = screen.sticky
             self._content = content
             self._layout = Layout(
                 content: UI.Layout.Item(content.view),
-                overlay: UI.Layout.Item(screen.stickyView),
+                overlay: UI.Layout.Item(screen.sticky),
                 overlayVisibility: screen.stickyVisibility,
                 overlayHidden: screen.stickyHidden
             )
@@ -236,8 +236,8 @@ extension UI.Container.Sticky : IUIStackContentContainer where ContentContainer 
 
 extension UI.Container.Sticky : IUIPageContentContainer where ContentContainer : IUIPageContentContainer {
     
-    public var pageItemView: UI.View.PageBar.Item {
-        return self.content.pageItemView
+    public var pageItem: UI.View.PageBar.Item {
+        return self.content.pageItem
     }
     
 }
@@ -260,8 +260,8 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
         return self.content.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
-        return self.content.dialogBackgroundView
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
+        return self.content.dialogBackground
     }
     
 }

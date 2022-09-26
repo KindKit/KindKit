@@ -409,7 +409,7 @@ extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScree
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     

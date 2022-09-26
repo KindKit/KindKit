@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIScreenPageable : AnyObject {
     
-    var pageItemView: UI.View.PageBar.Item { get }
+    var pageItem: UI.View.PageBar.Item { get }
     
 }
 

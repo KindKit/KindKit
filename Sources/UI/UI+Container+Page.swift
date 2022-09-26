@@ -106,7 +106,7 @@ public extension UI.Container {
         ) {
             self.isPresented = false
             self.screen = screen
-            self._bar = screen.pageBarView
+            self._bar = screen.pageBar
             self._layout = Layout(
                 bar: UI.Layout.Item(self._bar),
                 barVisibility: screen.pageBarVisibility,
@@ -223,7 +223,7 @@ public extension UI.Container {
         }
         
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
-            self.bar = self.screen.pageBarView
+            self.bar = self.screen.pageBar
             self.barVisibility = self.screen.pageBarVisibility
             self.barHidden = self.screen.pageBarHidden
             self.didChangeInsets()
@@ -317,7 +317,7 @@ extension UI.Container.Page : IUIRootContentContainer {
 extension UI.Container.Page : IUIStackContentContainer where Screen : IUIScreenStackable {
     
     public var stackBar: UI.View.StackBar {
-        return self.screen.stackBarView
+        return self.screen.stackBar
     }
     
     public var stackBarVisibility: Float {
@@ -360,7 +360,7 @@ extension UI.Container.Page : IUIDialogContentContainer where Screen : IUIScreen
         return self.screen.dialogAlignment
     }
     
-    public var dialogBackgroundView: (IUIView & IUIViewAlphable)? {
+    public var dialogBackground: (IUIView & IUIViewAlphable)? {
         return self.screen.dialogBackgroundView
     }
     
