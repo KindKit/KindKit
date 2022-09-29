@@ -6,8 +6,25 @@ import Foundation
 
 public extension UI.View {
 
-    final class Bar : IUIWidgetView, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Bar : IUIWidgetView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
+        public private(set) var body: UI.View.Custom
+        public var color: UI.Color? {
+            set(value) { self._background.color = value }
+            get { return self._background.color }
+        }
+        public var cornerRadius: UI.CornerRadius {
+            set(value) { self._background.cornerRadius = value }
+            get { return self._background.cornerRadius }
+        }
+        public var border: UI.Border {
+            set(value) { self._background.border = value }
+            get { return self._background.border }
+        }
+        public var shadow: UI.Shadow? {
+            set(value) { self._background.shadow = value }
+            get { return self._background.shadow }
+        }
         public var placement: Placement {
             set(value) { self._layout.placement = value }
             get { return self._layout.placement }
@@ -26,23 +43,6 @@ public extension UI.View {
                 self._layout.separatorItem = self.separatorView.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var color: UI.Color? {
-            set(value) { self._background.color = value }
-            get { return self._background.color }
-        }
-        public var cornerRadius: UI.CornerRadius {
-            set(value) { self._background.cornerRadius = value }
-            get { return self._background.cornerRadius }
-        }
-        public var border: UI.Border {
-            set(value) { self._background.border = value }
-            get { return self._background.border }
-        }
-        public var shadow: UI.Shadow? {
-            set(value) { self._background.shadow = value }
-            get { return self._background.shadow }
-        }
-        public private(set) var body: UI.View.Custom
         
         private var _layout: Layout
         private var _background = UI.View.Empty()

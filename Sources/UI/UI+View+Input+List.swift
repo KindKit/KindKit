@@ -15,11 +15,9 @@ protocol KKInputListViewDelegate : AnyObject {
 }
 
 public extension UI.View.Input {
-
-    final class List : IUIView, IUIViewInputable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    
+    final class List : IUIView, IUIViewReusable, IUIViewInputable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -30,12 +28,26 @@ public extension UI.View.Input {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: Swift.String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var isEditing: Bool {
             guard self.isLoaded == true else { return false }
@@ -51,6 +63,36 @@ public extension UI.View.Input {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
+            }
+        }
+        public var color: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(color: self.color)
+            }
+        }
+        public var cornerRadius: UI.CornerRadius = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(cornerRadius: self.cornerRadius)
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(border: self.border)
+            }
+        }
+        public var shadow: UI.Shadow? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(shadow: self.shadow)
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(alpha: self.alpha)
             }
         }
         public var items: [IInputListItem] = [] {
@@ -103,44 +145,14 @@ public extension UI.View.Input {
                 self._view.update(alignment: self.alignment)
             }
         }
-        #if os(iOS)
+#if os(iOS)
         public var toolbar: UI.View.Input.Toolbar? {
             didSet {
                 guard self.isLoaded == true else { return }
                 self._view.update(toolbar: self.toolbar)
             }
         }
-        #endif
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
-            }
-        }
+#endif
         public var onAppear: ((UI.View.Input.List) -> Void)?
         public var onDisappear: ((UI.View.Input.List) -> Void)?
         public var onVisible: ((UI.View.Input.List) -> Void)?
@@ -152,7 +164,7 @@ public extension UI.View.Input {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _selected: IInputListItem?
         
@@ -187,16 +199,16 @@ public extension UI.View.Input {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            #if os(iOS)
+#if os(iOS)
             self.toolbar?.appear(to: self)
-            #endif
+#endif
             self.onAppear?(self)
         }
         
         public func disappear() {
-            #if os(iOS)
+#if os(iOS)
             self.toolbar?.disappear()
-            #endif
+#endif
             self._reuse.disappear()
             self.appearedLayout = nil
             self.onDisappear?(self)
@@ -227,7 +239,7 @@ public extension UI.View.Input {
             self._view.endEditing(false)
             return self
         }
-
+        
     }
     
 }
@@ -289,8 +301,8 @@ public extension UI.View.Input.List {
         self.alignment = value
         return self
     }
-        
-    #if os(iOS)
+    
+#if os(iOS)
     
     @inlinable
     @discardableResult
@@ -299,7 +311,7 @@ public extension UI.View.Input.List {
         return self
     }
     
-    #endif
+#endif
     
 }
 

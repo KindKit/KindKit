@@ -16,10 +16,8 @@ protocol KKInputDateViewDelegate : AnyObject {
 
 public extension UI.View.Input {
     
-    final class Date : IUIView, IUIViewInputable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Date : IUIView, IUIViewReusable, IUIViewInputable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -30,12 +28,26 @@ public extension UI.View.Input {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: Swift.String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var isEditing: Bool {
             guard self.isLoaded == true else { return false }
@@ -51,6 +63,36 @@ public extension UI.View.Input {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
+            }
+        }
+        public var color: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(color: self.color)
+            }
+        }
+        public var cornerRadius: UI.CornerRadius = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(cornerRadius: self.cornerRadius)
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(border: self.border)
+            }
+        }
+        public var shadow: UI.Shadow? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(shadow: self.shadow)
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(alpha: self.alpha)
             }
         }
         public var mode: Mode = .dateTime {
@@ -129,36 +171,6 @@ public extension UI.View.Input {
             }
         }
 #endif
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
-            }
-        }
         public var onAppear: ((UI.View.Input.Date) -> Void)?
         public var onDisappear: ((UI.View.Input.Date) -> Void)?
         public var onVisible: ((UI.View.Input.Date) -> Void)?
@@ -170,7 +182,7 @@ public extension UI.View.Input {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _selectedDate: Foundation.Date?
         

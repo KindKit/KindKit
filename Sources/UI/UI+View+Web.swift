@@ -19,10 +19,8 @@ protocol KKWebViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Web : IUIView, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Web : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -33,12 +31,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
@@ -52,26 +64,6 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var enablePinchGesture: Bool = true {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(enablePinchGesture: self.enablePinchGesture)
-            }
-        }
-        public var contentInset: InsetFloat = .zero {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(contentInset: self.contentInset)
-            }
-        }
-        public private(set) var contentSize: SizeFloat = .zero
-        public var request: Request? {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(request: request)
-            }
-        }
-        public private(set) var state: State = .empty
         public var color: UI.Color? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
@@ -104,6 +96,26 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var enablePinchGesture: Bool = true {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(enablePinchGesture: self.enablePinchGesture)
+            }
+        }
+        public var contentInset: InsetFloat = .zero {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(contentInset: self.contentInset)
+            }
+        }
+        public private(set) var contentSize: SizeFloat = .zero
+        public var request: Request? {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(request: request)
+            }
+        }
+        public private(set) var state: State = .empty
         public var onAppear: ((UI.View.Web) -> Void)?
         public var onDisappear: ((UI.View.Web) -> Void)?
         public var onVisible: ((UI.View.Web) -> Void)?
@@ -116,7 +128,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         
         public init() {

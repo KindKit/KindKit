@@ -14,9 +14,8 @@ protocol KKInputToolbarViewDelegate : AnyObject {
 
 public extension UI.View.Input {
 
-    final class Toolbar : IUIAccessoryView, IUIViewColorable {
+    final class Toolbar : IUIAccessoryView, IUIViewReusable, IUIViewColorable {
         
-        public private(set) unowned var parentView: IUIView?
         public var native: NativeView {
             return self._view
         }
@@ -26,6 +25,25 @@ public extension UI.View.Input {
         public var bounds: RectFloat {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
+        }
+        public private(set) unowned var parentView: IUIView?
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: Swift.String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
+        }
+        public var color: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(color: self.color)
+            }
         }
         public var items: [IInputToolbarItem] {
             didSet {
@@ -57,18 +75,12 @@ public extension UI.View.Input {
                 self._view.update(contentTintColor: self.contentTintColor)
             }
         }
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
         public var onAppear: ((UI.View.Input.Toolbar) -> Void)?
         public var onDisappear: ((UI.View.Input.Toolbar) -> Void)?
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         
         public init(

@@ -8,10 +8,8 @@ import Foundation
 
 public extension UI.View {
 
-    final class Graphics : IUIView, IUIViewStaticSizeable, IUIViewLockable, IUIViewColorable, IUIViewAlphable {
+    final class Graphics : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewLockable, IUIViewColorable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -22,12 +20,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet(oldValue) {
@@ -41,17 +53,6 @@ public extension UI.View {
                 guard self.height != oldValue else { return }
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var canvas: IGraphicsCanvas {
-            willSet(oldValue) {
-                guard self.canvas !== oldValue else { return }
-                self.canvas.detach()
-            }
-            didSet(oldValue) {
-                guard self.canvas !== oldValue else { return }
-                self.canvas.attach(view: self)
-                self._view.update(canvas: self.canvas)
             }
         }
         public var isLocked: Bool {
@@ -78,6 +79,17 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var canvas: IGraphicsCanvas {
+            willSet(oldValue) {
+                guard self.canvas !== oldValue else { return }
+                self.canvas.detach()
+            }
+            didSet(oldValue) {
+                guard self.canvas !== oldValue else { return }
+                self.canvas.attach(view: self)
+                self._view.update(canvas: self.canvas)
+            }
+        }
         public var onAppear: ((UI.View.Graphics) -> Void)?
         public var onDisappear: ((UI.View.Graphics) -> Void)?
         public var onVisible: ((UI.View.Graphics) -> Void)?
@@ -87,7 +99,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _isLocked: Bool = false
         

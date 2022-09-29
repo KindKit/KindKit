@@ -32,10 +32,8 @@ protocol KKPagingViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Paging : IUIView, IUIViewPageable, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Paging : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewPageable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -46,12 +44,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fill {
             didSet {
@@ -63,27 +75,6 @@ public extension UI.View {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var direction: Direction = .horizontal(bounds: true) {
-            didSet(oldValue) {
-                guard self.direction != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(direction: self.direction)
-            }
-        }
-        public var visibleInset: InsetFloat = .zero {
-            didSet(oldValue) {
-                guard self.visibleInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(visibleInset: self.visibleInset)
-            }
-        }
-        public var contentInset: InsetFloat = .zero {
-            didSet(oldValue) {
-                guard self.contentInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(contentInset: self.contentInset)
             }
         }
         public var currentPage: Float {
@@ -118,19 +109,6 @@ public extension UI.View {
                 self.linkedPageable?.linkedPageable = self
             }
         }
-        public private(set) var contentSize: SizeFloat = .zero
-        public var content: IUILayout {
-            willSet {
-                self.content.view = nil
-            }
-            didSet(oldValue) {
-                self.content.view = self
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
-            }
-        }
-        public private(set) var isDragging: Bool = false
-        public private(set) var isDecelerating: Bool = false
         public var isLocked: Bool {
             set(value) {
                 if self._isLocked != value {
@@ -180,6 +158,40 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var direction: Direction = .horizontal(bounds: true) {
+            didSet(oldValue) {
+                guard self.direction != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(direction: self.direction)
+            }
+        }
+        public var visibleInset: InsetFloat = .zero {
+            didSet(oldValue) {
+                guard self.visibleInset != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(visibleInset: self.visibleInset)
+            }
+        }
+        public var contentInset: InsetFloat = .zero {
+            didSet(oldValue) {
+                guard self.contentInset != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(contentInset: self.contentInset)
+            }
+        }
+        public private(set) var contentSize: SizeFloat = .zero
+        public var content: IUILayout {
+            willSet {
+                self.content.view = nil
+            }
+            didSet(oldValue) {
+                self.content.view = self
+                guard self.isLoaded == true else { return }
+                self._view.update(content: self.content)
+            }
+        }
+        public private(set) var isDragging: Bool = false
+        public private(set) var isDecelerating: Bool = false
         public var onAppear: ((UI.View.Paging) -> Void)?
         public var onDisappear: ((UI.View.Paging) -> Void)?
         public var onVisible: ((UI.View.Paging) -> Void)?
@@ -194,7 +206,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _isLocked: Bool = false
         private var _currentPage: Float = 0

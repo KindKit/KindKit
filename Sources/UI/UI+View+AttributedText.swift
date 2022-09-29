@@ -13,10 +13,8 @@ protocol KKAttributedTextViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class AttributedText : IUIView, IUIViewDynamicSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class AttributedText : IUIViewReusable, IUIView, IUIViewDynamicSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -27,12 +25,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet(oldValue) {
@@ -49,40 +61,6 @@ public extension UI.View {
                 guard self.isLoaded == true else { return }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
-                self.setNeedForceLayout()
-            }
-        }
-        public var text: NSAttributedString {
-            didSet(oldValue) {
-                guard self.text != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(text: self.text, alignment: self.alignment)
-                self._cacheAvailable = nil
-                self._cacheSize = nil
-                self.setNeedForceLayout()
-            }
-        }
-        public var alignment: UI.Text.Alignment? = nil {
-            didSet(oldValue) {
-                guard self.alignment != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alignment: self.alignment)
-                self.setNeedLayout()
-            }
-        }
-        public var lineBreak: UI.Text.LineBreak = .wordWrapping {
-            didSet(oldValue) {
-                guard self.lineBreak != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(lineBreak: self.lineBreak)
-                self.setNeedForceLayout()
-            }
-        }
-        public var numberOfLines: UInt = 0 {
-            didSet(oldValue) {
-                guard self.numberOfLines != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(numberOfLines: self.numberOfLines)
                 self.setNeedForceLayout()
             }
         }
@@ -123,6 +101,40 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var text: NSAttributedString {
+            didSet(oldValue) {
+                guard self.text != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(text: self.text, alignment: self.alignment)
+                self._cacheAvailable = nil
+                self._cacheSize = nil
+                self.setNeedForceLayout()
+            }
+        }
+        public var alignment: UI.Text.Alignment? = nil {
+            didSet(oldValue) {
+                guard self.alignment != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(alignment: self.alignment)
+                self.setNeedLayout()
+            }
+        }
+        public var lineBreak: UI.Text.LineBreak = .wordWrapping {
+            didSet(oldValue) {
+                guard self.lineBreak != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(lineBreak: self.lineBreak)
+                self.setNeedForceLayout()
+            }
+        }
+        public var numberOfLines: UInt = 0 {
+            didSet(oldValue) {
+                guard self.numberOfLines != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(numberOfLines: self.numberOfLines)
+                self.setNeedForceLayout()
+            }
+        }
         public var onAppear: ((UI.View.AttributedText) -> Void)?
         public var onDisappear: ((UI.View.AttributedText) -> Void)?
         public var onVisible: ((UI.View.AttributedText) -> Void)?
@@ -132,7 +144,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _cacheAvailable: SizeFloat?
         private var _cacheSize: SizeFloat?

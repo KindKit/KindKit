@@ -12,10 +12,18 @@ protocol IPageBarItemViewDelegate : AnyObject {
 
 public extension UI.View.PageBar {
     
-    final class Item : IUIWidgetView, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Item : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        unowned var delegate: IPageBarItemViewDelegate?
-        
+        public let body: UI.View.Custom
+        public var isSelected: Bool {
+            set(value) {
+                if self._isSelected != value {
+                    self._isSelected = value
+                    self.triggeredChangeStyle(false)
+                }
+            }
+            get { return self._isSelected }
+        }
         public var inset: InsetFloat {
             set(value) { self._layout.inset = value }
             get { return self._layout.inset }
@@ -26,17 +34,9 @@ public extension UI.View.PageBar {
                 self._layout.content = UI.Layout.Item(self.content)
             }
         }
-        public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
-            }
-            get { return self._isSelected }
-        }
         public let tapGesture = UI.Gesture.Tap()
-        public let body: UI.View.Custom
+        
+        unowned var delegate: IPageBarItemViewDelegate?
         
         private var _layout: UI.View.PageBar.Item.Layout
         private var _isSelected: Bool = false

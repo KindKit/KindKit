@@ -12,9 +12,9 @@ public protocol IGroupBarViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class GroupBar : IUIWidgetView, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class GroupBar : IUIWidgetView, IUIViewReusable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public unowned var delegate: IGroupBarViewDelegate?
+        public private(set) var body: UI.View.Bar
         public var items: [UI.View.GroupBar.Item] {
             set(value) {
                 for itemView in self._items {
@@ -45,7 +45,7 @@ public extension UI.View {
             }
             get { return self._selected }
         }
-        public private(set) var body: UI.View.Bar
+        public unowned var delegate: IGroupBarViewDelegate?
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Custom

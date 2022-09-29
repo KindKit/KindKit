@@ -103,7 +103,7 @@ public extension UI.Gesture {
 
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _gesture: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _onShouldBegin: ((UI.Gesture.Pinch) -> Bool)?
         private var _onShouldSimultaneously: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?

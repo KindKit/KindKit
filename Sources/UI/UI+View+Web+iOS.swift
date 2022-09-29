@@ -51,11 +51,9 @@ final class KKWebView : WKWebView {
     }
     
     private unowned var _view: UI.View.Web?
-    private var _enablePinchGesture: Bool
+    private var _enablePinchGesture: Bool = true
     
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-        self._enablePinchGesture = true
-        
         super.init(frame: frame, configuration: configuration)
 
         if #available(iOS 11.0, *) {

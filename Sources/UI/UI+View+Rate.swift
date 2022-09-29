@@ -8,10 +8,8 @@ import Foundation
 
 public extension UI.View {
 
-    final class Rate : IUIView, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Rate : IUIView, IUIViewReusable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -22,11 +20,55 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
+            }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
+        }
+        public var color: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(color: self.color)
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(border: self.border)
+            }
+        }
+        public var cornerRadius: UI.CornerRadius = .none {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(cornerRadius: self.cornerRadius)
+            }
+        }
+        public var shadow: UI.Shadow? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(shadow: self.shadow)
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(alpha: self.alpha)
             }
         }
         public var itemSize: SizeFloat = .init(width: 40, height: 40) {
@@ -70,36 +112,6 @@ public extension UI.View {
                 self._view.update(rating: self.rating)
             }
         }
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
-            }
-        }
         public var onAppear: ((UI.View.Rate) -> Void)?
         public var onDisappear: ((UI.View.Rate) -> Void)?
         public var onVisible: ((UI.View.Rate) -> Void)?
@@ -108,7 +120,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _states: [State] = []
         

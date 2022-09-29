@@ -12,10 +12,9 @@ public protocol IPageBarViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class PageBar : IUIWidgetView, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class PageBar : IUIWidgetView, IUIViewReusable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public unowned var delegate: IPageBarViewDelegate?
-        
+        public private(set) var body: UI.View.Bar
         public var leading: IUIView? {
             didSet(oldValue) {
                 guard self.leading !== oldValue else { return }
@@ -74,7 +73,7 @@ public extension UI.View {
             }
             get { return self._selected }
         }
-        public private(set) var body: UI.View.Bar
+        public unowned var delegate: IPageBarViewDelegate?
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Scroll

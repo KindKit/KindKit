@@ -8,10 +8,8 @@ import Foundation
 
 public extension UI.View {
 
-    final class Progress : IUIView, IUIViewProgressable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Progress : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewProgressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -22,12 +20,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
@@ -39,18 +51,6 @@ public extension UI.View {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var progressColor: UI.Color? {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(progressColor: self.progressColor)
-            }
-        }
-        public var trackColor: UI.Color? {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(trackColor: self.trackColor)
             }
         }
         public var progress: Float = 0 {
@@ -89,6 +89,18 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var progressColor: UI.Color? {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(progressColor: self.progressColor)
+            }
+        }
+        public var trackColor: UI.Color? {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(trackColor: self.trackColor)
+            }
+        }
         public var onAppear: ((UI.View.Progress) -> Void)?
         public var onDisappear: ((UI.View.Progress) -> Void)?
         public var onVisible: ((UI.View.Progress) -> Void)?
@@ -97,7 +109,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         
         public init() {

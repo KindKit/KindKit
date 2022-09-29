@@ -6,8 +6,9 @@ import Foundation
 
 public extension UI.View {
 
-    final class Button : IUIWidgetView, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Button : IUIWidgetView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
+        public private(set) var body: UI.View.Control
         public var inset: InsetFloat {
             set(value) { self._layout.inset = value }
             get { return self._layout.inset }
@@ -23,6 +24,15 @@ public extension UI.View {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var isSelected: Bool {
+            set(value) {
+                if self._isSelected != value {
+                    self._isSelected = value
+                    self.triggeredChangeStyle(false)
+                }
+            }
+            get { return self._isSelected }
         }
         public var alignment: Alignment {
             set(value) { self._layout.alignment = value }
@@ -63,16 +73,6 @@ public extension UI.View {
             set(value) { self._layout.secondaryInset = value }
             get { return self._layout.secondaryInset }
         }
-        public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
-            }
-            get { return self._isSelected }
-        }
-        public private(set) var body: UI.View.Control
         
         private var _layout: Layout
         private var _isSelected: Bool = false
