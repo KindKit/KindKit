@@ -6,12 +6,31 @@ import Foundation
 
 public protocol IUIViewPressable : AnyObject {
     
+    var shouldPressed: Bool { set get }
+    
     @discardableResult
     func onPressed(_ value: ((Self) -> Void)?) -> Self
     
 }
 
+public extension IUIViewPressable {
+    
+    @inlinable
+    @discardableResult
+    func shouldPressed(_ value: Bool) -> Self {
+        self.shouldPressed = value
+        return self
+    }
+    
+}
+
 public extension IUIViewPressable where Self : IUIWidgetView, Body : IUIViewPressable {
+    
+    @inlinable
+    var shouldPressed: Bool {
+        set(value) { self.body.shouldPressed = value }
+        get { return self.body.shouldPressed }
+    }
     
     @inlinable
     @discardableResult

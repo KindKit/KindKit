@@ -11,8 +11,9 @@ import UIKit
 
 public extension UI.View {
     
-    final class SwipeCell : IUIWidgetView, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class SwipeCell : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
+        public let body: UI.View.Custom
         public var isSelected: Bool {
             set(value) {
                 if self._isSelected != value {
@@ -76,7 +77,6 @@ public extension UI.View {
         public let pressedGesture = UI.Gesture.Tap()
         public let interactiveGesture = UI.Gesture.Pan()
 #endif
-        public private(set) var body: UI.View.Custom
         public var onShowLeading: ((UI.View.SwipeCell) -> Void)?
         public var onHideLeading: ((UI.View.SwipeCell) -> Void)?
         public var onShowTrailing: ((UI.View.SwipeCell) -> Void)?

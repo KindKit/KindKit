@@ -8,7 +8,6 @@ public protocol IUIView : IUIAnyView {
     
     var appearedLayout: IUILayout? { get }
     var appearedItem: UI.Layout.Item? { set get }
-    var isAppeared: Bool { get }
     var isVisible: Bool { get }
     var isHidden: Bool { set get }
     

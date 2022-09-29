@@ -13,10 +13,8 @@ protocol KKCustomViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Custom : IUIView, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Custom : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -27,12 +25,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
@@ -45,31 +57,6 @@ public extension UI.View {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
             }
-        }
-        public var gestures: [IUIGesture] {
-            set(value) {
-                self._gestures = value
-                if self.isLoaded == true {
-                    self._view.update(gestures: value)
-                }
-            }
-            get { return self._gestures }
-        }
-        public var content: IUILayout {
-            willSet {
-                self.content.view = nil
-            }
-            didSet(oldValue) {
-                self.content.view = self
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
-                self.content.setNeedForceUpdate()
-                self.setNeedForceLayout()
-            }
-        }
-        public var contentSize: SizeFloat {
-            guard self.isLoaded == true else { return .zero }
-            return self._view.contentSize
         }
         public var shouldHighlighting: Bool = false {
             didSet {
@@ -131,6 +118,31 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var gestures: [IUIGesture] {
+            set(value) {
+                self._gestures = value
+                if self.isLoaded == true {
+                    self._view.update(gestures: value)
+                }
+            }
+            get { return self._gestures }
+        }
+        public var content: IUILayout {
+            willSet {
+                self.content.view = nil
+            }
+            didSet(oldValue) {
+                self.content.view = self
+                guard self.isLoaded == true else { return }
+                self._view.update(content: self.content)
+                self.content.setNeedForceUpdate()
+                self.setNeedForceLayout()
+            }
+        }
+        public var contentSize: SizeFloat {
+            guard self.isLoaded == true else { return .zero }
+            return self._view.contentSize
+        }
         public var onAppear: ((UI.View.Custom) -> Void)?
         public var onDisappear: ((UI.View.Custom) -> Void)?
         public var onVisible: ((UI.View.Custom) -> Void)?
@@ -140,7 +152,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _gestures: [IUIGesture] = []
         private var _isHighlighted: Bool = false
@@ -218,6 +230,13 @@ public extension UI.View {
 
 public extension UI.View.Custom {
     
+    @inlinable
+    @discardableResult
+    func gestures(_ value: [IUIGesture]) -> Self {
+        self.gestures = value
+        return self
+    }
+    
     @discardableResult
     func add(gesture: IUIGesture) -> Self {
         if self._gestures.contains(where: { $0 === gesture }) == false {
@@ -237,20 +256,6 @@ public extension UI.View.Custom {
                 self._view.remove(gesture: gesture)
             }
         }
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func shouldHighlighting(_ value: Bool) -> Self {
-        self.shouldHighlighting = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func gestures(_ value: [IUIGesture]) -> Self {
-        self.gestures = value
         return self
     }
     

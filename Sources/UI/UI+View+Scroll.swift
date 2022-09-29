@@ -36,10 +36,8 @@ protocol KKScrollViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Scroll : IUIView, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Scroll : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -50,12 +48,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fill {
             didSet {
@@ -67,6 +79,55 @@ public extension UI.View {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
+            }
+        }
+        public var isLocked: Bool {
+            set(value) {
+                if self._isLocked != value {
+                    self._isLocked = value
+                    if self.isLoaded == true {
+                        self._view.update(locked: self._isLocked)
+                    }
+                    self.triggeredChangeStyle(false)
+                }
+            }
+            get { return self._isLocked }
+        }
+        public var color: UI.Color? = nil {
+            didSet(oldValue) {
+                guard self.color != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(color: self.color)
+            }
+        }
+        public var cornerRadius: UI.CornerRadius = .none {
+            didSet(oldValue) {
+                guard self.cornerRadius != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(cornerRadius: self.cornerRadius)
+                self._view.updateShadowPath()
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet(oldValue) {
+                guard self.border != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(border: self.border)
+            }
+        }
+        public var shadow: UI.Shadow? = nil {
+            didSet(oldValue) {
+                guard self.shadow != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(shadow: self.shadow)
+                self._view.updateShadowPath()
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet(oldValue) {
+                guard self.alpha != oldValue else { return }
+                guard self.isLoaded == true else { return }
+                self._view.update(alpha: self.alpha)
             }
         }
         public var direction: Direction = [ .vertical, .bounds ] {
@@ -148,55 +209,6 @@ public extension UI.View {
             get { return self._isRefreshing }
         }
     #endif
-        public var isLocked: Bool {
-            set(value) {
-                if self._isLocked != value {
-                    self._isLocked = value
-                    if self.isLoaded == true {
-                        self._view.update(locked: self._isLocked)
-                    }
-                    self.triggeredChangeStyle(false)
-                }
-            }
-            get { return self._isLocked }
-        }
-        public var color: UI.Color? = nil {
-            didSet(oldValue) {
-                guard self.color != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet(oldValue) {
-                guard self.cornerRadius != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet(oldValue) {
-                guard self.border != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet(oldValue) {
-                guard self.shadow != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet(oldValue) {
-                guard self.alpha != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
-            }
-        }
         public var onAppear: ((UI.View.Scroll) -> Void)?
         public var onDisappear: ((UI.View.Scroll) -> Void)?
         public var onVisible: ((UI.View.Scroll) -> Void)?
@@ -213,7 +225,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _contentOffset: PointFloat = .zero
         private var _refreshColor: UI.Color?

@@ -14,10 +14,8 @@ protocol KKSwitchViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Switch : IUIView, IUIViewStaticSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
-            
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+    final class Switch : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+        
         public var native: NativeView {
             return self._view
         }
@@ -28,12 +26,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fixed(51) {
             didSet {
@@ -46,32 +58,6 @@ public extension UI.View {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
             }
-        }
-        public var thumbColor: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(thumbColor: self.thumbColor)
-            }
-        }
-        public var offColor: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(offColor: self.offColor)
-            }
-        }
-        public var onColor: UI.Color? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(onColor: self.onColor)
-            }
-        }
-        public var value: Bool {
-            set(value) {
-                self._value = value
-                guard self.isLoaded == true else { return }
-                self._view.update(value: self._value)
-            }
-            get { return self._value }
         }
         public var isLocked: Bool {
             set(value) {
@@ -115,6 +101,32 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var thumbColor: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(thumbColor: self.thumbColor)
+            }
+        }
+        public var offColor: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(offColor: self.offColor)
+            }
+        }
+        public var onColor: UI.Color? = nil {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(onColor: self.onColor)
+            }
+        }
+        public var value: Bool {
+            set(value) {
+                self._value = value
+                guard self.isLoaded == true else { return }
+                self._view.update(value: self._value)
+            }
+            get { return self._value }
+        }
         public var onAppear: ((UI.View.Switch) -> Void)?
         public var onDisappear: ((UI.View.Switch) -> Void)?
         public var onVisible: ((UI.View.Switch) -> Void)?
@@ -125,7 +137,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _isLocked: Bool = false
         private var _value: Bool = false

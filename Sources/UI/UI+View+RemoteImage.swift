@@ -6,9 +6,9 @@ import Foundation
 
 public extension UI.View {
 
-    final class RemoteImage : IUIWidgetView, IUIViewDynamicSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class RemoteImage : IUIWidgetView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) var isLoading: Bool = false
+        public let body: UI.View.Custom
         public var placeholder: UI.View.Image? {
             didSet(oldValue) {
                 guard self.placeholder !== oldValue else { return }
@@ -33,10 +33,10 @@ public extension UI.View {
                 self._layout.error = self.error.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public private(set) var loader: KindKit.RemoteImage.Loader
+        public private(set) var isLoading: Bool = false
+        public let loader: KindKit.RemoteImage.Loader
         public var query: IRemoteImageQuery
         public var filter: IRemoteImageFilter?
-        public let body: UI.View.Custom
         public var onProgress: ((UI.View.RemoteImage, Float) -> Void)?
         public var onFinish: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?
         public var onError: ((UI.View.RemoteImage, Error) -> Void)?

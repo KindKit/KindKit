@@ -6,10 +6,8 @@ import Foundation
 
 public extension UI.View {
 
-    final class Image : IUIView, IUIViewDynamicSizeable, IUIViewColorable, IUIViewTintColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Image : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewColorable, IUIViewTintColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -20,12 +18,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
@@ -42,20 +54,6 @@ public extension UI.View {
         public var aspectRatio: Float? = nil {
             didSet {
                 guard self.isLoaded == true else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var image: UI.Image {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(image: self.image)
-                self.setNeedForceLayout()
-            }
-        }
-        public var mode: Mode = .aspectFit {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(mode: self.mode)
                 self.setNeedForceLayout()
             }
         }
@@ -95,6 +93,20 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var image: UI.Image {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(image: self.image)
+                self.setNeedForceLayout()
+            }
+        }
+        public var mode: Mode = .aspectFit {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(mode: self.mode)
+                self.setNeedForceLayout()
+            }
+        }
         public var onAppear: ((UI.View.Image) -> Void)?
         public var onDisappear: ((UI.View.Image) -> Void)?
         public var onVisible: ((UI.View.Image) -> Void)?
@@ -103,7 +115,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         
         public init(

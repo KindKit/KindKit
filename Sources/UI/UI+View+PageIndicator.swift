@@ -14,10 +14,8 @@ protocol KKPageIndicatorViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class PageIndicator : IUIView, IUIViewPageable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class PageIndicator : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewPageable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
         public var native: NativeView {
             return self._view
         }
@@ -28,12 +26,26 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return Rect(self._view.bounds)
         }
+        public private(set) unowned var appearedLayout: IUILayout?
+        public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet(oldValue) {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
+        }
+        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+            set(value) { self._reuse.unloadBehaviour = value }
+            get { return self._reuse.unloadBehaviour }
+        }
+        public var reuseCache: UI.Reuse.Cache? {
+            set(value) { self._reuse.cache = value }
+            get { return self._reuse.cache }
+        }
+        public var reuseName: String? {
+            set(value) { self._reuse.name = value }
+            get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
@@ -45,18 +57,6 @@ public extension UI.View {
             didSet {
                 guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var pageColor: UI.Color? {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(pageColor: self.pageColor)
-            }
-        }
-        public var currentPageColor: UI.Color? {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(currentPageColor: self.currentPageColor)
             }
         }
         public var currentPage: Float {
@@ -117,6 +117,18 @@ public extension UI.View {
                 self._view.update(alpha: self.alpha)
             }
         }
+        public var pageColor: UI.Color? {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(pageColor: self.pageColor)
+            }
+        }
+        public var currentPageColor: UI.Color? {
+            didSet {
+                guard self.isLoaded == true else { return }
+                self._view.update(currentPageColor: self.currentPageColor)
+            }
+        }
         public var onAppear: ((UI.View.PageIndicator) -> Void)?
         public var onDisappear: ((UI.View.PageIndicator) -> Void)?
         public var onVisible: ((UI.View.PageIndicator) -> Void)?
@@ -125,7 +137,7 @@ public extension UI.View {
         
         private var _reuse: UI.Reuse.Item< Reusable >
         private var _view: Reusable.Content {
-            return self._reuse.content()
+            return self._reuse.content
         }
         private var _currentPage: Float = 0
         

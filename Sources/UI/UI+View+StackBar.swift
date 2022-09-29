@@ -8,6 +8,7 @@ public extension UI.View {
 
     final class StackBar : IUIWidgetView, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
+        public let body: UI.View.Bar
         public var size: Float? {
             set(value) {
                 guard self.body.size != value else { return }
@@ -53,7 +54,6 @@ public extension UI.View {
         public var footerSpacing: Float = 8 {
             didSet { self._relayout() }
         }
-        public private(set) var body: UI.View.Bar
 
         private var _contentLayout: UI.Layout.Composition {
             didSet {

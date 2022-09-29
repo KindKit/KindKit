@@ -14,8 +14,16 @@ public extension UI.View.GroupBar {
     
     final class Item : IUIWidgetView, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
-        unowned var delegate: IGroupBarItemViewDelegate?
-        
+        public private(set) var body: UI.View.Custom
+        public var isSelected: Bool {
+            set(value) {
+                if self._isSelected != value {
+                    self._isSelected = value
+                    self.triggeredChangeStyle(false)
+                }
+            }
+            get { return self._isSelected }
+        }
         public var inset: InsetFloat {
             set(value) { self._layout.inset = value }
             get { return self._layout.inset }
@@ -26,16 +34,8 @@ public extension UI.View.GroupBar {
                 self._layout.content = UI.Layout.Item(self.content)
             }
         }
-        public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
-            }
-            get { return self._isSelected }
-        }
-        public private(set) var body: UI.View.Custom
+        
+        unowned var delegate: IGroupBarItemViewDelegate?
         
         private var _layout: UI.View.GroupBar.Item.Layout
         private var _tapGesture = UI.Gesture.Tap()
