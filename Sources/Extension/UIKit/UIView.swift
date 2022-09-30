@@ -41,10 +41,6 @@ public extension UIView {
         return false
     }
     
-    func update(locked: Bool) {
-        self.isUserInteractionEnabled = locked == false
-    }
-    
     func update(color: UI.Color?) {
         self.backgroundColor = color?.native
     }
@@ -56,15 +52,20 @@ public extension UIView {
     func update(cornerRadius: UI.CornerRadius) {
         let layer = self.layer
         switch cornerRadius {
-        case .none: layer.cornerRadius = 0
-        case .manual(let radius): layer.cornerRadius = CGFloat(radius)
-        case .auto:
+        case .none:
+            layer.cornerRadius = 0
+            layer.maskedCorners = [ .layerMinXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner ]
+        case .auto(let percent, let edges):
             let size = self.bounds.size
             if size.width > 0 && size.height > 0 {
-                layer.cornerRadius = ceil(min(size.width - 1, size.height - 1)) / 2
+                layer.cornerRadius = ceil(min(size.width - 1, size.height - 1)) * CGFloat(percent.value)
             } else {
                 layer.cornerRadius = 0
             }
+            layer.maskedCorners = edges.caCornerMask
+        case .manual(let radius, let edges):
+            layer.cornerRadius = CGFloat(radius)
+            layer.maskedCorners = edges.caCornerMask
         }
     }
     

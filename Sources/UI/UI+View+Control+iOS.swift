@@ -40,13 +40,12 @@ final class KKControlView : UIControl {
         return self._layoutManager.size
     }
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }
@@ -109,6 +108,10 @@ extension KKControlView {
         self.update(alpha: view.alpha)
         self.updateShadowPath()
         self.kkDelegate = view
+    }
+    
+    func update(locked: Bool) {
+        self.isUserInteractionEnabled = locked == false
     }
     
     func update(content: IUILayout) {

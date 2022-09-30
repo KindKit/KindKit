@@ -89,6 +89,10 @@ extension KKStepperView {
         self.kkDelegate = view
     }
     
+    func update(locked: Bool) {
+        self.isUserInteractionEnabled = locked == false
+    }
+    
     func update(minValue: Float) {
         self._stepper.minimumValue = Double(minValue)
     }

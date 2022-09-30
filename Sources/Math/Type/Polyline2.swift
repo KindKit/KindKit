@@ -176,7 +176,7 @@ public extension Polyline2 {
 public extension Polyline2 {
     
     subscript(corner key: CornerIndex) -> Point< Value > {
-        set(value) { self.corners[key.value] = value }
+        set { self.corners[key.value] = newValue }
         get { return self.corners[key.value] }
     }
     
@@ -185,14 +185,14 @@ public extension Polyline2 {
     }
     
     subscript(segment key: EdgeIndex) -> Segment2< Value > {
-        set(value) { self[segment: self.edges[key.value]] = value }
+        set { self[segment: self.edges[key.value]] = newValue }
         get { return self[segment: self.edges[key.value]] }
     }
     
     subscript(segment key: Edge) -> Segment2< Value > {
-        set(value) {
-            self.corners[key.start.value] = value.start
-            self.corners[key.end.value] = value.end
+        set {
+            self.corners[key.start.value] = newValue.start
+            self.corners[key.end.value] = newValue.end
         }
         get {
             return Segment2(

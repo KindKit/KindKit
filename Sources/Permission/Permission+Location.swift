@@ -94,11 +94,7 @@ public extension Permission {
 #if os(iOS)
                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
                 if UIApplication.shared.canOpenURL(url) == true {
-                    if #available(iOS 10.0, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
                     self._resignSource = source
                     self._didRedirectToSettings(source: source)
                 }
@@ -140,11 +136,10 @@ private extension Permission.Location {
 private extension Permission.Location {
     
     func _rawStatus() -> CLAuthorizationStatus {
-        if #available(iOS 14, *) {
+        if #available(macOS 11, iOS 14, *) {
             return self._locationManager.authorizationStatus
-        } else {
-            return CLLocationManager.authorizationStatus()
         }
+        return CLLocationManager.authorizationStatus()
     }
     
     func _didRedirectToSettings(source: Any) {

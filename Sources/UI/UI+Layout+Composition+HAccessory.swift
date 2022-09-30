@@ -9,19 +9,25 @@ public extension UI.Layout.Composition {
     struct HAccessory {
         
         public var leading: IUICompositionLayoutEntity?
+        public var leadingSpacing: Float
         public var center: IUICompositionLayoutEntity
         public var trailing: IUICompositionLayoutEntity?
+        public var trailingSpacing: Float
         public var filling: Bool
         
         public init(
             leading: IUICompositionLayoutEntity? = nil,
+            leadingSpacing: Float = 0,
             center: IUICompositionLayoutEntity,
             trailing: IUICompositionLayoutEntity? = nil,
+            trailingSpacing: Float = 0,
             filling: Bool = true
         ) {
             self.leading = leading
+            self.leadingSpacing = leadingSpacing
             self.center = center
             self.trailing = trailing
+            self.trailingSpacing = trailingSpacing
             self.filling = filling
         }
         
@@ -51,8 +57,9 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
         } else {
             trailingSize = .zero
         }
+        let accessorySize = (leadingSize.width + self.leadingSpacing) + (trailingSize.width + self.trailingSpacing)
         let centerSize = self.center.size(available: SizeFloat(
-            width: bounds.width - (leadingSize.width + trailingSize.width),
+            width: bounds.width - accessorySize,
             height: max(leadingSize.height, bounds.height, trailingSize.height)
         ))
         let base = RectFloat(
@@ -77,15 +84,15 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
         }
         if self.filling == true {
             self.center.layout(bounds: RectFloat(
-                x: base.x + leadingSize.width,
+                x: base.x + (leadingSize.width + self.leadingSpacing),
                 y: base.y,
-                width: base.width - (leadingSize.width + trailingSize.width),
+                width: base.width - accessorySize,
                 height: base.height
             ))
         } else {
             self.center.layout(bounds: RectFloat(
                 center: base.center,
-                width: bounds.width - (max(leadingSize.width, trailingSize.width) * 2),
+                width: bounds.width - (max(leadingSize.width + self.leadingSpacing, trailingSize.width + self.trailingSpacing) * 2),
                 height: base.height
             ))
         }
@@ -105,8 +112,9 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
         } else {
             trailingSize = .zero
         }
+        let accessorySize = (leadingSize.width + self.leadingSpacing) + (trailingSize.width + self.trailingSpacing)
         let centerSize = self.center.size(available: SizeFloat(
-            width: available.width - (leadingSize.width + trailingSize.width),
+            width: available.width - accessorySize,
             height: max(leadingSize.height, available.height, trailingSize.height)
         ))
         return Size(
@@ -134,14 +142,18 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func hAccessory(
         leading: IUICompositionLayoutEntity? = nil,
+        leadingSpacing: Float = 0,
         center: IUICompositionLayoutEntity,
         trailing: IUICompositionLayoutEntity? = nil,
+        trailingSpacing: Float = 0,
         filling: Bool = true
     ) -> UI.Layout.Composition.HAccessory {
         return .init(
             leading: leading,
+            leadingSpacing: leadingSpacing,
             center: center,
             trailing: trailing,
+            trailingSpacing: trailingSpacing,
             filling: filling
         )
     }

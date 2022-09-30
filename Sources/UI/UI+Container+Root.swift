@@ -48,7 +48,7 @@ public extension UI.Container {
         }
 #endif
         public private(set) var isPresented: Bool {
-            didSet(oldValue) {
+            didSet {
                 guard self.isPresented != oldValue else { return }
                 self.didChangeInsets()
             }
@@ -57,19 +57,21 @@ public extension UI.Container {
             return self._view
         }
         public var statusBarSubstrate: (IUIView & IUIViewStaticSizeable)? {
-            didSet(oldValue) {
+            didSet {
                 guard self.statusBarSubstrate !== oldValue else { return }
                 self._layout.statusBar = self.statusBarSubstrate.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var safeArea: InsetFloat {
-            didSet(oldValue) {
+            didSet {
                 guard self.safeArea != oldValue else { return }
-                self.didChangeInsets()
+                if self.isPresented == true {
+                    self.didChangeInsets()
+                }
             }
         }
         public var overlay: IUIRootContentContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.overlay !== oldValue else { return }
                 if let overlay = self.overlay {
                     if self.isPresented == true {
@@ -89,7 +91,7 @@ public extension UI.Container {
             }
         }
         public var content: IUIRootContentContainer {
-            didSet(oldValue) {
+            didSet {
                 guard self.content !== oldValue else { return }
                 if self.isPresented == true {
                     self.content.prepareHide(interactive: false)

@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Modal : IUIModalContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -55,7 +55,7 @@ public extension UI.Container {
             return self._view
         }
         public var content: (IUIContainer & IUIContainerParentable)? {
-            didSet(oldValue) {
+            didSet {
                 if let content = self.content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
@@ -287,11 +287,16 @@ private extension UI.Container.Modal {
     func _present(modal: Item, animated: Bool, completion: (() -> Void)?) {
         self._current = modal
         if animated == true {
-            self._layout.state = .present(modal: modal, progress: .zero)
-            modal.container.prepareShow(interactive: false)
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
+                preparing: { [unowned self] in
+                    self._layout.state = .present(modal: modal, progress: .zero)
+                    if self.isPresented == true {
+                        modal.container.didChangeInsets()
+                        modal.container.prepareShow(interactive: false)
+                    }
+                },
                 processing: { [unowned self] progress in
                     self._layout.state = .present(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
@@ -299,14 +304,19 @@ private extension UI.Container.Modal {
                 completion: { [unowned self] in
                     self._animation = nil
                     self._layout.state = .idle(modal: modal)
-                    modal.container.finishShow(interactive: false)
+                    if self.isPresented == true {
+                        modal.container.finishShow(interactive: false)
+                    }
                     completion?()
                 }
             )
         } else {
             self._layout.state = .idle(modal: modal)
-            modal.container.prepareShow(interactive: false)
-            modal.container.finishShow(interactive: false)
+            if self.isPresented == true {
+                modal.container.didChangeInsets()
+                modal.container.prepareShow(interactive: false)
+                modal.container.finishShow(interactive: false)
+            }
             completion?()
         }
     }

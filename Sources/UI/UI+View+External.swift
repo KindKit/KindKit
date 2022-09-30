@@ -22,77 +22,87 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Static = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var aspectRatio: Float? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.aspectRatio != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
             }
         }
         public var border: UI.Border = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var content: NativeView {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
+                guard self.content !== oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(content: self.content)
+                }
             }
         }
         public var onAppear: ((UI.View.External) -> Void)?

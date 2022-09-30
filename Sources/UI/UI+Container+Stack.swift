@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Stack< Screen : IUIStackScreen > : IUIStackContainer, IUIContainerScreenable {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -104,12 +104,12 @@ public extension UI.Container {
             RootScreen : IUIScreen & IUIScreenStackable & IUIScreenViewable
         >(
             screen: Screen,
-            rootScreen: RootScreen,
+            root: RootScreen,
             hidesGroupBarWhenPushed: Bool = false
         ) {
             self.init(
                 screen: screen,
-                root: UI.Container.Screen(rootScreen),
+                root: UI.Container.Screen(root),
                 hidesGroupBarWhenPushed: hidesGroupBarWhenPushed
             )
         }
@@ -218,7 +218,9 @@ public extension UI.Container {
             if let item = item {
                 item.update()
             }
-            self.didChangeInsets()
+            if self.isPresented == true {
+                self.didChangeInsets()
+            }
             completion?()
         }
         
@@ -499,8 +501,8 @@ private extension UI.Container.Stack {
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [unowned self] in
                     self._layout.state = .push(current: current.item, forward: forward.item, progress: .zero)
-                    forward.container.didChangeInsets()
                     if self.isPresented == true {
+                        forward.container.didChangeInsets()
                         current.container.prepareHide(interactive: false)
                         forward.container.prepareShow(interactive: false)
                     }
@@ -531,8 +533,8 @@ private extension UI.Container.Stack {
             )
         } else {
             self._layout.state = .idle(current: forward.item)
-            forward.container.didChangeInsets()
             if self.isPresented == true {
+                forward.container.didChangeInsets()
                 current.container.prepareHide(interactive: false)
                 forward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
@@ -569,8 +571,8 @@ private extension UI.Container.Stack {
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [unowned self] in
                     self._layout.state = .pop(backward: backward.item, current: current.item, progress: .zero)
-                    backward.container.didChangeInsets()
                     if self.isPresented == true {
+                        backward.container.didChangeInsets()
                         current.container.prepareHide(interactive: false)
                         backward.container.prepareShow(interactive: false)
                     }
@@ -601,8 +603,8 @@ private extension UI.Container.Stack {
             )
         } else {
             self._layout.state = .idle(current: backward.item)
-            backward.container.didChangeInsets()
             if self.isPresented == true {
+                backward.container.didChangeInsets()
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)

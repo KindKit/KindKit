@@ -11,19 +11,31 @@ extension UI.Container.Stack.Item {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var bar: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.bar != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barVisibility: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barVisibility != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barHidden: Bool {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barHidden != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barOffset: Float = 0 {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barOffset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
-        var barSize: Float = 0
-        var content: UI.Layout.Item
+        private(set) var barSize: Float = 0
+        let content: UI.Layout.Item
         
         init(
             bar: UI.Layout.Item,

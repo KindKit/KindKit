@@ -6,7 +6,7 @@ import Foundation
 
 extension UI.Container.Hamburger.Layout {
     
-    enum State {
+    enum State : Equatable {
         
         case idle
         case leading(progress: PercentFloat)

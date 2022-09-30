@@ -38,13 +38,12 @@ final class KKSegmentedView : UISegmentedControl {
     unowned var kkDelegate: KKSegmentedViewDelegate?
     
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }
@@ -85,6 +84,7 @@ extension KKSegmentedView {
         self._view = view
         self.update(items: view.items)
         self.update(selected: view.selected)
+        self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -92,6 +92,10 @@ extension KKSegmentedView {
         self.update(alpha: view.alpha)
         self.updateShadowPath()
         self.kkDelegate = view
+    }
+    
+    func update(locked: Bool) {
+        self.isUserInteractionEnabled = locked == false
     }
     
     func update(items: [UI.View.Segmented.Item]) {

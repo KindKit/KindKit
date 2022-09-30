@@ -48,146 +48,150 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Dynamic = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var currentPage: Float {
-            set(value) {
-                if self._currentPage != value {
-                    self._currentPage = value
-                    self.linkedPageable?.currentPage = value
-                    if self.isLoaded == true {
-                        self._view.update(
-                            direction: self.direction,
-                            currentPage: value,
-                            numberOfPages: self.numberOfPages
-                        )
-                    }
+            set {
+                guard self._currentPage != newValue else { return }
+                self._currentPage = newValue
+                self.linkedPageable?.currentPage = newValue
+                if self.isLoaded == true {
+                    self._view.update(
+                        direction: self.direction,
+                        currentPage: newValue,
+                        numberOfPages: self.numberOfPages
+                    )
                 }
             }
             get { return self._currentPage }
         }
         public var numberOfPages: UInt = 0 {
-            didSet(oldValue) {
+            didSet {
                 guard self.numberOfPages != oldValue else { return }
                 self.linkedPageable?.numberOfPages = self.numberOfPages
             }
         }
         public unowned var linkedPageable: IUIViewPageable? {
-            willSet(newValue) {
+            willSet {
                 guard self.linkedPageable !== newValue else { return }
                 self.linkedPageable?.linkedPageable = nil
             }
-            didSet(oldValue) {
+            didSet {
                 guard self.linkedPageable !== oldValue else { return }
                 self.linkedPageable?.linkedPageable = self
             }
         }
         public var isLocked: Bool {
-            set(value) {
-                if self._isLocked != value {
-                    self._isLocked = value
-                    if self.isLoaded == true {
-                        self._view.update(locked: self._isLocked)
-                    }
-                    self.triggeredChangeStyle(false)
+            set {
+                guard self._isLocked != newValue else { return }
+                self._isLocked = newValue
+                if self.isLoaded == true {
+                    self._view.update(locked: self._isLocked)
                 }
+                self.triggeredChangeStyle(false)
             }
             get { return self._isLocked }
         }
         public var color: UI.Color? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.color != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
-            didSet(oldValue) {
+            didSet {
                 guard self.cornerRadius != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
             }
         }
         public var border: UI.Border = .none {
-            didSet(oldValue) {
+            didSet {
                 guard self.border != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.shadow != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
-            didSet(oldValue) {
+            didSet {
                 guard self.alpha != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var direction: Direction = .horizontal(bounds: true) {
-            didSet(oldValue) {
+            didSet {
                 guard self.direction != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(direction: self.direction)
+                if self.isLoaded == true {
+                    self._view.update(direction: self.direction)
+                }
             }
         }
         public var visibleInset: InsetFloat = .zero {
-            didSet(oldValue) {
+            didSet {
                 guard self.visibleInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(visibleInset: self.visibleInset)
+                if self.isLoaded == true {
+                    self._view.update(visibleInset: self.visibleInset)
+                }
             }
         }
         public var contentInset: InsetFloat = .zero {
-            didSet(oldValue) {
+            didSet {
                 guard self.contentInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(contentInset: self.contentInset)
+                if self.isLoaded == true {
+                    self._view.update(contentInset: self.contentInset)
+                }
             }
         }
         public private(set) var contentSize: SizeFloat = .zero
         public var content: IUILayout {
-            willSet {
-                self.content.view = nil
-            }
-            didSet(oldValue) {
+            didSet {
+                guard self.content.view !== oldValue else { return }
+                oldValue.view = nil
                 self.content.view = self
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
+                if self.isLoaded == true {
+                    self._view.update(content: self.content)
+                }
             }
         }
         public private(set) var isDragging: Bool = false

@@ -25,7 +25,7 @@ public extension IUIViewCornerRadiusable where Self : IUIWidgetView, Body : IUIV
     
     @inlinable
     var cornerRadius: UI.CornerRadius {
-        set(value) { self.body.cornerRadius = value }
+        set { self.body.cornerRadius = newValue }
         get { return self.body.cornerRadius }
     }
     

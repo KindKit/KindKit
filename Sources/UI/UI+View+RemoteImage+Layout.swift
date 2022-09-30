@@ -11,7 +11,7 @@ extension UI.View.RemoteImage {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State = .loading {
-            didSet(oldValue) {
+            didSet {
                 guard self.state != oldValue else { return }
                 self.setNeedForceUpdate()
             }

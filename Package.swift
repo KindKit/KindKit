@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "KindKit",
     platforms: [
-        .iOS(.v10),
-        .macOS(.v11)
+        .iOS(.v11),
+        .macOS(.v10_15)
     ],
     products: [
         .library(name: "KindKit", targets: [ "KindKit" ]),

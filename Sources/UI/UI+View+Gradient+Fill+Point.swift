@@ -8,7 +8,7 @@ import Foundation
 
 public extension UI.View.Gradient.Fill {
     
-    struct Point {
+    struct Point : Equatable {
         
         public let color: UI.Color
         public let location: Float

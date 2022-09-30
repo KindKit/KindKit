@@ -11,22 +11,40 @@ extension UI.Container.Hamburger {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.state != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var content: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var leading: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.leading != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var leadingSize: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.leadingSize != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var trailing: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.trailing != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var trailingSize: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.trailingSize != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init(

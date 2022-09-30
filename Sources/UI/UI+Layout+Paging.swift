@@ -11,21 +11,22 @@ public extension UI.Layout {
         public unowned var delegate: IUILayoutDelegate?
         public unowned var view: IUIView?
         public var direction: Direction {
-            didSet(oldValue) {
+            didSet {
                 guard self.direction != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
         public var items: [UI.Layout.Item] {
-            set(value) {
-                self._items = value
+            set {
+                guard self._items != newValue else { return }
+                self._items = newValue
                 self.setNeedForceUpdate()
             }
             get { return self._items }
         }
         public var views: [IUIView] {
-            set(value) {
-                self._items = value.compactMap({ return UI.Layout.Item($0) })
+            set {
+                self._items = newValue.compactMap({ UI.Layout.Item($0) })
                 self.setNeedForceUpdate()
             }
             get { return self._items.compactMap({ $0.view }) }

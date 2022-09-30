@@ -25,7 +25,7 @@ public extension IUIViewBorderable where Self : IUIWidgetView, Body : IUIViewBor
     
     @inlinable
     var border: UI.Border {
-        set(value) { self.body.border = value }
+        set { self.body.border = newValue }
         get { return self.body.border }
     }
     

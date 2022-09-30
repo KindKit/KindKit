@@ -14,7 +14,7 @@ public extension UI.Container {
     final class None : IUIContainer, IUIContainerParentable {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()

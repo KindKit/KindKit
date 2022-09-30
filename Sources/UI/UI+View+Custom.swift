@@ -29,32 +29,32 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Dynamic = .fit {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
@@ -66,75 +66,84 @@ public extension UI.View {
             }
         }
         public var isHighlighted: Bool {
-            set(value) {
-                if self._isHighlighted != value {
-                    self._isHighlighted = value
-                    self.triggeredChangeStyle(false)
-                }
+            set {
+                guard self._isHighlighted != newValue else { return }
+                self._isHighlighted = newValue
+                self.triggeredChangeStyle(false)
             }
             get { return self._isHighlighted }
         }
         public var isLocked: Bool {
-            set(value) {
-                if self._isLocked != value {
-                    self._isLocked = value
-                    if self.isLoaded == true {
-                        self._view.update(locked: self._isLocked)
-                    }
-                    self.triggeredChangeStyle(false)
+            set {
+                guard self._isLocked != newValue else { return }
+                self._isLocked = newValue
+                if self.isLoaded == true {
+                    self._view.update(locked: self._isLocked)
                 }
+                self.triggeredChangeStyle(false)
             }
             get { return self._isLocked }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var gestures: [IUIGesture] {
-            set(value) {
-                self._gestures = value
+            set {
+                self._gestures = newValue
                 if self.isLoaded == true {
-                    self._view.update(gestures: value)
+                    self._view.update(gestures: newValue)
                 }
             }
             get { return self._gestures }
         }
         public var content: IUILayout {
             willSet {
+                guard self.content !== newValue else { return }
                 self.content.view = nil
             }
-            didSet(oldValue) {
+            didSet {
+                guard self.content !== oldValue else { return }
                 self.content.view = self
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
+                if self.isLoaded == true {
+                    self._view.update(content: self.content)
+                }
                 self.content.setNeedForceUpdate()
                 self.setNeedForceLayout()
             }

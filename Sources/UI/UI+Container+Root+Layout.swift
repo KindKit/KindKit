@@ -11,13 +11,22 @@ extension UI.Container.Root {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var statusBar: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.statusBar != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlay: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.overlay != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var content: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init(

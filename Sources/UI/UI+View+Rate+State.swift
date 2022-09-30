@@ -8,7 +8,7 @@ import Foundation
 
 public extension UI.View.Rate {
     
-    struct State {
+    struct State : Equatable {
         
         public let image: UI.Image
         public let rate: Float

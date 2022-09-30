@@ -36,13 +36,12 @@ extension UI.View.Rate {
 final class KKRateView : UIView {
     
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }
@@ -50,13 +49,13 @@ final class KKRateView : UIView {
     
     private unowned var _view: UI.View.Rate?
     private var _itemSize: SizeFloat {
-        didSet(oldValue) {
+        didSet {
             guard self._itemSize != oldValue else { return }
             self.setNeedsLayout()
         }
     }
     private var _itemSpacing: Float {
-        didSet(oldValue) {
+        didSet {
             guard self._itemSpacing != oldValue else { return }
             self.setNeedsLayout()
         }
@@ -68,7 +67,7 @@ final class KKRateView : UIView {
         }
     }
     private var _numberOfItem: UInt {
-        didSet(oldValue) {
+        didSet {
             guard self._numberOfItem != oldValue else { return }
             self.setNeedsLayout()
         }

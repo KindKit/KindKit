@@ -36,13 +36,12 @@ extension UI.View.Blur {
 final class KKBlurView : UIVisualEffectView {
         
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }
@@ -50,7 +49,7 @@ final class KKBlurView : UIVisualEffectView {
     
     private unowned var _view: UI.View.Blur?
     private var _style: UIBlurEffect.Style {
-        didSet(oldValue) {
+        didSet {
             guard self._style != oldValue else { return }
             self.effect = UIBlurEffect(style: self._style)
         }

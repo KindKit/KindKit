@@ -29,109 +29,114 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
-            didSet(oldValue) {
+            didSet {
                 guard self.width != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Dynamic = .fit {
-            didSet(oldValue) {
+            didSet {
                 guard self.height != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
             }
         }
         public var color: UI.Color? = .clear {
-            didSet(oldValue) {
+            didSet {
                 guard self.color != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet(oldValue) {
-                guard self.border != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
-            didSet(oldValue) {
+            didSet {
                 guard self.cornerRadius != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.shadow != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
-            didSet(oldValue) {
+            didSet {
                 guard self.alpha != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var text: NSAttributedString {
-            didSet(oldValue) {
+            didSet {
                 guard self.text != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(text: self.text, alignment: self.alignment)
                 self._cacheAvailable = nil
                 self._cacheSize = nil
+                if self.isLoaded == true {
+                    self._view.update(text: self.text, alignment: self.alignment)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var alignment: UI.Text.Alignment? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.alignment != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alignment: self.alignment)
+                if self.isLoaded == true {
+                    self._view.update(alignment: self.alignment)
+                }
                 self.setNeedLayout()
             }
         }
         public var lineBreak: UI.Text.LineBreak = .wordWrapping {
-            didSet(oldValue) {
+            didSet {
                 guard self.lineBreak != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(lineBreak: self.lineBreak)
+                if self.isLoaded == true {
+                    self._view.update(lineBreak: self.lineBreak)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var numberOfLines: UInt = 0 {
-            didSet(oldValue) {
+            didSet {
                 guard self.numberOfLines != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(numberOfLines: self.numberOfLines)
+                if self.isLoaded == true {
+                    self._view.update(numberOfLines: self.numberOfLines)
+                }
                 self.setNeedForceLayout()
             }
         }

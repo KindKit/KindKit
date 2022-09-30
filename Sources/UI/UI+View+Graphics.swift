@@ -24,59 +24,60 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
-            didSet(oldValue) {
+            didSet {
                 guard self.width != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Static = .fill {
-            didSet(oldValue) {
+            didSet {
                 guard self.height != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self.setNeedForceLayout()
             }
         }
         public var isLocked: Bool {
-            set(value) {
-                if self._isLocked != value {
-                    self._isLocked = value
-                    if self.isLoaded == true {
-                        self._view.update(locked: self._isLocked)
-                    }
-                    self.triggeredChangeStyle(false)
+            set {
+                guard self._isLocked != newValue else { return }
+                self._isLocked = newValue
+                if self.isLoaded == true {
+                    self._view.update(locked: self._isLocked)
                 }
+                self.triggeredChangeStyle(false)
             }
             get { return self._isLocked }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var canvas: IGraphicsCanvas {
@@ -84,10 +85,12 @@ public extension UI.View {
                 guard self.canvas !== oldValue else { return }
                 self.canvas.detach()
             }
-            didSet(oldValue) {
+            didSet {
                 guard self.canvas !== oldValue else { return }
                 self.canvas.attach(view: self)
-                self._view.update(canvas: self.canvas)
+                if self.isLoaded == true {
+                    self._view.update(canvas: self.canvas)
+                }
             }
         }
         public var onAppear: ((UI.View.Graphics) -> Void)?

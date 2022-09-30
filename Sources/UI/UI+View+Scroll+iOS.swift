@@ -37,22 +37,22 @@ final class KKScrollView : UIScrollView {
     
     unowned var kkDelegate: KKScrollViewDelegate?
     var needLayoutContent: Bool {
-        didSet(oldValue) {
+        didSet {
             if self.needLayoutContent == true {
                 self.setNeedsLayout()
             }
         }
     }
     override var frame: CGRect {
-        set(value) {
+        set {
             let oldValue = super.frame
-            if oldValue != value {
-                super.frame = value
+            if oldValue != newValue {
+                super.frame = newValue
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)
                     self.updateShadowPath()
                 }
-                if oldValue.size != value.size {
+                if oldValue.size != newValue.size {
                     self.needLayoutContent = true
                 }
             }
@@ -60,12 +60,11 @@ final class KKScrollView : UIScrollView {
         get { return super.frame }
     }
     override var contentSize: CGSize {
-        set(value) {
-            if super.contentSize != value {
-                self._contentView.frame = CGRect(origin: CGPoint.zero, size: value)
-                super.contentSize = value
-                self.setNeedsLayout()
-            }
+        set {
+            guard super.contentSize != newValue else { return }
+            self._contentView.frame = CGRect(origin: CGPoint.zero, size: newValue)
+            super.contentSize = newValue
+            self.setNeedsLayout()
         }
         get { return super.contentSize }
     }
@@ -75,7 +74,7 @@ final class KKScrollView : UIScrollView {
     private var _refreshView: UIRefreshControl!
     private var _layoutManager: UI.Layout.Manager!
     private var _visibleInset: InsetFloat {
-        didSet(oldValue) {
+        didSet {
             guard self._visibleInset != oldValue else { return }
             self.setNeedsLayout()
         }
@@ -100,9 +99,7 @@ final class KKScrollView : UIScrollView {
         
         self._refreshView = UIRefreshControl()
         self._refreshView.addTarget(self, action: #selector(self._triggeredRefresh(_:)), for: .valueChanged)
-        if #available(iOS 10.0, *) {
-            self.refreshControl = self._refreshView
-        }
+        self.refreshControl = self._refreshView
         
         self._layoutManager = UI.Layout.Manager(contentView: self._contentView, delegate: self)
     }
@@ -177,10 +174,9 @@ extension KKScrollView {
         self.update(contentSize: view.contentSize)
         self.update(contentOffset: view.contentOffset, normalized: true)
         self.update(content: view.content)
-        if #available(iOS 10.0, *) {
-            self.update(refreshColor: view.refreshColor)
-            self.update(isRefreshing: view.isRefreshing)
-        }
+        self.update(refreshColor: view.refreshColor)
+        self.update(isRefreshing: view.isRefreshing)
+        self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -188,6 +184,10 @@ extension KKScrollView {
         self.update(alpha: view.alpha)
         self.updateShadowPath()
         self.kkDelegate = view
+    }
+    
+    func update(locked: Bool) {
+        self.isScrollEnabled = locked == false
     }
     
     func update(content: IUILayout) {
@@ -239,7 +239,6 @@ extension KKScrollView {
         self.setContentOffset(validContentOffset, animated: false)
     }
     
-    @available(iOS 10.0, *)
     func update(refreshColor: UI.Color?) {
         if let refreshColor = refreshColor {
             self._refreshView.tintColor = refreshColor.native
@@ -253,7 +252,6 @@ extension KKScrollView {
         }
     }
     
-    @available(iOS 10.0, *)
     func update(isRefreshing: Bool) {
         if isRefreshing == true {
             self._refreshView.beginRefreshing()

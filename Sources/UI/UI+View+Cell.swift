@@ -12,16 +12,16 @@ public extension UI.View {
     final class Cell : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public var isSelected: Bool {
-            set(value) {
-                guard self._isSelected != value else { return }
-                self._isSelected = value
+            set {
+                guard self._isSelected != newValue else { return }
+                self._isSelected = newValue
                 self.triggeredChangeStyle(false)
             }
             get { return self._isSelected }
         }
         public var shouldPressed: Bool = true
         public var content: IUIView {
-            didSet(oldValue) {
+            didSet {
                 guard self.content !== oldValue else { return }
                 self._layout.content = UI.Layout.Item(self.content)
             }

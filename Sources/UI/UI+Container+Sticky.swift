@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Sticky< ContentContainer : IUIContainer > : IUIStickyContainer where ContentContainer : IUIContainerParentable {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -44,33 +44,35 @@ public extension UI.Container {
         }
         public private(set) var screen: IUIStickyScreen
         public private(set) var overlay: UI.View.Bar {
-            set(value) {
-                guard self._overlay !== value else { return }
-                self._layout.overlay = UI.Layout.Item(self._overlay)
+            set {
+                guard self._overlay !== newValue else { return }
+                self._layout.overlay = UI.Layout.Item(newValue)
             }
             get { return self._overlay }
         }
         public private(set) var overlayVisibility: Float {
-            set(value) { self._layout.overlayVisibility = value }
+            set { self._layout.overlayVisibility = newValue }
             get { return self._layout.overlayVisibility }
             
         }
         public private(set) var overlayHidden: Bool {
-            set(value) { self._layout.overlayHidden = value }
+            set { self._layout.overlayHidden = newValue }
             get { return self._layout.overlayHidden }
         }
         public var content: ContentContainer {
-            set(value) {
-                guard self._content !== value else { return }
+            set {
+                guard self._content !== newValue else { return }
                 if self.isPresented == true {
                     self._content.prepareHide(interactive: false)
                     self._content.finishHide(interactive: false)
+                    self._content.didChangeInsets()
                 }
                 self._content.parent = nil
-                self._content = value
+                self._content = newValue
                 self._content.parent = self
                 self._layout.content = UI.Layout.Item(self._content.view)
                 if self.isPresented == true {
+                    self._content.didChangeInsets()
                     self._content.prepareShow(interactive: false)
                     self._content.finishShow(interactive: false)
                 }
@@ -78,7 +80,6 @@ public extension UI.Container {
                 self.setNeedUpdateOrientations()
                 self.setNeedUpdateStatusBar()
 #endif
-                self.didChangeInsets()
             }
             get { return self._content }
         }
@@ -188,7 +189,9 @@ public extension UI.Container {
         
         public func updateOverlay(animated: Bool, completion: (() -> Void)?) {
             self._layout.overlayHidden = self.screen.stickyHidden
-            self.didChangeInsets()
+            if self.isPresented == true {
+                self.didChangeInsets()
+            }
         }
         
     }

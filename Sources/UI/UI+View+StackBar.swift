@@ -10,49 +10,67 @@ public extension UI.View {
         
         public let body: UI.View.Bar
         public var size: Float? {
-            set(value) {
-                guard self.body.size != value else { return }
-                self.body.size = value
+            set {
+                guard self.body.size != newValue else { return }
+                self.body.size = newValue
                 self._relayout()
             }
             get { return self.body.size }
         }
         public var inset: InsetFloat {
-            set(value) { self._contentLayout.inset = value }
+            set { self._contentLayout.inset = newValue }
             get { return self._contentLayout.inset }
         }
         public var header: IUIView? {
             didSet { self._relayout() }
         }
         public var headerSpacing: Float = 8 {
-            didSet { self._relayout() }
+            didSet {
+                guard self.headerSpacing != oldValue else { return }
+                self._relayout()
+            }
         }
         public var leadings: [IUIView] = [] {
             didSet { self._relayout() }
         }
         public var leadingsSpacing: Float = 4 {
-            didSet { self._relayout() }
+            didSet {
+                guard self.leadingsSpacing != oldValue else { return }
+                self._relayout()
+            }
         }
         public var center: IUIView? {
             didSet { self._relayout() }
         }
         public var centerFilling: Bool = false {
-            didSet { self._relayout() }
+            didSet {
+                guard self.centerFilling != oldValue else { return }
+                self._relayout()
+            }
         }
         public var centerSpacing: Float = 4 {
-            didSet { self._relayout() }
+            didSet {
+                guard self.centerSpacing != oldValue else { return }
+                self._relayout()
+            }
         }
         public var trailings: [IUIView] = [] {
             didSet { self._relayout() }
         }
         public var trailingsSpacing: Float = 4 {
-            didSet { self._relayout() }
+            didSet {
+                guard self.trailingsSpacing != oldValue else { return }
+                self._relayout()
+            }
         }
         public var footer: IUIView? {
             didSet { self._relayout() }
         }
         public var footerSpacing: Float = 8 {
-            didSet { self._relayout() }
+            didSet {
+                guard self.footerSpacing != oldValue else { return }
+                self._relayout()
+            }
         }
 
         private var _contentLayout: UI.Layout.Composition {

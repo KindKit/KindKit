@@ -119,6 +119,10 @@ extension KKGraphicsView {
         self.update(alpha: view.alpha)
     }
     
+    func update(locked: Bool) {
+        self.isUserInteractionEnabled = locked == false
+    }
+    
     func update(canvas: IGraphicsCanvas) {
         self._canvas = canvas
         self.setNeedsDisplay()

@@ -16,20 +16,19 @@ public extension UI.View.GroupBar {
         
         public private(set) var body: UI.View.Custom
         public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
+            set {
+                guard self._isSelected != newValue else { return }
+                self._isSelected = newValue
+                self.triggeredChangeStyle(false)
             }
             get { return self._isSelected }
         }
         public var inset: InsetFloat {
-            set(value) { self._layout.inset = value }
+            set { self._layout.inset = newValue }
             get { return self._layout.inset }
         }
         public var content: IUIView {
-            didSet(oldValue) {
+            didSet {
                 guard self.content !== oldValue else { return }
                 self._layout.content = UI.Layout.Item(self.content)
             }

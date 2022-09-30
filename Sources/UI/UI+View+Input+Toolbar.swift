@@ -28,51 +28,62 @@ public extension UI.View.Input {
         }
         public private(set) unowned var parentView: IUIView?
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: Swift.String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var items: [IInputToolbarItem] {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(items: self.items)
+                if self.isLoaded == true {
+                    self._view.update(items: self.items)
+                }
             }
         }
         public var size: Float = 55 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(size: self.size)
+                guard self.size != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(size: self.size)
+                }
             }
         }
         public var isTranslucent: Bool = false {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(translucent: self.isTranslucent)
+                guard self.isTranslucent != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(translucent: self.isTranslucent)
+                }
             }
         }
         public var barTintColor: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(barTintColor: self.barTintColor)
+                guard self.barTintColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(barTintColor: self.barTintColor)
+                }
             }
         }
         public var contentTintColor: UI.Color = .white {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(contentTintColor: self.contentTintColor)
+                guard self.contentTintColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(contentTintColor: self.contentTintColor)
+                }
             }
         }
         public var onAppear: ((UI.View.Input.Toolbar) -> Void)?

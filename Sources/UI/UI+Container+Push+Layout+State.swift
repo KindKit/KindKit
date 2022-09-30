@@ -6,7 +6,7 @@ import Foundation
 
 extension UI.Container.Push.Layout {
     
-    enum State {
+    enum State : Equatable {
         
         case empty
         case idle(push: UI.Container.Push.Item)

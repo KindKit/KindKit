@@ -25,7 +25,7 @@ public extension IUIViewProgressable where Self : IUIWidgetView, Body : IUIViewP
     
     @inlinable
     var progress: Float {
-        set(value) { self.body.progress = value }
+        set { self.body.progress = newValue }
         get { return self.body.progress }
     }
     

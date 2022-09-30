@@ -16,11 +16,11 @@ extension UI.Layout {
         unowned let contentView: NativeView
         unowned let delegate: IUILayoutDelegate
         var layout: IUILayout? {
-            willSet(newValue) {
+            willSet {
                 self.layout?.delegate = nil
                 self.clear()
             }
-            didSet(oldValue) {
+            didSet {
                 self.layout?.delegate = self.delegate
             }
         }
@@ -80,7 +80,7 @@ extension UI.Layout {
                             }
                             if item.view.native.superview !== self.contentView {
                                 #if os(macOS)
-                                self.contentView.addSubview(item.view.native, positioned: .above, relativeTo: self.contentView.subviews[index])
+                                self.contentView.addSubview(item.view.native, positioned: .above, relativeTo: self.contentView.subviews.last)
                                 #elseif os(iOS)
                                 self.contentView.insertSubview(item.view.native, at: index)
                                 #endif

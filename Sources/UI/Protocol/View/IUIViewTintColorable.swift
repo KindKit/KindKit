@@ -25,7 +25,7 @@ public extension IUIViewTintColorable where Self : IUIWidgetView, Body : IUIView
     
     @inlinable
     var tintColor: UI.Color? {
-        set(value) { self.body.tintColor = value }
+        set { self.body.tintColor = newValue }
         get { return self.body.tintColor }
     }
     

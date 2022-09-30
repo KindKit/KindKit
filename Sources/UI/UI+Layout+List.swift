@@ -11,43 +11,44 @@ public extension UI.Layout {
         public unowned var delegate: IUILayoutDelegate?
         public unowned var view: IUIView?
         public var direction: Direction {
-            didSet(oldValue) {
+            didSet {
                 guard self.direction != oldValue else { return }
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
         }
         public var alignment: Alignment {
-            didSet(oldValue) {
+            didSet {
                 guard self.alignment != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
         public var inset: InsetFloat {
-            didSet(oldValue) {
+            didSet {
                 guard self.inset != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
         public var spacing: Float {
-            didSet(oldValue) {
+            didSet {
                 guard self.spacing != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
         public var items: [UI.Layout.Item] {
-            set(value) {
-                self._items = value
-                self._cache = Array< SizeFloat? >(repeating: nil, count: value.count)
+            set {
+                guard self.items != newValue else { return }
+                self._items = newValue
+                self._cache = Array< SizeFloat? >(repeating: nil, count: newValue.count)
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
             get { return self._items }
         }
         public var views: [IUIView] {
-            set(value) {
-                self._items = value.compactMap({ return UI.Layout.Item($0) })
-                self._cache = Array< SizeFloat? >(repeating: nil, count: value.count)
+            set {
+                self._items = newValue.compactMap({ UI.Layout.Item($0) })
+                self._cache = Array< SizeFloat? >(repeating: nil, count: newValue.count)
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }

@@ -8,7 +8,7 @@ import UIKit
 
 public extension UI.View.Input {
 
-    struct Keyboard {
+    struct Keyboard : Equatable {
         
         public var type: UIKeyboardType
         public var appearance: UIKeyboardAppearance

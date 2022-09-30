@@ -34,13 +34,13 @@ public extension IUIViewHighlightable where Self : IUIWidgetView, Body : IUIView
     
     @inlinable
     var shouldHighlighting: Bool {
-        set(value) { self.body.shouldHighlighting = value }
+        set { self.body.shouldHighlighting = newValue }
         get { return self.body.shouldHighlighting }
     }
     
     @inlinable
     var isHighlighted: Bool {
-        set(value) { self.body.isHighlighted = value }
+        set { self.body.isHighlighted = newValue }
         get { return self.body.isHighlighted }
     }
     

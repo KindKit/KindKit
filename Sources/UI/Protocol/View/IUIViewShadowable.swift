@@ -25,7 +25,7 @@ public extension IUIViewShadowable where Self : IUIWidgetView, Body : IUIViewSha
     
     @inlinable
     var shadow: UI.Shadow? {
-        set(value) { self.body.shadow = value }
+        set { self.body.shadow = newValue }
         get { return self.body.shadow }
     }
     

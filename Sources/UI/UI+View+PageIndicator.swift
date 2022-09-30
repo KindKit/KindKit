@@ -30,103 +30,118 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Static = .fixed(26) {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var currentPage: Float {
-            set(value) {
-                if self._currentPage != value {
-                    self._currentPage = value
-                    self.linkedPageable?.currentPage = value
-                    if self.isLoaded == true {
-                        self._view.update(currentPage: self.currentPage)
-                    }
+            set {
+                guard self._currentPage != newValue else { return }
+                self._currentPage = newValue
+                self.linkedPageable?.currentPage = newValue
+                if self.isLoaded == true {
+                    self._view.update(currentPage: self.currentPage)
                 }
             }
             get { return self._currentPage }
         }
         public var numberOfPages: UInt = 0 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(numberOfPages: self.numberOfPages)
+                guard self.numberOfPages != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(numberOfPages: self.numberOfPages)
+                }
             }
         }
         public unowned var linkedPageable: IUIViewPageable? {
-            willSet(newValue) {
+            willSet {
                 guard self.linkedPageable !== newValue else { return }
                 self.linkedPageable?.linkedPageable = nil
             }
-            didSet(oldValue) {
+            didSet {
                 guard self.linkedPageable !== oldValue else { return }
                 self.linkedPageable?.linkedPageable = self
             }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var border: UI.Border = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var pageColor: UI.Color? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(pageColor: self.pageColor)
+                guard self.pageColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(pageColor: self.pageColor)
+                }
             }
         }
         public var currentPageColor: UI.Color? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(currentPageColor: self.currentPageColor)
+                guard self.currentPageColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(currentPageColor: self.currentPageColor)
+                }
             }
         }
         public var onAppear: ((UI.View.PageIndicator) -> Void)?

@@ -9,7 +9,7 @@ public extension UI.Layout {
     final class Item {
         
         public var frame: RectFloat
-        public private(set) var view: IUIView
+        public let view: IUIView
         public private(set) var isNeedForceUpdate: Bool
         
         public init(_ view: IUIView) {

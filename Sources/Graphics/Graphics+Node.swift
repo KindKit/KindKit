@@ -9,26 +9,26 @@ public extension Graphics {
     final class Node {
         
         public unowned var owner: IGraphicsNodeOwner? {
-            didSet(oldValue) {
+            didSet {
                 guard self.owner !== oldValue else { return }
                 self._didUpdate(owner: self.owner)
             }
         }
         public var parent: Graphics.Node? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 self.needUpdateAbsoluteMatrix()
             }
         }
         public private(set) var childs: [Graphics.Node]
         public unowned var content: IGraphicsNodeContent? {
-            didSet(oldValue) {
+            didSet {
                 guard self.content !== oldValue else { return }
                 self.owner?.setNeedRedraw()
             }
         }
         public var transform: Graphics.Transform {
-            didSet(oldValue) {
+            didSet {
                 guard self.transform != oldValue else { return }
                 self._relativeMatrix = nil
                 self._relativeInverseMatrix = nil
@@ -37,14 +37,14 @@ public extension Graphics {
             }
         }
         public var alpha: Float = 1 {
-            didSet(oldValue) {
+            didSet {
                 guard self.alpha != oldValue else { return }
                 self.needUpdateAbsoluteAlpha()
                 self.owner?.setNeedRedraw()
             }
         }
         public var hidden: Bool {
-            didSet(oldValue) {
+            didSet {
                 guard self.hidden != oldValue else { return }
                 self.owner?.setNeedRedraw()
             }
