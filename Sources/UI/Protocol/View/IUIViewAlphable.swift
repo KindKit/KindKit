@@ -25,7 +25,7 @@ public extension IUIViewAlphable where Self : IUIWidgetView, Body : IUIViewAlpha
     
     @inlinable
     var alpha: Float {
-        set(value) { self.body.alpha = value }
+        set { self.body.alpha = newValue }
         get { return self.body.alpha }
     }
     

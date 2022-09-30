@@ -24,81 +24,97 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Static = .fixed(21) {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var progress: Float = 0 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(progress: self.progress)
+                guard self.progress != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(progress: self.progress)
+                }
             }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var progressColor: UI.Color? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(progressColor: self.progressColor)
+                guard self.progressColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(progressColor: self.progressColor)
+                }
             }
         }
         public var trackColor: UI.Color? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(trackColor: self.trackColor)
+                guard self.trackColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(trackColor: self.trackColor)
+                }
             }
         }
         public var onAppear: ((UI.View.Progress) -> Void)?

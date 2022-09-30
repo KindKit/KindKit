@@ -88,6 +88,10 @@ extension KKSwitchView {
         self.kkDelegate = view
     }
     
+    func update(locked: Bool) {
+        self.isUserInteractionEnabled = locked == false
+    }
+    
     func update(thumbColor: UI.Color?) {
         self._switch.thumbTintColor = thumbColor?.native
     }

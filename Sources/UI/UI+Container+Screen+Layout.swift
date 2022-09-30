@@ -10,19 +10,28 @@ extension UI.Container.Screen {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
+        
+        var inset: InsetFloat = .zero {
+            didSet {
+                guard self.inset != oldValue else { return }
+                self.setNeedUpdate()
+            }
+        }
         var item: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.item != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init() {
-            
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
             guard let item = self.item else {
                 return .zero
             }
-            item.frame = bounds
+            item.frame = bounds.inset(self.inset)
             return bounds.size
         }
         
@@ -30,7 +39,8 @@ extension UI.Container.Screen {
             guard let item = self.item else {
                 return .zero
             }
-            return item.size(available: available)
+            let itemSize = item.size(available: available.inset(self.inset))
+            return itemSize.inset(-self.inset)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {

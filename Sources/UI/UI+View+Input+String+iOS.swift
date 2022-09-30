@@ -37,13 +37,12 @@ final class KKInputStringView : UITextField {
     
     unowned var kkDelegate: KKInputStringViewDelegate?
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }
@@ -154,9 +153,7 @@ extension KKInputStringView {
         self.spellCheckingType = keyboard?.spellChecking ?? .default
         self.returnKeyType = keyboard?.returnKey ?? .default
         self.enablesReturnKeyAutomatically = keyboard?.enablesReturnKeyAutomatically ?? true
-        if #available(iOS 10.0, *) {
-            self.textContentType = keyboard?.textContent
-        }
+        self.textContentType = keyboard?.textContent
     }
     
     func cleanup() {

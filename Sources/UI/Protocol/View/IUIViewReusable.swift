@@ -41,15 +41,15 @@ public extension IUIViewReusable where Self : IUIWidgetView, Body : IUIViewReusa
     
     @inlinable
     var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-        set(value) { self.body.reuseUnloadBehaviour = value }
+        set { self.body.reuseUnloadBehaviour = newValue }
         get { return self.body.reuseUnloadBehaviour }
     }
     var reuseCache: UI.Reuse.Cache? {
-        set(value) { self.body.reuseCache = value }
+        set { self.body.reuseCache = newValue }
         get { return self.body.reuseCache }
     }
     var reuseName: String? {
-        set(value) { self.body.reuseName = value }
+        set { self.body.reuseName = newValue }
         get { return self.body.reuseName }
     }
     

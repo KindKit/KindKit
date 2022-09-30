@@ -11,14 +11,14 @@ public extension UI.Layout {
         public unowned var delegate: IUILayoutDelegate?
         public unowned var view: IUIView?
         public var inset: InsetFloat = .zero {
-            didSet(oldValue) {
+            didSet {
                 guard self.inset != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
         public var state: State {
-            set(value) {
-                self._internalState = .idle(state: value)
+            set {
+                self._internalState = .idle(state: newValue)
             }
             get {
                 switch self._internalState {
@@ -48,7 +48,7 @@ public extension UI.Layout {
         public private(set) var data: [State : Data]
         
         private var _internalState: InternalState {
-            didSet(oldValue) {
+            didSet {
                 guard self._internalState != oldValue else { return }
                 self.setNeedForceUpdate()
             }

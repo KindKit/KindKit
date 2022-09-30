@@ -15,15 +15,15 @@ extension UI.Container.Stack {
         }
         var item: UI.Layout.Item
         var bar: UI.Layout.Item {
-            set(value) { self._layout.bar = value }
+            set { self._layout.bar = newValue }
             get { return self._layout.bar }
         }
         var barVisibility: Float {
-            set(value) { self._layout.barVisibility = value }
+            set { self._layout.barVisibility = newValue }
             get { return self._layout.barVisibility }
         }
         var barHidden: Bool {
-            set(value) { self._layout.barHidden = value }
+            set { self._layout.barHidden = newValue }
             get { return self._layout.barHidden }
         }
         var barSize: Float {

@@ -52,126 +52,134 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Dynamic = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var isLocked: Bool {
-            set(value) {
-                if self._isLocked != value {
-                    self._isLocked = value
-                    if self.isLoaded == true {
-                        self._view.update(locked: self._isLocked)
-                    }
-                    self.triggeredChangeStyle(false)
+            set {
+                guard self._isLocked != newValue else { return }
+                self._isLocked = newValue
+                if self.isLoaded == true {
+                    self._view.update(locked: self._isLocked)
                 }
+                self.triggeredChangeStyle(false)
             }
             get { return self._isLocked }
         }
         public var color: UI.Color? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.color != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
-            didSet(oldValue) {
+            didSet {
                 guard self.cornerRadius != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
             }
         }
         public var border: UI.Border = .none {
-            didSet(oldValue) {
+            didSet {
                 guard self.border != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
-            didSet(oldValue) {
+            didSet {
                 guard self.shadow != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
-            didSet(oldValue) {
+            didSet {
                 guard self.alpha != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var direction: Direction = [ .vertical, .bounds ] {
-            didSet(oldValue) {
+            didSet {
                 guard self.direction != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(direction: self.direction)
+                if self.isLoaded == true {
+                    self._view.update(direction: self.direction)
+                }
             }
         }
         public var indicatorDirection: Direction = .vertical {
-            didSet(oldValue) {
+            didSet {
                 guard self.indicatorDirection != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(indicatorDirection: self.indicatorDirection)
+                if self.isLoaded == true {
+                    self._view.update(indicatorDirection: self.indicatorDirection)
+                }
             }
         }
 #if os(iOS)
         public var delaysContentTouches: Bool = true {
-            didSet(oldValue) {
+            didSet {
                 guard self.delaysContentTouches != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(delaysContentTouches: self.delaysContentTouches)
+                if self.isLoaded == true {
+                    self._view.update(delaysContentTouches: self.delaysContentTouches)
+                }
             }
         }
 #endif
         public var visibleInset: InsetFloat = .zero {
-            didSet(oldValue) {
+            didSet {
                 guard self.visibleInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(visibleInset: self.visibleInset)
+                if self.isLoaded == true {
+                    self._view.update(visibleInset: self.visibleInset)
+                }
             }
         }
         public var contentInset: InsetFloat = .zero {
-            didSet(oldValue) {
+            didSet {
                 guard self.contentInset != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(contentInset: self.contentInset)
+                if self.isLoaded == true {
+                    self._view.update(contentInset: self.contentInset)
+                }
             }
         }
         public var contentOffset: PointFloat {
-            set(value) {
-                self._contentOffset = value
+            set {
+                guard self._contentOffset != newValue else { return }
+                self._contentOffset = newValue
                 if self.isLoaded == true {
-                    self._view.update(contentOffset: value, normalized: false)
+                    self._view.update(contentOffset: newValue, normalized: false)
                 }
             }
             get { return self._contentOffset }
@@ -181,30 +189,33 @@ public extension UI.View {
             willSet {
                 self.content.view = nil
             }
-            didSet(oldValue) {
+            didSet {
                 self.content.view = self
-                guard self.isLoaded == true else { return }
-                self._view.update(content: self.content)
+                if self.isLoaded == true {
+                    self._view.update(content: self.content)
+                }
             }
         }
         public private(set) var isDragging: Bool = false
         public private(set) var isDecelerating: Bool = false
     #if os(iOS)
         public var refreshColor: UI.Color? {
-            set(value) {
-                guard self._refreshColor != value else { return }
-                self._refreshColor = value
-                guard self.isLoaded == true else { return }
-                self._view.update(refreshColor: self._refreshColor)
+            set {
+                guard self._refreshColor != newValue else { return }
+                self._refreshColor = newValue
+                if self.isLoaded == true {
+                    self._view.update(refreshColor: self._refreshColor)
+                }
             }
             get { return self._refreshColor }
         }
         public var isRefreshing: Bool {
-            set(value) {
-                guard self._isRefreshing != value else { return }
-                self._isRefreshing = value
-                guard self.isLoaded == true else { return }
-                self._view.update(isRefreshing: self._isRefreshing)
+            set {
+                guard self._isRefreshing != newValue else { return }
+                self._isRefreshing = newValue
+                if self.isLoaded == true {
+                    self._view.update(isRefreshing: self._isRefreshing)
+                }
             }
             get { return self._isRefreshing }
         }
@@ -516,14 +527,12 @@ public extension UI.View.Scroll {
     
 #if os(iOS)
     
-    @available(iOS 10.0, *)
     @discardableResult
     func beginRefresh() -> Self {
         self.isRefreshing = true
         return self
     }
     
-    @available(iOS 10.0, *)
     @discardableResult
     func endRefresh() -> Self {
         self.isRefreshing = false

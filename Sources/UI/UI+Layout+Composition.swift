@@ -25,7 +25,7 @@ public extension UI.Layout {
         public unowned var delegate: IUILayoutDelegate?
         public unowned var view: IUIView?
         public var inset: InsetFloat {
-            didSet(oldValue) {
+            didSet {
                 guard self.inset != oldValue else { return }
                 self.setNeedForceUpdate()
             }

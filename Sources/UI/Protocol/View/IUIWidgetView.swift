@@ -21,7 +21,7 @@ public extension IUIWidgetView {
     
     @inlinable
     unowned var appearedItem: UI.Layout.Item? {
-        set(value) { self.body.appearedItem = value }
+        set { self.body.appearedItem = newValue }
         get { return self.body.appearedItem }
     }
     
@@ -47,7 +47,7 @@ public extension IUIWidgetView {
     
     @inlinable
     var isHidden: Bool {
-        set(value) { self.body.isHidden = value }
+        set { self.body.isHidden = newValue }
         get { return self.body.isHidden }
     }
     

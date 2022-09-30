@@ -57,19 +57,19 @@ public extension IUIViewPageable where Self : IUIWidgetView, Body : IUIViewPagea
     
     @inlinable
     var currentPage: Float {
-        set(value) { self.body.currentPage = value }
+        set { self.body.currentPage = newValue }
         get { return self.body.currentPage }
     }
     
     @inlinable
     var numberOfPages: UInt {
-        set(value) { self.body.numberOfPages = value }
+        set { self.body.numberOfPages = newValue }
         get { return self.body.numberOfPages }
     }
     
     @inlinable
     var linkedPageable: IUIViewPageable? {
-        set(value) { self.body.linkedPageable = value }
+        set { self.body.linkedPageable = newValue }
         get { return self.body.linkedPageable }
     }
     

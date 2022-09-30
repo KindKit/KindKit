@@ -12,7 +12,7 @@ public extension UI {
         
         public let container: UI.Container.Root
         public private(set) var virtualKeyboardHeight: Float {
-            didSet(oldValue) {
+            didSet {
                 guard self.virtualKeyboardHeight != oldValue else { return }
                 self._updateSafeArea()
             }
@@ -34,13 +34,13 @@ public extension UI {
         }
         
         private var _containerView: UIView? {
-            willSet(newValue) {
+            willSet {
                 guard self._containerView != newValue else { return }
                 if let containerView = self._containerView {
                     containerView.removeFromSuperview()
                 }
             }
-            didSet(oldValue) {
+            didSet {
                 guard self._containerView != oldValue else { return }
                 if let containerView = self._containerView {
                     containerView.frame = self.view.bounds

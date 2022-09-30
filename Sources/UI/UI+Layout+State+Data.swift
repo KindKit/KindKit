@@ -12,7 +12,7 @@ public extension UI.Layout.State {
         public var alignment: Alignment
         public var item: UI.Layout.Item?
         public var view: IUIView? {
-            set(value) { self.item = value.flatMap({ UI.Layout.Item($0) }) }
+            set { self.item = newValue.flatMap({ UI.Layout.Item($0) }) }
             get { return self.item?.view }
         }
         

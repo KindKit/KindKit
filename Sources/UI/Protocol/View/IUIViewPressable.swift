@@ -28,7 +28,7 @@ public extension IUIViewPressable where Self : IUIWidgetView, Body : IUIViewPres
     
     @inlinable
     var shouldPressed: Bool {
-        set(value) { self.body.shouldPressed = value }
+        set { self.body.shouldPressed = newValue }
         get { return self.body.shouldPressed }
     }
     

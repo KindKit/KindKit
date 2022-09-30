@@ -14,7 +14,7 @@ public extension UI.Container {
     final class State : IUIStateContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -43,20 +43,22 @@ public extension UI.Container {
             return self._view
         }
         public var content: ContentContainer? {
-            set(value) {
-                guard self._content !== value else { return }
+            set {
+                guard self._content !== newValue else { return }
                 if let content = self._content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
                         content.finishHide(interactive: false)
+                        content.didChangeInsets()
                     }
                     content.parent = nil
                 }
-                self._content = value
+                self._content = newValue
                 if let content = self._content {
                     self._layout.content = UI.Layout.Item(content.view)
                     content.parent = self
                     if self.isPresented == true {
+                        content.didChangeInsets()
                         content.prepareShow(interactive: false)
                         content.finishShow(interactive: false)
                     }

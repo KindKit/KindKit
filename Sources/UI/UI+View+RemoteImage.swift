@@ -10,25 +10,25 @@ public extension UI.View {
         
         public let body: UI.View.Custom
         public var placeholder: UI.View.Image? {
-            didSet(oldValue) {
+            didSet {
                 guard self.placeholder !== oldValue else { return }
                 self._layout.placeholder = self.placeholder.flatMap({ UI.Layout.Item($0) })
             }
         }
         public private(set) var imageView: UI.View.Image? {
-            didSet(oldValue) {
+            didSet {
                 guard self.imageView !== oldValue else { return }
                 self._layout.image = self.imageView.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var progress: (IUIView & IUIViewProgressable)? {
-            didSet(oldValue) {
+            didSet {
                 guard self.progress !== oldValue else { return }
                 self._layout.progress = self.progress.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var error: IUIView? {
-            didSet(oldValue) {
+            didSet {
                 guard self.error !== oldValue else { return }
                 self._layout.error = self.error.flatMap({ UI.Layout.Item($0) })
             }

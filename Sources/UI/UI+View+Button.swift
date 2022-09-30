@@ -10,67 +10,63 @@ public extension UI.View {
         
         public private(set) var body: UI.View.Control
         public var inset: InsetFloat {
-            set(value) { self._layout.inset = value }
+            set { self._layout.inset = newValue }
             get { return self._layout.inset }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Dynamic = .fit {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
+            set {
+                guard self._isSelected != newValue else { return }
+                self._isSelected = newValue
+                self.triggeredChangeStyle(false)
             }
             get { return self._isSelected }
         }
         public var alignment: Alignment {
-            set(value) { self._layout.alignment = value }
+            set { self._layout.alignment = newValue }
             get { return self._layout.alignment }
         }
         public var background: IUIView? {
             didSet { self._layout.background = self.background.flatMap({ UI.Layout.Item($0) }) }
         }
-        public var spinner: (IUIView & IUIViewAnimatable)? {
+        public var spinner: IUIView? {
             didSet { self._layout.spinner = self.spinner.flatMap({ UI.Layout.Item($0) }) }
         }
         public var spinnerPosition: SpinnerPosition {
-            set(value) { self._layout.spinnerPosition = value }
+            set { self._layout.spinnerPosition = newValue }
             get { return self._layout.spinnerPosition }
         }
         public var spinnerAnimating: Bool {
-            set(value) {
-                self._layout.spinnerAnimating = value
-                self.spinner?.animating(value)
-            }
+            set { self._layout.spinnerAnimating = newValue }
             get { return self._layout.spinnerAnimating }
         }
         public var primary: IUIView? {
             didSet { self._layout.primary = self.primary.flatMap({ UI.Layout.Item($0) }) }
         }
         public var primaryInset: InsetFloat {
-            set(value) { self._layout.primaryInset = value }
+            set { self._layout.primaryInset = newValue }
             get { return self._layout.primaryInset }
         }
         public var secondary: IUIView? {
             didSet { self._layout.secondary = self.secondary.flatMap({ UI.Layout.Item($0) }) }
         }
         public var secondaryPosition: SecondaryPosition {
-            set(value) { self._layout.secondaryPosition = value }
+            set { self._layout.secondaryPosition = newValue }
             get { return self._layout.secondaryPosition }
         }
         public var secondaryInset: InsetFloat {
-            set(value) { self._layout.secondaryInset = value }
+            set { self._layout.secondaryInset = newValue }
             get { return self._layout.secondaryInset }
         }
         

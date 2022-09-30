@@ -8,7 +8,7 @@ import Foundation
 
 public extension UI.View.AnimatedImage {
     
-    enum Repeat {
+    enum Repeat : Equatable {
         
         case loops(Int)
         case infinity

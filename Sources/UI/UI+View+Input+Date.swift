@@ -32,21 +32,21 @@ public extension UI.View.Input {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: Swift.String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var isEditing: Bool {
@@ -55,119 +55,153 @@ public extension UI.View.Input {
         }
         public var width: UI.Size.Static = .fill {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.width != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var height: UI.Size.Static = .fixed(28) {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.height != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
             }
         }
         public var border: UI.Border = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var mode: Mode = .dateTime {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(mode: self.mode)
+                guard self.mode != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(mode: self.mode)
+                }
             }
         }
         public var minimumDate: Foundation.Date? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(minimumDate: self.minimumDate)
+                guard self.minimumDate != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(minimumDate: self.minimumDate)
+                }
             }
         }
         public var maximumDate: Foundation.Date? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(maximumDate: self.maximumDate)
+                guard self.maximumDate != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(maximumDate: self.maximumDate)
+                }
             }
         }
         public var selectedDate: Foundation.Date? {
-            set(value) {
-                self._selectedDate = value
-                guard self.isLoaded == true else { return }
-                self._view.update(selectedDate: self._selectedDate)
+            set {
+                guard self.maximumDate != newValue else { return }
+                self._selectedDate = newValue
+                if self.isLoaded == true {
+                    self._view.update(selectedDate: self._selectedDate)
+                }
             }
             get { return self._selectedDate }
         }
         public var formatter: DateFormatter = DateFormatter(format: "MM-dd-yyyy HH:mm") {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(formatter: self.formatter)
+                guard self.formatter != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(formatter: self.formatter)
+                }
             }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(textFont: self.textFont)
+                guard self.textFont != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(textFont: self.textFont)
+                }
             }
         }
         public var textColor: UI.Color = .black {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(textColor: self.textColor)
+                guard self.textColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(textColor: self.textColor)
+                }
             }
         }
         public var textInset: InsetFloat = Inset(horizontal: 8, vertical: 4) {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(textInset: self.textInset)
+                guard self.textInset != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(textInset: self.textInset)
+                }
             }
         }
         public var placeholder: UI.View.Input.Placeholder? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(placeholder: self.placeholder)
+                guard self.placeholder != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholder: self.placeholder)
+                }
             }
         }
         public var placeholderInset: InsetFloat? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(placeholderInset: self.placeholderInset)
+                guard self.placeholderInset != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderInset: self.placeholderInset)
+                }
             }
         }
         public var alignment: UI.Text.Alignment = .left {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alignment: self.alignment)
+                guard self.alignment != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alignment: self.alignment)
+                }
             }
         }
 #if os(iOS)
         public var toolbar: UI.View.Input.Toolbar? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(toolbar: self.toolbar)
+                guard self.toolbar !== oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(toolbar: self.toolbar)
+                }
             }
         }
 #endif

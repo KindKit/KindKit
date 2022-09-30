@@ -11,19 +11,34 @@ extension UI.Container.Sticky {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var content: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlay: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.overlay != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlayInset: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.overlayInset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlayVisibility: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.overlayVisibility != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlayHidden: Bool {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.overlayHidden != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var overlaySize: SizeFloat?
         

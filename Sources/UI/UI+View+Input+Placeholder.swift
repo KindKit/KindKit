@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.View.Input {
 
-    struct Placeholder {
+    struct Placeholder : Equatable {
         
         public var text: Swift.String
         public var font: UI.Font

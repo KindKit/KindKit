@@ -36,8 +36,8 @@ extension UI.View.Scroll {
 final class KKScrollView : NSScrollView {
     
     unowned var kkDelegate: KKScrollViewDelegate?
-    var needLayoutContent: Bool {
-        didSet(oldValue) {
+    var needLayoutContent: Bool = true {
+        didSet {
             if self.needLayoutContent == true {
                 self.documentView?.needsLayout = true
                 self.contentView.needsLayout = true
@@ -45,21 +45,21 @@ final class KKScrollView : NSScrollView {
         }
     }
     override var contentSize: CGSize {
-        set(value) {
-            self.documentView?.frame = NSRect(origin: self.frame.origin, size: value)
+        set {
+            self.documentView?.frame = NSRect(origin: self.frame.origin, size: newValue)
         }
         get { return super.contentSize }
     }
     override var frame: CGRect {
-        set(value) {
+        set {
             let oldValue = super.frame
-            if oldValue != value {
-                super.frame = value
+            if oldValue != newValue {
+                super.frame = newValue
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)
                     self.updateShadowPath()
                 }
-                if oldValue.size != value.size {
+                if oldValue.size != newValue.size {
                     self.needLayoutContent = true
                 }
             }
@@ -72,19 +72,16 @@ final class KKScrollView : NSScrollView {
     
     private unowned var _view: UI.View.Scroll?
     private var _layoutManager: UI.Layout.Manager!
-    private var _visibleInset: InsetFloat {
-        didSet(oldValue) {
+    private var _visibleInset: InsetFloat = .zero {
+        didSet {
             guard self._visibleInset != oldValue else { return }
             self.needLayoutContent = true
         }
     }
-    private var _isLayout: Bool
+    private var _isLayout: Bool = false
+    private var _isLocked: Bool = false
     
     override init(frame: CGRect) {
-        self.needLayoutContent = true
-        self._visibleInset = .zero
-        self._isLayout = false
-        
         super.init(frame: frame)
         
         self.autohidesScrollers = true
@@ -103,6 +100,12 @@ final class KKScrollView : NSScrollView {
     deinit {
         NotificationCenter.default.removeObserver(self)
         self.documentView = nil
+    }
+    
+    override func scrollWheel(with event: NSEvent) {
+        if self._isLocked == false {
+            super.scrollWheel(with: event)
+        }
     }
 
     override func viewWillMove(toSuperview superview: NSView?) {
@@ -205,6 +208,7 @@ extension KKScrollView {
         self.update(contentSize: view.contentSize)
         self.update(contentOffset: view.contentOffset, normalized: true)
         self.update(content: view.content)
+        self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -212,6 +216,10 @@ extension KKScrollView {
         self.update(alpha: view.alpha)
         self.updateShadowPath()
         self.kkDelegate = view
+    }
+    
+    func update(locked: Bool) {
+        self._isLocked = locked
     }
     
     func update(content: IUILayout) {

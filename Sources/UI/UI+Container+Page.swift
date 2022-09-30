@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Page< Screen : IUIPageScreen > : IUIPageContainer, IUIContainerScreenable {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -44,10 +44,10 @@ public extension UI.Container {
         }
         public private(set) var screen: Screen
         public private(set) var bar: UI.View.PageBar {
-            set(value) {
-                guard self._bar !== value else { return }
+            set {
+                guard self._bar !== newValue else { return }
                 self._bar.delegate = nil
-                self._bar = value
+                self._bar = newValue
                 self._bar.delegate = self
                 self._layout.bar = UI.Layout.Item(self._bar)
             }
@@ -57,11 +57,11 @@ public extension UI.Container {
             get { return self._layout.barSize }
         }
         public private(set) var barVisibility: Float {
-            set(value) { self._layout.barVisibility = value }
+            set { self._layout.barVisibility = newValue }
             get { return self._layout.barVisibility }
         }
         public private(set) var barHidden: Bool {
-            set(value) { self._layout.barHidden = value }
+            set { self._layout.barHidden = newValue }
             get { return self._layout.barHidden }
         }
         public var containers: [IUIPageContentContainer] {
@@ -227,7 +227,9 @@ public extension UI.Container {
             self.bar = self.screen.pageBar
             self.barVisibility = self.screen.pageBarVisibility
             self.barHidden = self.screen.pageBarHidden
-            self.didChangeInsets()
+            if self.isPresented == true {
+                self.didChangeInsets()
+            }
             completion?()
         }
         
@@ -266,7 +268,13 @@ public extension UI.Container {
             }
             if oldCurrent !== newCurrent {
                 self._current = newCurrent
-                self._set(current: oldCurrent, forward: newCurrent, animated: animated, completion: completion)
+                if let newCurrent = newCurrent {
+                    if let oldCurrent = oldCurrent {
+                        self._set(current: oldCurrent, forward: newCurrent, animated: animated, completion: completion)
+                    } else {
+                        self._set(current: newCurrent, completion: completion)
+                    }
+                }
             } else {
                 completion?()
             }
@@ -291,7 +299,8 @@ public extension UI.Container {
                     completion?()
                 }
             } else {
-                self._set(current: nil, forward: newCurrent, animated: animated, completion: completion)
+                self._current = newCurrent
+                self._set(current: newCurrent, completion: completion)
             }
         }
         
@@ -421,212 +430,128 @@ private extension UI.Container.Page {
     }
     
     func _set(
-        current: Item?,
-        forward: Item?,
+        current: Item,
+        completion: (() -> Void)?
+    ) {
+        self._bar.selected(current.bar)
+        self._layout.state = .idle(current: current.pageItem)
+        if self.isPresented == true {
+            current.container.didChangeInsets()
+            current.container.prepareShow(interactive: false)
+            current.container.finishShow(interactive: false)
+        }
+#if os(iOS)
+        self.setNeedUpdateOrientations()
+        self.setNeedUpdateStatusBar()
+#endif
+        self.screen.change(current: current.container)
+        completion?()
+    }
+    
+    func _set(
+        current: Item,
+        forward: Item,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        let interCompletion: (_ item: Item?) -> Void = { item in
-            if let item = item {
-                self.screen.change(current: item.container)
-            }
-            completion?()
-        }
         if animated == true {
-            if let current = current, let forward = forward {
-                self._animation = Animation.default.run(
-                    duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
-                    ease: Animation.Ease.QuadraticInOut(),
-                    preparing: { [unowned self] in
-                        self._bar.beginTransition()
-                        self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: .zero)
-                        if self.isPresented == true {
-                            current.container.prepareHide(interactive: false)
-                            forward.container.prepareShow(interactive: false)
-                        }
-                    },
-                    processing: { [unowned self] progress in
-                        self._bar.transition(to: forward.bar, progress: progress)
-                        self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
-                        self._layout.updateIfNeeded()
-                    },
-                    completion: { [unowned self] in
-                        self._animation = nil
-                        self._bar.finishTransition(to: forward.bar)
-                        self._layout.state = .idle(current: forward.pageItem)
-                        if self.isPresented == true {
-                            current.container.finishHide(interactive: false)
-                            forward.container.finishShow(interactive: false)
-                        }
-#if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
-#endif
-                        interCompletion(forward)
+            self._animation = Animation.default.run(
+                duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
+                ease: Animation.Ease.QuadraticInOut(),
+                preparing: { [unowned self] in
+                    self._bar.beginTransition()
+                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: .zero)
+                    if self.isPresented == true {
+                        forward.container.didChangeInsets()
+                        current.container.prepareHide(interactive: false)
+                        forward.container.prepareShow(interactive: false)
                     }
-                )
-            } else if let forward = forward {
-                self._bar.selected(forward.bar)
-                self._layout.state = .idle(current: forward.pageItem)
-                if self.isPresented == true {
-                    forward.container.prepareShow(interactive: false)
-                    forward.container.finishShow(interactive: false)
+                },
+                processing: { [unowned self] progress in
+                    self._bar.transition(to: forward.bar, progress: progress)
+                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
+                    self._layout.updateIfNeeded()
+                },
+                completion: { [unowned self] in
+                    self._animation = nil
+                    self._bar.finishTransition(to: forward.bar)
+                    self._layout.state = .idle(current: forward.pageItem)
+                    if self.isPresented == true {
+                        current.container.finishHide(interactive: false)
+                        forward.container.finishShow(interactive: false)
+                    }
+#if os(iOS)
+                    self.setNeedUpdateOrientations()
+                    self.setNeedUpdateStatusBar()
+#endif
+                    self.screen.change(current: forward.container)
+                    completion?()
                 }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(forward)
-            } else if let current = current {
-                self._bar.selected(nil)
-                self._layout.state = .empty
-                if self.isPresented == true {
-                    current.container.prepareHide(interactive: false)
-                    current.container.finishHide(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            } else {
-                self._layout.state = .empty
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            }
-        } else if let current = current, let forward = forward {
-            self._bar.selected(forward.bar)
-            self._layout.state = .idle(current: forward.pageItem)
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                forward.container.prepareShow(interactive: false)
-                current.container.finishHide(interactive: false)
-                forward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(forward)
-        } else if let forward = forward {
-            self._bar.selected(forward.bar)
-            self._layout.state = .idle(current: forward.pageItem)
-            if self.isPresented == true {
-                forward.container.prepareShow(interactive: false)
-                forward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(forward)
-        } else if let current = current {
-            self._bar.selected(nil)
-            self._layout.state = .empty
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                current.container.finishHide(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
+            )
         } else {
-            self._bar.selected(nil)
-            self._layout.state = .empty
+            self._bar.selected(forward.bar)
+            self._layout.state = .idle(current: forward.pageItem)
+            if self.isPresented == true {
+                forward.container.didChangeInsets()
+                current.container.prepareHide(interactive: false)
+                forward.container.prepareShow(interactive: false)
+                current.container.finishHide(interactive: false)
+                forward.container.finishShow(interactive: false)
+            }
 #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
 #endif
-            interCompletion(nil)
+            self.screen.change(current: forward.container)
+            completion?()
         }
     }
     
     func _set(
-        current: Item?,
-        backward: Item?,
+        current: Item,
+        backward: Item,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        let interCompletion: (_ item: Item?) -> Void = { item in
-            if let item = item {
-                self.screen.change(current: item.container)
-            }
-            completion?()
-        }
         if animated == true {
-            if let current = current, let backward = backward {
-                self._animation = Animation.default.run(
-                    duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
-                    ease: Animation.Ease.QuadraticInOut(),
-                    preparing: { [unowned self] in
-                        self._bar.beginTransition()
-                        self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: .zero)
-                        if self.isPresented == true {
-                            current.container.prepareHide(interactive: false)
-                            backward.container.prepareShow(interactive: false)
-                        }
-                    },
-                    processing: { [unowned self] progress in
-                        self._bar.transition(to: backward.bar, progress: progress)
-                        self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
-                        self._layout.updateIfNeeded()
-                    },
-                    completion: { [unowned self] in
-                        self._animation = nil
-                        self._bar.finishTransition(to: backward.bar)
-                        self._layout.state = .idle(current: backward.pageItem)
-                        if self.isPresented == true {
-                            current.container.finishHide(interactive: false)
-                            backward.container.finishShow(interactive: false)
-                        }
-#if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
-#endif
-                        interCompletion(backward)
+            self._animation = Animation.default.run(
+                duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
+                ease: Animation.Ease.QuadraticInOut(),
+                preparing: { [unowned self] in
+                    self._bar.beginTransition()
+                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: .zero)
+                    if self.isPresented == true {
+                        backward.container.didChangeInsets()
+                        current.container.prepareHide(interactive: false)
+                        backward.container.prepareShow(interactive: false)
                     }
-                )
-            } else if let backward = backward {
-                self._bar.selected(backward.bar)
-                self._layout.state = .idle(current: backward.pageItem)
-                if self.isPresented == true {
-                    backward.container.prepareShow(interactive: false)
-                    backward.container.finishShow(interactive: false)
+                },
+                processing: { [unowned self] progress in
+                    self._bar.transition(to: backward.bar, progress: progress)
+                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
+                    self._layout.updateIfNeeded()
+                },
+                completion: { [unowned self] in
+                    self._animation = nil
+                    self._bar.finishTransition(to: backward.bar)
+                    self._layout.state = .idle(current: backward.pageItem)
+                    if self.isPresented == true {
+                        current.container.finishHide(interactive: false)
+                        backward.container.finishShow(interactive: false)
+                    }
+#if os(iOS)
+                    self.setNeedUpdateOrientations()
+                    self.setNeedUpdateStatusBar()
+#endif
+                    self.screen.change(current: backward.container)
+                    completion?()
                 }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(backward)
-            } else if let current = current {
-                self._bar.selected(nil)
-                self._layout.state = .empty
-                if self.isPresented == true {
-                    current.container.prepareHide(interactive: false)
-                    current.container.finishHide(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            } else {
-                self._layout.state = .empty
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            }
-        } else if let current = current, let backward = backward {
+            )
+        } else {
             self._bar.selected(backward.bar)
             self._layout.state = .idle(current: backward.pageItem)
             if self.isPresented == true {
+                backward.container.didChangeInsets()
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
@@ -636,39 +561,8 @@ private extension UI.Container.Page {
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
 #endif
-            interCompletion(backward)
-        } else if let backward = backward {
-            self._bar.selected(nil)
-            self._layout.state = .idle(current: backward.pageItem)
-            if self.isPresented == true {
-                backward.container.prepareShow(interactive: false)
-                backward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(backward)
-        } else if let current = current {
-            self._bar.selected(nil)
-            self._layout.state = .empty
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                current.container.finishHide(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
-        } else {
-            self._bar.selected(nil)
-            self._layout.state = .empty
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
+            self.screen.change(current: backward.container)
+            completion?()
         }
     }
     

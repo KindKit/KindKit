@@ -26,7 +26,7 @@ public extension IUIViewColorable where Self : IUIWidgetView, Body : IUIViewColo
     
     @inlinable
     var color: UI.Color? {
-        set(value) { self.body.color = value }
+        set { self.body.color = newValue }
         get { return self.body.color }
     }
     

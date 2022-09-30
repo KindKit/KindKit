@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Screen< Screen : IUIScreen & IUIScreenViewable > : IUIScreenContainer, IUIContainerScreenable {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -70,6 +70,14 @@ public extension UI.Container {
         }
         
         public func didChangeInsets() {
+            let inheritedInsets = self.inheritedInsets(interactive: true)
+            let overlayEdge = self.screen.overlayEdge
+            self._layout.inset = .init(
+                top: overlayEdge.contains(.top) == false ? inheritedInsets.top : 0,
+                left: overlayEdge.contains(.left) == false ? inheritedInsets.left : 0,
+                right: overlayEdge.contains(.right) == false ? inheritedInsets.right : 0,
+                bottom: overlayEdge.contains(.bottom) == false ? inheritedInsets.bottom : 0
+            )
             self.screen.didChangeInsets()
         }
         

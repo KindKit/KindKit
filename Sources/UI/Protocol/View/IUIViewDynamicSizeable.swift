@@ -34,13 +34,13 @@ public extension IUIViewDynamicSizeable where Self : IUIWidgetView, Body : IUIVi
     
     @inlinable
     var width: UI.Size.Dynamic {
-        set(value) { self.body.width = value }
+        set { self.body.width = newValue }
         get { return self.body.width }
     }
     
     @inlinable
     var height: UI.Size.Dynamic {
-        set(value) { self.body.height = value }
+        set { self.body.height = newValue }
         get { return self.body.height }
     }
     

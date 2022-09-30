@@ -24,92 +24,115 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var itemSize: SizeFloat = .init(width: 40, height: 40) {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(itemSize: self.itemSize)
+                guard self.itemSize != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(itemSize: self.itemSize)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var itemSpacing: Float = 2 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(itemSpacing: self.itemSpacing)
+                guard self.itemSpacing != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(itemSpacing: self.itemSpacing)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var numberOfItem: UInt = 0 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(numberOfItem: self.numberOfItem)
+                guard self.numberOfItem != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(numberOfItem: self.numberOfItem)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var rounding: Rounding = .down {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(rounding: self.rounding)
+                guard self.rounding != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(rounding: self.rounding)
+                }
             }
         }
         public var states: [State] {
-            set(value) {
-                guard self.isLoaded == true else { return }
-                self._states = Self._sort(states: value)
-                self._view.update(states: self._states)
+            set {
+                let value = Self._sort(states: newValue)
+                guard self.states != value else { return }
+                self._states = value
+                if self.isLoaded == true {
+                    self._view.update(states: self._states)
+                }
             }
             get { return self._states }
         }
         public var rating: Float = 0 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(rating: self.rating)
+                guard self.rating != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(rating: self.rating)
+                }
             }
         }
         public var onAppear: ((UI.View.Rate) -> Void)?

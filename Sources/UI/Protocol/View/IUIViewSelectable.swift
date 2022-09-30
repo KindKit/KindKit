@@ -25,7 +25,7 @@ public extension IUIViewSelectable where Self : IUIWidgetView, Body : IUIViewSel
     
     @inlinable
     var isSelected: Bool {
-        set(value) { self.body.isSelected = value }
+        set { self.body.isSelected = newValue }
         get { return self.body.isSelected }
     }
     

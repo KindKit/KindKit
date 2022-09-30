@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Dialog : IUIDialogContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -55,7 +55,7 @@ public extension UI.Container {
             return self._view
         }
         public var content: (IUIContainer & IUIContainerParentable)? {
-            didSet(oldValue) {
+            didSet {
                 if let content = self.content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
@@ -284,6 +284,9 @@ extension UI.Container.Dialog {
         self._current = dialog
         self._layout.dialogItem = dialog
         self._layout.state = .present(progress: .zero)
+        if self.isPresented == true {
+            dialog.container.didChangeInsets()
+        }
         if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareShow(interactive: false)
             if animated == true {
@@ -341,6 +344,9 @@ extension UI.Container.Dialog {
     func _dismiss(dialog: Item, animated: Bool, completion: (() -> Void)?) {
         self._layout.dialogItem = dialog
         self._layout.state = .dismiss(progress: .zero)
+        if self.isPresented == true {
+            dialog.container.didChangeInsets()
+        }
         if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareHide(interactive: false)
             if animated == true {

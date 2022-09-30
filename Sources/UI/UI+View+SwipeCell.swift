@@ -15,17 +15,16 @@ public extension UI.View {
         
         public let body: UI.View.Custom
         public var isSelected: Bool {
-            set(value) {
-                if self._isSelected != value {
-                    self._isSelected = value
-                    self.triggeredChangeStyle(false)
-                }
+            set {
+                guard self._isSelected != newValue else { return }
+                self._isSelected = newValue
+                self.triggeredChangeStyle(false)
             }
             get { return self._isSelected }
         }
         public var shouldPressed: Bool = true
         public var content: IUIView {
-            didSet(oldValue) {
+            didSet {
                 guard self.content !== oldValue else { return }
                 self._layout.content = UI.Layout.Item(self.content)
             }
@@ -37,7 +36,7 @@ public extension UI.View {
             }
         }
         public private(set) var leading: IUIView? {
-            didSet(oldValue) {
+            didSet {
                 guard self.leading !== oldValue else { return }
                 if let view = self.leading {
                     self._layout.leading = UI.Layout.Item(view)
@@ -47,7 +46,7 @@ public extension UI.View {
             }
         }
         public var leadingSize: Float {
-            set(value) { self._layout.leadingSize = value }
+            set { self._layout.leadingSize = newValue }
             get { return self._layout.leadingSize }
         }
         public var leadingLimit: Float = 0
@@ -58,7 +57,7 @@ public extension UI.View {
             }
         }
         public var trailing: IUIView? {
-            didSet(oldValue) {
+            didSet {
                 guard self.trailing !== oldValue else { return }
                 if let view = self.trailing {
                     self._layout.trailing = UI.Layout.Item(view)
@@ -68,7 +67,7 @@ public extension UI.View {
             }
         }
         public var trailingSize: Float {
-            set(value) { self._layout.trailingSize = value }
+            set { self._layout.trailingSize = newValue }
             get { return self._layout.trailingSize }
         }
         public var trailingLimit: Float = 0

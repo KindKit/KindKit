@@ -14,19 +14,34 @@ public extension UI.Layout {
             didSet { self.setNeedForceUpdate() }
         }
         public var contentView: IUIView {
-            didSet { self.contentItem = UI.Layout.Item(self.contentView) }
+            didSet {
+                guard self.contentView !== oldValue else { return }
+                self.contentItem = UI.Layout.Item(self.contentView)
+            }
         }
         public private(set) var contentItem: UI.Layout.Item {
-            didSet { self.setNeedForceUpdate(item: self.contentItem) }
+            didSet {
+                guard self.contentItem != oldValue else { return }
+                self.setNeedForceUpdate(item: self.contentItem)
+            }
         }
         public var detailInset: InsetFloat {
-            didSet { self.setNeedForceUpdate() }
+            didSet {
+                guard self.detailInset != oldValue else { return }
+                self.setNeedForceUpdate()
+            }
         }
         public var detailView: IUIView {
-            didSet { self.detailItem = UI.Layout.Item(self.detailView) }
+            didSet {
+                guard self.detailView !== oldValue else { return }
+                self.detailItem = UI.Layout.Item(self.detailView)
+            }
         }
         public private(set) var detailItem: UI.Layout.Item {
-            didSet { self.setNeedForceUpdate(item: self.detailItem) }
+            didSet {
+                guard self.detailItem != oldValue else { return }
+                self.setNeedForceUpdate(item: self.detailItem)
+            }
         }
         public var isAnimating: Bool {
             return self._animation != nil

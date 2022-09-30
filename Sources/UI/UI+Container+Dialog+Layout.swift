@@ -11,16 +11,25 @@ extension UI.Container.Dialog {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var inset: InsetFloat {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.inset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var content: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content !== oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var state: State {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.state != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var dialogItem: Item? {
-            didSet(oldValue) {
+            didSet {
                 guard self.dialogItem !== oldValue else { return }
                 self._dialogSize = nil
                 self.setNeedUpdate()

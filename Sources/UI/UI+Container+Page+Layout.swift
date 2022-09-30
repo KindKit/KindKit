@@ -11,19 +11,34 @@ extension UI.Container.Page {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State = .empty {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.state != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var bar: UI.Layout.Item {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.bar != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barVisibility: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barVisibility != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barHidden: Bool {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barHidden != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barOffset: Float {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.barOffset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var barSize: Float
         

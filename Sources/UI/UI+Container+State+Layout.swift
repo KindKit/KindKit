@@ -11,7 +11,10 @@ extension UI.Container.State {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var content: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init(_ content: UI.Layout.Item?) {

@@ -16,11 +16,11 @@ public extension UI.View {
         
         public private(set) var body: UI.View.Bar
         public var items: [UI.View.GroupBar.Item] {
-            set(value) {
+            set {
                 for itemView in self._items {
                     itemView.delegate = nil
                 }
-                self._items = value
+                self._items = newValue
                 for itemView in self._items {
                     itemView.delegate = self
                 }
@@ -29,18 +29,18 @@ public extension UI.View {
             get { return self._items }
         }
         public var itemsInset: InsetFloat {
-            set(value) { self._contentLayout.itemsInset = value }
+            set { self._contentLayout.itemsInset = newValue }
             get { return self._contentLayout.itemsInset }
         }
         public var itemsSpacing: Float {
-            set(value) { self._contentLayout.itemsSpacing = value }
+            set { self._contentLayout.itemsSpacing = newValue }
             get { return self._contentLayout.itemsSpacing }
         }
         public var selected: UI.View.GroupBar.Item? {
-            set(value) {
-                guard self._selected !== value else { return }
+            set {
+                guard self._selected !== newValue else { return }
                 self._selected?.select(false)
-                self._selected = value
+                self._selected = newValue
                 self._selected?.select(true)
             }
             get { return self._selected }

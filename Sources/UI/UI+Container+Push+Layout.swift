@@ -11,16 +11,28 @@ extension UI.Container.Push {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State = .empty {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.state != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var inset: InsetFloat {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.inset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var inheritedInset: InsetFloat = .zero {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.inheritedInset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var content: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init(

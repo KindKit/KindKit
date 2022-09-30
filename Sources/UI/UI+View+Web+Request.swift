@@ -8,7 +8,7 @@ import Foundation
 
 public extension UI.View.Web {
     
-    enum Request {
+    enum Request : Equatable {
         
         case request(_ request: URLRequest)
         case file(url: URL, readAccess: URL)

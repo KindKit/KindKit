@@ -25,7 +25,7 @@ public extension IUIViewAnimatable where Self : IUIWidgetView, Body : IUIViewAni
     
     @inlinable
     var isAnimating: Bool {
-        set(value) { self.body.isAnimating = value }
+        set { self.body.isAnimating = newValue }
         get { return self.body.isAnimating }
     }
     

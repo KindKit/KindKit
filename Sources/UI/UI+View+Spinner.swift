@@ -24,63 +24,75 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
         }
         public var color: UI.Color? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
             }
         }
         public var cornerRadius: UI.CornerRadius = .none {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
             }
         }
         public var shadow: UI.Shadow? = nil {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
             }
         }
         public var alpha: Float = 1 {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var size: UI.Size.Static = .fixed(40) {
             didSet {
-                guard self.isLoaded == true else { return }
+                guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var activityColor: UI.Color? {
             didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(activityColor: self.activityColor)
+                guard self.activityColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(activityColor: self.activityColor)
+                }
             }
         }
         public var onAppear: ((UI.View.Spinner) -> Void)?
@@ -93,7 +105,6 @@ public extension UI.View {
         private var _view: Reusable.Content {
             return self._reuse.content
         }
-        private var _isAnimating: Bool = false
         
         public init() {
             self._reuse = UI.Reuse.Item()
@@ -152,7 +163,7 @@ public extension UI.View {
     }
     
 }
-/*
+
 public extension UI.View.Spinner {
     
     @inlinable
@@ -167,32 +178,6 @@ public extension UI.View.Spinner {
     func activityColor(_ value: UI.Color?) -> Self {
         self.activityColor = value
         return self
-    }
-    
-}
-*/
-#endif
-
-#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI) && DEBUG
-
-import SwiftUI
-
-@available(macOS 10.15.0, *)
-@available(iOS 13.0, *)
-struct UI_View_Spinner_Preview : PreviewProvider {
-    
-    static var previews: some View {
-        UI.View.Preview(
-            UI.View.Custom(.composition(
-                entity: .position(
-                    mode: .center,
-                    entity: .view(UI.View.Spinner(configure: {
-                        $0.size = .fixed(40)
-                        $0.color = .alabaster
-                    }))
-                )
-            ))
-        )
     }
     
 }

@@ -6,7 +6,7 @@ import Foundation
 
 extension UI.Container.Page.Layout {
     
-    enum State {
+    enum State : Equatable {
         
         case empty
         case idle(current: UI.Layout.Item)

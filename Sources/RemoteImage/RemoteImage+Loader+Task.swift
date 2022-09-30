@@ -24,7 +24,7 @@ extension RemoteImage.Loader {
             return self.lockQueue.sync(execute: { self._targets })
         }
         var task: ICancellable? {
-            set(value) { self.lockQueue.sync(flags: .barrier, execute: { self._task = value }) }
+            set { self.lockQueue.sync(flags: .barrier, execute: { self._task = newValue }) }
             get { return self.lockQueue.sync(execute: { self._task }) }
         }
         

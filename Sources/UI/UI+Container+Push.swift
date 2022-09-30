@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Push : IUIPushContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -55,11 +55,11 @@ public extension UI.Container {
             return self._view
         }
         public var inset: InsetFloat {
-            set(value) { self._layout.inset = value }
+            set { self._layout.inset = newValue }
             get { return self._layout.inset }
         }
         public var content: (IUIContainer & IUIContainerParentable)? {
-            didSet(oldValue) {
+            didSet {
                 if let content = self.content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
@@ -299,11 +299,17 @@ private extension UI.Container.Push {
     
     func _present(push: Item, animated: Bool, completion: (() -> Void)?) {
         self._current = push
-        push.container.prepareShow(interactive: false)
         if animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(push.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
+                preparing: {
+                    self._layout.state = .present(push: push, progress: .zero)
+                    if self.isPresented == true {
+                        push.container.prepareShow(interactive: false)
+                        push.container.didChangeInsets()
+                    }
+                },
                 processing: { [unowned self] progress in
                     self._layout.state = .present(push: push, progress: progress)
                     self._layout.updateIfNeeded()
@@ -312,7 +318,9 @@ private extension UI.Container.Push {
                     self._animation = nil
                     self._layout.state = .idle(push: push)
                     self._didPresent(push: push)
-                    push.container.finishShow(interactive: false)
+                    if self.isPresented == true {
+                        push.container.finishShow(interactive: false)
+                    }
 #if os(iOS)
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
@@ -321,9 +329,13 @@ private extension UI.Container.Push {
                 }
             )
         } else {
-            self._didPresent(push: push)
-            push.container.finishShow(interactive: false)
             self._layout.state = .idle(push: push)
+            self._didPresent(push: push)
+            if self.isPresented == true {
+                push.container.prepareShow(interactive: false)
+                push.container.finishShow(interactive: false)
+                push.container.didChangeInsets()
+            }
 #if os(iOS)
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()

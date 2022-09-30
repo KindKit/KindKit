@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Hamburger : IUIHamburgerContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -43,40 +43,42 @@ public extension UI.Container {
             return self._view
         }
         public var content: IUIHamburgerContentContainer {
-            set(value) {
-                guard self._content !== value else { return }
+            set {
+                guard self._content !== newValue else { return }
                 if self.isPresented == true {
                     self._content.prepareHide(interactive: false)
                     self._content.finishHide(interactive: false)
+                    self._content.didChangeInsets()
                 }
                 self._content.parent = nil
-                self._content = value
+                self._content = newValue
                 self._content.parent = self
                 self._layout.content = UI.Layout.Item(self._content.view)
                 if self.isPresented == true {
+                    self._content.didChangeInsets()
                     self._content.prepareShow(interactive: false)
                     self._content.finishShow(interactive: false)
                 }
-                self.didChangeInsets()
             }
             get { return self._content }
         }
         public var leading: IHamburgerMenuContainer? {
-            set(value) {
-                guard self._leading !== value else { return }
+            set {
+                guard self._leading !== newValue else { return }
                 if let leading = self._leading {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .leading:
                             leading.prepareHide(interactive: false)
                             leading.finishHide(interactive: false)
+                            leading.didChangeInsets()
                         default:
                             break
                         }
                     }
                     leading.parent = nil
                 }
-                self._leading = value
+                self._leading = newValue
                 if let leading = self._leading {
                     leading.parent = self
                     self._layout.leading = UI.Layout.Item(leading.view)
@@ -84,6 +86,7 @@ public extension UI.Container {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .leading:
+                            leading.didChangeInsets()
                             leading.prepareShow(interactive: false)
                             leading.finishShow(interactive: false)
                         default:
@@ -91,7 +94,6 @@ public extension UI.Container {
                         }
                     }
                 }
-                self.didChangeInsets()
             }
             get { return self._leading }
         }
@@ -102,21 +104,22 @@ public extension UI.Container {
             }
         }
         public var trailing: IHamburgerMenuContainer? {
-            set(value) {
-                guard self._trailing !== value else { return }
+            set {
+                guard self._trailing !== newValue else { return }
                 if let trailing = self._trailing {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .trailing:
                             trailing.prepareHide(interactive: false)
                             trailing.finishHide(interactive: false)
+                            trailing.didChangeInsets()
                         default:
                             break
                         }
                     }
                     trailing.parent = nil
                 }
-                self._trailing = value
+                self._trailing = newValue
                 if let trailing = self._trailing {
                     trailing.parent = self
                     self._layout.trailing = UI.Layout.Item(trailing.view)
@@ -124,6 +127,7 @@ public extension UI.Container {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .trailing:
+                            trailing.didChangeInsets()
                             trailing.prepareShow(interactive: false)
                             trailing.finishShow(interactive: false)
                         default:
@@ -131,7 +135,6 @@ public extension UI.Container {
                         }
                     }
                 }
-                self.didChangeInsets()
             }
             get { return self._trailing }
         }

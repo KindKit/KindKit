@@ -22,59 +22,26 @@ public extension UI.View {
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
-            didSet(oldValue) {
+            didSet {
                 guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set(value) { self._reuse.unloadBehaviour = value }
+            set { self._reuse.unloadBehaviour = newValue }
             get { return self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
-            set(value) { self._reuse.cache = value }
+            set { self._reuse.cache = newValue }
             get { return self._reuse.cache }
         }
         public var reuseName: String? {
-            set(value) { self._reuse.name = value }
+            set { self._reuse.name = newValue }
             get { return self._reuse.name }
-        }
-        public var color: UI.Color? = .clear {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(color: self.color)
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(border: self.border)
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(cornerRadius: self.cornerRadius)
-                self._view.updateShadowPath()
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(shadow: self.shadow)
-                self._view.updateShadowPath()
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.isLoaded == true else { return }
-                self._view.update(alpha: self.alpha)
-            }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
                 guard self.width != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
@@ -83,17 +50,57 @@ public extension UI.View {
         public var height: UI.Size.Dynamic = .fit {
             didSet {
                 guard self.height != oldValue else { return }
-                guard self.isLoaded == true else { return }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
             }
         }
+        public var color: UI.Color? = .clear {
+            didSet {
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
+            }
+        }
+        public var cornerRadius: UI.CornerRadius = .none {
+            didSet {
+                guard self.cornerRadius != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(cornerRadius: self.cornerRadius)
+                }
+            }
+        }
+        public var border: UI.Border = .none {
+            didSet {
+                guard self.border != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(border: self.border)
+                }
+            }
+        }
+        public var shadow: UI.Shadow? = nil {
+            didSet {
+                guard self.shadow != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(shadow: self.shadow)
+                }
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet {
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
+            }
+        }
         public var text: String {
             didSet {
                 guard self.text != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(text: self.text)
+                if self.isLoaded == true {
+                    self._view.update(text: self.text)
+                }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
@@ -102,8 +109,9 @@ public extension UI.View {
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
                 guard self.textFont != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(textFont: self.textFont)
+                if self.isLoaded == true {
+                    self._view.update(textFont: self.textFont)
+                }
                 self._cacheAvailable = nil
                 self._cacheSize = nil
                 self.setNeedForceLayout()
@@ -112,31 +120,35 @@ public extension UI.View {
         public var textColor: UI.Color = .black {
             didSet {
                 guard self.textColor != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(textColor: self.textColor)
+                if self.isLoaded == true {
+                    self._view.update(textColor: self.textColor)
+                }
             }
         }
         public var alignment: UI.Text.Alignment = .left {
             didSet {
                 guard self.alignment != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(alignment: self.alignment)
+                if self.isLoaded == true {
+                    self._view.update(alignment: self.alignment)
+                }
                 self.setNeedLayout()
             }
         }
         public var lineBreak: UI.Text.LineBreak = .wordWrapping {
             didSet {
                 guard self.lineBreak != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(lineBreak: self.lineBreak)
+                if self.isLoaded == true {
+                    self._view.update(lineBreak: self.lineBreak)
+                }
                 self.setNeedForceLayout()
             }
         }
         public var numberOfLines: UInt = 0 {
             didSet {
                 guard self.numberOfLines != oldValue else { return }
-                guard self.isLoaded == true else { return }
-                self._view.update(numberOfLines: self.numberOfLines)
+                if self.isLoaded == true {
+                    self._view.update(numberOfLines: self.numberOfLines)
+                }
                 self.setNeedForceLayout()
             }
         }

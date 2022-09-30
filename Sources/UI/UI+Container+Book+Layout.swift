@@ -11,7 +11,10 @@ extension UI.Container.Book {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.state != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         
         init(

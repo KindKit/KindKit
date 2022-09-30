@@ -36,13 +36,12 @@ extension UI.View.Image {
 final class KKImageView : UIImageView {
     
     override var frame: CGRect {
-        set(value) {
-            if super.frame != value {
-                super.frame = value
-                if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
-                }
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.update(cornerRadius: view.cornerRadius)
+                self.updateShadowPath()
             }
         }
         get { return super.frame }

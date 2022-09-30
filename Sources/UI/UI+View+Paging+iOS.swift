@@ -37,24 +37,24 @@ final class KKPagingView : UIScrollView {
     
     unowned var kkDelegate: KKPagingViewDelegate?
     var needLayoutContent: Bool {
-        didSet(oldValue) {
+        didSet {
             if self.needLayoutContent == true {
                 self.setNeedsLayout()
             }
         }
     }
     override var frame: CGRect {
-        set(value) {
+        set {
             let oldValue = super.frame
-            if oldValue != value {
+            if oldValue != newValue {
                 let oldContentOffset = self.contentOffset
                 let oldContentSize = self.contentSize
-                super.frame = value
+                super.frame = newValue
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)
                     self.updateShadowPath()
                 }
-                if oldValue.size != value.size {
+                if oldValue.size != newValue.size {
                     if self._revalidatePage == nil {
                         self._revalidatePage = Self._currentPage(
                             viewportSize: oldValue.size,
@@ -69,12 +69,11 @@ final class KKPagingView : UIScrollView {
         get { return super.frame }
     }
     override var contentSize: CGSize {
-        set(value) {
-            if super.contentSize != value {
-                self._contentView.frame = CGRect(origin: CGPoint.zero, size: value)
-                super.contentSize = value
-                self.setNeedsLayout()
-            }
+        set {
+            guard super.contentSize != newValue else { return }
+            self._contentView.frame = CGRect(origin: CGPoint.zero, size: newValue)
+            super.contentSize = newValue
+            self.setNeedsLayout()
         }
         get { return super.contentSize }
     }
@@ -83,7 +82,7 @@ final class KKPagingView : UIScrollView {
     private var _contentView: UIView!
     private var _layoutManager: UI.Layout.Manager!
     private var _visibleInset: InsetFloat {
-        didSet(oldValue) {
+        didSet {
             guard self._visibleInset != oldValue else { return }
             self.setNeedsLayout()
         }
@@ -178,6 +177,7 @@ extension KKPagingView {
         self.update(contentSize: view.contentSize)
         self.update(direction: view.direction, currentPage: view.currentPage, numberOfPages: view.numberOfPages)
         self.update(content: view.content)
+        self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(border: view.border)
         self.update(cornerRadius: view.cornerRadius)
@@ -185,6 +185,10 @@ extension KKPagingView {
         self.update(alpha: view.alpha)
         self.updateShadowPath()
         self.kkDelegate = view
+    }
+    
+    func update(locked: Bool) {
+        self.isScrollEnabled = locked == false
     }
     
     func update(content: IUILayout) {
@@ -217,12 +221,16 @@ extension KKPagingView {
     }
     
     func update(direction: UI.View.Paging.Direction, currentPage: Float, numberOfPages: UInt) {
-        self.contentOffset = Self._contentOffset(
-            direction: direction,
-            currentPage: currentPage,
-            numberOfPages: numberOfPages,
-            contentSize: self.contentSize
-        )
+        if self.superview == nil {
+            self._revalidatePage = currentPage
+        } else {
+            self.contentOffset = Self._contentOffset(
+                direction: direction,
+                currentPage: currentPage,
+                numberOfPages: numberOfPages,
+                contentSize: self.contentSize
+            )
+        }
     }
     
     func cleanup() {

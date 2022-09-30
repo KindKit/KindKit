@@ -14,7 +14,7 @@ public extension IUIViewLockable {
     
     @inlinable
     var locked: Bool {
-        set(value) { self.isLocked = value }
+        set { self.isLocked = newValue }
         get { return self.isLocked }
     }
     
@@ -35,13 +35,13 @@ public extension IUIViewLockable where Self : IUIWidgetView, Body : IUIViewLocka
     
     @inlinable
     var isLocked: Bool {
-        set(value) { self.body.isLocked = value }
+        set { self.body.isLocked = newValue }
         get { return self.body.isLocked }
     }
     
     @inlinable
     var locked: Bool {
-        set(value) { self.isLocked = value }
+        set { self.isLocked = newValue }
         get { return self.isLocked }
     }
     

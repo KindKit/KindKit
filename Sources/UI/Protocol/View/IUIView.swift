@@ -43,7 +43,7 @@ public extension IUIView {
     
     @inlinable
     var hidden: Bool {
-        set(value) { self.isHidden = value }
+        set { self.isHidden = newValue }
         get { return self.isHidden }
     }
     

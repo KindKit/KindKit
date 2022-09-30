@@ -14,7 +14,7 @@ public extension UI.Container {
     final class Book< Screen : IUIBookScreen > : IUIBookContainer {
         
         public unowned var parent: IUIContainer? {
-            didSet(oldValue) {
+            didSet {
                 guard self.parent !== oldValue else { return }
                 if self.parent == nil || self.parent?.isPresented == true {
                     self.didChangeInsets()
@@ -195,7 +195,11 @@ public extension UI.Container {
         public func set(current: IUIBookContentContainer, animated: Bool, completion: (() -> Void)?) {
             let forward = Item(container: current)
             forward.container.parent = self
-            self._set(current: self._current, forward: forward, animated: animated, completion: completion)
+            if let current = self._current {
+                self._set(current: current, forward: forward, animated: animated, completion: completion)
+            } else {
+                self._set(current: forward, completion: completion)
+            }
         }
         
     }
@@ -307,6 +311,162 @@ private extension UI.Container.Book {
         self._animation = nil
     }
     
+    func _set(
+        current: Item,
+        completion: (() -> Void)?
+    ) {
+        self._layout.state = .idle(current: current.bookItem)
+        if self.isPresented == true {
+            current.container.didChangeInsets()
+            current.container.prepareShow(interactive: false)
+            current.container.finishShow(interactive: false)
+        }
+#if os(iOS)
+        self.setNeedUpdateOrientations()
+        self.setNeedUpdateStatusBar()
+#endif
+        self._didSet(
+            current: current,
+            completion: completion
+        )
+    }
+    
+    func _set(
+        current: Item,
+        forward: Item,
+        animated: Bool,
+        completion: (() -> Void)?
+    ) {
+        if animated == true {
+            self._animation = Animation.default.run(
+                duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
+                ease: Animation.Ease.QuadraticInOut(),
+                preparing: { [unowned self] in
+                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: .zero)
+                    if self.isPresented == true {
+                        forward.container.didChangeInsets()
+                        current.container.prepareHide(interactive: false)
+                        forward.container.prepareShow(interactive: false)
+                    }
+                },
+                processing: { [unowned self] progress in
+                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
+                    self._layout.updateIfNeeded()
+                },
+                completion: { [unowned self] in
+                    self._animation = nil
+                    self._layout.state = .idle(current: forward.bookItem)
+                    if self.isPresented == true {
+                        current.container.finishHide(interactive: false)
+                        forward.container.finishShow(interactive: false)
+                    }
+#if os(iOS)
+                    self.setNeedUpdateOrientations()
+                    self.setNeedUpdateStatusBar()
+#endif
+                    self._didSet(
+                        current: forward,
+                        completion: completion
+                    )
+                }
+            )
+        } else {
+            self._layout.state = .idle(current: forward.bookItem)
+            if self.isPresented == true {
+                forward.container.didChangeInsets()
+                current.container.prepareHide(interactive: false)
+                forward.container.prepareShow(interactive: false)
+                current.container.finishHide(interactive: false)
+                forward.container.finishShow(interactive: false)
+            }
+#if os(iOS)
+            self.setNeedUpdateOrientations()
+            self.setNeedUpdateStatusBar()
+#endif
+            self._didSet(
+                current: forward,
+                completion: completion
+            )
+        }
+    }
+    
+    func _set(
+        current: Item,
+        backward: Item,
+        animated: Bool,
+        completion: (() -> Void)?
+    ) {
+        if animated == true {
+            self._animation = Animation.default.run(
+                duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
+                ease: Animation.Ease.QuadraticInOut(),
+                preparing: { [unowned self] in
+                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: .zero)
+                    if self.isPresented == true {
+                        backward.container.didChangeInsets()
+                        current.container.prepareHide(interactive: false)
+                        backward.container.prepareShow(interactive: false)
+                    }
+                },
+                processing: { [unowned self] progress in
+                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
+                    self._layout.updateIfNeeded()
+                },
+                completion: { [unowned self] in
+                    self._animation = nil
+                    self._layout.state = .idle(current: backward.bookItem)
+                    if self.isPresented == true {
+                        current.container.finishHide(interactive: false)
+                        backward.container.finishShow(interactive: false)
+                    }
+#if os(iOS)
+                    self.setNeedUpdateOrientations()
+                    self.setNeedUpdateStatusBar()
+#endif
+                    self._didSet(
+                        current: backward,
+                        completion: completion
+                    )
+                }
+            )
+        } else {
+            self._layout.state = .idle(current: backward.bookItem)
+            if self.isPresented == true {
+                backward.container.didChangeInsets()
+                current.container.prepareHide(interactive: false)
+                backward.container.prepareShow(interactive: false)
+                current.container.finishHide(interactive: false)
+                backward.container.finishShow(interactive: false)
+            }
+#if os(iOS)
+            self.setNeedUpdateOrientations()
+            self.setNeedUpdateStatusBar()
+#endif
+            self._didSet(
+                current: backward,
+                completion: completion
+            )
+        }
+    }
+    
+    func _didSet(
+        current: Item,
+        completion: (() -> Void)?
+    ) {
+        let newBackward = self.screen.backwardContainer(current.container).flatMap({ Item(container: $0) })
+        let newForward = self.screen.forwardContainer(current.container).flatMap({ Item(container: $0) })
+        self._update(
+            newBackward: newBackward,
+            newCurrent: current,
+            newForward: newForward,
+            oldBackward: self._backward,
+            oldCurrent: self._current,
+            oldForward: self._forward
+        )
+        self.screen.change(current: current.container)
+        completion?()
+    }
+    
     func _update(
         newBackward: Item?,
         newCurrent: Item?,
@@ -350,274 +510,6 @@ private extension UI.Container.Book {
         }
     }
     
-    func _set(
-        current: Item?,
-        forward: Item?,
-        animated: Bool,
-        completion: (() -> Void)?
-    ) {
-        let interCompletion: (_ item: Item?) -> Void = { item in
-            let newBackward: Item?
-            let newForward: Item?
-            if let item = item {
-                newBackward = self.screen.backwardContainer(item.container).flatMap({ Item(container: $0) })
-                newForward = self.screen.forwardContainer(item.container).flatMap({ Item(container: $0) })
-            } else {
-                newBackward = nil
-                newForward = nil
-            }
-            self._update(
-                newBackward: newBackward,
-                newCurrent: item,
-                newForward: newForward,
-                oldBackward: self._backward,
-                oldCurrent: self._current,
-                oldForward: self._forward
-            )
-            if let item = item {
-                self.screen.change(current: item.container)
-            }
-            completion?()
-        }
-        if animated == true {
-            if let current = current, let forward = forward {
-                self._animation = Animation.default.run(
-                    duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
-                    ease: Animation.Ease.QuadraticInOut(),
-                    preparing: { [unowned self] in
-                        self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: .zero)
-                        if self.isPresented == true {
-                            current.container.prepareHide(interactive: false)
-                            forward.container.prepareShow(interactive: false)
-                        }
-                    },
-                    processing: { [unowned self] progress in
-                        self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
-                        self._layout.updateIfNeeded()
-                    },
-                    completion: { [unowned self] in
-                        self._animation = nil
-                        self._layout.state = .idle(current: forward.bookItem)
-                        if self.isPresented == true {
-                            current.container.finishHide(interactive: false)
-                            forward.container.finishShow(interactive: false)
-                        }
-#if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
-#endif
-                        interCompletion(forward)
-                    }
-                )
-            } else if let forward = forward {
-                self._layout.state = .idle(current: forward.bookItem)
-                if self.isPresented == true {
-                    forward.container.prepareShow(interactive: false)
-                    forward.container.finishShow(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(forward)
-            } else if let current = current {
-                self._layout.state = .empty
-                if self.isPresented == true {
-                    current.container.prepareHide(interactive: false)
-                    current.container.finishHide(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            } else {
-                self._layout.state = .empty
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            }
-        } else if let current = current, let forward = forward {
-            self._layout.state = .idle(current: forward.bookItem)
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                forward.container.prepareShow(interactive: false)
-                current.container.finishHide(interactive: false)
-                forward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(forward)
-        } else if let forward = forward {
-            self._layout.state = .idle(current: forward.bookItem)
-            if self.isPresented == true {
-                forward.container.prepareShow(interactive: false)
-                forward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(forward)
-        } else if let current = current {
-            self._layout.state = .empty
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                current.container.finishHide(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
-        } else {
-            self._layout.state = .empty
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
-        }
-    }
-    
-    func _set(
-        current: Item?,
-        backward: Item?,
-        animated: Bool,
-        completion: (() -> Void)?
-    ) {
-        let interCompletion: (_ item: Item?) -> Void = { item in
-            let newBackward: Item?
-            let newForward: Item?
-            if let item = item {
-                newBackward = self.screen.backwardContainer(item.container).flatMap({ Item(container: $0) })
-                newForward = self.screen.forwardContainer(item.container).flatMap({ Item(container: $0) })
-            } else {
-                newBackward = nil
-                newForward = nil
-            }
-            self._update(
-                newBackward: newBackward,
-                newCurrent: item,
-                newForward: newForward,
-                oldBackward: self._backward,
-                oldCurrent: self._current,
-                oldForward: self._forward
-            )
-            if let item = item {
-                self.screen.change(current: item.container)
-            }
-            completion?()
-        }
-        if animated == true {
-            if let current = current, let backward = backward {
-                self._animation = Animation.default.run(
-                    duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
-                    ease: Animation.Ease.QuadraticInOut(),
-                    preparing: { [unowned self] in
-                        self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: .zero)
-                        if self.isPresented == true {
-                            current.container.prepareHide(interactive: false)
-                            backward.container.prepareShow(interactive: false)
-                        }
-                    },
-                    processing: { [unowned self] progress in
-                        self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
-                        self._layout.updateIfNeeded()
-                    },
-                    completion: { [unowned self] in
-                        self._animation = nil
-                        self._layout.state = .idle(current: backward.bookItem)
-                        if self.isPresented == true {
-                            current.container.finishHide(interactive: false)
-                            backward.container.finishShow(interactive: false)
-                        }
-#if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
-#endif
-                        interCompletion(backward)
-                    }
-                )
-            } else if let backward = backward {
-                self._layout.state = .idle(current: backward.bookItem)
-                if self.isPresented == true {
-                    backward.container.prepareShow(interactive: false)
-                    backward.container.finishShow(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(backward)
-            } else if let current = current {
-                self._layout.state = .empty
-                if self.isPresented == true {
-                    current.container.prepareHide(interactive: false)
-                    current.container.finishHide(interactive: false)
-                }
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            } else {
-                self._layout.state = .empty
-#if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
-#endif
-                interCompletion(nil)
-            }
-        } else if let current = current, let backward = backward {
-            self._layout.state = .idle(current: backward.bookItem)
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                backward.container.prepareShow(interactive: false)
-                current.container.finishHide(interactive: false)
-                backward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(backward)
-        } else if let backward = backward {
-            self._layout.state = .idle(current: backward.bookItem)
-            if self.isPresented == true {
-                backward.container.prepareShow(interactive: false)
-                backward.container.finishShow(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(backward)
-        } else if let current = current {
-            self._layout.state = .empty
-            if self.isPresented == true {
-                current.container.prepareHide(interactive: false)
-                current.container.finishHide(interactive: false)
-            }
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
-        } else {
-            self._layout.state = .empty
-#if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
-#endif
-            interCompletion(nil)
-        }
-    }
-    
 }
 
 #if os(iOS)
@@ -641,6 +533,7 @@ private extension UI.Container.Book {
         if deltaLocation < 0 {
             if self._forward != nil && self._interactiveForward == nil {
                 self._forward?.container.prepareShow(interactive: true)
+                self._forward?.container.didChangeInsets()
                 self._interactiveForward = self._forward
             }
             if let forward = self._interactiveForward {
@@ -652,6 +545,7 @@ private extension UI.Container.Book {
         } else if deltaLocation > 0 {
             if self._backward != nil && self._interactiveBackward == nil {
                 self._backward?.container.prepareShow(interactive: true)
+                self._backward?.container.didChangeInsets()
                 self._interactiveBackward = self._backward
             }
             if let backward = self._interactiveBackward {

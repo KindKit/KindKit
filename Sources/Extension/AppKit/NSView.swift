@@ -10,7 +10,24 @@ public typealias NativeView = NSView
 
 public extension NSView {
     
+    func child< View >(of type: View.Type, recursive: Bool) -> View? {
+        for subview in self.subviews {
+            if let view = subview as? View {
+                return view
+            } else if recursive == true {
+                if let view = subview.child(of: type, recursive: recursive) {
+                    return view
+                }
+            }
+            
+        }
+        return nil
+    }
+    
     func isChild(of view: NSView, recursive: Bool) -> Bool {
+        if self === view {
+            return true
+        }
         for subview in self.subviews {
             if subview === view {
                 return true
@@ -69,11 +86,18 @@ public extension NSView {
         switch cornerRadius {
         case .none:
             layer.cornerRadius = 0
-        case .manual(let radius):
+            layer.maskedCorners = [ .layerMinXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner ]
+        case .auto(let percent, let edges):
+            let size = self.bounds.size
+            if size.width > 0 && size.height > 0 {
+                layer.cornerRadius = ceil(min(size.width - 1, size.height - 1)) * CGFloat(percent.value)
+            } else {
+                layer.cornerRadius = 0
+            }
+            layer.maskedCorners = edges.caCornerMask
+        case .manual(let radius, let edges):
             layer.cornerRadius = CGFloat(radius)
-        case .auto:
-            let boundsSize = self.bounds.size
-            layer.cornerRadius = CGFloat(ceil(min(boundsSize.width - 1, boundsSize.height - 1) / 2))
+            layer.maskedCorners = edges.caCornerMask
         }
     }
 

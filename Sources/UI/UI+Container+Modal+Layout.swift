@@ -11,7 +11,7 @@ extension UI.Container.Modal {
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
         var state: State = .empty {
-            didSet(oldValue) {
+            didSet {
                 guard self.state != oldValue else { return }
                 switch oldValue {
                 case .empty:
@@ -27,10 +27,16 @@ extension UI.Container.Modal {
             }
         }
         var inset: InsetFloat = .zero {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.inset != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         var content: UI.Layout.Item? {
-            didSet { self.setNeedUpdate() }
+            didSet {
+                guard self.content != oldValue else { return }
+                self.setNeedUpdate()
+            }
         }
         private var _cache: [UI.Layout.Item : SizeFloat] = [:]
 

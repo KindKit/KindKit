@@ -25,3 +25,11 @@ extension UI.Container.Push {
     }
     
 }
+
+extension UI.Container.Push.Item : Equatable {
+    
+    public static func == (lhs: UI.Container.Push.Item, rhs: UI.Container.Push.Item) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+}

@@ -16,29 +16,29 @@ public extension UI.View {
         
         public private(set) var body: UI.View.Bar
         public var leading: IUIView? {
-            didSet(oldValue) {
+            didSet {
                 guard self.leading !== oldValue else { return }
                 self._contentLayout.leading = self.leading.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var trailing: IUIView? {
-            didSet(oldValue) {
+            didSet {
                 guard self.trailing !== oldValue else { return }
                 self._contentLayout.trailing = self.trailing.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var indicator: IUIView {
-            didSet(oldValue) {
+            didSet {
                 guard self.indicator !== oldValue else { return }
                 self._contentLayout.indicator = UI.Layout.Item(self.indicator)
             }
         }
         public var items: [UI.View.PageBar.Item] {
-            set(value) {
+            set {
                 for itemView in self._items {
                     itemView.delegate = nil
                 }
-                self._items = value
+                self._items = newValue
                 for itemView in self._items {
                     itemView.delegate = self
                 }
@@ -47,18 +47,18 @@ public extension UI.View {
             get { return self._items }
         }
         public var itemsInset: InsetFloat {
-            set(value) { self._contentLayout.itemsInset = value }
+            set { self._contentLayout.itemsInset = newValue }
             get { return self._contentLayout.itemsInset }
         }
         public var itemsSpacing: Float {
-            set(value) { self._contentLayout.itemsSpacing = value }
+            set { self._contentLayout.itemsSpacing = newValue }
             get { return self._contentLayout.itemsSpacing }
         }
         public var selected: UI.View.PageBar.Item? {
-            set(value) {
-                guard self._selected !== value else { return }
+            set {
+                guard self._selected !== newValue else { return }
                 self._selected?.select(false)
-                self._selected = value
+                self._selected = newValue
                 if let selectedView = self._selected {
                     selectedView.select(true)
                     if let contentOffset = self._contentView.contentOffset(with: selectedView, horizontal: .center, vertical: .center) {
