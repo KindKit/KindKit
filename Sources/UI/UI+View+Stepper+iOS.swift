@@ -90,7 +90,7 @@ extension KKStepperView {
     }
     
     func update(locked: Bool) {
-        self.isUserInteractionEnabled = locked == false
+        self._stepper.isEnabled = locked == false
     }
     
     func update(minValue: Float) {

@@ -89,7 +89,7 @@ extension KKSwitchView {
     }
     
     func update(locked: Bool) {
-        self.isUserInteractionEnabled = locked == false
+        self._switch.isEnabled = locked == false
     }
     
     func update(thumbColor: UI.Color?) {

@@ -95,7 +95,7 @@ extension KKSegmentedView {
     }
     
     func update(locked: Bool) {
-        self.isUserInteractionEnabled = locked == false
+        self.isEnabled = locked == false
     }
     
     func update(items: [UI.View.Segmented.Item]) {
