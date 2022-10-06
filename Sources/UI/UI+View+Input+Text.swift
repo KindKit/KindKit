@@ -198,15 +198,11 @@ public extension UI.View.Input {
         public var onEditing: ((UI.View.Input.Text) -> Void)?
         public var onEndEditing: ((UI.View.Input.Text) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _text: Swift.String = ""
         
         public init() {
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

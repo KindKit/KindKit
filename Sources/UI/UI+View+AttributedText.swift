@@ -147,10 +147,8 @@ public extension UI.View {
         public var onInvisible: ((UI.View.AttributedText) -> Void)?
         public var onTap: ((UI.View.AttributedText, [NSAttributedString.Key: Any]?) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _cacheAvailable: SizeFloat?
         private var _cacheSize: SizeFloat?
         
@@ -158,8 +156,6 @@ public extension UI.View {
             _ text: NSAttributedString
         ) {
             self.text = text
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

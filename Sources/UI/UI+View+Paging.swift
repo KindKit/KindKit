@@ -208,10 +208,8 @@ public extension UI.View {
         public var onBeginDecelerating: ((UI.View.Paging) -> Void)?
         public var onEndDecelerating: ((UI.View.Paging) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _isLocked: Bool = false
         private var _currentPage: Float = 0
         private var _observer: Observer< IUIPagingViewObserver >
@@ -223,10 +221,8 @@ public extension UI.View {
             _ content: IUILayout
         ) {
             self.content = content
-            self._reuse = UI.Reuse.Item()
             self._observer = Observer()
             self.content.view = self
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

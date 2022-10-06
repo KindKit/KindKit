@@ -168,16 +168,12 @@ public extension UI.View {
         public var onChangeStyle: ((UI.View.Stepper, Bool) -> Void)?
         public var onChangeValue: ((UI.View.Stepper) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _isLocked: Bool = false
         private var _value: Float = 0
         
         public init() {
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(
