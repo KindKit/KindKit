@@ -140,15 +140,11 @@ public extension UI.View {
         public var onChangeStyle: ((UI.View.Segmented, Bool) -> Void)?
         public var onSelect: ((UI.View.Segmented, Item) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _selected: Item?
         
         public init() {
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

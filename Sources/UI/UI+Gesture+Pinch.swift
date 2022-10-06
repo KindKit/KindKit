@@ -123,11 +123,9 @@ public extension UI.Gesture {
         public var scale: Float {
             return Float(self._gesture.scale)
         }
-
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _gesture: Reusable.Content {
-            return self._reuse.content
-        }
+        
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
+        @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
         private var _onShouldBegin: ((UI.Gesture.Pinch) -> Bool)?
         private var _onShouldSimultaneously: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?
         private var _onShouldRequireFailure: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?
@@ -138,8 +136,6 @@ public extension UI.Gesture {
         private var _onEnd: ((UI.Gesture.Pinch) -> Void)?
 
         public init() {
-            self._reuse = UI.Reuse.Item(unloadBehaviour: .whenDestroy)
-            self._reuse.configure(owner: self)
         }
         
         deinit {

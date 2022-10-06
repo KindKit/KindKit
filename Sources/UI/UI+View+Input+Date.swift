@@ -214,15 +214,11 @@ public extension UI.View.Input {
         public var onEditing: ((UI.View.Input.Date) -> Void)?
         public var onEndEditing: ((UI.View.Input.Date) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _selectedDate: Foundation.Date?
         
         public init() {
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

@@ -123,14 +123,10 @@ public extension UI.View {
         public var onVisibility: ((UI.View.Progress) -> Void)?
         public var onInvisible: ((UI.View.Progress) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         
         public init() {
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

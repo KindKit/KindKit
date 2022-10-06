@@ -140,14 +140,10 @@ public extension UI.View {
         public var onEndLoading: ((UI.View.Web) -> Void)?
         public var onDecideNavigation: ((UI.View.Web, URLRequest) -> NavigationPolicy)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         
         public init() {
-            self._reuse = UI.Reuse.Item(unloadBehaviour: .whenDestroy)
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

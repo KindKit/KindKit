@@ -154,10 +154,8 @@ public extension UI.View {
         public var onChangeStyle: ((UI.View.Control, Bool) -> Void)?
         public var onPressed: ((UI.View.Control) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _isHighlighted: Bool = false
         private var _isLocked: Bool = false
         
@@ -165,9 +163,7 @@ public extension UI.View {
             _ content: IUILayout
         ) {
             self.content = content
-            self._reuse = UI.Reuse.Item()
             self.content.view = self
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

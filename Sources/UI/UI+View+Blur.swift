@@ -95,7 +95,7 @@ public extension UI.View {
         public var onVisibility: ((UI.View.Blur) -> Void)?
         public var onInvisible: ((UI.View.Blur) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         private var _view: KKBlurView {
             return self._reuse.content
         }
@@ -104,8 +104,6 @@ public extension UI.View {
             _ style: UIBlurEffect.Style
         ) {
             self.style = style
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

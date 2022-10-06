@@ -100,18 +100,14 @@ public extension UI.View {
         public var onInvisible: ((UI.View.Graphics) -> Void)?
         public var onChangeStyle: ((UI.View.Graphics, Bool) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _isLocked: Bool = false
         
         public init(
             _ canvas: IGraphicsCanvas
         ) {
             self.canvas = canvas
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
             self.canvas.attach(view: self)
         }
         

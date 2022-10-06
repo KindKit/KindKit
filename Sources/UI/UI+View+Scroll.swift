@@ -234,10 +234,8 @@ public extension UI.View {
         public var onEndDecelerating: ((UI.View.Scroll) -> Void)?
         public var onScrollToTop: ((UI.View.Scroll) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         private var _contentOffset: PointFloat = .zero
         private var _refreshColor: UI.Color?
         private var _isRefreshing: Bool = false
@@ -251,11 +249,9 @@ public extension UI.View {
             _ content: IUILayout
         ) {
             self.content = content
-            self._reuse = UI.Reuse.Item()
             self._observer = Observer()
             self._contentOffset = contentOffset
             self.content.view = self
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

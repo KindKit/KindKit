@@ -129,10 +129,8 @@ public extension UI.Gesture {
             }
         }
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _gesture: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
+        @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
         private var _onShouldBegin: ((UI.Gesture.Tap) -> Bool)?
         private var _onShouldSimultaneously: ((UI.Gesture.Tap, NativeGesture) -> Bool)?
         private var _onShouldRequireFailure: ((UI.Gesture.Tap, NativeGesture) -> Bool)?
@@ -140,8 +138,6 @@ public extension UI.Gesture {
         private var _onTriggered: ((UI.Gesture.Tap) -> Void)?
         
         public init() {
-            self._reuse = UI.Reuse.Item(unloadBehaviour: .whenDestroy)
-            self._reuse.configure(owner: self)
         }
         
         deinit {

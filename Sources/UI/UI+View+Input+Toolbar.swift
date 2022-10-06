@@ -89,17 +89,13 @@ public extension UI.View.Input {
         public var onAppear: ((UI.View.Input.Toolbar) -> Void)?
         public var onDisappear: ((UI.View.Input.Toolbar) -> Void)?
         
-        private var _reuse: UI.Reuse.Item< Reusable >
-        private var _view: Reusable.Content {
-            return self._reuse.content
-        }
+        private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
+        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
         
         public init(
             _ items: [IInputToolbarItem]
         ) {
             self.items = items
-            self._reuse = UI.Reuse.Item()
-            self._reuse.configure(owner: self)
         }
         
         public convenience init(

@@ -8,18 +8,20 @@ public extension UI.Reuse {
 
     struct Item< Reusable : IUIReusable > {
         
+        unowned let owner: Reusable.Owner
         var unloadBehaviour: UI.Reuse.UnloadBehaviour
         var cache: UI.Reuse.Cache?
         var name: String?
         
-        private unowned var _owner: Reusable.Owner!
         private var _content: Reusable.Content!
         
         public init(
+            owner: Reusable.Owner,
             unloadBehaviour: UI.Reuse.UnloadBehaviour = .whenDisappear,
             cache: UI.Reuse.Cache = UI.Reuse.Cache.shared,
             name: String? = nil
         ) {
+            self.owner = owner
             self.unloadBehaviour = unloadBehaviour
             self.cache = cache
             self.name = name
@@ -46,17 +48,13 @@ public extension UI.Reuse.Item {
 
 public extension UI.Reuse.Item {
     
-    mutating func configure(owner: Reusable.Owner) {
-        self._owner = owner
-    }
-    
     mutating func loadIfNeeded() {
         if self._content == nil {
             if let cache = self.cache {
-                self._content = cache.get(Reusable.self, name: self.name, owner: self._owner)
+                self._content = cache.get(Reusable.self, name: self.name, owner: self.owner)
             } else {
-                let item = Reusable.createReuse(owner: self._owner)
-                Reusable.configureReuse(owner: self._owner, content: item)
+                let item = Reusable.createReuse(owner: self.owner)
+                Reusable.configureReuse(owner: self.owner, content: item)
                 self._content = item
             }
         }
