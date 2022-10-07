@@ -247,24 +247,22 @@ extension UI.Container.Dialog {
     
     func _setup() {
 #if os(iOS)
-        self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
-            guard let content = self.content else { return true }
-            guard let view = gesture.view else { return false }
-            return content.view.native.kk_isChild(of: view, recursive: true)
-        }).onShouldBegin({ [unowned self] _ in
-            guard let current = self._current else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            guard self._interactiveGesture.contains(in: current.container.view) == true else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }) .onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._interactiveGesture
+            .onShouldBeRequiredToFailBy(self, {
+                guard let content = $0.content else { return true }
+                guard let view = $1.view else { return false }
+                return content.view.native.kk_isChild(of: view, recursive: true)
+            })
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard current.container.shouldInteractive == true else { return false }
+                guard $0._interactiveGesture.contains(in: current.container.view) == true else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #endif
         self.content?.parent = self
     }

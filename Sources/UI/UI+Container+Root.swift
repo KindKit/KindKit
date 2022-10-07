@@ -11,14 +11,14 @@ import UIKit
 
 public protocol IRootContainerDelegate : AnyObject {
     
-    #if os(iOS)
+#if os(iOS)
     
     func viewController() -> UIViewController?
     
     func updateOrientations()
     func updateStatusBar()
     
-    #endif
+#endif
     
 }
 

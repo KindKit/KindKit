@@ -13,7 +13,7 @@ protocol KKWebViewDelegate : AnyObject {
     func beginLoading(_ view: KKWebView)
     func endLoading(_ view: KKWebView, error: Error?)
     
-    func onDecideNavigation(_ view: KKWebView, request: URLRequest) -> UI.View.Web.NavigationPolicy
+    func decideNavigation(_ view: KKWebView, request: URLRequest) -> UI.View.Web.NavigationPolicy
     
 }
 
@@ -42,15 +42,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
@@ -130,15 +130,15 @@ public extension UI.View {
             }
         }
         public private(set) var state: State = .empty
-        public var onAppear: ((UI.View.Web) -> Void)?
-        public var onDisappear: ((UI.View.Web) -> Void)?
-        public var onVisible: ((UI.View.Web) -> Void)?
-        public var onVisibility: ((UI.View.Web) -> Void)?
-        public var onInvisible: ((UI.View.Web) -> Void)?
-        public var onContentSize: ((UI.View.Web) -> Void)?
-        public var onBeginLoading: ((UI.View.Web) -> Void)?
-        public var onEndLoading: ((UI.View.Web) -> Void)?
-        public var onDecideNavigation: ((UI.View.Web, URLRequest) -> NavigationPolicy)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onContentSize: Signal.Empty< Void > = .init()
+        public let onBeginLoading: Signal.Empty< Void > = .init()
+        public let onEndLoading: Signal.Empty< Void > = .init()
+        public let onDecideNavigation: Signal.Args< NavigationPolicy?, URLRequest > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -172,27 +172,27 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
         
     }
@@ -252,64 +252,99 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onAppear(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onAppear = value
+    func onContentSize(_ closure: (() -> Void)?) -> Self {
+        self.onContentSize.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onDisappear(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onDisappear = value
+    func onContentSize(_ closure: ((Self) -> Void)?) -> Self {
+        self.onContentSize.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onVisible = value
+    func onContentSize< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onContentSize.set(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisibility(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onVisibility = value
+    func onBeginLoading(_ closure: (() -> Void)?) -> Self {
+        self.onBeginLoading.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onInvisible(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onInvisible = value
+    func onBeginLoading(_ closure: ((Self) -> Void)?) -> Self {
+        self.onBeginLoading.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onContentSize(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onContentSize = value
+    func onBeginLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onBeginLoading.set(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBeginLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onBeginLoading = value
+    func onEndLoading(_ closure: (() -> Void)?) -> Self {
+        self.onEndLoading.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEndLoading(_ value: ((UI.View.Web) -> Void)?) -> Self {
-        self.onEndLoading = value
+    func onEndLoading(_ closure: ((Self) -> Void)?) -> Self {
+        self.onEndLoading.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onDecideNavigation(_ value: ((UI.View.Web, URLRequest) -> NavigationPolicy)?) -> Self {
-        self.onDecideNavigation = value
+    func onEndLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onEndLoading.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(_ closure: (() -> NavigationPolicy?)?) -> Self {
+        self.onDecideNavigation.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(_ closure: ((Self) -> NavigationPolicy?)?) -> Self {
+        self.onDecideNavigation.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(_ closure: ((URLRequest) -> NavigationPolicy?)?) -> Self {
+        self.onDecideNavigation.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(_ closure: ((Self, URLRequest) -> NavigationPolicy?)?) -> Self {
+        self.onDecideNavigation.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, URLRequest) -> NavigationPolicy?)?) -> Self {
+        self.onDecideNavigation.set(sender, closure)
         return self
     }
     
@@ -332,22 +367,22 @@ extension UI.View.Web : KKWebViewDelegate {
     func update(_ view: KKWebView, contentSize: SizeFloat) {
         if self.contentSize != contentSize {
             self.contentSize = contentSize
-            self.onContentSize?(self)
+            self.onContentSize.emit()
         }
     }
     
     func beginLoading(_ view: KKWebView) {
         self.state = .loading
-        self.onBeginLoading?(self)
+        self.onBeginLoading.emit()
     }
     
     func endLoading(_ view: KKWebView, error: Error?) {
         self.state = .loaded(error)
-        self.onEndLoading?(self)
+        self.onEndLoading.emit()
     }
     
-    func onDecideNavigation(_ view: KKWebView, request: URLRequest) -> NavigationPolicy {
-        self.onDecideNavigation?(self, request) ?? .allow
+    func decideNavigation(_ view: KKWebView, request: URLRequest) -> NavigationPolicy {
+        return self.onDecideNavigation.emit(request, default: .allow)
     }
     
 }

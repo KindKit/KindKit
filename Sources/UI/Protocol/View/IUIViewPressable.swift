@@ -8,8 +8,22 @@ public protocol IUIViewPressable : AnyObject {
     
     var shouldPressed: Bool { set get }
     
-    @discardableResult
-    func onPressed(_ value: ((Self) -> Void)?) -> Self
+    var onPressed: Signal.Empty< Void > { get }
+    
+}
+
+public extension IUIViewPressable where Self : IUIWidgetView, Body : IUIViewPressable {
+    
+    @inlinable
+    var shouldPressed: Bool {
+        set { self.body.shouldPressed = newValue }
+        get { self.body.shouldPressed }
+    }
+    
+    @inlinable
+    var onPressed: Signal.Empty< Void > {
+        self.body.onPressed
+    }
     
 }
 
@@ -22,24 +36,24 @@ public extension IUIViewPressable {
         return self
     }
     
-}
-
-public extension IUIViewPressable where Self : IUIWidgetView, Body : IUIViewPressable {
-    
     @inlinable
-    var shouldPressed: Bool {
-        set { self.body.shouldPressed = newValue }
-        get { return self.body.shouldPressed }
+    @discardableResult
+    func onPressed(_ closure: (() -> Void)?) -> Self {
+        self.onPressed.set(closure)
+        return self
     }
     
     @inlinable
     @discardableResult
-    func onPressed(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onPressed({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onPressed(nil)
-        }
+    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+        self.onPressed.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onPressed.set(sender, closure)
         return self
     }
     

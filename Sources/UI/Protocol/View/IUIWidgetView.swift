@@ -16,13 +16,13 @@ public extension IUIWidgetView {
     
     @inlinable
     var appearedLayout: IUILayout? {
-        get { return self.body.appearedLayout }
+        self.body.appearedLayout
     }
     
     @inlinable
     unowned var appearedItem: UI.Layout.Item? {
         set { self.body.appearedItem = newValue }
-        get { return self.body.appearedItem }
+        get { self.body.appearedItem }
     }
     
     @inlinable
@@ -48,7 +48,32 @@ public extension IUIWidgetView {
     @inlinable
     var isHidden: Bool {
         set { self.body.isHidden = newValue }
-        get { return self.body.isHidden }
+        get { self.body.isHidden }
+    }
+    
+    @inlinable
+    var onAppear: Signal.Empty< Void > {
+        self.body.onAppear
+    }
+    
+    @inlinable
+    var onDisappear: Signal.Empty< Void > {
+        self.body.onDisappear
+    }
+    
+    @inlinable
+    var onVisible: Signal.Empty< Void > {
+        self.body.onVisible
+    }
+    
+    @inlinable
+    var onVisibility: Signal.Empty< Void > {
+        self.body.onVisibility
+    }
+    
+    @inlinable
+    var onInvisible: Signal.Empty< Void > {
+        self.body.onInvisible
     }
     
     @inlinable
@@ -94,68 +119,6 @@ public extension IUIWidgetView {
     @inlinable
     func invisible() {
         self.body.invisible()
-    }
-    
-    @inlinable
-    @discardableResult
-    func hidden(_ value: Bool) -> Self {
-        self.body.hidden(value)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onAppear({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onAppear(nil)
-        }
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onDisappear({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onDisappear(nil)
-        }
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisible(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onVisible({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onVisible(nil)
-        }
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onVisibility({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onVisibility(nil)
-        }
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((Self) -> Void)?) -> Self {
-        if let value = value {
-            self.body.onInvisible({ [unowned self] _ in value(self) })
-        } else {
-            self.body.onInvisible(nil)
-        }
-        return self
     }
     
 }

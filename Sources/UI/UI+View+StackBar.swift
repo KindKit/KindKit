@@ -15,11 +15,11 @@ public extension UI.View {
                 self.body.size = newValue
                 self._relayout()
             }
-            get { return self.body.size }
+            get { self.body.size }
         }
         public var inset: InsetFloat {
             set { self._contentLayout.inset = newValue }
-            get { return self._contentLayout.inset }
+            get { self._contentLayout.inset }
         }
         public var header: IUIView? {
             didSet { self._relayout() }

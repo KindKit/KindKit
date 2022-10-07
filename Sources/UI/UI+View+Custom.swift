@@ -36,15 +36,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
@@ -71,7 +71,7 @@ public extension UI.View {
                 self._isHighlighted = newValue
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isHighlighted }
+            get { self._isHighlighted }
         }
         public var isLocked: Bool {
             set {
@@ -82,7 +82,7 @@ public extension UI.View {
                 }
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isLocked }
+            get { self._isLocked }
         }
         public var color: UI.Color? = nil {
             didSet {
@@ -131,7 +131,7 @@ public extension UI.View {
                     self._view.update(gestures: newValue)
                 }
             }
-            get { return self._gestures }
+            get { self._gestures }
         }
         public var content: IUILayout {
             willSet {
@@ -152,12 +152,12 @@ public extension UI.View {
             guard self.isLoaded == true else { return .zero }
             return self._view.contentSize
         }
-        public var onAppear: ((UI.View.Custom) -> Void)?
-        public var onDisappear: ((UI.View.Custom) -> Void)?
-        public var onVisible: ((UI.View.Custom) -> Void)?
-        public var onVisibility: ((UI.View.Custom) -> Void)?
-        public var onInvisible: ((UI.View.Custom) -> Void)?
-        public var onChangeStyle: ((UI.View.Custom, Bool) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onChangeStyle: Signal.Args< Void, Bool > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -202,31 +202,27 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
-        }
-        
-        public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self.onChangeStyle?(self, userInteraction)
+            self.onInvisible.emit()
         }
 
     }
@@ -273,53 +269,6 @@ public extension UI.View.Custom {
     
 }
 
-public extension UI.View.Custom {
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((UI.View.Custom) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Custom) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisible(_ value: ((UI.View.Custom) -> Void)?) -> Self {
-        self.onVisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ value: ((UI.View.Custom) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.Custom) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChangeStyle(_ value: ((UI.View.Custom, Bool) -> Void)?) -> Self {
-        self.onChangeStyle = value
-        return self
-    }
-    
-}
-
-
 extension UI.View.Custom : KKCustomViewDelegate {
     
     func shouldHighlighting(_ view: KKCustomView) -> Bool {
@@ -329,7 +278,7 @@ extension UI.View.Custom : KKCustomViewDelegate {
     func set(_ view: KKCustomView, highlighted: Bool) {
         if self._isHighlighted != highlighted {
             self._isHighlighted = highlighted
-            self.onChangeStyle?(self, true)
+            self.triggeredChangeStyle(true)
         }
     }
     

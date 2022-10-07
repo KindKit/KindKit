@@ -29,15 +29,15 @@ public extension UI.View.Input {
         public private(set) unowned var parentView: IUIView?
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: Swift.String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var color: UI.Color? = nil {
             didSet {
@@ -86,8 +86,8 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var onAppear: ((UI.View.Input.Toolbar) -> Void)?
-        public var onDisappear: ((UI.View.Input.Toolbar) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -120,13 +120,13 @@ public extension UI.View.Input {
         
         public func appear(to view: IUIView) {
             self.parentView = view
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.parentView = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
     }
@@ -167,24 +167,6 @@ public extension UI.View.Input.Toolbar {
     @discardableResult
     func contentTintColor(_ value: UI.Color) -> Self {
         self.contentTintColor = value
-        return self
-    }
-    
-}
-
-public extension UI.View.Input.Toolbar {
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Input.Toolbar) -> Void)?) -> Self {
-        self.onDisappear = value
         return self
     }
     

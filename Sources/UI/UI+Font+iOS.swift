@@ -12,15 +12,58 @@ public extension UI.Font {
         weight: Weight,
         size: Float = UI.Font.systemSize
     ) {
-        self.native = UIFont.systemFont(ofSize: CGFloat(size), weight: weight.uiFontWeight)
-        
+        self.native = UIFont.systemFont(
+            ofSize: CGFloat(size),
+            weight: weight.uiFontWeight
+        )
+    }
+    
+    init(
+        weight: Weight,
+        scaled: Float = UI.Font.systemSize,
+        lower: Float? = nil,
+        upper: Float? = nil
+    ) {
+        var size = Float(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
+        if let lower = lower {
+            size = max(lower, size)
+        }
+        if let upper = upper {
+            size = min(size, upper)
+        }
+        self.native = UIFont.systemFont(
+            ofSize: CGFloat(size),
+            weight: weight.uiFontWeight
+        )
     }
     
     init(
         name: String,
-        size: Float = Float(UIFont.systemFontSize)
+        size: Float = UI.Font.systemSize
     ) {
-        self.native = UIFont(name: name, size: CGFloat(size))!
+        self.native = UIFont(
+            name: name,
+            size: CGFloat(size)
+        )!
+    }
+    
+    init(
+        name: String,
+        scaled: Float = UI.Font.systemSize,
+        lower: Float? = nil,
+        upper: Float? = nil
+    ) {
+        var size = Float(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
+        if let lower = lower {
+            size = max(lower, size)
+        }
+        if let upper = upper {
+            size = min(size, upper)
+        }
+        self.native = UIFont(
+            name: name,
+            size: CGFloat(size)
+        )!
     }
     
     init(

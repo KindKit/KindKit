@@ -46,7 +46,7 @@ final class KKSegmentedView : UISegmentedControl {
                 self.kk_updateShadowPath()
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     var items: [UI.View.Segmented.Item] = [] {
         willSet {

@@ -12,6 +12,24 @@ public protocol IUIViewReusable : AnyObject {
     
 }
 
+public extension IUIViewReusable where Self : IUIWidgetView, Body : IUIViewReusable {
+    
+    @inlinable
+    var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self.body.reuseUnloadBehaviour = newValue }
+        get { self.body.reuseUnloadBehaviour }
+    }
+    var reuseCache: UI.Reuse.Cache? {
+        set { self.body.reuseCache = newValue }
+        get { self.body.reuseCache }
+    }
+    var reuseName: String? {
+        set { self.body.reuseName = newValue }
+        get { self.body.reuseName }
+    }
+    
+}
+
 public extension IUIViewReusable {
     
     @inlinable
@@ -33,24 +51,6 @@ public extension IUIViewReusable {
     func reuseName(_ value: String?) -> Self {
         self.reuseName = value
         return self
-    }
-    
-}
-
-public extension IUIViewReusable where Self : IUIWidgetView, Body : IUIViewReusable {
-    
-    @inlinable
-    var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-        set { self.body.reuseUnloadBehaviour = newValue }
-        get { return self.body.reuseUnloadBehaviour }
-    }
-    var reuseCache: UI.Reuse.Cache? {
-        set { self.body.reuseCache = newValue }
-        get { return self.body.reuseCache }
-    }
-    var reuseName: String? {
-        set { self.body.reuseName = newValue }
-        get { return self.body.reuseName }
     }
     
 }

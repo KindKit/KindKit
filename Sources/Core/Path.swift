@@ -23,7 +23,7 @@ public struct Path : Hashable {
             } else {
                 self.string = Self._join(prefix: "/", components: compoments)
             }
-        #if os(macOS)
+#if os(macOS)
         case "~":
             let home = Self._home
             if compoments.isEmpty == true {
@@ -31,7 +31,7 @@ public struct Path : Hashable {
             } else {
                 self.string = Self._join(prefix: home, components: compoments.dropFirst())
             }
-        #endif
+#endif
         default:
             return nil
         }
@@ -80,13 +80,13 @@ public extension Path {
         return Path(string: "/")
     }
     
-    #if os(macOS)
+#if os(macOS)
     
     static var home: Path {
         return Path(string: Self._home)
     }
     
-    #endif
+#endif
     
     static var current: Path {
         return Path(string: Self._current)
@@ -139,13 +139,13 @@ private extension Path {
         return FileManager.default.currentDirectoryPath
     }
     
-    #if os(macOS)
+#if os(macOS)
     
     static var _home: String {
         return FileManager.default.homeDirectoryForCurrentUser.path
     }
     
-    #endif
+#endif
     
     @inline(__always)
     static func _join< Compoment : StringProtocol >(prefix: String, component: Compoment) -> String {

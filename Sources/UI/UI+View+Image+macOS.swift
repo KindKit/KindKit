@@ -45,7 +45,7 @@ final class KKImageView : NSImageView {
                 self.kk_updateShadowPath()
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     override var isFlipped: Bool {
         return true

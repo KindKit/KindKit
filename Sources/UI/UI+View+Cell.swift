@@ -17,7 +17,7 @@ public extension UI.View {
                 self._isSelected = newValue
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isSelected }
+            get { self._isSelected }
         }
         public var shouldPressed: Bool = true
         public var content: IUIView {
@@ -30,7 +30,7 @@ public extension UI.View {
         public let pressedGesture = UI.Gesture.Tap()
 #endif
         public private(set) var body: UI.View.Custom
-        public var onPressed: ((UI.View.Cell) -> Void)?
+        public let onPressed: Signal.Empty< Void > = .init()
         
         private var _layout: Layout
         private var _isSelected: Bool = false
@@ -64,26 +64,8 @@ public extension UI.View.Cell {
     
     @inlinable
     @discardableResult
-    func shouldPressed(_ value: Bool) -> Self {
-        self.shouldPressed = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
     func content(_ value: IUIView) -> Self {
         self.content = value
-        return self
-    }
-    
-}
-
-public extension UI.View.Cell {
-    
-    @inlinable
-    @discardableResult
-    func onPressed(_ value: ((UI.View.Cell) -> Void)?) -> Self {
-        self.onPressed = value
         return self
     }
     
@@ -93,11 +75,9 @@ private extension UI.View.Cell {
     
     func _setup() {
 #if os(iOS)
-        self.pressedGesture.onShouldBegin({ [unowned self] _ in
-            return self.shouldPressed
-        }).onTriggered({ [unowned self] _ in
-            self.onPressed?(self)
-        })
+        self.pressedGesture
+            .onShouldBegin(self, { $0.shouldPressed })
+            .onTriggered(self, { $0.onPressed.emit() })
 #endif
     }
     

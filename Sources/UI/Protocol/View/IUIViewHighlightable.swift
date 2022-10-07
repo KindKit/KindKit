@@ -12,6 +12,22 @@ public protocol IUIViewHighlightable : IUIViewStyleable {
     
 }
 
+public extension IUIViewHighlightable where Self : IUIWidgetView, Body : IUIViewHighlightable {
+    
+    @inlinable
+    var shouldHighlighting: Bool {
+        set { self.body.shouldHighlighting = newValue }
+        get { self.body.shouldHighlighting }
+    }
+    
+    @inlinable
+    var isHighlighted: Bool {
+        set { self.body.isHighlighted = newValue }
+        get { self.body.isHighlighted }
+    }
+    
+}
+
 public extension IUIViewHighlightable {
     
     @inlinable
@@ -23,25 +39,16 @@ public extension IUIViewHighlightable {
     
     @inlinable
     @discardableResult
-    func highlight(_ value: Bool) -> Self {
+    func isHighlighted(_ value: Bool) -> Self {
         self.isHighlighted = value
         return self
     }
     
-}
-
-public extension IUIViewHighlightable where Self : IUIWidgetView, Body : IUIViewHighlightable {
-    
     @inlinable
-    var shouldHighlighting: Bool {
-        set { self.body.shouldHighlighting = newValue }
-        get { return self.body.shouldHighlighting }
-    }
-    
-    @inlinable
-    var isHighlighted: Bool {
-        set { self.body.isHighlighted = newValue }
-        get { return self.body.isHighlighted }
+    @discardableResult
+    func highlight(_ value: Bool) -> Self {
+        self.isHighlighted = value
+        return self
     }
     
 }

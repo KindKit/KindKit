@@ -122,9 +122,8 @@ private extension Polylabel2 {
     struct Queue {
         var data: [Cell]
         var compare: (Cell, Cell) -> Value
-        var length: Int { get {
-                return data.count
-            }
+        var length: Int {
+            self.data.count
         }
         
         init(data: [Cell], compare: @escaping (Cell, Cell) -> Value) {
@@ -209,13 +208,11 @@ private extension Polylabel2 {
         var y: Value
         var h: Value
         var polygon: [[[Value]]]
-        var d: Value { get {
-            return pointToPolygonDist(x: x, y: y, polygon: polygon)
-            }
+        var d: Value {
+            self.pointToPolygonDist(x: x, y: y, polygon: polygon)
         }
-        var max: Value { get {
-            return d + h * Value(2).sqrt
-            }
+        var max: Value {
+            self.d + self.h * Value(2).sqrt
         }
         
         func pointToPolygonDist(x: Value, y: Value, polygon: [[[Value]]]) -> Value {

@@ -451,22 +451,20 @@ private extension UI.Container.Stack {
     
     func _setup() {
 #if os(iOS)
-        self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture in
-            guard let gestureView = gesture.view else { return false }
-            return self._view.native.kk_isChild(of: gestureView, recursive: true)
-        }).onShouldBegin({ [unowned self] _ in
-            guard self._items.count > 0 else { return false }
-            guard self.shouldInteractive == true else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }) .onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._interactiveGesture
+            .onShouldBeRequiredToFailBy(self, {
+                guard let gestureView = $1.view else { return false }
+                return $0._view.native.kk_isChild(of: gestureView, recursive: true)
+            })
+            .onShouldBegin(self, {
+                guard $0._items.count > 0 else { return false }
+                guard $0.shouldInteractive == true else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #else
 #endif
         self._root.container.parent = self

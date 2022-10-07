@@ -53,11 +53,11 @@ private extension Animation.DisplayLink {
     @objc
     func _handle() {
         let now = CACurrentMediaTime()
-        #if targetEnvironment(simulator)
+#if targetEnvironment(simulator)
         let delta = (now - self._prevTime) / CFTimeInterval(UIAnimationDragCoefficient())
-        #else
+#else
         let delta = now - self._prevTime
-        #endif
+#endif
         self._prevTime = now
         self.delegate?.update(TimeInterval(delta))
     }

@@ -32,7 +32,7 @@ protocol KKPagingViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Paging : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewPageable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Paging : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewPageable, IUIViewScrollable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public var native: NativeView {
             return self._view
@@ -55,15 +55,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fill {
             didSet {
@@ -90,7 +90,7 @@ public extension UI.View {
                     )
                 }
             }
-            get { return self._currentPage }
+            get { self._currentPage }
         }
         public var numberOfPages: UInt = 0 {
             didSet {
@@ -117,7 +117,7 @@ public extension UI.View {
                 }
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isLocked }
+            get { self._isLocked }
         }
         public var color: UI.Color? = nil {
             didSet {
@@ -196,17 +196,17 @@ public extension UI.View {
         }
         public private(set) var isDragging: Bool = false
         public private(set) var isDecelerating: Bool = false
-        public var onAppear: ((UI.View.Paging) -> Void)?
-        public var onDisappear: ((UI.View.Paging) -> Void)?
-        public var onVisible: ((UI.View.Paging) -> Void)?
-        public var onVisibility: ((UI.View.Paging) -> Void)?
-        public var onInvisible: ((UI.View.Paging) -> Void)?
-        public var onChangeStyle: ((UI.View.Paging, Bool) -> Void)?
-        public var onBeginDragging: ((UI.View.Paging) -> Void)?
-        public var onDragging: ((UI.View.Paging) -> Void)?
-        public var onEndDragging: ((UI.View.Paging, Bool) -> Void)?
-        public var onBeginDecelerating: ((UI.View.Paging) -> Void)?
-        public var onEndDecelerating: ((UI.View.Paging) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onChangeStyle: Signal.Args< Void, Bool > = .init()
+        public let onBeginDragging: Signal.Empty< Void > = .init()
+        public let onDragging: Signal.Empty< Void > = .init()
+        public let onEndDragging: Signal.Args< Void, Bool > = .init()
+        public let onBeginDecelerating: Signal.Empty< Void > = .init()
+        public let onEndDecelerating: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -255,31 +255,31 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
         
         public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self.onChangeStyle?(self, userInteraction)
+            self.onChangeStyle.emit(userInteraction)
         }
         
         public func add(observer: IUIPagingViewObserver) {
@@ -305,20 +305,6 @@ public extension UI.View.Paging {
     
     @inlinable
     @discardableResult
-    func visibleInset(_ value: InsetFloat) -> Self {
-        self.visibleInset = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func contentInset(_ value: InsetFloat) -> Self {
-        self.contentInset = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
     func content(_ value: IUILayout) -> Self {
         self.content = value
         return self
@@ -327,87 +313,6 @@ public extension UI.View.Paging {
     @inlinable
     func animate(currentPage: Float, completion: (() -> Void)?) {
         self.scrollTo(page: UInt(currentPage), duration: 0.2, completion: completion)
-    }
-    
-}
-
-public extension UI.View.Paging {
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisible(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onVisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChangeStyle(_ value: ((UI.View.Paging, Bool) -> Void)?) -> Self {
-        self.onChangeStyle = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginDragging(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onBeginDragging = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDragging(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onDragging = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndDragging(_ value: ((UI.View.Paging, Bool) -> Void)?) -> Self {
-        self.onEndDragging = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginDecelerating(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onBeginDecelerating = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndDecelerating(_ value: ((UI.View.Paging) -> Void)?) -> Self {
-        self.onEndDecelerating = value
-        return self
     }
     
 }
@@ -464,7 +369,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
     func beginDragging(_ view: KKPagingView) {
         if self.isDragging == false {
             self.isDragging = true
-            self.onBeginDragging?(self)
+            self.onBeginDragging.emit()
             self._observer.notify({ $0.beginDragging(paging: self) })
         }
     }
@@ -473,7 +378,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
         if self._currentPage != currentPage {
             self._currentPage = currentPage
             self.linkedPageable?.currentPage = currentPage
-            self.onDragging?(self)
+            self.onDragging.emit()
             self._observer.notify({ $0.dragging(paging: self) })
         }
     }
@@ -481,7 +386,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
     func endDragging(_ view: KKPagingView, decelerate: Bool) {
         if self.isDragging == true {
             self.isDragging = false
-            self.onEndDragging?(self, decelerate)
+            self.onEndDragging.emit(decelerate)
             self._observer.notify({ $0.endDragging(paging: self, decelerate: decelerate) })
         }
     }
@@ -489,7 +394,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
     func beginDecelerating(_ view: KKPagingView) {
         if self.isDecelerating == false {
             self.isDecelerating = true
-            self.onBeginDecelerating?(self)
+            self.onBeginDecelerating.emit()
             self._observer.notify({ $0.beginDecelerating(paging: self) })
         }
     }
@@ -497,7 +402,7 @@ extension UI.View.Paging : KKPagingViewDelegate {
     func endDecelerating(_ view: KKPagingView) {
         if self.isDecelerating == true {
             self.isDecelerating = false
-            self.onEndDecelerating?(self)
+            self.onEndDecelerating.emit()
             self._observer.notify({ $0.endDecelerating(paging: self) })
         }
     }

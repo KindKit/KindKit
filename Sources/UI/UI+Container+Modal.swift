@@ -245,31 +245,30 @@ private extension UI.Container.Modal {
     
     func _setup() {
 #if os(iOS)
-        self._interactiveGesture.onShouldRequireFailure({ [unowned self] _, gesture -> Bool in
-            guard let view = gesture.view else { return false }
-            if let container = self._current?.container {
-                return container.view.native.kk_isChild(of: view, recursive: true)
-            }
-            return false
-        }).onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
-            guard let view = gesture.view else { return false }
-            if let container = self.content {
-                return container.view.native.kk_isChild(of: view, recursive: true)
-            }
-            return false
-        }).onShouldBegin({ [unowned self] _ in
-            guard let current = self._current else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            return self._interactiveGesture.contains(in: current.container.view)
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }) .onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._interactiveGesture
+            .onShouldRequireFailure(self, {
+                guard let view = $1.view else { return false }
+                if let container = $0._current?.container {
+                    return container.view.native.kk_isChild(of: view, recursive: true)
+                }
+                return false
+            })
+            .onShouldBeRequiredToFailBy(self, {
+                guard let view = $1.view else { return false }
+                if let container = $0.content {
+                    return container.view.native.kk_isChild(of: view, recursive: true)
+                }
+                return false
+            })
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard current.container.shouldInteractive == true else { return false }
+                return $0._interactiveGesture.contains(in: current.container.view)
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #endif
         self.content?.parent = self
     }

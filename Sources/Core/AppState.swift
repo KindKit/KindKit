@@ -41,15 +41,17 @@ public final class AppState {
     private var _active: Bool?
     private let _observer: Observer< IAppStateObserver >
     
+#if os(iOS)
     private var _becomeActiveObserver: NSObjectProtocol?
     private var _resignActiveObserver: NSObjectProtocol?
     private var _enterForegroundObserver: NSObjectProtocol?
     private var _enterBackgroundObserver: NSObjectProtocol?
     private var _memoryWarningObserver: NSObjectProtocol?
+#endif
     
     public init() {
         self._observer = Observer()
-        #if os(iOS)
+#if os(iOS)
         self._becomeActiveObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
@@ -80,7 +82,7 @@ public final class AppState {
             queue: OperationQueue.main,
             using: { [unowned self] in self._didMemoryWarning($0) }
         )
-        #endif
+#endif
     }
     
     deinit {

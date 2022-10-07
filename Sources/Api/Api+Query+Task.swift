@@ -180,7 +180,7 @@ private extension Api.Query.Task {
     }
 
     func _complete(_ result: Response.Result) {
-        #if DEBUG
+#if DEBUG
         switch self.provider.logging {
         case .never:
             break
@@ -194,7 +194,7 @@ private extension Api.Query.Task {
         case .always:
             print(self.debugString())
         }
-        #endif
+#endif
         self.queue.async(execute: {
             self.onCompleted(result)
         })

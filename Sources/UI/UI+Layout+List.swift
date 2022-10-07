@@ -43,7 +43,7 @@ public extension UI.Layout {
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
-            get { return self._items }
+            get { self._items }
         }
         public var views: [IUIView] {
             set {
@@ -52,7 +52,7 @@ public extension UI.Layout {
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
-            get { return self._items.map({ $0.view }) }
+            get { self._items.map({ $0.view }) }
         }
         public private(set) var isAnimating: Bool
         

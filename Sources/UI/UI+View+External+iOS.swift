@@ -44,7 +44,7 @@ final class KKExternalView : UIView {
                 self.kk_updateShadowPath()
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     var content: UIView? {
         willSet {

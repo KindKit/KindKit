@@ -12,6 +12,22 @@ public protocol IUIViewStaticSizeable : AnyObject {
     
 }
 
+public extension IUIViewStaticSizeable where Self : IUIWidgetView, Body : IUIViewStaticSizeable {
+    
+    @inlinable
+    var width: UI.Size.Static {
+        set { self.body.width = newValue }
+        get { self.body.width }
+    }
+    
+    @inlinable
+    var height: UI.Size.Static {
+        set { self.body.height = newValue }
+        get { self.body.height }
+    }
+    
+}
+
 public extension IUIViewStaticSizeable {
     
     @inlinable
@@ -26,22 +42,6 @@ public extension IUIViewStaticSizeable {
     func height(_ value: UI.Size.Static) -> Self {
         self.height = value
         return self
-    }
-    
-}
-
-public extension IUIViewStaticSizeable where Self : IUIWidgetView, Body : IUIViewStaticSizeable {
-    
-    @inlinable
-    var width: UI.Size.Static {
-        set { self.body.width = newValue }
-        get { return self.body.width }
-    }
-    
-    @inlinable
-    var height: UI.Size.Static {
-        set { self.body.height = newValue }
-        get { return self.body.height }
     }
     
 }

@@ -57,7 +57,7 @@ final class KKScrollView : UIScrollView {
                 }
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     override var contentSize: CGSize {
         set {
@@ -66,7 +66,7 @@ final class KKScrollView : UIScrollView {
             super.contentSize = newValue
             self.setNeedsLayout()
         }
-        get { return super.contentSize }
+        get { super.contentSize }
     }
     
     private unowned var _view: UI.View.Scroll?

@@ -19,12 +19,12 @@ extension Timer {
         public private(set) var isPaused: Bool
         public private(set) var repeated: UInt
 
-        private var _onStarted: (() -> Void)?
-        private var _onRepeat: (() -> Void)?
-        private var _onFinished: (() -> Void)?
-        private var _onStoped: (() -> Void)?
-        private var _onPaused: (() -> Void)?
-        private var _onResumed: (() -> Void)?
+        let onStarted: Signal.Empty< Void > = .init()
+        let onRepeat: Signal.Empty< Void > = .init()
+        let onFinished: Signal.Empty< Void > = .init()
+        let onStoped: Signal.Empty< Void > = .init()
+        let onPaused: Signal.Empty< Void > = .init()
+        let onResumed: Signal.Empty< Void > = .init()
 
         private var _startDelayDate: Date?
         private var _startDate: Date?
@@ -53,42 +53,6 @@ extension Timer {
         }
         
         @discardableResult
-        public func onStarted(_ value: (() -> Void)?) -> Self {
-            self._onStarted = value
-            return self
-        }
-        
-        @discardableResult
-        public func onRepeat(_ value: (() -> Void)?) -> Self {
-            self._onRepeat = value
-            return self
-        }
-        
-        @discardableResult
-        public func onFinished(_ value: (() -> Void)?) -> Self {
-            self._onFinished = value
-            return self
-        }
-        
-        @discardableResult
-        public func onStoped(_ value: (() -> Void)?) -> Self {
-            self._onStoped = value
-            return self
-        }
-        
-        @discardableResult
-        public func onPaused(_ value: (() -> Void)?) -> Self {
-            self._onPaused = value
-            return self
-        }
-        
-        @discardableResult
-        public func onResumed(_ value: (() -> Void)?) -> Self {
-            self._onResumed = value
-            return self
-        }
-        
-        @discardableResult
         public func start() -> Self {
             if self.isStarted == false {
                 self.isStarted = true
@@ -111,7 +75,7 @@ extension Timer {
                     repeats: (self.isDelaying == true) || (self.repeating != 0)
                 )
                 if self.isDelaying == false {
-                    self._onStarted?()
+                    self.onStarted.emit()
                 }
                 RunLoop.main.add(self._timer!, forMode: RunLoop.Mode.common)
             }
@@ -129,7 +93,7 @@ extension Timer {
                 self.repeated = 0
                 self._timer?.invalidate()
                 self._timer = nil
-                self._onStoped?()
+                self.onStoped.emit()
             }
             return self
         }
@@ -141,7 +105,7 @@ extension Timer {
                 self._pauseDate = Date()
                 self._timer?.invalidate()
                 self._timer = nil
-                self._onPaused?()
+                self.onPaused.emit()
             }
             return self
         }
@@ -160,7 +124,7 @@ extension Timer {
                     userInfo: nil,
                     repeats: (self.repeating != 0)
                 )
-                self._onResumed?()
+                self.onResumed.emit()
                 RunLoop.main.add(self._timer!, forMode: RunLoop.Mode.common)
             }
             return self
@@ -180,17 +144,17 @@ extension Timer {
 private extension Timer.Impl {
     
     func _subsribe() {
-        #if os(iOS)
+#if os(iOS)
         NotificationCenter.default.addObserver(self, selector: #selector(self._didEnterBackground(_:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self._willEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
-        #endif
+#endif
     }
     
     func _unsubsribe() {
-        #if os(iOS)
+#if os(iOS)
         NotificationCenter.default.removeObserver(self, name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
-        #endif
+#endif
     }
     
     @objc
@@ -207,14 +171,14 @@ private extension Timer.Impl {
     func _handler(_ sender: Any) {
         if self.isDelaying == true {
             self.isDelaying = false
-            self._onStarted?()
+            self.onStarted.emit()
         } else {
             var finished = false
             self.repeated += 1
             if self.repeating == UInt.max {
-                self._onRepeat?()
+                self.onRepeat.emit()
             } else if self.repeated != 0 {
-                self._onRepeat?()
+                self.onRepeat.emit()
                 if self.repeated >= self.repeating {
                     finished = true
                 }
@@ -226,7 +190,7 @@ private extension Timer.Impl {
                 self.isPaused = false
                 self._timer?.invalidate()
                 self._timer = nil
-                self._onFinished?()
+                self.onFinished.emit()
             }
         }
     }

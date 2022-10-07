@@ -22,14 +22,14 @@ public extension UI.Layout {
                 self._items = newValue
                 self.setNeedForceUpdate()
             }
-            get { return self._items }
+            get { self._items }
         }
         public var views: [IUIView] {
             set {
                 self._items = newValue.map({ UI.Layout.Item($0) })
                 self.setNeedForceUpdate()
             }
-            get { return self._items.map({ $0.view }) }
+            get { self._items.map({ $0.view }) }
         }
         
         private var _items: [UI.Layout.Item]

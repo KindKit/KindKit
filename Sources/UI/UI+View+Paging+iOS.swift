@@ -66,7 +66,7 @@ final class KKPagingView : UIScrollView {
                 }
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     override var contentSize: CGSize {
         set {
@@ -75,7 +75,7 @@ final class KKPagingView : UIScrollView {
             super.contentSize = newValue
             self.setNeedsLayout()
         }
-        get { return super.contentSize }
+        get { super.contentSize }
     }
     
     private unowned var _view: UI.View.Paging?

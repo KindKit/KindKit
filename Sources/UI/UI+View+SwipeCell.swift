@@ -20,7 +20,7 @@ public extension UI.View {
                 self._isSelected = newValue
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isSelected }
+            get { self._isSelected }
         }
         public var shouldPressed: Bool = true
         public var content: IUIView {
@@ -47,7 +47,7 @@ public extension UI.View {
         }
         public var leadingSize: Float {
             set { self._layout.leadingSize = newValue }
-            get { return self._layout.leadingSize }
+            get { self._layout.leadingSize }
         }
         public var leadingLimit: Float = 0
         public var isShowedTrailing: Bool {
@@ -68,7 +68,7 @@ public extension UI.View {
         }
         public var trailingSize: Float {
             set { self._layout.trailingSize = newValue }
-            get { return self._layout.trailingSize }
+            get { self._layout.trailingSize }
         }
         public var trailingLimit: Float = 0
         public var animationVelocity: Float
@@ -76,11 +76,9 @@ public extension UI.View {
         public let pressedGesture = UI.Gesture.Tap()
         public let interactiveGesture = UI.Gesture.Pan()
 #endif
-        public var onShowLeading: ((UI.View.SwipeCell) -> Void)?
-        public var onHideLeading: ((UI.View.SwipeCell) -> Void)?
-        public var onShowTrailing: ((UI.View.SwipeCell) -> Void)?
-        public var onHideTrailing: ((UI.View.SwipeCell) -> Void)?
-        public var onPressed: ((UI.View.SwipeCell) -> Void)?
+        public let onLeading: Signal.Args< Void, Bool > = .init()
+        public let onTrailing: Signal.Args< Void, Bool > = .init()
+        public let onPressed: Signal.Empty< Void > = .init()
         
         private var _isSelected: Bool = false
 #if os(iOS)
@@ -136,17 +134,17 @@ public extension UI.View {
                         completion: { [unowned self] in
                             self._animation = nil
                             self._layout.state = .leading(progress: .one)
-                            self.onShowLeading?(self)
+                            self.onLeading.emit(true)
                             completion?()
                         }
                     )
                 } else {
                     self._layout.state = .leading(progress: .one)
-                    self.onShowLeading?(self)
+                    self.onLeading.emit(true)
                     completion?()
                 }
             case .leading:
-                self.onShowLeading?(self)
+                self.onLeading.emit(true)
                 completion?()
                 break
             case .trailing:
@@ -170,18 +168,18 @@ public extension UI.View {
                         completion: { [unowned self] in
                             self._animation = nil
                             self._layout.state = .idle
-                            self.onHideLeading?(self)
+                            self.onLeading.emit(false)
                             completion?()
                         }
                     )
                 } else {
                     self._layout.state = .idle
-                    self.onHideLeading?(self)
+                    self.onLeading.emit(false)
                     completion?()
                 }
             default:
                 completion?()
-                self.onHideLeading?(self)
+                self.onLeading.emit(false)
                 break
             }
         }
@@ -200,13 +198,13 @@ public extension UI.View {
                         completion: { [unowned self] in
                             self._animation = nil
                             self._layout.state = .trailing(progress: .one)
-                            self.onShowTrailing?(self)
+                            self.onTrailing.emit(true)
                             completion?()
                         }
                     )
                 } else {
                     self._layout.state = .trailing(progress: .one)
-                    self.onShowTrailing?(self)
+                    self.onTrailing.emit(true)
                     completion?()
                 }
             case .leading:
@@ -215,7 +213,7 @@ public extension UI.View {
                 })
             case .trailing:
                 completion?()
-                self.onShowTrailing?(self)
+                self.onTrailing.emit(true)
                 break
             }
         }
@@ -234,18 +232,18 @@ public extension UI.View {
                         completion: { [unowned self] in
                             self._animation = nil
                             self._layout.state = .idle
-                            self.onHideTrailing?(self)
+                            self.onTrailing.emit(false)
                             completion?()
                         }
                     )
                 } else {
                     self._layout.state = .idle
-                    self.onHideTrailing?(self)
+                    self.onTrailing.emit(false)
                     completion?()
                 }
             default:
                 completion?()
-                self.onHideTrailing?(self)
+                self.onTrailing.emit(false)
                 break
             }
         }
@@ -315,36 +313,64 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
-    func onShowLeading(_ value: ((UI.View.SwipeCell) -> Void)?) -> Self {
-        self.onShowLeading = value
+    func onLeading(_ closure: ((Bool) -> Void)?) -> Self {
+        self.onLeading.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onHideLeading(_ value: ((UI.View.SwipeCell) -> Void)?) -> Self {
-        self.onHideLeading = value
+    func onLeading(_ closure: ((Self, Bool) -> Void)?) -> Self {
+        self.onLeading.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onShowTrailing(_ value: ((UI.View.SwipeCell) -> Void)?) -> Self {
-        self.onShowTrailing = value
+    func onLeading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
+        self.onLeading.set(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onHideTrailing(_ value: ((UI.View.SwipeCell) -> Void)?) -> Self {
-        self.onHideTrailing = value
+    func onTrailing(_ closure: ((Bool) -> Void)?) -> Self {
+        self.onTrailing.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressed(_ value: ((UI.View.SwipeCell) -> Void)?) -> Self {
-        self.onPressed = value
+    func onTrailing(_ closure: ((Self, Bool) -> Void)?) -> Self {
+        self.onTrailing.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTrailing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
+        self.onTrailing.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPressed(_ closure: (() -> Void)?) -> Self {
+        self.onPressed.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+        self.onPressed.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onPressed.set(sender, closure)
         return self
     }
     
@@ -354,29 +380,26 @@ private extension UI.View.SwipeCell {
     
     func _setup() {
 #if os(iOS)
-        self.pressedGesture.onShouldBegin({ [unowned self] _ in
-            return self.shouldPressed
-        }).onTriggered({ [unowned self] _ in
-            switch self._layout.state {
-            case .idle: self.onPressed?(self)
-            case .leading: self.hideLeading(animated: true, completion: nil)
-            case .trailing: self.hideTrailing(animated: true, completion: nil)
-            }
-        })
-        self.interactiveGesture.onShouldBegin({ [unowned self] _ in
-            guard self.leading != nil || self.trailing != nil else { return false }
-            let translation = self.interactiveGesture.translation(in: self.content)
-            guard abs(translation.x) >= abs(translation.y) else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }).onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self.pressedGesture
+            .onShouldBegin(self, { $0.shouldPressed })
+            .onTriggered(self, {
+                switch $0._layout.state {
+                case .idle: $0.onPressed.emit()
+                case .leading: $0.hideLeading(animated: true, completion: nil)
+                case .trailing: $0.hideTrailing(animated: true, completion: nil)
+                }
+            })
+        self.interactiveGesture
+            .onShouldBegin(self, {
+                guard $0.leading != nil || $0.trailing != nil else { return false }
+                let translation = $0.interactiveGesture.translation(in: self.content)
+                guard abs(translation.x) >= abs(translation.y) else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #endif
     }
     
@@ -446,7 +469,7 @@ private extension UI.View.SwipeCell {
                         completion: { [unowned self] in
                             self._resetInteractiveAnimation()
                             self._layout.state = .leading(progress: .one)
-                            self.onShowLeading?(self)
+                            self.onLeading.emit(true)
                         }
                     )
                 } else {
@@ -476,7 +499,7 @@ private extension UI.View.SwipeCell {
                         completion: { [unowned self] in
                             self._resetInteractiveAnimation()
                             self._layout.state = .trailing(progress: .one)
-                            self.onShowTrailing?(self)
+                            self.onTrailing.emit(true)
                         }
                     )
                 } else {
@@ -511,7 +534,7 @@ private extension UI.View.SwipeCell {
                         completion: { [unowned self] in
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
-                            self.onHideLeading?(self)
+                            self.onLeading.emit(false)
                         }
                     )
                 } else {
@@ -546,7 +569,7 @@ private extension UI.View.SwipeCell {
                         completion: { [unowned self] in
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
-                            self.onHideTrailing?(self)
+                            self.onTrailing.emit(false)
                         }
                     )
                 } else {

@@ -26,15 +26,15 @@ public extension UI.View {
                 }
                 self._contentLayout.items = newValue.map({ UI.Layout.Item($0) })
             }
-            get { return self._items }
+            get { self._items }
         }
         public var itemsInset: InsetFloat {
             set { self._contentLayout.itemsInset = newValue }
-            get { return self._contentLayout.itemsInset }
+            get { self._contentLayout.itemsInset }
         }
         public var itemsSpacing: Float {
             set { self._contentLayout.itemsSpacing = newValue }
-            get { return self._contentLayout.itemsSpacing }
+            get { self._contentLayout.itemsSpacing }
         }
         public var selected: UI.View.GroupBar.Item? {
             set {
@@ -43,7 +43,7 @@ public extension UI.View {
                 self._selected = newValue
                 self._selected?.select(true)
             }
-            get { return self._selected }
+            get { self._selected }
         }
         public unowned var delegate: IGroupBarViewDelegate?
         

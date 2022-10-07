@@ -76,7 +76,7 @@ public extension UI.Container {
 #endif
                 }
             }
-            get { return self._content }
+            get { self._content }
         }
         
         private var _layout: Layout

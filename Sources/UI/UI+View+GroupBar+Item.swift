@@ -21,11 +21,11 @@ public extension UI.View.GroupBar {
                 self._isSelected = newValue
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isSelected }
+            get { self._isSelected }
         }
         public var inset: InsetFloat {
             set { self._layout.inset = newValue }
-            get { return self._layout.inset }
+            get { self._layout.inset }
         }
         public var content: IUIView {
             didSet {
@@ -97,10 +97,8 @@ public extension UI.View.GroupBar.Item {
 private extension UI.View.GroupBar.Item {
     
     func _setup() {
-        self._tapGesture.onTriggered({ [weak self] _ in
-            guard let self = self else { return }
-            self.delegate?.pressed(self)
-        })
+        self._tapGesture
+            .onTriggered(self, { $0.delegate?.pressed($0) })
     }
     
 }

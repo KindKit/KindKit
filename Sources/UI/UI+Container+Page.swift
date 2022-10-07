@@ -55,18 +55,18 @@ public extension UI.Container {
                 self._bar.delegate = self
                 self._layout.bar = UI.Layout.Item(self._bar)
             }
-            get { return self._bar }
+            get { self._bar }
         }
         public var barSize: Float {
-            get { return self._layout.barSize }
+            get { self._layout.barSize }
         }
         public private(set) var barVisibility: Float {
             set { self._layout.barVisibility = newValue }
-            get { return self._layout.barVisibility }
+            get { self._layout.barVisibility }
         }
         public private(set) var barHidden: Bool {
             set { self._layout.barHidden = newValue }
-            get { return self._layout.barHidden }
+            get { self._layout.barHidden }
         }
         public var containers: [IUIPageContentContainer] {
             return self._items.map({ $0.container })
@@ -393,21 +393,18 @@ private extension UI.Container.Page {
     
     func _setup() {
 #if os(iOS)
-        self._interactiveGesture.onShouldBegin({ [unowned self] _ in
-            guard let current = self._current else { return false }
-            guard self.shouldInteractive == true else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            guard self._items.count > 1 else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }) .onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._interactiveGesture
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard self.shouldInteractive == true else { return false }
+                guard current.container.shouldInteractive == true else { return false }
+                guard $0._items.count > 1 else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #else
 #endif
         self._bar.delegate = self

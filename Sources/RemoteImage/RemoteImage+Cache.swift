@@ -12,14 +12,16 @@ public extension RemoteImage {
         public private(set) var memory: [String: UI.Image]
         public private(set) var url: URL
         
+        private let _appState: AppState
         private var _fileManager: FileManager
         private var _queue: DispatchQueue
 
         public init(name: String) throws {
             self.name = name
             self.memory = [:]
+            self._appState = .init()
             self._fileManager = FileManager.default
-            self._queue = DispatchQueue(label: "KindKitRemoteImageView.RemoteImageCache")
+            self._queue = DispatchQueue(label: "KindKit.RemoteImage.Cache")
             if let cachePath = self._fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
                 self.url = cachePath
             } else {
@@ -29,6 +31,11 @@ public extension RemoteImage {
             if self._fileManager.fileExists(atPath: self.url.path) == false {
                 try self._fileManager.createDirectory(at: self.url, withIntermediateDirectories: true, attributes: nil)
             }
+            self._setup()
+        }
+        
+        deinit {
+            self._destroy()
         }
         
     }
@@ -144,9 +151,7 @@ public extension RemoteImage.Cache {
 public extension RemoteImage.Cache {
 
     func cleanup(before: TimeInterval) {
-        self._queue.sync(flags: .barrier, execute: {
-            self.memory.removeAll()
-        })
+        self.cleanupMemory()
         let now = Date()
         if let urls = try? self._fileManager.contentsOfDirectory(at: self.url, includingPropertiesForKeys: nil, options: [ .skipsHiddenFiles ]) {
             for url in urls {
@@ -164,7 +169,7 @@ public extension RemoteImage.Cache {
         }
     }
 
-    func didReceiveMemoryWarning() {
+    func cleanupMemory() {
         self._queue.sync(flags: .barrier, execute: {
             self.memory.removeAll()
         })
@@ -173,6 +178,14 @@ public extension RemoteImage.Cache {
 }
 
 private extension RemoteImage.Cache {
+    
+    func _setup() {
+        self._appState.add(observer: self, priority: .internal)
+    }
+    
+    func _destroy() {
+        self._appState.remove(observer: self)
+    }
     
     func _key(_ query: IRemoteImageQuery) -> String? {
         let key = query.key
@@ -188,6 +201,18 @@ private extension RemoteImage.Cache {
             return sha256
         }
         return nil
+    }
+    
+}
+
+extension RemoteImage.Cache : IAppStateObserver {
+    
+    public func didEnterBackground(_ appState: AppState) {
+        self.cleanupMemory()
+    }
+    
+    public func didMemoryWarning(_ appState: AppState) {
+        self.cleanupMemory()
     }
     
 }

@@ -13,7 +13,7 @@ public extension UI.Layout.State {
         public var item: UI.Layout.Item?
         public var view: IUIView? {
             set { self.item = newValue.flatMap({ UI.Layout.Item($0) }) }
-            get { return self.item?.view }
+            get { self.item?.view }
         }
         
         public init(

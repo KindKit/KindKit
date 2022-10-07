@@ -28,7 +28,7 @@ public extension UI.Container {
         public var shouldInteractive: Bool {
             return self.screen.shouldInteractive
         }
-    #if os(iOS)
+#if os(iOS)
         public var statusBar: UIStatusBarStyle {
             return self.current?.statusBar ?? .default
         }
@@ -41,7 +41,7 @@ public extension UI.Container {
         public var supportedOrientations: UIInterfaceOrientationMask {
             return self.current?.supportedOrientations ?? .portrait
         }
-    #endif
+#endif
         public private(set) var isPresented: Bool
         public var view: IUIView {
             return self._view
@@ -57,20 +57,20 @@ public extension UI.Container {
             return self._forward?.container
         }
         public var animationVelocity: Float
-    #if os(iOS)
+#if os(iOS)
         public var interactiveLimit: Float
-    #endif
+#endif
         
         private var _layout: Layout
         private var _view: UI.View.Custom
-    #if os(iOS)
+#if os(iOS)
         private var _interactiveGesture = UI.Gesture.Pan()
         private var _interactiveBeginLocation: PointFloat?
         private var _interactiveCurrentIndex: Int?
         private var _interactiveBackward: Item?
         private var _interactiveCurrent: Item?
         private var _interactiveForward: Item?
-    #endif
+#endif
         private var _backward: Item?
         private var _current: Item?
         private var _forward: Item?
@@ -83,17 +83,17 @@ public extension UI.Container {
         ) {
             self.isPresented = false
             self.screen = screen
-    #if os(macOS)
+#if os(macOS)
             self.animationVelocity = NSScreen.kk_animationVelocity
-    #elseif os(iOS)
+#elseif os(iOS)
             self.animationVelocity = UIScreen.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
-    #endif
+#endif
             self._layout = Layout()
             self._view = UI.View.Custom(self._layout)
-    #if os(iOS)
+#if os(iOS)
             self._view.gestures([ self._interactiveGesture ])
-    #endif
+#endif
             self._setup()
         }
         
@@ -270,21 +270,18 @@ private extension UI.Container.Book {
     
     func _setup() {
 #if os(iOS)
-        self._interactiveGesture.onShouldBegin({ [unowned self] _ in
-            guard let current = self._current else { return false }
-            guard self.shouldInteractive == true else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            guard self._backward != nil || self._forward != nil else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }) .onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._interactiveGesture
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard $0.shouldInteractive == true else { return false }
+                guard current.container.shouldInteractive == true else { return false }
+                guard $0._backward != nil || $0._forward != nil else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #else
 #endif
         self.screen.container = self

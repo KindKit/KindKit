@@ -19,14 +19,14 @@ extension Float : IScalar {
         return Double(self)
     }
     
-    #if canImport(CoreGraphics)
+#if canImport(CoreGraphics)
 
     @inlinable
     public var cgFloat: CGFloat {
         return CGFloat(self)
     }
 
-    #endif
+#endif
     
     @inlinable
     public var roundUp: Self {

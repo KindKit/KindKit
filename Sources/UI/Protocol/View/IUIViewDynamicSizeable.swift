@@ -12,6 +12,22 @@ public protocol IUIViewDynamicSizeable : AnyObject {
     
 }
 
+public extension IUIViewDynamicSizeable where Self : IUIWidgetView, Body : IUIViewDynamicSizeable {
+    
+    @inlinable
+    var width: UI.Size.Dynamic {
+        set { self.body.width = newValue }
+        get { self.body.width }
+    }
+    
+    @inlinable
+    var height: UI.Size.Dynamic {
+        set { self.body.height = newValue }
+        get { self.body.height }
+    }
+    
+}
+
 public extension IUIViewDynamicSizeable {
     
     @inlinable
@@ -26,22 +42,6 @@ public extension IUIViewDynamicSizeable {
     func height(_ value: UI.Size.Dynamic) -> Self {
         self.height = value
         return self
-    }
-    
-}
-
-public extension IUIViewDynamicSizeable where Self : IUIWidgetView, Body : IUIViewDynamicSizeable {
-    
-    @inlinable
-    var width: UI.Size.Dynamic {
-        set { self.body.width = newValue }
-        get { return self.body.width }
-    }
-    
-    @inlinable
-    var height: UI.Size.Dynamic {
-        set { self.body.height = newValue }
-        get { return self.body.height }
     }
     
 }

@@ -15,13 +15,13 @@ public protocol IUIContainerParentable : AnyObject {
 
 public extension IUIContainerParentable where Self : IUIContainer {
     
-    #if os(iOS)
+#if os(iOS)
     
     var uiViewController: UIViewController? {
         return self.parent?.uiViewController
     }
     
-    #endif
+#endif
     
     func inheritedInsets(interactive: Bool) -> InsetFloat {
         guard let parent = self.parent else { return .zero }
@@ -29,7 +29,7 @@ public extension IUIContainerParentable where Self : IUIContainer {
         return parent.insets(of: self, interactive: interactive)
     }
     
-    #if os(iOS)
+#if os(iOS)
     
     func setNeedUpdateStatusBar() {
         self.parent?.setNeedUpdateStatusBar()
@@ -39,6 +39,6 @@ public extension IUIContainerParentable where Self : IUIContainer {
         self.parent?.setNeedUpdateOrientations()
     }
     
-    #endif
+#endif
     
 }

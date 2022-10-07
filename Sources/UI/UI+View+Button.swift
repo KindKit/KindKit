@@ -11,7 +11,7 @@ public extension UI.View {
         public private(set) var body: UI.View.Control
         public var inset: InsetFloat {
             set { self._layout.inset = newValue }
-            get { return self._layout.inset }
+            get { self._layout.inset }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
@@ -31,11 +31,11 @@ public extension UI.View {
                 self._isSelected = newValue
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isSelected }
+            get { self._isSelected }
         }
         public var alignment: Alignment {
             set { self._layout.alignment = newValue }
-            get { return self._layout.alignment }
+            get { self._layout.alignment }
         }
         public var background: IUIView? {
             didSet { self._layout.background = self.background.flatMap({ UI.Layout.Item($0) }) }
@@ -45,29 +45,29 @@ public extension UI.View {
         }
         public var spinnerPosition: SpinnerPosition {
             set { self._layout.spinnerPosition = newValue }
-            get { return self._layout.spinnerPosition }
+            get { self._layout.spinnerPosition }
         }
         public var spinnerAnimating: Bool {
             set { self._layout.spinnerAnimating = newValue }
-            get { return self._layout.spinnerAnimating }
+            get { self._layout.spinnerAnimating }
         }
         public var primary: IUIView? {
             didSet { self._layout.primary = self.primary.flatMap({ UI.Layout.Item($0) }) }
         }
         public var primaryInset: InsetFloat {
             set { self._layout.primaryInset = newValue }
-            get { return self._layout.primaryInset }
+            get { self._layout.primaryInset }
         }
         public var secondary: IUIView? {
             didSet { self._layout.secondary = self.secondary.flatMap({ UI.Layout.Item($0) }) }
         }
         public var secondaryPosition: SecondaryPosition {
             set { self._layout.secondaryPosition = newValue }
-            get { return self._layout.secondaryPosition }
+            get { self._layout.secondaryPosition }
         }
         public var secondaryInset: InsetFloat {
             set { self._layout.secondaryInset = newValue }
-            get { return self._layout.secondaryInset }
+            get { self._layout.secondaryInset }
         }
         
         private var _layout: Layout

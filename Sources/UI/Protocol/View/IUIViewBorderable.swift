@@ -10,6 +10,16 @@ public protocol IUIViewBorderable : AnyObject {
     
 }
 
+public extension IUIViewBorderable where Self : IUIWidgetView, Body : IUIViewBorderable {
+    
+    @inlinable
+    var border: UI.Border {
+        set { self.body.border = newValue }
+        get { self.body.border }
+    }
+    
+}
+
 public extension IUIViewBorderable {
     
     @inlinable
@@ -17,16 +27,6 @@ public extension IUIViewBorderable {
     func border(_ value: UI.Border) -> Self {
         self.border = value
         return self
-    }
-    
-}
-
-public extension IUIViewBorderable where Self : IUIWidgetView, Body : IUIViewBorderable {
-    
-    @inlinable
-    var border: UI.Border {
-        set { self.body.border = newValue }
-        get { return self.body.border }
     }
     
 }

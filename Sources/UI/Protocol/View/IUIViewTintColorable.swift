@@ -10,6 +10,16 @@ public protocol IUIViewTintColorable : AnyObject {
     
 }
 
+public extension IUIViewTintColorable where Self : IUIWidgetView, Body : IUIViewTintColorable {
+    
+    @inlinable
+    var tintColor: UI.Color? {
+        set { self.body.tintColor = newValue }
+        get { self.body.tintColor }
+    }
+    
+}
+
 public extension IUIViewTintColorable {
     
     @inlinable
@@ -17,16 +27,6 @@ public extension IUIViewTintColorable {
     func tintColor(_ value: UI.Color?) -> Self {
         self.tintColor = value
         return self
-    }
-    
-}
-
-public extension IUIViewTintColorable where Self : IUIWidgetView, Body : IUIViewTintColorable {
-    
-    @inlinable
-    var tintColor: UI.Color? {
-        set { self.body.tintColor = newValue }
-        get { return self.body.tintColor }
     }
     
 }

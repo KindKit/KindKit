@@ -37,9 +37,9 @@ public extension UI.View {
         public let loader: KindKit.RemoteImage.Loader
         public var query: IRemoteImageQuery
         public var filter: IRemoteImageFilter?
-        public var onProgress: ((UI.View.RemoteImage, Float) -> Void)?
-        public var onFinish: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?
-        public var onError: ((UI.View.RemoteImage, Error) -> Void)?
+        public let onProgress: Signal.Args< Void, Float > = .init()
+        public let onFinish: Signal.Args< UI.View.Image?, UI.Image > = .init()
+        public let onError: Signal.Args< Void, Error > = .init()
         
         private var _layout: Layout
         
@@ -53,8 +53,6 @@ public extension UI.View {
             self.filter = filter
             self._layout = Layout()
             self.body = UI.View.Custom(self._layout)
-            self.body.onAppear({ [unowned self] _ in self.startLoading() })
-            self.body.onDisappear({ [unowned self] _ in self.stopLoading() })
         }
         
         public convenience init(
@@ -79,6 +77,16 @@ public extension UI.View {
             return self
         }
         
+    }
+    
+}
+
+private extension UI.View.RemoteImage {
+    
+    func _setup() {
+        self.body
+            .onAppear(self, { $0.startLoading() })
+            .onDisappear(self, { $0.stopLoading() })
     }
     
 }
@@ -126,22 +134,127 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onProgress(_ value: ((UI.View.RemoteImage, Float) -> Void)?) -> Self {
-        self.onProgress = value
+    func onProgress(_ closure: (() -> Void)?) -> Self {
+        self.onProgress.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onFinish(_ value: ((UI.View.RemoteImage, UI.Image) -> UI.View.Image)?) -> Self {
-        self.onFinish = value
+    func onProgress(_ closure: ((Self) -> Void)?) -> Self {
+        self.onProgress.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onError(_ value: ((UI.View.RemoteImage, Error) -> Void)?) -> Self {
-        self.onError = value
+    func onProgress(_ closure: ((Float) -> Void)?) -> Self {
+        self.onProgress.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onProgress(_ closure: ((Self, Float) -> Void)?) -> Self {
+        self.onProgress.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onProgress.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Float) -> Void)?) -> Self {
+        self.onProgress.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(_ closure: (() -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(_ closure: ((Self) -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(_ closure: ((UI.Image) -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(_ closure: ((Self, UI.Image) -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.Image) -> UI.View.Image?)?) -> Self {
+        self.onFinish.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError(_ closure: (() -> Void)?) -> Self {
+        self.onError.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError(_ closure: ((Self) -> Void)?) -> Self {
+        self.onError.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError(_ closure: ((Error) -> Void)?) -> Self {
+        self.onError.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError(_ closure: ((Self, Error) -> Void)?) -> Self {
+        self.onError.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onError.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Error) -> Void)?) -> Self {
+        self.onError.set(sender, closure)
         return self
     }
     
@@ -175,26 +288,19 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
     
     public func remoteImage(progress: Float) {
         self.progress?.progress(progress)
-        self.onProgress?(self, progress)
+        self.onProgress.emit(progress)
     }
     
     public func remoteImage(image: UI.Image) {
         self.isLoading = false
         self._layout.state = .loaded
-        
-        let imageView: UI.View.Image
-        if let onFinish = self.onFinish {
-            imageView = onFinish(self, image)
-        } else {
-            imageView = UI.View.Image(image)
-        }
-        self.imageView = imageView
+        self.imageView = self.onFinish.emit(image, default: UI.View.Image(image))
     }
     
     public func remoteImage(error: Error) {
         self.isLoading = false
         self._layout.state = .error
-        self.onError?(self, error)
+        self.onError.emit(error)
     }
     
 }

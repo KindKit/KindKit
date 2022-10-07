@@ -180,7 +180,7 @@ private extension Observer {
         var priority: UInt
         var pointer: UnsafeMutableRawPointer
         var observer: T {
-            get { return Unmanaged< AnyObject >.fromOpaque(self.pointer).takeUnretainedValue() as! T }
+            get { Unmanaged< AnyObject >.fromOpaque(self.pointer).takeUnretainedValue() as! T }
         }
         
         init(priority: UInt, observer: T) {

@@ -49,7 +49,7 @@ final class KKGradientView : UIView {
                 self.kk_updateShadowPath()
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     
     private unowned var _view: View?

@@ -36,15 +36,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Dynamic = .fit {
             didSet {
@@ -140,12 +140,12 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var onAppear: ((UI.View.AttributedText) -> Void)?
-        public var onDisappear: ((UI.View.AttributedText) -> Void)?
-        public var onVisible: ((UI.View.AttributedText) -> Void)?
-        public var onVisibility: ((UI.View.AttributedText) -> Void)?
-        public var onInvisible: ((UI.View.AttributedText) -> Void)?
-        public var onTap: ((UI.View.AttributedText, [NSAttributedString.Key: Any]?) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onTap: Signal.Args< Void, [NSAttributedString.Key: Any]? > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -199,27 +199,27 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
 
     }
@@ -258,55 +258,14 @@ public extension UI.View.AttributedText {
     
 }
 
-public extension UI.View.AttributedText {
-    
-    @discardableResult
-    func onAppear(_ value: ((UI.View.AttributedText) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.AttributedText) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @discardableResult
-    func onVisible(_ value: ((UI.View.AttributedText) -> Void)?) -> Self {
-        self.onVisible = value
-        return self
-    }
-    
-    @discardableResult
-    func onVisibility(_ value: ((UI.View.AttributedText) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.AttributedText) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTap(_ value: ((UI.View.AttributedText, [NSAttributedString.Key: Any]?) -> Void)?) -> Self {
-        self.onTap = value
-        return self
-    }
-    
-}
-
 extension UI.View.AttributedText : KKAttributedTextViewDelegate {
     
     func shouldTap(_ view: KKAttributedTextView) -> Bool {
-        return self.onTap != nil
+        return self.onTap.isEmpty == false
     }
     
     func tap(_ view: KKAttributedTextView, attributes: [NSAttributedString.Key: Any]?) {
-        self.onTap?(self, attributes)
+        self.onTap.emit(attributes)
     }
     
 }

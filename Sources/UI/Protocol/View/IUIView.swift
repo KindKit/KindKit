@@ -10,6 +10,9 @@ public protocol IUIView : IUIAnyView {
     var appearedItem: UI.Layout.Item? { set get }
     var isVisible: Bool { get }
     var isHidden: Bool { set get }
+    var onVisible: Signal.Empty< Void > { get }
+    var onVisibility: Signal.Empty< Void > { get }
+    var onInvisible: Signal.Empty< Void > { get }
     
     func loadIfNeeded()
     
@@ -23,15 +26,6 @@ public protocol IUIView : IUIAnyView {
     func visibility()
     func invisible()
     
-    @discardableResult
-    func onVisible(_ value: ((Self) -> Void)?) -> Self
-    
-    @discardableResult
-    func onVisibility(_ value: ((Self) -> Void)?) -> Self
-    
-    @discardableResult
-    func onInvisible(_ value: ((Self) -> Void)?) -> Self
-    
 }
 
 public extension IUIView {
@@ -44,7 +38,7 @@ public extension IUIView {
     @inlinable
     var hidden: Bool {
         set { self.isHidden = newValue }
-        get { return self.isHidden }
+        get { self.isHidden }
     }
     
 }
@@ -53,8 +47,78 @@ public extension IUIView {
     
     @inlinable
     @discardableResult
-    func hidden(_ value: Bool) -> Self {
+    func isHidden(_ value: Bool) -> Self {
         self.isHidden = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func hide(_ value: Bool) -> Self {
+        self.isHidden = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ closure: (() -> Void)?) -> Self {
+        self.onVisible.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible(_ closure: ((Self) -> Void)?) -> Self {
+        self.onVisible.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisible< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onVisible.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ closure: (() -> Void)?) -> Self {
+        self.onVisibility.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility(_ closure: ((Self) -> Void)?) -> Self {
+        self.onVisibility.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onVisibility< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onVisibility.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ closure: (() -> Void)?) -> Self {
+        self.onInvisible.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible(_ closure: ((Self) -> Void)?) -> Self {
+        self.onInvisible.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onInvisible< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onInvisible.set(sender, closure)
         return self
     }
     

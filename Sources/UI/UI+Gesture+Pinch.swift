@@ -122,17 +122,17 @@ public extension UI.Gesture {
         public var scale: Float {
             return Float(self._gesture.scale)
         }
+        public let onShouldBegin: Signal.Empty< Bool? > = .init()
+        public let onShouldSimultaneously: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onShouldRequireFailure: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onShouldBeRequiredToFailBy: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onBegin: Signal.Empty< Void > = .init()
+        public let onChange: Signal.Empty< Void > = .init()
+        public let onCancel: Signal.Empty< Void > = .init()
+        public let onEnd: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
         @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
-        private var _onShouldBegin: ((UI.Gesture.Pinch) -> Bool)?
-        private var _onShouldSimultaneously: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?
-        private var _onShouldRequireFailure: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?
-        private var _onShouldBeRequiredToFailBy: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?
-        private var _onBegin: ((UI.Gesture.Pinch) -> Void)?
-        private var _onChange: ((UI.Gesture.Pinch) -> Void)?
-        private var _onCancel: ((UI.Gesture.Pinch) -> Void)?
-        private var _onEnd: ((UI.Gesture.Pinch) -> Void)?
 
         public init() {
         }
@@ -140,55 +140,95 @@ public extension UI.Gesture {
         deinit {
             self._reuse.destroy()
         }
-                
-        @discardableResult
-        public func onShouldBegin(_ value: ((UI.Gesture.Pinch) -> Bool)?) -> Self {
-            self._onShouldBegin = value
-            return self
-        }
         
-        @discardableResult
-        public func onShouldSimultaneously(_ value: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldSimultaneously = value
-            return self
-        }
-        
-        @discardableResult
-        public func onShouldRequireFailure(_ value: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldRequireFailure = value
-            return self
-        }
-        
-        @discardableResult
-        public func onShouldBeRequiredToFailBy(_ value: ((UI.Gesture.Pinch, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldBeRequiredToFailBy = value
-            return self
-        }
-        
-        @discardableResult
-        public func onBegin(_ value: ((UI.Gesture.Pinch) -> Void)?) -> Self {
-            self._onBegin = value
-            return self
-        }
-        
-        @discardableResult
-        public func onChange(_ value: ((UI.Gesture.Pinch) -> Void)?) -> Self {
-            self._onChange = value
-            return self
-        }
-        
-        @discardableResult
-        public func onCancel(_ value: ((UI.Gesture.Pinch) -> Void)?) -> Self {
-            self._onCancel = value
-            return self
-        }
-        
-        @discardableResult
-        public func onEnd(_ value: ((UI.Gesture.Pinch) -> Void)?) -> Self {
-            self._onEnd = value
-            return self
-        }
-        
+    }
+    
+}
+
+public extension UI.Gesture.Pinch {
+    
+    @inlinable
+    @discardableResult
+    func onBegin(_ closure: (() -> Void)?) -> Self {
+        self.onBegin.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBegin(_ closure: ((Self) -> Void)?) -> Self {
+        self.onBegin.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onBegin.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChange(_ closure: (() -> Void)?) -> Self {
+        self.onChange.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChange(_ closure: ((Self) -> Void)?) -> Self {
+        self.onChange.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChange< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onChange.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onCancel(_ closure: (() -> Void)?) -> Self {
+        self.onCancel.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onCancel(_ closure: ((Self) -> Void)?) -> Self {
+        self.onCancel.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onCancel< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onCancel.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd(_ closure: (() -> Void)?) -> Self {
+        self.onEnd.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd(_ closure: ((Self) -> Void)?) -> Self {
+        self.onEnd.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onEnd.set(sender, closure)
+        return self
     }
     
 }
@@ -196,19 +236,19 @@ public extension UI.Gesture {
 extension UI.Gesture.Pinch : KKGestureDelegate {
     
     func shouldBegin(_ gesture: NativeGesture) -> Bool {
-        return self._onShouldBegin?(self) ?? true
+        return self.onShouldBegin.emit(default: true)
     }
     
     func shouldSimultaneously(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldSimultaneously?(self, otherGesture) ?? false
+        return self.onShouldSimultaneously.emit(otherGesture, default: false)
     }
     
     func shouldRequireFailureOf(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldRequireFailure?(self, otherGesture) ?? false
+        return self.onShouldRequireFailure.emit(otherGesture, default: false)
     }
     
     func shouldBeRequiredToFailBy(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldBeRequiredToFailBy?(self, otherGesture) ?? false
+        return self.onShouldBeRequiredToFailBy.emit(otherGesture, default: false)
     }
     
 }
@@ -216,19 +256,19 @@ extension UI.Gesture.Pinch : KKGestureDelegate {
 extension UI.Gesture.Pinch : KKPinchGestureDelegate {
     
     func begin(_ gesture: NativeGesture) {
-        self._onBegin?(self)
+        self.onBegin.emit()
     }
     
     func changed(_ gesture: NativeGesture) {
-        self._onChange?(self)
+        self.onChange.emit()
     }
     
     func cancel(_ gesture: NativeGesture) {
-        self._onCancel?(self)
+        self.onCancel.emit()
     }
     
     func end(_ gesture: NativeGesture) {
-        self._onEnd?(self)
+        self.onEnd.emit()
     }
     
 }

@@ -64,7 +64,7 @@ public extension UI.Container {
                     self._content.finishShow(interactive: false)
                 }
             }
-            get { return self._content }
+            get { self._content }
         }
         public var leading: IHamburgerMenuContainer? {
             set {
@@ -99,7 +99,7 @@ public extension UI.Container {
                     }
                 }
             }
-            get { return self._leading }
+            get { self._leading }
         }
         public var isShowedLeading: Bool {
             switch self._layout.state {
@@ -140,7 +140,7 @@ public extension UI.Container {
                     }
                 }
             }
-            get { return self._trailing }
+            get { self._trailing }
         }
         public var isShowedTrailing: Bool {
             switch self._layout.state {
@@ -325,30 +325,28 @@ private extension UI.Container.Hamburger {
     
     func _setup() {
 #if os(iOS)
-        self._pressedGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
-            guard let view = gesture.view else { return false }
-            return self._view.native.kk_isChild(of: view, recursive: true)
-        }).onShouldBegin({ [unowned self] _ in
-            switch self._layout.state {
-            case .idle: return false
-            case .leading, .trailing: return self._pressedGesture.contains(in: self._content.view)
-            }
-        }).onTriggered({ [unowned self] _ in
-            self._pressed()
-        })
-        self._interactiveGesture.onShouldBegin({ [unowned self] _ in
-            guard self._leading != nil || self._trailing != nil else { return false }
-            guard self._content.shouldInteractive == true else { return false }
-            return true
-        }).onBegin({ [unowned self] _ in
-            self._beginInteractiveGesture()
-        }).onChange({ [unowned self] _ in
-            self._changeInteractiveGesture()
-        }).onCancel({ [unowned self] _ in
-            self._endInteractiveGesture(true)
-        }).onEnd({ [unowned self] _ in
-            self._endInteractiveGesture(false)
-        })
+        self._pressedGesture
+            .onShouldBeRequiredToFailBy(self, {
+                guard let view = $1.view else { return false }
+                return $0._view.native.kk_isChild(of: view, recursive: true)
+            })
+            .onShouldBegin(self, {
+                switch $0._layout.state {
+                case .idle: return false
+                case .leading, .trailing: return $0._pressedGesture.contains(in: $0._content.view)
+                }
+            })
+            .onTriggered(self, { $0._pressed() })
+        self._interactiveGesture
+            .onShouldBegin(self, {
+                guard $0._leading != nil || $0._trailing != nil else { return false }
+                guard $0._content.shouldInteractive == true else { return false }
+                return true
+            })
+            .onBegin(self, { $0._beginInteractiveGesture() })
+            .onChange(self, { $0._changeInteractiveGesture() })
+            .onCancel(self, { $0._endInteractiveGesture(true) })
+            .onEnd(self, { $0._endInteractiveGesture(false) })
 #endif
         self._content.parent = self
         self._leading?.parent = self

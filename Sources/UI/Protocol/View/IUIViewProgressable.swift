@@ -10,6 +10,16 @@ public protocol IUIViewProgressable : AnyObject {
     
 }
 
+public extension IUIViewProgressable where Self : IUIWidgetView, Body : IUIViewProgressable {
+    
+    @inlinable
+    var progress: Float {
+        set { self.body.progress = newValue }
+        get { self.body.progress }
+    }
+    
+}
+
 public extension IUIViewProgressable {
     
     @inlinable
@@ -17,16 +27,6 @@ public extension IUIViewProgressable {
     func progress(_ value: Float) -> Self {
         self.progress = value
         return self
-    }
-    
-}
-
-public extension IUIViewProgressable where Self : IUIWidgetView, Body : IUIViewProgressable {
-    
-    @inlinable
-    var progress: Float {
-        set { self.body.progress = newValue }
-        get { return self.body.progress }
     }
     
 }

@@ -55,18 +55,18 @@ public extension UI.Container {
                 self._bar.delegate = self
                 self._layout.bar = UI.Layout.Item(self._bar)
             }
-            get { return self._bar }
+            get { self._bar }
         }
         public var barSize: Float {
-            get { return self._layout.barSize }
+            get { self._layout.barSize }
         }
         public private(set) var barVisibility: Float {
             set { self._layout.barVisibility = newValue }
-            get { return self._layout.barVisibility }
+            get { self._layout.barVisibility }
         }
         public private(set) var barHidden: Bool {
             set { self._layout.barHidden = newValue }
-            get { return self._layout.barHidden }
+            get { self._layout.barHidden }
         }
         public var containers: [IUIGroupContentContainer] {
             return self._items.map({ $0.container })

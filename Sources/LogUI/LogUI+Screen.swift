@@ -35,9 +35,7 @@ extension LogUI {
                 $0.indicatorDirection = .vertical
                 $0.color = .white
             }
-        ).onBeginDragging({ [unowned self] _ in
-            self._autoScrollButton.isSelected = false
-        })
+        )
         
 #if os(iOS)
         
@@ -55,10 +53,6 @@ extension LogUI {
             $0.color = .white
             $0.border = .manual(width: 1, color: .platinum)
             $0.cornerRadius = .manual(radius: 4)
-        }).onPressedReturn({ [unowned self] in
-            $0.endEditing()
-            self._search = $0.text
-            self._reload()
         })
         
 #endif
@@ -78,46 +72,25 @@ extension LogUI {
                 }
             )
             $0.isSelected = true
-        }).onChangeStyle({ button, _ in
-            guard let background = button.background as? UI.View.Empty else { return }
-            guard let primary = button.primary as? UI.View.Text else { return }
-            if button.isSelected == true {
-                background.color = .glaucous
-                primary.textColor = .white
-            } else {
-                background.color = .platinum
-                primary.textColor = .black
-            }
-        }).onPressed({ [unowned self] in
-            $0.isSelected = !$0.isSelected
-            self._scrollToBottom()
         })
         
-        private(set) lazy var _closeButton = UI.View.Button(configure: {
-            $0.inset = .init(horizontal: 12, vertical: 4)
-            $0.height = .fixed(44)
-            $0.background = UI.View.Empty(configure: {
-                $0.cornerRadius = .manual(radius: 4)
-                $0.color = .glaucous
+        private(set) lazy var _closeButton: UI.View.Button = {
+            UI.View.Button(configure: {
+                $0.inset = .init(horizontal: 12, vertical: 4)
+                $0.height = .fixed(44)
+                $0.background = UI.View.Empty(configure: {
+                    $0.cornerRadius = .manual(radius: 4)
+                    $0.color = .glaucous
+                })
+                $0.primary = UI.View.Text(
+                    text: "✕",
+                    configure: {
+                        $0.textFont = .init(weight: .regular, size: 20)
+                        $0.textColor = .white
+                    }
+                )
             })
-            $0.primary = UI.View.Text(
-                text: "✕",
-                configure: {
-                    $0.textFont = .init(weight: .regular, size: 20)
-                    $0.textColor = .white
-                }
-            )
-        }).onPressed({ [unowned self] _ in
-#if os(iOS)
-            if self._searchView.isEditing == true {
-                self._searchView.endEditing()
-            } else {
-                self._pressedClose()
-            }
-#else
-            self._pressedClose()
-#endif
-        })
+        }()
         
         private var _entities: [Entity]
         private var _search: String?
@@ -130,6 +103,39 @@ extension LogUI {
         }
         
         func setup() {
+            self.view.onBeginDragging(self, {
+                $0._autoScrollButton.isSelected = false
+            })
+            self._searchView.onPressedReturn(self, {
+                $0._searchView.endEditing()
+                $0._search = $0._searchView.text
+                $0._reload()
+            })
+            self._autoScrollButton.onChangeStyle(self, {
+                guard let background = $0._autoScrollButton.background as? UI.View.Empty else { return }
+                guard let primary = $0._autoScrollButton.primary as? UI.View.Text else { return }
+                if $0._autoScrollButton.isSelected == true {
+                    background.color = .glaucous
+                    primary.textColor = .white
+                } else {
+                    background.color = .platinum
+                    primary.textColor = .black
+                }
+            }).onPressed(self, {
+                $0._autoScrollButton.isSelected = !$0._autoScrollButton.isSelected
+                $0._scrollToBottom()
+            })
+            self._closeButton.onPressed(self, {
+#if os(iOS)
+                if $0._searchView.isEditing == true {
+                    $0._searchView.endEditing()
+                } else {
+                    $0._pressedClose()
+                }
+#else
+                $0._pressedClose()
+#endif
+            })
             self.target.add(observer: self, priority: .public)
         }
         

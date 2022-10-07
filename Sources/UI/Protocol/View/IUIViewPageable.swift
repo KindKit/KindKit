@@ -16,6 +16,28 @@ public protocol IUIViewPageable : AnyObject {
     
 }
 
+public extension IUIViewPageable where Self : IUIWidgetView, Body : IUIViewPageable {
+    
+    @inlinable
+    var currentPage: Float {
+        set { self.body.currentPage = newValue }
+        get { self.body.currentPage }
+    }
+    
+    @inlinable
+    var numberOfPages: UInt {
+        set { self.body.numberOfPages = newValue }
+        get { self.body.numberOfPages }
+    }
+    
+    @inlinable
+    var linkedPageable: IUIViewPageable? {
+        set { self.body.linkedPageable = newValue }
+        get { self.body.linkedPageable }
+    }
+    
+}
+
 public extension IUIViewPageable {
     
     @inlinable
@@ -49,40 +71,6 @@ public extension IUIViewPageable {
     func linkedPageable(_ value: IUIViewPageable?) -> Self {
         self.linkedPageable = value
         return self
-    }
-    
-}
-
-public extension IUIViewPageable where Self : IUIWidgetView, Body : IUIViewPageable {
-    
-    @inlinable
-    var currentPage: Float {
-        set { self.body.currentPage = newValue }
-        get { return self.body.currentPage }
-    }
-    
-    @inlinable
-    var numberOfPages: UInt {
-        set { self.body.numberOfPages = newValue }
-        get { return self.body.numberOfPages }
-    }
-    
-    @inlinable
-    var linkedPageable: IUIViewPageable? {
-        set { self.body.linkedPageable = newValue }
-        get { return self.body.linkedPageable }
-    }
-    
-    @inlinable
-    @discardableResult
-    func currentPage(_ value: Float) -> Self {
-        self.body.currentPage(value)
-        return self
-    }
-    
-    @inlinable
-    func animate(currentPage: Float, completion: (() -> Void)?) {
-        self.body.animate(currentPage: currentPage, completion: completion)
     }
     
 }

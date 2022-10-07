@@ -48,7 +48,7 @@ final class KKScrollView : NSScrollView {
         set {
             self.documentView?.frame = NSRect(origin: self.frame.origin, size: newValue)
         }
-        get { return super.contentSize }
+        get { super.contentSize }
     }
     override var frame: CGRect {
         set {
@@ -64,7 +64,7 @@ final class KKScrollView : NSScrollView {
                 }
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     override var isFlipped: Bool {
         return true

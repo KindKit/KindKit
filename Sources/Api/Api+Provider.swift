@@ -12,9 +12,9 @@ public extension Api {
         public var headers: [Api.Request.Header]
         public var authenticationChallenge: AuthenticationChallenge
         public var localCertificateUrls: [URL]
-        #if DEBUG
+#if DEBUG
         public var logging: Api.Logging = .never
-        #endif
+#endif
 
         public var session: URLSession!
         

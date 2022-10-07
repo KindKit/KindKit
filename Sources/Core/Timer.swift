@@ -46,41 +46,121 @@ public final class Timer {
         self._impl.stop()
     }
     
+}
+
+public extension Timer {
+    
     @discardableResult
-    public func onStarted(_ value: (() -> Void)?) -> Self {
-        self._impl.onStarted(value)
+    func onStarted(_ value: (() -> Void)?) -> Self {
+        self._impl.onStarted.set(value)
         return self
     }
     
     @discardableResult
-    public func onRepeat(_ value: (() -> Void)?) -> Self {
-        self._impl.onRepeat(value)
+    func onStarted(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onStarted.set(self, closure)
         return self
     }
     
     @discardableResult
-    public func onFinished(_ value: (() -> Void)?) -> Self {
-        self._impl.onFinished(value)
+    func onStarted< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onStarted.set(sender, closure)
         return self
     }
     
     @discardableResult
-    public func onStoped(_ value: (() -> Void)?) -> Self {
-        self._impl.onStoped(value)
+    func onRepeat(_ value: (() -> Void)?) -> Self {
+        self._impl.onRepeat.set(value)
         return self
     }
     
     @discardableResult
-    public func onPaused(_ value: (() -> Void)?) -> Self {
-        self._impl.onPaused(value)
+    func onRepeat(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onRepeat.set(self, closure)
         return self
     }
     
     @discardableResult
-    public func onResumed(_ value: (() -> Void)?) -> Self {
-        self._impl.onResumed(value)
+    func onRepeat< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onRepeat.set(sender, closure)
         return self
     }
+    
+    @discardableResult
+    func onFinished(_ value: (() -> Void)?) -> Self {
+        self._impl.onFinished.set(value)
+        return self
+    }
+    
+    @discardableResult
+    func onFinished(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onFinished.set(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onFinished.set(sender, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onStoped(_ value: (() -> Void)?) -> Self {
+        self._impl.onStoped.set(value)
+        return self
+    }
+    
+    @discardableResult
+    func onStoped(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onStoped.set(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onStoped< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onStoped.set(sender, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onPaused(_ value: (() -> Void)?) -> Self {
+        self._impl.onPaused.set(value)
+        return self
+    }
+    
+    @discardableResult
+    func onPaused(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onPaused.set(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onPaused< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onPaused.set(sender, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onResumed(_ value: (() -> Void)?) -> Self {
+        self._impl.onResumed.set(value)
+        return self
+    }
+    
+    @discardableResult
+    func onResumed(_ closure: ((Self) -> Void)?) -> Self {
+        self._impl.onResumed.set(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onResumed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self._impl.onResumed.set(sender, closure)
+        return self
+    }
+    
+}
+
+public extension Timer {
     
     @discardableResult
     public func start() -> Self {

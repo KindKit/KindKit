@@ -37,15 +37,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Static = .fill {
             didSet {
@@ -130,15 +130,15 @@ public extension UI.View {
                     self._view.update(selected: self._selected)
                 }
             }
-            get { return self._selected }
+            get { self._selected }
         }
-        public var onAppear: ((UI.View.Segmented) -> Void)?
-        public var onDisappear: ((UI.View.Segmented) -> Void)?
-        public var onVisible: ((UI.View.Segmented) -> Void)?
-        public var onVisibility: ((UI.View.Segmented) -> Void)?
-        public var onInvisible: ((UI.View.Segmented) -> Void)?
-        public var onChangeStyle: ((UI.View.Segmented, Bool) -> Void)?
-        public var onSelect: ((UI.View.Segmented, Item) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onChangeStyle: Signal.Args< Void, Bool > = .init()
+        public let onSelect: Signal.Args< Void, UI.View.Segmented.Item > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -173,31 +173,27 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
-        }
-        
-        public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self.onChangeStyle?(self, userInteraction)
+            self.onInvisible.emit()
         }
         
     }
@@ -226,50 +222,43 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
-    func onAppear(_ value: ((UI.View.Segmented) -> Void)?) -> Self {
-        self.onAppear = value
+    func onSelect(_ closure: (() -> Void)?) -> Self {
+        self.onSelect.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onDisappear(_ value: ((UI.View.Segmented) -> Void)?) -> Self {
-        self.onDisappear = value
+    func onSelect(_ closure: ((Self) -> Void)?) -> Self {
+        self.onSelect.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisible(_ value: ((UI.View.Segmented) -> Void)?) -> Self {
-        self.onVisible = value
+    func onSelect(_ closure: ((UI.View.Segmented.Item) -> Void)?) -> Self {
+        self.onSelect.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisibility(_ value: ((UI.View.Segmented) -> Void)?) -> Self {
-        self.onVisibility = value
+    func onSelect(_ closure: ((Self, UI.View.Segmented.Item) -> Void)?) -> Self {
+        self.onSelect.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onInvisible(_ value: ((UI.View.Segmented) -> Void)?) -> Self {
-        self.onInvisible = value
+    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onSelect.set(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onChangeStyle(_ value: ((UI.View.Segmented, Bool) -> Void)?) -> Self {
-        self.onChangeStyle = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onSelect(_ value: ((UI.View.Segmented, Item) -> Void)?) -> Self {
-        self.onSelect = value
+    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.View.Segmented.Item) -> Void)?) -> Self {
+        self.onSelect.set(sender, closure)
         return self
     }
     
@@ -279,8 +268,10 @@ extension UI.View.Segmented : KKSegmentedViewDelegate {
     
     func selected(_ view: KKSegmentedView, index: Int) {
         let selected = self.items[index]
-        self._selected = selected
-        self.onSelect?(self, selected)
+        if self._selected != selected {
+            self._selected = selected
+            self.onSelect.emit(selected)
+        }
     }
     
 }

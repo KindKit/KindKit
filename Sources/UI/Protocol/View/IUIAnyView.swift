@@ -9,18 +9,14 @@ public protocol IUIAnyView : AnyObject {
     var native: NativeView { get }
     var isLoaded: Bool { get }
     var bounds: RectFloat { get }
+    var onAppear: Signal.Empty< Void > { get }
+    var onDisappear: Signal.Empty< Void > { get }
     
     func size(available: SizeFloat) -> SizeFloat
     
     func disappear()
     
     func isChild(of view: IUIView, recursive: Bool) -> Bool
-    
-    @discardableResult
-    func onAppear(_ value: ((Self) -> Void)?) -> Self
-    
-    @discardableResult
-    func onDisappear(_ value: ((Self) -> Void)?) -> Self
     
 }
 
@@ -30,6 +26,48 @@ public extension IUIAnyView {
     @discardableResult
     func modify(_ block: (Self) -> Void) -> Self {
         block(self)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ closure: (() -> Void)?) -> Self {
+        self.onAppear.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAppear(_ closure: ((Self) -> Void)?) -> Self {
+        self.onAppear.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAppear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onAppear.set(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ closure: (() -> Void)?) -> Self {
+        self.onDisappear.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear(_ closure: ((Self) -> Void)?) -> Self {
+        self.onDisappear.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDisappear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onDisappear.set(sender, closure)
         return self
     }
     

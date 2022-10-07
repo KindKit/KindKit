@@ -7,11 +7,11 @@ import Foundation
 public extension Bundle {
     
     var kk_isDebug: Bool {
-        #if DEBUG
+#if DEBUG
         return true
-        #else
+#else
         return false
-        #endif
+#endif
     }
     
     var kk_isTestFlight: Bool {

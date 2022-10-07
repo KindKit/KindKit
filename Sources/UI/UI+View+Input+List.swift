@@ -39,15 +39,15 @@ public extension UI.View.Input {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: Swift.String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var isEditing: Bool {
             guard self.isLoaded == true else { return false }
@@ -120,7 +120,7 @@ public extension UI.View.Input {
                     self._view.update(selected: self._selected, userInteraction: false)
                 }
             }
-            get { return self._selected }
+            get { self._selected }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -180,14 +180,14 @@ public extension UI.View.Input {
             }
         }
 #endif
-        public var onAppear: ((UI.View.Input.List) -> Void)?
-        public var onDisappear: ((UI.View.Input.List) -> Void)?
-        public var onVisible: ((UI.View.Input.List) -> Void)?
-        public var onVisibility: ((UI.View.Input.List) -> Void)?
-        public var onInvisible: ((UI.View.Input.List) -> Void)?
-        public var onBeginEditing: ((UI.View.Input.List) -> Void)?
-        public var onEditing: ((UI.View.Input.List) -> Void)?
-        public var onEndEditing: ((UI.View.Input.List) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onBeginEditing: Signal.Empty< Void > = .init()
+        public let onEditing: Signal.Empty< Void > = .init()
+        public let onEndEditing: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -225,7 +225,7 @@ public extension UI.View.Input {
 #if os(iOS)
             self.toolbar?.appear(to: self)
 #endif
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
@@ -234,21 +234,21 @@ public extension UI.View.Input {
 #endif
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
         
         @discardableResult
@@ -338,80 +338,20 @@ public extension UI.View.Input.List {
     
 }
 
-public extension UI.View.Input.List {
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisible(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onVisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginEditing(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onBeginEditing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEditing(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onEditing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndEditing(_ value: ((UI.View.Input.List) -> Void)?) -> Self {
-        self.onEndEditing = value
-        return self
-    }
-    
-}
-
 extension UI.View.Input.List : KKInputListViewDelegate {
     
     func beginEditing(_ view: KKInputListView) {
-        self.onBeginEditing?(self)
+        self.onBeginEditing.emit()
     }
     
     func select(_ view: KKInputListView, appearedItem: IInputListItem) {
         self._selected = appearedItem
         self._view.update(selected: appearedItem, userInteraction: true)
-        self.onEditing?(self)
+        self.onEditing.emit()
     }
     
     func endEditing(_ view: KKInputListView) {
-        self.onEndEditing?(self)
+        self.onEndEditing.emit()
     }
     
 }

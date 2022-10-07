@@ -127,50 +127,20 @@ public extension UI.Gesture {
                 }
             }
         }
+        public let onShouldBegin: Signal.Empty< Bool? > = .init()
+        public let onShouldSimultaneously: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onShouldRequireFailure: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onShouldBeRequiredToFailBy: Signal.Args< Bool?, NativeGesture > = .init()
+        public let onTriggered: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
         @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
-        private var _onShouldBegin: ((UI.Gesture.Tap) -> Bool)?
-        private var _onShouldSimultaneously: ((UI.Gesture.Tap, NativeGesture) -> Bool)?
-        private var _onShouldRequireFailure: ((UI.Gesture.Tap, NativeGesture) -> Bool)?
-        private var _onShouldBeRequiredToFailBy: ((UI.Gesture.Tap, NativeGesture) -> Bool)?
-        private var _onTriggered: ((UI.Gesture.Tap) -> Void)?
         
         public init() {
         }
         
         deinit {
             self._reuse.destroy()
-        }
-                
-        @discardableResult
-        public func onShouldBegin(_ value: ((UI.Gesture.Tap) -> Bool)?) -> Self {
-            self._onShouldBegin = value
-            return self
-        }
-        
-        @discardableResult
-        public func onShouldSimultaneously(_ value: ((UI.Gesture.Tap, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldSimultaneously = value
-            return self
-        }
-        
-        @discardableResult
-        public func onShouldRequireFailure(_ value: ((UI.Gesture.Tap, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldRequireFailure = value
-            return self
-        }
-        
-        @discardableResult
-        public func onShouldBeRequiredToFailBy(_ value: ((UI.Gesture.Tap, NativeGesture) -> Bool)?) -> Self {
-            self._onShouldBeRequiredToFailBy = value
-            return self
-        }
-        
-        @discardableResult
-        public func onTriggered(_ value: ((UI.Gesture.Tap) -> Void)?) -> Self {
-            self._onTriggered = value
-            return self
         }
         
     }
@@ -193,22 +163,47 @@ public extension UI.Gesture.Tap {
     
 }
 
+public extension UI.Gesture.Tap {
+    
+    @inlinable
+    @discardableResult
+    func onTriggered(_ closure: (() -> Void)?) -> Self {
+        self.onTriggered.set(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTriggered(_ closure: ((Self) -> Void)?) -> Self {
+        self.onTriggered.set(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onTriggered.set(sender, closure)
+        return self
+    }
+    
+}
+
 extension UI.Gesture.Tap : KKGestureDelegate {
     
     func shouldBegin(_ gesture: NativeGesture) -> Bool {
-        return self._onShouldBegin?(self) ?? true
+        return self.onShouldBegin.emit(default: true)
     }
     
     func shouldSimultaneously(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldSimultaneously?(self, otherGesture) ?? false
+        return self.onShouldSimultaneously.emit(otherGesture, default: false)
     }
     
     func shouldRequireFailureOf(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldRequireFailure?(self, otherGesture) ?? false
+        return self.onShouldRequireFailure.emit(otherGesture, default: false)
     }
     
     func shouldBeRequiredToFailBy(_ gesture: NativeGesture, otherGesture: NativeGesture) -> Bool {
-        return self._onShouldBeRequiredToFailBy?(self, otherGesture) ?? false
+        return self.onShouldBeRequiredToFailBy.emit(otherGesture, default: false)
     }
     
 }
@@ -216,7 +211,7 @@ extension UI.Gesture.Tap : KKGestureDelegate {
 extension UI.Gesture.Tap : KKTapGestureDelegate {
     
     func triggered(_ gesture: NativeGesture) {
-        self._onTriggered?(self)
+        self.onTriggered.emit()
     }
     
 }

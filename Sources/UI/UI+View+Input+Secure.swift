@@ -40,15 +40,15 @@ public extension UI.View.Input {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: Swift.String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var isEditing: Bool {
             guard self.isLoaded == true else { return false }
@@ -114,7 +114,7 @@ public extension UI.View.Input {
                     self._view.update(text: self._text)
                 }
             }
-            get { return self._text }
+            get { self._text }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -190,15 +190,15 @@ public extension UI.View.Input {
             }
         }
 #endif
-        public var onAppear: ((UI.View.Input.Secure) -> Void)?
-        public var onDisappear: ((UI.View.Input.Secure) -> Void)?
-        public var onVisible: ((UI.View.Input.Secure) -> Void)?
-        public var onVisibility: ((UI.View.Input.Secure) -> Void)?
-        public var onInvisible: ((UI.View.Input.Secure) -> Void)?
-        public var onBeginEditing: ((UI.View.Input.Secure) -> Void)?
-        public var onEditing: ((UI.View.Input.Secure) -> Void)?
-        public var onEndEditing: ((UI.View.Input.Secure) -> Void)?
-        public var onPressedReturn: ((UI.View.Input.Secure) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onBeginEditing: Signal.Empty< Void > = .init()
+        public let onEditing: Signal.Empty< Void > = .init()
+        public let onEndEditing: Signal.Empty< Void > = .init()
+        public let onPressedReturn: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -236,7 +236,7 @@ public extension UI.View.Input {
 #if os(iOS)
             self.toolbar?.appear(to: self)
 #endif
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
@@ -245,21 +245,21 @@ public extension UI.View.Input {
 #endif
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
         
         @discardableResult
@@ -359,64 +359,22 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
-    func onAppear(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onAppear = value
+    func onPressedReturn(_ closure: (() -> Void)?) -> Self {
+        self.onPressedReturn.set(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisible(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onVisible = value
+    func onPressedReturn(_ closure: ((Self) -> Void)?) -> Self {
+        self.onPressedReturn.set(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onVisibility(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginEditing(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onBeginEditing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEditing(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onEditing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndEditing(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onEndEditing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onPressedReturn(_ value: ((UI.View.Input.Secure) -> Void)?) -> Self {
-        self.onPressedReturn = value
+    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onPressedReturn.set(sender, closure)
         return self
     }
     
@@ -425,20 +383,22 @@ public extension UI.View.Input.Secure {
 extension UI.View.Input.Secure : KKInputSecureViewDelegate {
     
     func beginEditing(_ view: KKInputSecureView) {
-        self.onBeginEditing?(self)
+        self.onBeginEditing.emit()
     }
     
     func editing(_ view: KKInputSecureView, text: Swift.String) {
-        self._text = text
-        self.onEditing?(self)
+        if self._text != text {
+            self._text = text
+            self.onEditing.emit()
+        }
     }
     
     func endEditing(_ view: KKInputSecureView) {
-        self.onEndEditing?(self)
+        self.onEndEditing.emit()
     }
     
     func pressedReturn(_ view: KKInputSecureView) {
-        self.onPressedReturn?(self)
+        self.onPressedReturn.emit()
     }
     
 }

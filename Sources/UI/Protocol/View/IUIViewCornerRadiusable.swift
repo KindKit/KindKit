@@ -10,6 +10,16 @@ public protocol IUIViewCornerRadiusable : AnyObject {
     
 }
 
+public extension IUIViewCornerRadiusable where Self : IUIWidgetView, Body : IUIViewCornerRadiusable {
+    
+    @inlinable
+    var cornerRadius: UI.CornerRadius {
+        set { self.body.cornerRadius = newValue }
+        get { self.body.cornerRadius }
+    }
+    
+}
+
 public extension IUIViewCornerRadiusable {
     
     @inlinable
@@ -17,16 +27,6 @@ public extension IUIViewCornerRadiusable {
     func cornerRadius(_ value: UI.CornerRadius) -> Self {
         self.cornerRadius = value
         return self
-    }
-    
-}
-
-public extension IUIViewCornerRadiusable where Self : IUIWidgetView, Body : IUIViewCornerRadiusable {
-    
-    @inlinable
-    var cornerRadius: UI.CornerRadius {
-        set { self.body.cornerRadius = newValue }
-        get { return self.body.cornerRadius }
     }
     
 }

@@ -52,16 +52,16 @@ public extension UI.Container {
                 guard self._sticky !== newValue else { return }
                 self._layout.sticky = UI.Layout.Item(newValue)
             }
-            get { return self._sticky }
+            get { self._sticky }
         }
         public private(set) var stickyVisibility: Float {
             set { self._layout.stickyVisibility = newValue }
-            get { return self._layout.stickyVisibility }
+            get { self._layout.stickyVisibility }
             
         }
         public private(set) var stickyHidden: Bool {
             set { self._layout.stickyHidden = newValue }
-            get { return self._layout.stickyHidden }
+            get { self._layout.stickyHidden }
         }
         public var content: ContentContainer {
             set {
@@ -85,7 +85,7 @@ public extension UI.Container {
                 self.setNeedUpdateStatusBar()
 #endif
             }
-            get { return self._content }
+            get { self._content }
         }
         
         private var _sticky: UI.View.Bar

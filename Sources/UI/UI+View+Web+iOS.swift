@@ -46,7 +46,7 @@ final class KKWebView : WKWebView {
                 self.kk_updateShadowPath()
             }
         }
-        get { return super.frame }
+        get { super.frame }
     }
     
     private unowned var _view: UI.View.Web?
@@ -138,6 +138,7 @@ extension KKWebView {
     func cleanup() {
         self.kkDelegate = nil
         self._view = nil
+        self.stopLoading()
         self.load(URLRequest(url: URL(string: "about:blank")!))
         self.frame = .zero
         self.scrollView.removeObserver(self, forKeyPath: "contentSize")
@@ -171,7 +172,7 @@ extension KKWebView : WKNavigationDelegate {
         }
         switch navigationAction.navigationType {
         case .linkActivated, .formSubmitted, .formResubmitted, .backForward, .reload:
-            let navigationPolicy = kkDelegate.onDecideNavigation(self, request: navigationAction.request)
+            let navigationPolicy = kkDelegate.decideNavigation(self, request: navigationAction.request)
             switch navigationPolicy {
             case .cancel: decisionHandler(.cancel)
             case .allow: decisionHandler(.allow)

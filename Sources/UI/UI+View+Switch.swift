@@ -14,7 +14,7 @@ protocol KKSwitchViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Switch : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Switch : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewChangeable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
         
         public var native: NativeView {
             return self._view
@@ -37,15 +37,15 @@ public extension UI.View {
         }
         public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
             set { self._reuse.unloadBehaviour = newValue }
-            get { return self._reuse.unloadBehaviour }
+            get { self._reuse.unloadBehaviour }
         }
         public var reuseCache: UI.Reuse.Cache? {
             set { self._reuse.cache = newValue }
-            get { return self._reuse.cache }
+            get { self._reuse.cache }
         }
         public var reuseName: String? {
             set { self._reuse.name = newValue }
-            get { return self._reuse.name }
+            get { self._reuse.name }
         }
         public var width: UI.Size.Static = .fixed(51) {
             didSet {
@@ -68,7 +68,7 @@ public extension UI.View {
                 }
                 self.triggeredChangeStyle(false)
             }
-            get { return self._isLocked }
+            get { self._isLocked }
         }
         public var color: UI.Color? = nil {
             didSet {
@@ -142,15 +142,15 @@ public extension UI.View {
                     self._view.update(value: self._value)
                 }
             }
-            get { return self._value }
+            get { self._value }
         }
-        public var onAppear: ((UI.View.Switch) -> Void)?
-        public var onDisappear: ((UI.View.Switch) -> Void)?
-        public var onVisible: ((UI.View.Switch) -> Void)?
-        public var onVisibility: ((UI.View.Switch) -> Void)?
-        public var onInvisible: ((UI.View.Switch) -> Void)?
-        public var onChangeStyle: ((UI.View.Switch, Bool) -> Void)?
-        public var onChangeValue: ((UI.View.Switch) -> Void)?
+        public let onAppear: Signal.Empty< Void > = .init()
+        public let onDisappear: Signal.Empty< Void > = .init()
+        public let onVisible: Signal.Empty< Void > = .init()
+        public let onVisibility: Signal.Empty< Void > = .init()
+        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onChangeStyle: Signal.Args< Void, Bool > = .init()
+        public let onChange: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
@@ -186,31 +186,31 @@ public extension UI.View {
         
         public func appear(to layout: IUILayout) {
             self.appearedLayout = layout
-            self.onAppear?(self)
+            self.onAppear.emit()
         }
         
         public func disappear() {
             self._reuse.disappear()
             self.appearedLayout = nil
-            self.onDisappear?(self)
+            self.onDisappear.emit()
         }
         
         public func visible() {
             self.isVisible = true
-            self.onVisible?(self)
+            self.onVisible.emit()
         }
         
         public func visibility() {
-            self.onVisibility?(self)
+            self.onVisibility.emit()
         }
         
         public func invisible() {
             self.isVisible = false
-            self.onInvisible?(self)
+            self.onInvisible.emit()
         }
         
         public func triggeredChangeStyle(_ userInteraction: Bool) {
-            self.onChangeStyle?(self, userInteraction)
+            self.onChangeStyle.emit(userInteraction)
         }
         
     }
@@ -249,64 +249,13 @@ public extension UI.View.Switch {
     
 }
 
-public extension UI.View.Switch {
-    
-    @inlinable
-    @discardableResult
-    func onAppear(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onAppear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onDisappear(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onDisappear = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisible(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onVisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onVisibility = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onInvisible(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onInvisible = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChangeStyle(_ value: ((UI.View.Switch, Bool) -> Void)?) -> Self {
-        self.onChangeStyle = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChangeValue(_ value: ((UI.View.Switch) -> Void)?) -> Self {
-        self.onChangeValue = value
-        return self
-    }
-    
-}
-
 extension UI.View.Switch : KKSwitchViewDelegate {
     
     func changed(_ view: KKSwitchView, value: Bool) {
-        self._value = value
-        self.onChangeValue?(self)
+        if self._value != value {
+            self._value = value
+            self.onChange.emit()
+        }
     }
     
 }

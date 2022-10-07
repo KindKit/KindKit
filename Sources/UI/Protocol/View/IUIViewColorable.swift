@@ -11,6 +11,16 @@ public protocol IUIViewColorable : AnyObject {
     
 }
 
+public extension IUIViewColorable where Self : IUIWidgetView, Body : IUIViewColorable {
+    
+    @inlinable
+    var color: UI.Color? {
+        set { self.body.color = newValue }
+        get { self.body.color }
+    }
+    
+}
+
 public extension IUIViewColorable {
     
     @inlinable
@@ -18,16 +28,6 @@ public extension IUIViewColorable {
     func color(_ value: UI.Color?) -> Self {
         self.color = value
         return self
-    }
-    
-}
-
-public extension IUIViewColorable where Self : IUIWidgetView, Body : IUIViewColorable {
-    
-    @inlinable
-    var color: UI.Color? {
-        set { self.body.color = newValue }
-        get { return self.body.color }
     }
     
 }

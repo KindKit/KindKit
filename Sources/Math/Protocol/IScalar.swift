@@ -19,9 +19,9 @@ public protocol IScalar : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral
     
     var double: Double { get }
     
-    #if canImport(CoreGraphics)
+#if canImport(CoreGraphics)
     var cgFloat: CGFloat { get }
-    #endif
+#endif
     
     var roundUp: Self { get }
     var roundDown: Self { get }
