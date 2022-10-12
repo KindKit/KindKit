@@ -150,11 +150,13 @@ final class KKPagingView : UIScrollView {
                 self.contentSize = size.cgSize
                 self.kkDelegate?.update(self, numberOfPages: Self._numberOfPages(bounds: bounds, contentSize: size), contentSize: size)
                 if let page = self._revalidatePage {
-                    self.contentOffset = Self._contentOffset(
-                        currentPage: page,
-                        viewportSize: bounds.size,
-                        contentSize: size
-                    )
+                    UIView.performWithoutAnimation({
+                        self.contentOffset = Self._contentOffset(
+                            currentPage: page,
+                            viewportSize: bounds.size,
+                            contentSize: size
+                        )
+                    })
                     self._revalidatePage = nil
                 }
             }
