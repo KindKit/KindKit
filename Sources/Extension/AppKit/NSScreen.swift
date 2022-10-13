@@ -8,7 +8,7 @@ import AppKit
 
 public extension NSScreen {
     
-    var animationVelocity: Float {
+    var kk_animationVelocity: Float {
         return 2000
     }
     

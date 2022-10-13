@@ -40,8 +40,8 @@ final class KKRateView : UIView {
             guard super.frame != newValue else { return }
             super.frame = newValue
             if let view = self._view {
-                self.update(cornerRadius: view.cornerRadius)
-                self.updateShadowPath()
+                self.kk_update(cornerRadius: view.cornerRadius)
+                self.kk_updateShadowPath()
             }
         }
         get { return super.frame }
@@ -126,12 +126,12 @@ extension KKRateView {
         self.update(rounding: view.rounding)
         self.update(states: view.states)
         self.update(rating: view.rating)
-        self.update(color: view.color)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(shadow: view.shadow)
-        self.update(alpha: view.alpha)
-        self.updateShadowPath()
+        self.kk_update(color: view.color)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(shadow: view.shadow)
+        self.kk_update(alpha: view.alpha)
+        self.kk_updateShadowPath()
     }
     
     func update(itemSize: SizeFloat) {

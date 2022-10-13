@@ -66,6 +66,7 @@ extension Api.Query {
         }
         
         func redirect(request: URLRequest) -> URLRequest? {
+            guard self._canceled == false else { return nil }
             guard let original = self.task.originalRequest else { return nil }
             guard self.request.redirect.contains(.enabled) == true else { return nil }
             var copy = request
@@ -90,6 +91,7 @@ extension Api.Query {
         }
 
         func upload(bytes: Int64, totalBytes: Int64) {
+            guard self._canceled == false else { return }
             self.uploadProgress.totalUnitCount = totalBytes
             self.uploadProgress.completedUnitCount = bytes
             if let upload = self.onUpload {
@@ -100,6 +102,7 @@ extension Api.Query {
         }
 
         func resumeDownload(bytes: Int64, totalBytes: Int64) {
+            guard self._canceled == false else { return }
             self.downloadProgress.totalUnitCount = totalBytes
             self.downloadProgress.completedUnitCount = bytes
             if let download = self.onDownload {
@@ -110,6 +113,7 @@ extension Api.Query {
         }
 
         func download(bytes: Int64, totalBytes: Int64) {
+            guard self._canceled == false else { return }
             self.downloadProgress.totalUnitCount = totalBytes
             self.downloadProgress.completedUnitCount = bytes
             if let download = self.onDownload {
@@ -120,14 +124,17 @@ extension Api.Query {
         }
 
         func receive(response: URLResponse) {
+            guard self._canceled == false else { return }
             self._receivedMeta = Api.Response.Meta(response)
         }
 
         func become(task: URLSessionTask) {
+            guard self._canceled == false else { return }
             self.task = task
         }
 
         func receive(data: Data) {
+            guard self._canceled == false else { return }
             if self._receivedData != nil {
                 self._receivedData!.append(data)
             } else {
@@ -136,16 +143,16 @@ extension Api.Query {
         }
 
         func download(url: URL) {
+            guard self._canceled == false else { return }
             if let data = try? Data(contentsOf: url) {
                 self._receivedData = data
             }
         }
 
         func finish(error: Error?) {
+            guard self._canceled == false else { return }
             if let error = error as NSError? {
-                if self._canceled == false {
-                    self._parse(error: error)
-                }
+                self._parse(error: error)
             } else {
                 self._parse()
             }

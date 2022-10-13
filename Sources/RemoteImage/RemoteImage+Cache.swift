@@ -176,7 +176,7 @@ private extension RemoteImage.Cache {
     
     func _key(_ query: IRemoteImageQuery) -> String? {
         let key = query.key
-        if let sha256 = key.sha256 {
+        if let sha256 = key.kk_sha256 {
             return sha256
         }
         return nil
@@ -184,7 +184,7 @@ private extension RemoteImage.Cache {
     
     func _key(_ query: IRemoteImageQuery, _ filter: IRemoteImageFilter) -> String? {
         let key = "{\(filter.name)}{\(query.key)}"
-        if let sha256 = key.sha256 {
+        if let sha256 = key.kk_sha256 {
             return sha256
         }
         return nil

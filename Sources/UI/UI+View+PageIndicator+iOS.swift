@@ -36,6 +36,17 @@ extension UI.View.PageIndicator {
 final class KKPageIndicatorView : UIPageControl {
     
     unowned var kkDelegate: KKPageIndicatorViewDelegate?
+    override var frame: CGRect {
+        set {
+            guard super.frame != newValue else { return }
+            super.frame = newValue
+            if let view = self._view {
+                self.kk_update(cornerRadius: view.cornerRadius)
+                self.kk_updateShadowPath()
+            }
+        }
+        get { return super.frame }
+    }
     
     private unowned var _view: UI.View.PageIndicator?
     
@@ -61,12 +72,12 @@ extension KKPageIndicatorView {
         self.update(currentPageColor: view.currentPageColor)
         self.update(currentPage: view.currentPage)
         self.update(numberOfPages: view.numberOfPages)
-        self.update(color: view.color)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(shadow: view.shadow)
-        self.update(alpha: view.alpha)
-        self.updateShadowPath()
+        self.kk_update(color: view.color)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(shadow: view.shadow)
+        self.kk_update(alpha: view.alpha)
+        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     

@@ -17,7 +17,7 @@ public extension Database.ValueDecoder {
             case .real(let value):
                 return .init(value)
             case .text(let value):
-                guard let number = NSNumber.number(from: value) else {
+                guard let number = NSNumber.kk_number(from: value) else {
                     throw Database.Error.decode
                 }
                 return .init(number.intValue)

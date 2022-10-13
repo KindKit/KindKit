@@ -39,7 +39,7 @@ extension RemoteImage.Loader {
 private extension RemoteImage.Loader.LoadTask {
     
     func _perform() {
-        self.task = DispatchWorkItem.async(block: {
+        self.task = DispatchWorkItem.kk_async(block: {
             if let image = self.cache.image(query: self.query) {
                 self.finish(image: image)
             } else if self.query.isLocal == true {

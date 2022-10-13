@@ -42,7 +42,7 @@ extension RemoteImage.Loader.FilterTask : IRemoteImageTarget {
     }
     
     func remoteImage(image: UI.Image) {
-        self.task = DispatchWorkItem.async(block: {
+        self.task = DispatchWorkItem.kk_async(block: {
             do {
                 if let image = self.filter.apply(image) {
                     if let data = image.pngData() {

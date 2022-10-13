@@ -114,7 +114,7 @@ public extension UI.Container {
             self._layout = Layout(content.flatMap({ UI.Layout.Item($0.view) }))
             self._view = UI.View.Custom(self._layout)
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.animationVelocity
+            self.animationVelocity = NSScreen.main!.kk_animationVelocity
 #elseif os(iOS)
             self.animationVelocity = Float(max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 3)
             self.interactiveLimit = 20
@@ -244,13 +244,13 @@ private extension UI.Container.Modal {
         self._interactiveGesture.onShouldRequireFailure({ [unowned self] _, gesture -> Bool in
             guard let view = gesture.view else { return false }
             if let container = self._current?.container {
-                return container.view.native.isChild(of: view, recursive: true)
+                return container.view.native.kk_isChild(of: view, recursive: true)
             }
             return false
         }).onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let view = gesture.view else { return false }
             if let container = self.content {
-                return container.view.native.isChild(of: view, recursive: true)
+                return container.view.native.kk_isChild(of: view, recursive: true)
             }
             return false
         }).onShouldBegin({ [unowned self] _ in

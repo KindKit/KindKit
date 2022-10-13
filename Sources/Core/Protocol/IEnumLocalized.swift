@@ -67,7 +67,7 @@ public extension IEnumLocalized {
     
     @inlinable
     func localized(_ args: [String : String]) -> String {
-        return self.localized.replace(keys: args)
+        return self.localized.kk_replace(keys: args)
     }
     
     @inlinable

@@ -123,7 +123,7 @@ public extension UI.View {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.kk_update(color: self.color)
                 }
             }
         }
@@ -131,7 +131,7 @@ public extension UI.View {
             didSet {
                 guard self.cornerRadius != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(cornerRadius: self.cornerRadius)
+                    self._view.kk_update(cornerRadius: self.cornerRadius)
                 }
             }
         }
@@ -139,7 +139,7 @@ public extension UI.View {
             didSet {
                 guard self.border != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(border: self.border)
+                    self._view.kk_update(border: self.border)
                 }
             }
         }
@@ -147,7 +147,7 @@ public extension UI.View {
             didSet {
                 guard self.shadow != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(shadow: self.shadow)
+                    self._view.kk_update(shadow: self.shadow)
                 }
             }
         }
@@ -155,7 +155,7 @@ public extension UI.View {
             didSet {
                 guard self.alpha != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(alpha: self.alpha)
+                    self._view.kk_update(alpha: self.alpha)
                 }
             }
         }

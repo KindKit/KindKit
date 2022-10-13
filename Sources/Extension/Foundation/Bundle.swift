@@ -6,7 +6,7 @@ import Foundation
 
 public extension Bundle {
     
-    var isDebug: Bool {
+    var kk_isDebug: Bool {
         #if DEBUG
         return true
         #else
@@ -14,25 +14,25 @@ public extension Bundle {
         #endif
     }
     
-    var isTestFlight: Bool {
+    var kk_isTestFlight: Bool {
         return self.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
     }
     
-    var shortVersion: String? {
+    var kk_shortVersion: String? {
         return self.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
     }
     
-    var version: String? {
+    var kk_version: String? {
         return self.object(forInfoDictionaryKey: "CFBundleVersion") as? String
     }
     
-    var semaVersion: SemaVersion? {
-        guard let shortVersion = self.shortVersion else { return nil }
-        guard let version = self.version else { return nil }
+    var kk_semaVersion: SemaVersion? {
+        guard let shortVersion = self.kk_shortVersion else { return nil }
+        guard let version = self.kk_version else { return nil }
         return SemaVersion("\(shortVersion)+\(version)")
     }
 
-    func containsUrlSheme(url: URL) -> Bool {
+    func kk_containsUrlSheme(url: URL) -> Bool {
         var shemes: [String] = []
         guard let scheme = url.scheme else { return false }
         guard let urlTypes = Bundle.main.infoDictionary?["CFBundleURLTypes"] as? [Any] else { return false }

@@ -6,8 +6,9 @@ import Foundation
 
 public extension Array {
     
-    init(range: Range< Element >) where Element : Strideable, Element.Stride : SignedInteger {
-        self.init(unsafeUninitializedCapacity: range.count, initializingWith: { buffer, count in
+    @inlinable
+    static func kk_make(range: Range< Element >) -> Self where Element : Strideable, Element.Stride : SignedInteger {
+        return Array(unsafeUninitializedCapacity: range.count, initializingWith: { buffer, count in
             for (index, value) in range.enumerated() {
                 buffer[index] = value
             }
@@ -16,7 +17,7 @@ public extension Array {
     }
     
     @inlinable
-    func appending(_ element: Element) -> Self {
+    func kk_appending(_ element: Element) -> Self {
         if self.isEmpty == true {
             return [ element ]
         }
@@ -26,7 +27,7 @@ public extension Array {
     }
     
     @inlinable
-    func appending< S : Sequence >(contentsOf contents: S) -> Self  where Element == S.Element {
+    func kk_appending< S : Sequence >(contentsOf contents: S) -> Self  where Element == S.Element {
         if self.isEmpty == true {
             return Array(contents)
         }
@@ -36,7 +37,7 @@ public extension Array {
     }
     
     @inlinable
-    func reorder(
+    func kk_reorder(
         where block: (_ lhs: Element, _ rhs: Element) throws -> [Element]
     ) rethrows -> Self {
         guard self.count > 1 else { return self }
@@ -52,7 +53,7 @@ public extension Array {
     }
     
     @inlinable
-    func reduce< Result >(
+    func kk_reduce< Result >(
         _ emptyResult: () throws -> Result,
         _ firstResult: (Element) throws -> Result,
         _ nextResult: (Result, Element) throws -> Result
@@ -66,7 +67,7 @@ public extension Array {
     }
     
     @inlinable
-    func count(where: (_ element: Element) -> Bool) -> Int {
+    func kk_count(where: (_ element: Element) -> Bool) -> Int {
         var result = 0
         for element in self {
             if `where`(element) == true {
@@ -77,7 +78,7 @@ public extension Array {
     }
     
     @inlinable
-    func processing(
+    func kk_processing(
         prefix: (() throws -> Element?)? = nil,
         suffix: (() throws -> Element?)? = nil,
         separator: (() throws -> Element?)?
@@ -112,7 +113,7 @@ public extension Array {
     }
     
     @inlinable
-    func processing(
+    func kk_processing(
         prefix: (() throws -> [Element])? = nil,
         suffix: (() throws -> [Element])? = nil,
         separator: (() throws -> [Element])?

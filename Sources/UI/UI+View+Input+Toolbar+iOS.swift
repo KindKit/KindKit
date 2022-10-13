@@ -65,7 +65,7 @@ extension KKInputToolbarView {
         self.update(translucent: view.isTranslucent)
         self.update(barTintColor: view.barTintColor)
         self.update(contentTintColor: view.contentTintColor)
-        self.update(color: view.color)
+        self.kk_update(color: view.color)
         self.kkDelegate = view
     }
     

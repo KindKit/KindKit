@@ -80,7 +80,7 @@ extension URL : IDatabaseExpressable {
 extension IDatabaseExpressable where Self : DataProtocol {
     
     public var query: String {
-        return "x'\(self.hexString)'"
+        return "x'\(self.kk_hexString)'"
     }
 
 }

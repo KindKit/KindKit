@@ -40,8 +40,8 @@ final class KKEmptyView : NSView {
             guard super.frame != newValue else { return }
             super.frame = newValue
             if let view = self._view {
-                self.update(cornerRadius: view.cornerRadius)
-                self.updateShadowPath()
+                self.kk_update(cornerRadius: view.cornerRadius)
+                self.kk_updateShadowPath()
             }
         }
         get { return super.frame }
@@ -62,12 +62,12 @@ extension KKEmptyView {
     
     func update(view: UI.View.Empty) {
         self._view = view
-        self.update(color: view.color)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(shadow: view.shadow)
-        self.update(alpha: view.alpha)
-        self.updateShadowPath()
+        self.kk_update(color: view.color)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(shadow: view.shadow)
+        self.kk_update(alpha: view.alpha)
+        self.kk_updateShadowPath()
     }
     
     func cleanup() {

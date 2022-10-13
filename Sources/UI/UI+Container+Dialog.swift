@@ -246,7 +246,7 @@ extension UI.Container.Dialog {
         self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let content = self.content else { return true }
             guard let view = gesture.view else { return false }
-            return content.view.native.isChild(of: view, recursive: true)
+            return content.view.native.kk_isChild(of: view, recursive: true)
         }).onShouldBegin({ [unowned self] _ in
             guard let current = self._current else { return false }
             guard current.container.shouldInteractive == true else { return false }

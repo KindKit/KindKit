@@ -6,7 +6,8 @@ import Foundation
 
 public extension Date {
     
-    init?(
+    @inlinable
+    static func kk_make(
         year: Int,
         month: Int,
         day: Int,
@@ -15,7 +16,7 @@ public extension Date {
         second: Int,
         calendar: Calendar = Calendar.current,
         timeZone: TimeZone = TimeZone.current
-    ) {
+    ) -> Self? {
         let components = DateComponents(
             calendar: calendar,
             timeZone: timeZone,
@@ -26,17 +27,17 @@ public extension Date {
             minute: minute,
             second: second
         )
-        guard let date = components.date else { return nil }
-        self = date
+        return components.date
     }
     
-    init?(
+    @inlinable
+    static func kk_make(
         year: Int,
         month: Int,
         day: Int,
         calendar: Calendar = Calendar.current,
         timeZone: TimeZone = TimeZone.current
-    ) {
+    ) -> Self? {
         let components = DateComponents(
             calendar: calendar,
             timeZone: timeZone,
@@ -44,17 +45,17 @@ public extension Date {
             month: month,
             day: day
         )
-        guard let date = components.date else { return nil }
-        self = date
+        return components.date
     }
     
-    init?(
+    @inlinable
+    static func kk_make(
         hour: Int,
         minute: Int,
         second: Int,
         calendar: Calendar = Calendar.current,
         timeZone: TimeZone = TimeZone.current
-    ) {
+    ) -> Self? {
         let components = DateComponents(
             calendar: calendar,
             timeZone: timeZone,
@@ -62,11 +63,10 @@ public extension Date {
             minute: minute,
             second: second
         )
-        guard let date = components.date else { return nil }
-        self = date
+        return components.date
     }
     
-    func isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
+    func kk_isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
         return calendar.isDate(self, equalTo: date, toGranularity: component)
     }
 

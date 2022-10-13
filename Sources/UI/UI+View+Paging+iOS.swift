@@ -51,8 +51,8 @@ final class KKPagingView : UIScrollView {
                 let oldContentSize = self.contentSize
                 super.frame = newValue
                 if let view = self._view {
-                    self.update(cornerRadius: view.cornerRadius)
-                    self.updateShadowPath()
+                    self.kk_update(cornerRadius: view.cornerRadius)
+                    self.kk_updateShadowPath()
                 }
                 if oldValue.size != newValue.size {
                     if self._revalidatePage == nil {
@@ -180,12 +180,12 @@ extension KKPagingView {
         self.update(direction: view.direction, currentPage: view.currentPage, numberOfPages: view.numberOfPages)
         self.update(content: view.content)
         self.update(locked: view.isLocked)
-        self.update(color: view.color)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(shadow: view.shadow)
-        self.update(alpha: view.alpha)
-        self.updateShadowPath()
+        self.kk_update(color: view.color)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(shadow: view.shadow)
+        self.kk_update(alpha: view.alpha)
+        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     

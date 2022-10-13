@@ -6,7 +6,8 @@ import Foundation
 
 extension UInt {
     
-    init?(_ string: String, radix: UInt) {
+    @inlinable
+    static func kk_make(string: String, radix: UInt) -> Self? {
         var result = UInt(0)
         let digits = "0123456789abcdefghijklmnopqrstuvwxyz"
         for digit in string.lowercased() {
@@ -20,7 +21,7 @@ extension UInt {
                 return nil
             }
         }
-        self = result
+        return result
     }
     
 }

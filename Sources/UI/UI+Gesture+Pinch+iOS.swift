@@ -49,11 +49,11 @@ final class KKPinchGesture : UIPinchGestureRecognizer {
 extension KKPinchGesture {
     
     func update(gesture: UI.Gesture.Pinch) {
-        self.update(enabled: gesture.isEnabled)
-        self.update(cancelsTouchesInView: gesture.cancelsTouchesInView)
-        self.update(delaysTouchesBegan: gesture.delaysTouchesBegan)
-        self.update(delaysTouchesEnded: gesture.delaysTouchesEnded)
-        self.update(requiresExclusiveTouchType: gesture.requiresExclusiveTouchType)
+        self.kk_update(enabled: gesture.isEnabled)
+        self.kk_update(cancelsTouchesInView: gesture.cancelsTouchesInView)
+        self.kk_update(delaysTouchesBegan: gesture.delaysTouchesBegan)
+        self.kk_update(delaysTouchesEnded: gesture.delaysTouchesEnded)
+        self.kk_update(requiresExclusiveTouchType: gesture.requiresExclusiveTouchType)
         self.kkDelegate = gesture
     }
     

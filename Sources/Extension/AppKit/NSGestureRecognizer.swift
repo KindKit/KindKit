@@ -10,31 +10,31 @@ public typealias NativeGesture = NSGestureRecognizer
 
 public extension NSGestureRecognizer {
     
-    func update(enabled: Bool) {
+    func kk_update(enabled: Bool) {
         self.isEnabled = enabled
     }
 
-    func update(delaysPrimaryMouseButtonEvents: Bool) {
+    func kk_update(delaysPrimaryMouseButtonEvents: Bool) {
         self.delaysPrimaryMouseButtonEvents = delaysPrimaryMouseButtonEvents
     }
 
-    func update(delaysSecondaryMouseButtonEvents: Bool) {
+    func kk_update(delaysSecondaryMouseButtonEvents: Bool) {
         self.delaysSecondaryMouseButtonEvents = delaysSecondaryMouseButtonEvents
     }
 
-    func update(delaysOtherMouseButtonEvents: Bool) {
+    func kk_update(delaysOtherMouseButtonEvents: Bool) {
         self.delaysOtherMouseButtonEvents = delaysOtherMouseButtonEvents
     }
 
-    func update(delaysKeyEvents: Bool) {
+    func kk_update(delaysKeyEvents: Bool) {
         self.delaysKeyEvents = delaysKeyEvents
     }
 
-    func update(delaysMagnificationEvents: Bool) {
+    func kk_update(delaysMagnificationEvents: Bool) {
         self.delaysMagnificationEvents = delaysMagnificationEvents
     }
     
-    func update(delaysRotationEvents: Bool) {
+    func kk_update(delaysRotationEvents: Bool) {
         self.delaysRotationEvents = delaysRotationEvents
     }
 

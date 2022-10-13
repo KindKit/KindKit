@@ -31,7 +31,7 @@ public extension Polygon2 {
     
     @inlinable
     var segments: [Segment2< Value >] {
-        return self.countours.reduce({
+        return self.countours.kk_reduce({
             return []
         }, {
             return $0.segments
@@ -57,7 +57,7 @@ private extension Polygon2 {
     
     @inline(__always)
     static func _bbox(_ countours: [Polyline2< Value >]) -> Box2< Value > {
-        return countours.reduce({
+        return countours.kk_reduce({
             return Box2< Value >()
         }, {
             return $0.bbox

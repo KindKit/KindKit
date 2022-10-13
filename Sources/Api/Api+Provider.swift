@@ -33,7 +33,7 @@ public extension Api {
             self.headers = headers
             self.authenticationChallenge = authenticationChallenge
             self.localCertificateUrls = localCertificateUrls
-            self._queue = DispatchQueue(label: "KindKitApi.Api.Provider")
+            self._queue = DispatchQueue(label: "KindKit.Api.Provider")
             self._tasks = [:]
             super.init()
             self.session = URLSession(
@@ -41,6 +41,13 @@ public extension Api {
                 delegate: self,
                 delegateQueue: OperationQueue()
             )
+        }
+        
+        deinit {
+            for (_, task) in self._tasks {
+                task.cancel()
+            }
+            self.session.invalidateAndCancel()
         }
         
         public func send< Response : IApiResponse >(

@@ -11,7 +11,7 @@ import UIKit
 public extension CATransaction {
     
     @inlinable
-    class func withoutActions(_ closure: () -> Void) {
+    class func kk_withoutActions(_ closure: () -> Void) {
         Self.begin()
         Self.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
         closure()

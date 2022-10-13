@@ -107,7 +107,7 @@ private extension UI.Layout.Composition.HSplitStack {
             for (index, entity) in self.entities.enumerated() {
                 pass.sizes[index] = entity.size(available: entityAvailableSize)
             }
-            let numberOfValid = pass.sizes.count(where: { $0.width > 0 })
+            let numberOfValid = pass.sizes.kk_count(where: { $0.width > 0 })
             if numberOfValid < self.entities.count {
                 entityAvailableSize = self._availableSize(
                     available: available,

@@ -164,7 +164,7 @@ private extension Json {
                 let startIndex = subpath.index(subpath.startIndex, offsetBy: 1)
                 let endIndex = subpath.index(subpath.endIndex, offsetBy: -1)
                 let indexString = String(subpath[startIndex ..< endIndex])
-                return NSNumber.number(from: indexString)
+                return NSNumber.kk_number(from: indexString)
             }
             return subpath
         })

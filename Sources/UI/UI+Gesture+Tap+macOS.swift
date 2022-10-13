@@ -54,13 +54,13 @@ final class KKTapGesture : NSClickGestureRecognizer {
 extension KKTapGesture {
     
     func update(gesture: UI.Gesture.Tap) {
-        self.update(enabled: gesture.isEnabled)
-        self.update(delaysPrimaryMouseButtonEvents: gesture.delaysPrimaryMouseButtonEvents)
-        self.update(delaysSecondaryMouseButtonEvents: gesture.delaysSecondaryMouseButtonEvents)
-        self.update(delaysOtherMouseButtonEvents: gesture.delaysOtherMouseButtonEvents)
-        self.update(delaysKeyEvents: gesture.delaysKeyEvents)
-        self.update(delaysMagnificationEvents: gesture.delaysMagnificationEvents)
-        self.update(delaysRotationEvents: gesture.delaysRotationEvents)
+        self.kk_update(enabled: gesture.isEnabled)
+        self.kk_update(delaysPrimaryMouseButtonEvents: gesture.delaysPrimaryMouseButtonEvents)
+        self.kk_update(delaysSecondaryMouseButtonEvents: gesture.delaysSecondaryMouseButtonEvents)
+        self.kk_update(delaysOtherMouseButtonEvents: gesture.delaysOtherMouseButtonEvents)
+        self.kk_update(delaysKeyEvents: gesture.delaysKeyEvents)
+        self.kk_update(delaysMagnificationEvents: gesture.delaysMagnificationEvents)
+        self.kk_update(delaysRotationEvents: gesture.delaysRotationEvents)
         self.update(numberOfTapsRequired: gesture.numberOfTapsRequired)
         self.update(numberOfTouchesRequired: gesture.numberOfTouchesRequired)
         self.kkDelegate = gesture

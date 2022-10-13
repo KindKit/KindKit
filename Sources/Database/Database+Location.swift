@@ -29,7 +29,7 @@ extension Database.Location {
     
     @inlinable
     static func path(filename: String) -> String {
-        return "\(FileManager.userDocumentsPath)/\(filename).sqlite"
+        return "\(FileManager.kk_userDocumentsPath)/\(filename).sqlite"
     }
     
     @inlinable

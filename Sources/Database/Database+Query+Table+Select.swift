@@ -39,7 +39,7 @@ public extension Database.Query.Table.Select {
     ) -> Self {
         return .init(
             table: self._table,
-            columns: self._columns.appending(column.name),
+            columns: self._columns.kk_appending(column.name),
             where: self._where,
             orderBy: self._orderBy,
             limit: self._limit
@@ -67,7 +67,7 @@ public extension Database.Query.Table.Select {
             table: self._table,
             columns: self._columns,
             where: self._where,
-            orderBy: self._orderBy.appending(orderBy.query),
+            orderBy: self._orderBy.kk_appending(orderBy.query),
             limit: self._limit
         )
     }

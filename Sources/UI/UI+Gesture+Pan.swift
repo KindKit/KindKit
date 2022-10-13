@@ -29,7 +29,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.isEnabled != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(enabled: self.isEnabled)
+                    self._gesture.kk_update(enabled: self.isEnabled)
                 }
             }
         }
@@ -38,7 +38,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysPrimaryMouseButtonEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysPrimaryMouseButtonEvents: self.delaysPrimaryMouseButtonEvents)
+                    self._gesture.kk_update(delaysPrimaryMouseButtonEvents: self.delaysPrimaryMouseButtonEvents)
                 }
             }
         }
@@ -46,7 +46,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysSecondaryMouseButtonEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysSecondaryMouseButtonEvents:
+                    self._gesture.kk_update(delaysSecondaryMouseButtonEvents:
                                             self.delaysSecondaryMouseButtonEvents)
                 }
             }
@@ -55,7 +55,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysOtherMouseButtonEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysOtherMouseButtonEvents: self.delaysOtherMouseButtonEvents)
+                    self._gesture.kk_update(delaysOtherMouseButtonEvents: self.delaysOtherMouseButtonEvents)
                 }
             }
         }
@@ -63,7 +63,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysKeyEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysKeyEvents: self.delaysKeyEvents)
+                    self._gesture.kk_update(delaysKeyEvents: self.delaysKeyEvents)
                 }
             }
         }
@@ -79,7 +79,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysRotationEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysRotationEvents: self.delaysRotationEvents)
+                    self._gesture.kk_update(delaysRotationEvents: self.delaysRotationEvents)
                 }
             }
         }
@@ -88,7 +88,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.cancelsTouchesInView != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(cancelsTouchesInView: self.cancelsTouchesInView)
+                    self._gesture.kk_update(cancelsTouchesInView: self.cancelsTouchesInView)
                 }
             }
         }
@@ -96,7 +96,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysTouchesBegan != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysTouchesBegan: self.delaysTouchesBegan)
+                    self._gesture.kk_update(delaysTouchesBegan: self.delaysTouchesBegan)
                 }
             }
         }
@@ -104,7 +104,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysTouchesEnded != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysTouchesEnded: self.delaysTouchesEnded)
+                    self._gesture.kk_update(delaysTouchesEnded: self.delaysTouchesEnded)
                 }
             }
         }
@@ -112,7 +112,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.requiresExclusiveTouchType != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(requiresExclusiveTouchType: self.requiresExclusiveTouchType)
+                    self._gesture.kk_update(requiresExclusiveTouchType: self.requiresExclusiveTouchType)
                 }
             }
         }

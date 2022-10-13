@@ -254,7 +254,7 @@ private extension Polyline2 {
     
     @inline(__always)
     static func _bbox(_ corners: [Point< Value >]) -> Box2< Value > {
-        return corners.reduce({
+        return corners.kk_reduce({
             return Box2< Value >()
         }, {
             return Box2< Value >(lower: $0, upper: $0)

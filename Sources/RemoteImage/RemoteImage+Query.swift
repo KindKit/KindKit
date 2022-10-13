@@ -16,7 +16,7 @@ public extension RemoteImage {
         
         public init(url: URL) {
             self.url = url
-            if let key = url.absoluteString.sha256 {
+            if let key = url.absoluteString.kk_sha256 {
                 self.key = key
             } else {
                 self.key = url.lastPathComponent

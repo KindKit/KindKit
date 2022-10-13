@@ -29,7 +29,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.isEnabled != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(enabled: self.isEnabled)
+                    self._gesture.kk_update(enabled: self.isEnabled)
                 }
             }
         }
@@ -88,7 +88,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.cancelsTouchesInView != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(cancelsTouchesInView: self.cancelsTouchesInView)
+                    self._gesture.kk_update(cancelsTouchesInView: self.cancelsTouchesInView)
                 }
             }
         }
@@ -96,7 +96,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysTouchesBegan != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysTouchesBegan: self.delaysTouchesBegan)
+                    self._gesture.kk_update(delaysTouchesBegan: self.delaysTouchesBegan)
                 }
             }
         }
@@ -104,7 +104,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysTouchesEnded != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysTouchesEnded: self.delaysTouchesEnded)
+                    self._gesture.kk_update(delaysTouchesEnded: self.delaysTouchesEnded)
                 }
             }
         }
@@ -112,7 +112,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.requiresExclusiveTouchType != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(requiresExclusiveTouchType: self.requiresExclusiveTouchType)
+                    self._gesture.kk_update(requiresExclusiveTouchType: self.requiresExclusiveTouchType)
                 }
             }
         }

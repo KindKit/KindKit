@@ -49,7 +49,7 @@ public extension Database.Query.Table.Create {
         return .init(
             table: self._table,
             ifNotExists: self._ifNotExists,
-            columns: self._columns.appending(column.query),
+            columns: self._columns.kk_appending(column.query),
             withoutRowId: self._withoutRowId
         )
     }
@@ -62,7 +62,7 @@ public extension Database.Query.Table.Create {
         return .init(
             table: self._table,
             ifNotExists: self._ifNotExists,
-            columns: self._columns.appending(column.query),
+            columns: self._columns.kk_appending(column.query),
             withoutRowId: self._withoutRowId
         )
     }

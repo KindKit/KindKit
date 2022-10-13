@@ -21,7 +21,7 @@ public extension Xml {
 public extension Xml.Value {
     
     var number: NSNumber? {
-        return NSNumber.number(from: self.text)
+        return NSNumber.kk_number(from: self.text)
     }
     
     var int: Int? {
@@ -45,7 +45,7 @@ public extension Xml.Value {
     }
     
     var decimalNumber: NSDecimalNumber? {
-        return NSDecimalNumber.decimalNumber(from: self.text)
+        return NSDecimalNumber.kk_decimalNumber(from: self.text)
     }
     
     var decimal: Decimal? {

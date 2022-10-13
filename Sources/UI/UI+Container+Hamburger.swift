@@ -170,9 +170,9 @@ public extension UI.Container {
         ) {
             self.isPresented = false
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.animationVelocity
+            self.animationVelocity = NSScreen.main!.kk_animationVelocity
 #elseif os(iOS)
-            self.animationVelocity = UIScreen.main.animationVelocity
+            self.animationVelocity = UIScreen.main.kk_animationVelocity
 #endif
             self._content = content
             self._leading = leading
@@ -323,7 +323,7 @@ private extension UI.Container.Hamburger {
 #if os(iOS)
         self._pressedGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture -> Bool in
             guard let view = gesture.view else { return false }
-            return self._view.native.isChild(of: view, recursive: true)
+            return self._view.native.kk_isChild(of: view, recursive: true)
         }).onShouldBegin({ [unowned self] _ in
             switch self._layout.state {
             case .idle: return false

@@ -7,7 +7,7 @@ import CommonCrypto
 
 public extension DataProtocol {
 
-    var hexString: String {
+    var kk_hexString: String {
         var string = String()
         self.forEach({ string += String(format: "%02x", $0) })
         return string
@@ -19,7 +19,7 @@ public extension Data {
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md2: Data {
+    var kk_md2: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD2_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD2($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
@@ -27,7 +27,7 @@ public extension Data {
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md4: Data {
+    var kk_md4: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD4_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD4($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
@@ -35,37 +35,37 @@ public extension Data {
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md5: Data {
+    var kk_md5: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD5_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD5($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    var sha1: Data {
+    var kk_sha1: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_SHA1_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_SHA1($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    var sha224: Data {
+    var kk_sha224: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_SHA224_DIGEST_LENGTH))
          self.withUnsafeBytes({ _ = CC_SHA224($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    var sha256: Data {
+    var kk_sha256: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_SHA256($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    var sha384: Data {
+    var kk_sha384: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_SHA384_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_SHA384($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    var sha512: Data {
+    var kk_sha512: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_SHA512_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_SHA512($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
@@ -75,7 +75,7 @@ public extension Data {
 
 public extension Data {
     
-    var isBmp: Bool {
+    var kk_isBmp: Bool {
         if self.count >= 2 {
             if self.starts(with: [ 0x42, 0x4D ]) == true {
                 return true
@@ -84,7 +84,7 @@ public extension Data {
         return false
     }
     
-    var isGif: Bool {
+    var kk_isGif: Bool {
         if self.count >= 4 {
             if self.starts(with: [ 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 ]) == true {
                 return true
@@ -96,7 +96,7 @@ public extension Data {
         return false
     }
     
-    var isJpeg: Bool {
+    var kk_isJpeg: Bool {
         if self.count >= 4 {
             if self.starts(with: [ 0xFF, 0xD8, 0xFF, 0xDB ]) == true {
                 return true
@@ -123,7 +123,7 @@ public extension Data {
         return false
     }
     
-    var isPng: Bool {
+    var kk_isPng: Bool {
         if self.count >= 8 {
             if self.starts(with: [ 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A ]) == true {
                 return true
@@ -132,7 +132,7 @@ public extension Data {
         return false
     }
     
-    var isTiff: Bool {
+    var kk_isTiff: Bool {
         if self.count >= 4 {
             if self.starts(with: [ 0x49, 0x49, 0x2A, 0x00 ]) == true {
                 return true
@@ -144,7 +144,7 @@ public extension Data {
         return false
     }
     
-    var isWebp: Bool {
+    var kk_isWebp: Bool {
         if self.count >= 12 {
             let header = self.subdata(in: 0..<4)
             let footer = self.subdata(in: 8..<12)

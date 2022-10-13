@@ -82,7 +82,7 @@ public extension Database.Query.Table.Update {
             columns: self._columns,
             values: self._values,
             where: self._where,
-            orderBy: self._orderBy.appending(orderBy.query),
+            orderBy: self._orderBy.kk_appending(orderBy.query),
             limit: self._limit
         )
     }

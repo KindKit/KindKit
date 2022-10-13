@@ -77,7 +77,7 @@ public extension UI.Color {
     
     @inlinable
     var isOpaque: Bool {
-        return self.native.isOpaque
+        return self.native.kk_isOpaque
     }
     
 }

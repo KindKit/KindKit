@@ -50,7 +50,7 @@ public extension Database.Query.Table.Delete {
         return .init(
             table: self._table,
             where: self._where,
-            orderBy: self._orderBy.appending(orderBy.query),
+            orderBy: self._orderBy.kk_appending(orderBy.query),
             limit: self._limit
         )
     }

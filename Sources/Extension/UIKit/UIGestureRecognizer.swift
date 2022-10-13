@@ -10,23 +10,23 @@ public typealias NativeGesture = UIGestureRecognizer
 
 public extension UIGestureRecognizer {
     
-    func update(enabled: Bool) {
+    func kk_update(enabled: Bool) {
         self.isEnabled = enabled
     }
 
-    func update(cancelsTouchesInView: Bool) {
+    func kk_update(cancelsTouchesInView: Bool) {
         self.cancelsTouchesInView = cancelsTouchesInView
     }
 
-    func update(delaysTouchesBegan: Bool) {
+    func kk_update(delaysTouchesBegan: Bool) {
         self.delaysTouchesBegan = delaysTouchesBegan
     }
 
-    func update(delaysTouchesEnded: Bool) {
+    func kk_update(delaysTouchesEnded: Bool) {
         self.delaysTouchesEnded = delaysTouchesEnded
     }
 
-    func update(requiresExclusiveTouchType: Bool) {
+    func kk_update(requiresExclusiveTouchType: Bool) {
         self.requiresExclusiveTouchType = requiresExclusiveTouchType
     }
 

@@ -83,7 +83,7 @@ private extension Api.Flow.Query {
         self._task = nil
         switch self._validation(input, output, Date().timeIntervalSince(date)) {
         case .retry(let delay):
-            self._task = DispatchWorkItem.async(
+            self._task = DispatchWorkItem.kk_async(
                 block: { [unowned self] in
                     self._run(date, input)
                 },

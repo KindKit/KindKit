@@ -205,7 +205,7 @@ public extension UI.Layout.List {
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(
                 type: .insert,
-                indices: Array(range: safeIndex ..< safeIndex + items.count),
+                indices: Array.kk_make(range: safeIndex ..< safeIndex + items.count),
                 progress: .zero
             ))
         } else {
@@ -225,7 +225,7 @@ public extension UI.Layout.List {
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(
                 type: .delete,
-                indices: Array(range: range),
+                indices: Array.kk_make(range: range),
                 progress: .zero
             ))
         } else {

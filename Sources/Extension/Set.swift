@@ -6,11 +6,13 @@ import Foundation
 
 public extension Set {
     
-    init(range: Range< Element >) where Element : Strideable, Element.Stride : SignedInteger {
-        self.init()
+    @inlinable
+    static func kk_make(range: Range< Element >) -> Self where Element : Strideable, Element.Stride : SignedInteger {
+        var set = Set()
         for value in range {
-            self.insert(value)
+            set.insert(value)
         }
+        return set
     }
     
 }

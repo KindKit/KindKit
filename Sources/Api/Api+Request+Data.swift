@@ -31,7 +31,7 @@ public extension Api.Request.Data {
         case .file(let url):
             return (
                 raw: try Data(contentsOf: url),
-                mimetype: url.mimeType
+                mimetype: url.kk_mimeType
             )
         case .json(let json):
             return (

@@ -1,25 +1,24 @@
 //
-//  File.swift
-//  
-//
-//  Created by Alexander Trifonov on 19.09.2022.
+//  KindKit
 //
 
 import Foundation
 
 public extension DateFormatter {
     
-    convenience init(
+    @inlinable
+    static func kk_make(
         format: String,
         calendar: Calendar = Calendar.current,
         locale: Locale = Locale.current,
         timeZone: TimeZone = TimeZone.current
-    ) {
-        self.init()
-        self.calendar = calendar
-        self.locale = locale
-        self.dateFormat = format
-        self.timeZone = timeZone
+    ) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = locale
+        formatter.dateFormat = format
+        formatter.timeZone = timeZone
+        return formatter
     }
     
 }

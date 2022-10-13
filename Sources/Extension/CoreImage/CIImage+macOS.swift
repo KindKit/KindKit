@@ -9,7 +9,7 @@ import CoreImage
 
 public extension CIImage {
     
-    func cgImage(withScale scale: CGPoint) -> CGImage? {
+    func kk_cgImage(withScale scale: CGPoint) -> CGImage? {
         guard let cgImage = CIContext(options: nil).createCGImage(self, from: self.extent) else {
             return nil
         }

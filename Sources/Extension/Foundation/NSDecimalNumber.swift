@@ -6,7 +6,7 @@ import Foundation
 
 public extension NSDecimalNumber {
 
-    class func decimalNumber(from string: NSString) -> NSDecimalNumber? {
+    class func kk_decimalNumber(from string: NSString) -> NSDecimalNumber? {
         let formatter = NumberFormatter()
         formatter.generatesDecimalNumbers = true
         formatter.locale = Locale.current;
@@ -25,12 +25,12 @@ public extension NSDecimalNumber {
         return number as? NSDecimalNumber
     }
     
-    class func decimalNumber(from string: String) -> NSDecimalNumber? {
-        return self.decimalNumber(from: string as NSString)
+    class func kk_decimalNumber(from string: String) -> NSDecimalNumber? {
+        return self.kk_decimalNumber(from: string as NSString)
     }
     
-    class func decimalNumber(from string: Substring) -> NSDecimalNumber? {
-        return self.decimalNumber(from: string as NSString)
+    class func kk_decimalNumber(from string: Substring) -> NSDecimalNumber? {
+        return self.kk_decimalNumber(from: string as NSString)
     }
 
 }

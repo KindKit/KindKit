@@ -80,9 +80,9 @@ public extension UI.Container {
             self.isPresented = false
             self.screen = screen
     #if os(macOS)
-            self.animationVelocity = NSScreen.main!.animationVelocity
+            self.animationVelocity = NSScreen.main!.kk_animationVelocity
     #elseif os(iOS)
-            self.animationVelocity = UIScreen.main.animationVelocity
+            self.animationVelocity = UIScreen.main.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
     #endif
             self._layout = Layout()

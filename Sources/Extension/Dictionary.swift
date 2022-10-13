@@ -7,7 +7,7 @@ import Foundation
 public extension Dictionary {
     
     @inlinable
-    func appending(key: Key, value: Value) -> Self {
+    func kk_appending(key: Key, value: Value) -> Self {
         if self.isEmpty == true {
             return [ key : value ]
         }
@@ -17,7 +17,7 @@ public extension Dictionary {
     }
     
     @inlinable
-    func countValues(where: (_ element: Value) -> Bool) -> Int {
+    func kk_countValues(where: (_ element: Value) -> Bool) -> Int {
         var result = 0
         for element in self {
             if `where`(element.value) == true {

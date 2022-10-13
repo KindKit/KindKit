@@ -18,7 +18,7 @@ public extension StringFormatter {
             locale: Locale = Locale.current,
             timeZone: TimeZone = TimeZone.current
         ) {
-            self.formatter = DateFormatter(
+            self.formatter = DateFormatter.kk_make(
                 format: format,
                 calendar: calendar,
                 locale: locale,

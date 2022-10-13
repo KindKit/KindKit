@@ -10,12 +10,12 @@ public typealias NativeView = UIView
 
 public extension UIView {
     
-    func child< View >(of type: View.Type, recursive: Bool) -> View? {
+    func kk_child< View >(of type: View.Type, recursive: Bool) -> View? {
         for subview in self.subviews {
             if let view = subview as? View {
                 return view
             } else if recursive == true {
-                if let view = subview.child(of: type, recursive: recursive) {
+                if let view = subview.kk_child(of: type, recursive: recursive) {
                     return view
                 }
             }
@@ -24,7 +24,7 @@ public extension UIView {
         return nil
     }
     
-    func isChild(of view: UIView, recursive: Bool) -> Bool {
+    func kk_isChild(of view: UIView, recursive: Bool) -> Bool {
         if self === view {
             return true
         }
@@ -32,7 +32,7 @@ public extension UIView {
             if subview === view {
                 return true
             } else if recursive == true {
-                if subview.isChild(of: view, recursive: recursive) == true {
+                if subview.kk_isChild(of: view, recursive: recursive) == true {
                     return true
                 }
             }
@@ -41,15 +41,11 @@ public extension UIView {
         return false
     }
     
-    func update(color: UI.Color?) {
+    func kk_update(color: UI.Color?) {
         self.backgroundColor = color?.native
     }
     
-    func update(tintColor: UI.Color?) {
-        self.tintColor = tintColor?.native
-    }
-    
-    func update(cornerRadius: UI.CornerRadius) {
+    func kk_update(cornerRadius: UI.CornerRadius) {
         let layer = self.layer
         switch cornerRadius {
         case .none:
@@ -69,7 +65,7 @@ public extension UIView {
         }
     }
     
-    func update(border: UI.Border) {
+    func kk_update(border: UI.Border) {
         let layer = self.layer
         switch border {
         case .none:
@@ -81,7 +77,7 @@ public extension UIView {
         }
     }
     
-    func update(shadow: UI.Shadow?) {
+    func kk_update(shadow: UI.Shadow?) {
         let layer = self.layer
         if let shadow = shadow {
             layer.shadowColor = shadow.color.cgColor
@@ -101,7 +97,7 @@ public extension UIView {
         }
     }
     
-    func updateShadowPath() {
+    func kk_updateShadowPath() {
         let layer = self.layer
         if layer.shadowColor != nil {
             layer.shadowPath = CGPath(roundedRect: self.bounds, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius, transform: nil)
@@ -110,7 +106,7 @@ public extension UIView {
         }
     }
     
-    func update(alpha: Float) {
+    func kk_update(alpha: Float) {
         self.alpha = CGFloat(alpha)
     }
     

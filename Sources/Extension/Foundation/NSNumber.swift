@@ -6,7 +6,7 @@ import Foundation
 
 public extension NSNumber {
 
-    class func number(from string: NSString) -> NSNumber? {
+    class func kk_number(from string: NSString) -> NSNumber? {
         let formatter = NumberFormatter()
         formatter.locale = Locale.current;
         formatter.formatterBehavior = .behavior10_4;
@@ -24,12 +24,12 @@ public extension NSNumber {
         return number
     }
     
-    class func number(from string: String) -> NSNumber? {
-        return self.number(from: string as NSString)
+    class func kk_number(from string: String) -> NSNumber? {
+        return self.kk_number(from: string as NSString)
     }
     
-    class func number(from string: Substring) -> NSNumber? {
-        return self.number(from: string as NSString)
+    class func kk_number(from string: Substring) -> NSNumber? {
+        return self.kk_number(from: string as NSString)
     }
 
 }

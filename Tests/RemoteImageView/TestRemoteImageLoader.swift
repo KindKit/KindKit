@@ -8,7 +8,12 @@ import KindKit
 class TestRemoteImageLoader : XCTestCase {
     
     func testLoad() {
-        let loader = RemoteImage.Loader.shared
+        let loader = RemoteImage.Loader(
+            provider: Api.Provider(
+                authenticationChallenge: [ .allowUntrusted ],
+                configuration: .default
+            )
+        )
         let expectation1 = self.expectation(description: "Test")
         let target1 = RemoteImage.Target(
             onImage: { image in
@@ -47,7 +52,12 @@ class TestRemoteImageLoader : XCTestCase {
     }
     
     func testFilter() {
-        let loader = RemoteImage.Loader.shared
+        let loader = RemoteImage.Loader(
+            provider: Api.Provider(
+                authenticationChallenge: [ .allowUntrusted ],
+                configuration: .default
+            )
+        )
         let expectation1 = self.expectation(description: "Test")
         let target1 = RemoteImage.Target(
             onImage: { image in

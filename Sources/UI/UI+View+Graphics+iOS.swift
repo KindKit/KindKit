@@ -115,8 +115,8 @@ extension KKGraphicsView {
     func update(view: UI.View.Graphics) {
         self.update(canvas: view.canvas)
         self.update(locked: view.isLocked)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
     }
     
     func update(locked: Bool) {

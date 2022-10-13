@@ -6,11 +6,11 @@ import Foundation
 
 public extension String {
 
-    func remove(_ characterSet: CharacterSet) -> String {
+    func kk_remove(_ characterSet: CharacterSet) -> String {
         return self.components(separatedBy: characterSet).joined()
     }
 
-    func replace(keys: [String : String]) -> String {
+    func kk_replace(keys: [String : String]) -> String {
         var result = self
         keys.forEach { (key: String, value: String) in
             if let range = result.range(of: key) {
@@ -20,7 +20,7 @@ public extension String {
         return result
     }
 
-    func applyMask(mask: String) -> String {
+    func kk_applyMask(mask: String) -> String {
         var result = String()
         var maskIndex = mask.startIndex
         let maskEndIndex = mask.endIndex
@@ -58,67 +58,67 @@ public extension String {
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md2: String? {
+    var kk_md2: String? {
         if let data = self.data(using: .utf8) {
-            return data.md2.hexString
+            return data.kk_md2.kk_hexString
         }
         return nil
     }
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md4: String? {
+    var kk_md4: String? {
         if let data = self.data(using: .utf8) {
-            return data.md4.hexString
+            return data.kk_md4.kk_hexString
         }
         return nil
     }
 
     @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    var md5: String? {
+    var kk_md5: String? {
         if let data = self.data(using: .utf8) {
-            return data.md5.hexString
+            return data.kk_md5.kk_hexString
         }
         return nil
     }
 
-    var sha1: String? {
+    var kk_sha1: String? {
         if let data = self.data(using: .utf8) {
-            return data.sha1.hexString
+            return data.kk_sha1.kk_hexString
         }
         return nil
     }
 
-    var sha224: String? {
+    var kk_sha224: String? {
         if let data = self.data(using: .utf8) {
-            return data.sha224.hexString
+            return data.kk_sha224.kk_hexString
         }
         return nil
     }
 
-    var sha256: String? {
+    var kk_sha256: String? {
         if let data = self.data(using: .utf8) {
-            return data.sha256.hexString
+            return data.kk_sha256.kk_hexString
         }
         return nil
     }
 
-    var sha384: String? {
+    var kk_sha384: String? {
         if let data = self.data(using: .utf8) {
-            return data.sha384.hexString
+            return data.kk_sha384.kk_hexString
         }
         return nil
     }
     
-    var sha512: String? {
+    var kk_sha512: String? {
         if let data = self.data(using: .utf8) {
-            return data.sha512.hexString
+            return data.kk_sha512.kk_hexString
         }
         return nil
     }
 
-    func components(pairSeparatedBy: String, valueSeparatedBy: String) -> [String: Any] {
+    func kk_components(pairSeparatedBy: String, valueSeparatedBy: String) -> [String: Any] {
         var components: [String: Any] = [:]
         for keyValuePair in self.components(separatedBy: pairSeparatedBy) {
             let pair = keyValuePair.components(separatedBy: valueSeparatedBy)
@@ -144,11 +144,11 @@ public extension String {
         return components
     }
 
-    func range(from nsRange: NSRange) -> Range< Index >? {
+    func kk_range(from nsRange: NSRange) -> Range< Index >? {
         return Range< Index >(nsRange, in: self)
     }
 
-    func nsRange(from range: Range< Index >) -> NSRange {
+    func kk_nsRange(from range: Range< Index >) -> NSRange {
         guard
             let from = range.lowerBound.samePosition(in: utf16),
             let to = range.upperBound.samePosition(in: utf16)
@@ -162,9 +162,9 @@ public extension String {
     }
     
     @inlinable
-    func size(font: UI.Font, available: SizeFloat) -> SizeFloat {
+    func kk_size(font: UI.Font, available: SizeFloat) -> SizeFloat {
         let attributed = NSAttributedString(string: self, attributes: [ .font : font.native ])
-        return attributed.size(available: available)
+        return attributed.kk_size(available: available)
     }
 
 }

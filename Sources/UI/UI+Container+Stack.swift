@@ -86,9 +86,9 @@ public extension UI.Container {
             self.screen = screen
             self.hidesGroupBarWhenPushed = hidesGroupBarWhenPushed
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.animationVelocity
+            self.animationVelocity = NSScreen.main!.kk_animationVelocity
 #elseif os(iOS)
-            self.animationVelocity = UIScreen.main.animationVelocity
+            self.animationVelocity = UIScreen.main.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.45)
 #endif
             self._root = Item(container: root)
@@ -449,7 +449,7 @@ private extension UI.Container.Stack {
 #if os(iOS)
         self._interactiveGesture.onShouldBeRequiredToFailBy({ [unowned self] _, gesture in
             guard let gestureView = gesture.view else { return false }
-            return self._view.native.isChild(of: gestureView, recursive: true)
+            return self._view.native.kk_isChild(of: gestureView, recursive: true)
         }).onShouldBegin({ [unowned self] _ in
             guard self._items.count > 0 else { return false }
             guard self.shouldInteractive == true else { return false }

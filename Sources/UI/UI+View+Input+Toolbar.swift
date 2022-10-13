@@ -43,7 +43,7 @@ public extension UI.View.Input {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.kk_update(color: self.color)
                 }
             }
         }

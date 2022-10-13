@@ -68,7 +68,7 @@ public extension UI.View {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.kk_update(color: self.color)
                 }
             }
         }
@@ -76,7 +76,7 @@ public extension UI.View {
             didSet {
                 guard self.alpha != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(alpha: self.alpha)
+                    self._view.kk_update(alpha: self.alpha)
                 }
             }
         }
