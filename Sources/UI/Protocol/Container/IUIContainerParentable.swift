@@ -17,15 +17,11 @@ public extension IUIContainerParentable where Self : IUIContainer {
     
     #if os(iOS)
     
-    var viewController: UIViewController? {
-        return self.parent?.viewController
+    var uiViewController: UIViewController? {
+        return self.parent?.uiViewController
     }
     
     #endif
-    
-}
-
-public extension IUIContainerParentable where Self : IUIContainer {
     
     func inheritedInsets(interactive: Bool) -> InsetFloat {
         guard let parent = self.parent else { return .zero }

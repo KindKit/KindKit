@@ -17,12 +17,17 @@ public protocol IUIWireframe {
 
 public extension IUIWireframe {
     
-    #if os(iOS)
+#if os(iOS)
     
-    var viewController: UIViewController? {
-        return self.container.viewController
+    var uiViewController: UIViewController? {
+        return self.container.uiViewController
     }
     
-    #endif
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        return self.container.dismiss(animated: animated, completion: completion)
+    }
+    
+#endif
     
 }

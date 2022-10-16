@@ -20,12 +20,19 @@ public extension IUIPageContentContainer {
     }
     
     @inlinable
-    func updatePageBar(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let pageContainer = self.pageContainer else {
-            completion?()
-            return
-        }
-        pageContainer.updateBar(animated: animated, completion: completion)
+    @discardableResult
+    func updateBar(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pageContainer else { return false }
+        container.updateBar(animated: animated, completion: completion)
+        return true
+    }
+    
+    @inlinable
+    @discardableResult
+    func updateItem(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pageContainer else { return false }
+        container.update(container: self, animated: animated, completion: completion)
+        return true
     }
     
 }

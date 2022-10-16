@@ -47,12 +47,12 @@ public extension UI.Layout {
         }
         public var views: [IUIView] {
             set {
-                self._items = newValue.compactMap({ UI.Layout.Item($0) })
+                self._items = newValue.map({ UI.Layout.Item($0) })
                 self._cache = Array< SizeFloat? >(repeating: nil, count: newValue.count)
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
-            get { return self._items.compactMap({ $0.view }) }
+            get { return self._items.map({ $0.view }) }
         }
         public private(set) var isAnimating: Bool
         
@@ -95,7 +95,7 @@ public extension UI.Layout {
                 alignment: alignment,
                 inset: inset,
                 spacing: spacing,
-                items: views.compactMap({ return UI.Layout.Item($0) })
+                items: views.map({ UI.Layout.Item($0) })
             )
         }
         
@@ -180,7 +180,7 @@ public extension UI.Layout.List {
     }
     
     func indices(items: [UI.Layout.Item]) -> [Int] {
-        return items.compactMap({ item in self.items.firstIndex(of: item) }).sorted()
+        return items.compactMap({ self.items.firstIndex(of: $0) }).sorted()
     }
     
     func animate(
@@ -216,7 +216,7 @@ public extension UI.Layout.List {
     func insert(index: Int, views: [IUIView]) {
         self.insert(
             index: index,
-            items: views.compactMap({ return UI.Layout.Item($0) })
+            items: views.map({ UI.Layout.Item($0) })
         )
     }
     
@@ -257,7 +257,7 @@ public extension UI.Layout.List {
     
     func delete(views: [IUIView]) {
         self.delete(
-            items: views.compactMap({ return $0.appearedItem })
+            items: views.compactMap({ $0.appearedItem })
         )
     }
     

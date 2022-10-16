@@ -47,7 +47,7 @@ public extension UI.Container {
             return self._root.container
         }
         public var containers: [IUIStackContentContainer] {
-            return self._items.compactMap({ $0.container })
+            return self._items.map({ $0.container })
         }
         public var current: IUIStackContentContainer {
             return self._current.container
@@ -248,7 +248,7 @@ public extension UI.Container {
                     return containers.contains(where: { item.container === $0 }) == false
                 })
                 let inheritedInsets = self.inheritedInsets(interactive: true)
-                self._items = containers.compactMap({ container in
+                self._items = containers.map({ container in
                     if let item = self._items.first(where: { $0.container === container }) {
                         return item
                     }

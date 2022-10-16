@@ -43,7 +43,7 @@ public extension UI.Container {
         public var supportedOrientations: UIInterfaceOrientationMask {
             return self.content.supportedOrientations
         }
-        public var viewController: UIViewController? {
+        public var uiViewController: UIViewController? {
             return self.delegate?.viewController()
         }
 #endif
@@ -60,14 +60,6 @@ public extension UI.Container {
             didSet {
                 guard self.statusBarSubstrate !== oldValue else { return }
                 self._layout.statusBar = self.statusBarSubstrate.flatMap({ UI.Layout.Item($0) })
-            }
-        }
-        public var safeArea: InsetFloat {
-            didSet {
-                guard self.safeArea != oldValue else { return }
-                if self.isPresented == true {
-                    self.didChangeInsets()
-                }
             }
         }
         public var overlay: IUIRootContentContainer? {
@@ -106,6 +98,14 @@ public extension UI.Container {
                 }
             }
         }
+        public var safeArea: InsetFloat = .zero {
+            didSet {
+                guard self.safeArea != oldValue else { return }
+                if self.isPresented == true {
+                    self.didChangeInsets()
+                }
+            }
+        }
         
         private var _layout: Layout
         private var _view: UI.View.Custom
@@ -119,7 +119,6 @@ public extension UI.Container {
             self.statusBarSubstrate = statusBarSubstrate
             self.overlay = overlay
             self.content = content
-            self.safeArea = .zero
             self._layout = Layout(
                 statusBar: statusBarSubstrate.flatMap({ UI.Layout.Item($0) }),
                 overlay: overlay.flatMap({ UI.Layout.Item($0.view) }),

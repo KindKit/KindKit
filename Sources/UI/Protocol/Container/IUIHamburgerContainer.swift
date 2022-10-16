@@ -44,6 +44,10 @@ public extension IUIHamburgerContainer {
     }
     
     func set(leading: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
+        guard self.leading !== leading else {
+        	completion?()
+        	return
+        }
         if animated == true {
             if self.isShowedLeading == true {
                 self.hideLeading(animated: animated, completion: { [unowned self] in
@@ -52,13 +56,19 @@ public extension IUIHamburgerContainer {
                 })
             } else {
                 self.leading = leading
+        		completion?()
             }
         } else {
             self.leading = leading
+        	completion?()
         }
     }
     
     func set(trailing: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
+        guard self.trailing !== trailing else {
+        	completion?()
+        	return
+        }
         if animated == true {
             if self.isShowedTrailing == true {
                 self.hideTrailing(animated: animated, completion: { [unowned self] in
@@ -67,9 +77,11 @@ public extension IUIHamburgerContainer {
                 })
             } else {
                 self.trailing = trailing
+        		completion?()
             }
         } else {
             self.trailing = trailing
+        	completion?()
         }
     }
     

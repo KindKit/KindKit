@@ -146,7 +146,7 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
-    func spinner(_ value: (IUIView & IUIViewAnimatable)?) -> Self {
+    func spinner(_ value: IUIView?) -> Self {
         self.spinner = value
         return self
     }

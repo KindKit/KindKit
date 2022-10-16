@@ -6,18 +6,18 @@ import Foundation
 
 public protocol IUIStickyContainer : IUIContainer, IUIContainerParentable {
     
-    var overlay: UI.View.Bar { get }
-    var overlayVisibility: Float { get }
-    var overlayHidden: Bool { get }
+    var sticky: UI.View.Bar { get }
+    var stickyVisibility: Float { get }
+    var stickyHidden: Bool { get }
     
-    func updateOverlay(animated: Bool, completion: (() -> Void)?)
+    func updateSticky(animated: Bool, completion: (() -> Void)?)
     
 }
 
 public extension IUIStickyContainer {
     
-    func updateOverlay(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.updateOverlay(animated: animated, completion: completion)
+    func updateSticky(animated: Bool = true, completion: (() -> Void)? = nil) {
+        self.updateSticky(animated: animated, completion: completion)
     }
     
 }

@@ -19,13 +19,11 @@ public extension IUIPushContentContainer {
         return self.parent as? IUIPushContainer
     }
     
-    @inlinable
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let pushContainer = self.pushContainer else {
-            completion?()
-            return
-        }
-        pushContainer.dismiss(container: self, animated: animated, completion: completion)
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pushContainer else { return false }
+        container.dismiss(container: self, animated: animated, completion: completion)
+        return true
     }
     
 }

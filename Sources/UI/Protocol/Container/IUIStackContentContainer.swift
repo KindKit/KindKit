@@ -22,21 +22,19 @@ public extension IUIStackContentContainer {
     }
     
     @inlinable
-    func pop(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let stackContainer = self.stackContainer else {
-            completion?()
-            return
-        }
-        stackContainer.pop(animated: animated, completion: completion)
+    @discardableResult
+    func pop(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.stackContainer else { return false }
+        container.pop(animated: animated, completion: completion)
+        return true
     }
     
     @inlinable
-    func popToRoot(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let stackContainer = self.stackContainer else {
-            completion?()
-            return
-        }
-        stackContainer.popToRoot(animated: animated, completion: completion)
+    @discardableResult
+    func popToRoot(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.stackContainer else { return false }
+        container.popToRoot(animated: animated, completion: completion)
+        return true
     }
     
 }

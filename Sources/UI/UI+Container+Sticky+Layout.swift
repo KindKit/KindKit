@@ -16,58 +16,58 @@ extension UI.Container.Sticky {
                 self.setNeedUpdate()
             }
         }
-        var overlay: UI.Layout.Item {
+        var sticky: UI.Layout.Item {
             didSet {
-                guard self.overlay != oldValue else { return }
+                guard self.sticky != oldValue else { return }
                 self.setNeedUpdate()
             }
         }
-        var overlayInset: Float {
+        var stickyInset: Float {
             didSet {
-                guard self.overlayInset != oldValue else { return }
+                guard self.stickyInset != oldValue else { return }
                 self.setNeedUpdate()
             }
         }
-        var overlayVisibility: Float {
+        var stickyVisibility: Float {
             didSet {
-                guard self.overlayVisibility != oldValue else { return }
+                guard self.stickyVisibility != oldValue else { return }
                 self.setNeedUpdate()
             }
         }
-        var overlayHidden: Bool {
+        var stickyHidden: Bool {
             didSet {
-                guard self.overlayHidden != oldValue else { return }
+                guard self.stickyHidden != oldValue else { return }
                 self.setNeedUpdate()
             }
         }
-        var overlaySize: SizeFloat?
+        var stickySize: SizeFloat?
         
         init(
             content: UI.Layout.Item,
-            overlay: UI.Layout.Item,
-            overlayInset: Float = 0,
-            overlayVisibility: Float = 0,
-            overlayHidden: Bool
+            sticky: UI.Layout.Item,
+            stickyInset: Float = 0,
+            stickyVisibility: Float = 0,
+            stickyHidden: Bool
         ) {
             self.content = content
-            self.overlay = overlay
-            self.overlayInset = overlayInset
-            self.overlayVisibility = overlayVisibility
-            self.overlayHidden = overlayHidden
+            self.sticky = sticky
+            self.stickyInset = stickyInset
+            self.stickyVisibility = stickyVisibility
+            self.stickyHidden = stickyHidden
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
             self.content.frame = bounds
-            if self.overlayHidden == false {
-                let overlaySize = self.overlay.size(available: bounds.size)
-                self.overlay.frame = RectFloat(
+            if self.stickyHidden == false {
+                let stickySize = self.sticky.size(available: bounds.size)
+                self.sticky.frame = RectFloat(
                     bottomLeft: bounds.bottomLeft,
                     size: SizeFloat(
                         width: bounds.size.width,
-                        height: self.overlayInset + (overlaySize.height * self.overlayVisibility)
+                        height: self.stickyInset + (stickySize.height * self.stickyVisibility)
                     )
                 )
-                self.overlaySize = overlaySize
+                self.stickySize = stickySize
             }
             return bounds.size
         }
@@ -77,8 +77,8 @@ extension UI.Container.Sticky {
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            if self.overlayHidden == false {
-                return [ self.content, self.overlay ]
+            if self.stickyHidden == false {
+                return [ self.content, self.sticky ]
             }
             return [ self.content ]
         }

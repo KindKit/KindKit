@@ -23,4 +23,11 @@ public extension IUIScreenGroupable where Self : IUIScreen {
         return self.groupContentContainer?.groupContainer
     }
     
+    @inlinable
+    @discardableResult
+    func pageUpdate(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.groupContentContainer else { return false }
+        return container.updateItem(animated: animated, completion: completion)
+    }
+    
 }

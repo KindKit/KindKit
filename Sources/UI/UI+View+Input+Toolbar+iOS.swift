@@ -70,7 +70,7 @@ extension KKInputToolbarView {
     }
     
     func update(items: [IInputToolbarItem]) {
-        let barItems = items.compactMap({ return $0.barItem })
+        let barItems = items.map({ $0.barItem })
         for barItem in barItems {
             barItem.target = self
             barItem.action = #selector(self._pressed(_:))

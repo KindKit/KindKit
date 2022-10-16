@@ -87,7 +87,7 @@ extension KKAnimatedImageView {
     }
     
     func update(images: [UI.Image]) {
-        self.animationImages = images.compactMap({ $0.native })
+        self.animationImages = images.map({ $0.native })
         self.image = self.animationImages?.first
     }
     

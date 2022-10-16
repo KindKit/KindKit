@@ -26,10 +26,10 @@ public extension UI.Layout {
         }
         public var views: [IUIView] {
             set {
-                self._items = newValue.compactMap({ UI.Layout.Item($0) })
+                self._items = newValue.map({ UI.Layout.Item($0) })
                 self.setNeedForceUpdate()
             }
-            get { return self._items.compactMap({ $0.view }) }
+            get { return self._items.map({ $0.view }) }
         }
         
         private var _items: [UI.Layout.Item]
@@ -48,7 +48,7 @@ public extension UI.Layout {
         ) {
             self.init(
                 direction: direction,
-                items: views.compactMap({ return UI.Layout.Item($0) })
+                items: views.map({ UI.Layout.Item($0) })
             )
         }
         

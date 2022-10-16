@@ -24,16 +24,10 @@ public extension IUIScreenPageable where Self : IUIScreen {
     }
     
     @inlinable
-    func updatePage(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let contentContainer = self.pageContentContainer else {
-            completion?()
-            return
-        }
-        guard let container = contentContainer.pageContainer else {
-            completion?()
-            return
-        }
-        container.update(container: contentContainer, animated: animated, completion: completion)
+    @discardableResult
+    func pageUpdate(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pageContentContainer else { return false }
+        return container.updateItem(animated: animated, completion: completion)
     }
     
 }

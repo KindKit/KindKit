@@ -74,7 +74,7 @@ public extension UI.Container {
             }
         }
         public var containers: [IUIModalContentContainer] {
-            return self._items.compactMap({ return $0.container })
+            return self._items.map({ return $0.container })
         }
         public var previous: IUIModalContentContainer? {
             return self._previous?.container

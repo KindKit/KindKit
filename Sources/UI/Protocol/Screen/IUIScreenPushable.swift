@@ -31,9 +31,10 @@ public extension IUIScreenPushable where Self : IUIScreen {
         return self.pushContentContainer?.pushContainer
     }
     
-    @inlinable
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.pushContentContainer?.dismiss(animated: animated, completion: completion)
+    @discardableResult
+    func pushDismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pushContentContainer else { return false }
+        return container.dismiss(animated: animated, completion: completion)
     }
     
 }

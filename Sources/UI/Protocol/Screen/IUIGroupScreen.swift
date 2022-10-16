@@ -10,14 +10,11 @@ public protocol IUIGroupScreen : IUIScreen {
     var groupBarVisibility: Float { get }
     var groupBarHidden: Bool { get }
     
+    func change(current: IUIGroupContentContainer)
+    
 }
 
 public extension IUIGroupScreen {
-    
-    @inlinable
-    var groupContainer: IUIGroupContainer? {
-        return self.container as? IUIGroupContainer
-    }
     
     var groupBarVisibility: Float {
         return 1
@@ -27,12 +24,23 @@ public extension IUIGroupScreen {
         return false
     }
     
-    func updateGroupBar(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let groupContainer = self.groupContainer else {
-            completion?()
-            return
-        }
-        groupContainer.updateBar(animated: animated, completion: completion)
+    func change(current: IUIGroupContentContainer) {
+    }
+    
+}
+
+public extension IUIGroupScreen {
+    
+    @inlinable
+    var groupContainer: IUIGroupContainer? {
+        return self.container as? IUIGroupContainer
+    }
+    
+    @discardableResult
+    func update(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.groupContainer else { return false }
+        container.updateBar(animated: animated, completion: completion)
+        return true
     }
     
 }
