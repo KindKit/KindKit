@@ -21,12 +21,11 @@ public extension IUIModalContentContainer {
     }
     
     @inlinable
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let modalContainer = self.modalContainer else {
-            completion?()
-            return
-        }
-        modalContainer.dismiss(container: self, animated: animated, completion: completion)
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.modalContainer else { return false }
+        container.dismiss(container: self, animated: animated, completion: completion)
+        return true
     }
     
 }

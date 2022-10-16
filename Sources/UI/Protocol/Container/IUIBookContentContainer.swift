@@ -12,6 +12,7 @@ public protocol IUIBookContentContainer : IUIContainer, IUIContainerParentable {
 
 public extension IUIBookContentContainer {
     
+    @inlinable
     var bookContainer: IUIBookContainer? {
         return self.parent as? IUIBookContainer
     }

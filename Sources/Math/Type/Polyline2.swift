@@ -48,7 +48,7 @@ public extension Polyline2 {
     
     @inlinable
     var segments: [Segment2< Value >] {
-        return self.edges.compactMap({ self[segment: $0] })
+        return self.edges.map({ self[segment: $0] })
     }
     
     @inlinable
@@ -89,7 +89,7 @@ public extension Polyline2 {
     
     func offset(distance: Point< Value >) -> Self {
         guard distance !~ .zero else { return self }
-        return Polyline2(corners: self.corners.compactMap({ $0 + distance }))
+        return Polyline2(corners: self.corners.map({ $0 + distance }))
     }
     
     func outline(distance: Value) -> Self {

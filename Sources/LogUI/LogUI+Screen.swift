@@ -170,7 +170,7 @@ private extension LogUI.Screen {
     
     func _reload() {
         self._entities = self._entities(self.target.items.filter({ self._filter($0) }))
-        self.layout.views = self._entities.compactMap({ $0.cell })
+        self.layout.views = self._entities.map({ $0.cell })
         self.view.layoutIfNeeded()
         self._scrollToBottom()
     }
@@ -190,7 +190,7 @@ private extension LogUI.Screen {
     }
     
     func _entities(_ items: [LogUI.Target.Item]) -> [Entity] {
-        return items.compactMap({ self._entity($0) })
+        return items.map({ self._entity($0) })
     }
     
     func _entity(_ item: LogUI.Target.Item) -> Entity {

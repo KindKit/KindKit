@@ -14,16 +14,25 @@ public protocol IUIGroupContentContainer : IUIContainer, IUIContainerParentable 
 
 public extension IUIGroupContentContainer {
     
+    @inlinable
     var groupContainer: IUIGroupContainer? {
         return self.parent as? IUIGroupContainer
     }
     
-    func updateGroupBar(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let groupContainer = self.groupContainer else {
-            completion?()
-            return
-        }
-        groupContainer.updateBar(animated: animated, completion: completion)
+    @inlinable
+    @discardableResult
+    func updateBar(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.groupContainer else { return false }
+        container.updateBar(animated: animated, completion: completion)
+        return true
+    }
+    
+    @inlinable
+    @discardableResult
+    func updateItem(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.groupContainer else { return false }
+        container.update(container: self, animated: animated, completion: completion)
+        return true
     }
     
 }

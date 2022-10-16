@@ -42,7 +42,7 @@ public extension UI.View {
                 for itemView in self._items {
                     itemView.delegate = self
                 }
-                self._contentLayout.items = self.items.compactMap({ UI.Layout.Item($0) })
+                self._contentLayout.items = newValue.map({ UI.Layout.Item($0) })
             }
             get { return self._items }
         }

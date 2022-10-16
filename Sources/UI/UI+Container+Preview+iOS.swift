@@ -28,8 +28,8 @@ public extension UI.Container {
             self.viewController = .init(container)
         }
         
-        public init(
-            _ container: IUIRootContentContainer
+        public init< Container : IUIRootContentContainer >(
+            _ container: Container
         ) {
             self.viewController = .init(container)
         }

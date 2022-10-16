@@ -87,8 +87,8 @@ extension KKGradientView {
         case .axial: self._layer.type = .axial
         case .radial: self._layer.type = .radial
         }
-        self._layer.colors = fill.points.compactMap({ return $0.color.cgColor })
-        self._layer.locations = fill.points.compactMap({ return NSNumber(value: $0.location) })
+        self._layer.colors = fill.points.map({ $0.color.cgColor })
+        self._layer.locations = fill.points.map({ NSNumber(value: $0.location) })
         self._layer.startPoint = fill.start.cgPoint
         self._layer.endPoint = fill.end.cgPoint
     }

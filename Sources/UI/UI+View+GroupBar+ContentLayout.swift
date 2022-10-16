@@ -30,7 +30,7 @@ extension UI.View.GroupBar {
         
         func invalidate(item: UI.Layout.Item) {
             if let index = self.items.firstIndex(of: item) {
-                self._cache.remove(at: index)
+                self._cache[index] = nil
             }
         }
         

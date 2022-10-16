@@ -24,11 +24,6 @@ public protocol IUIPageScreen : IUIScreen {
 
 public extension IUIPageScreen {
     
-    @inlinable
-    var pageContainer: IUIPageContainer? {
-        return self.container as? IUIPageContainer
-    }
-    
     var pageBarVisibility: Float {
         return 1
     }
@@ -56,12 +51,16 @@ public extension IUIPageScreen {
 
 public extension IUIPageScreen {
     
-    func updatePageBar(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let pageContainer = self.pageContainer else {
-            completion?()
-            return
-        }
-        pageContainer.updateBar(animated: animated, completion: completion)
+    @inlinable
+    var pageContainer: IUIPageContainer? {
+        return self.container as? IUIPageContainer
+    }
+    
+    @discardableResult
+    func update(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.pageContainer else { return false }
+        container.updateBar(animated: animated, completion: completion)
+        return true
     }
     
 }

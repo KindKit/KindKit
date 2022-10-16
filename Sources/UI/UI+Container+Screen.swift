@@ -26,20 +26,16 @@ public extension UI.Container {
         }
 #if os(iOS)
         public var statusBar: UIStatusBarStyle {
-            guard let screen = self.screen as? IScreenStatusable else { return .default }
-            return screen.statusBar
+            return self.screen.statusBar
         }
         public var statusBarAnimation: UIStatusBarAnimation {
-            guard let screen = self.screen as? IScreenStatusable else { return .fade }
-            return screen.statusBarAnimation
+            return self.screen.statusBarAnimation
         }
         public var statusBarHidden: Bool {
-            guard let screen = self.screen as? IScreenStatusable else { return false }
-            return screen.statusBarHidden
+            return self.screen.statusBarHidden
         }
         public var supportedOrientations: UIInterfaceOrientationMask {
-            guard let screen = self.screen as? IScreenOrientable else { return .all }
-            return screen.supportedOrientations
+            return self.screen.supportedOrientations
         }
 #endif
         public private(set) var isPresented: Bool
@@ -50,6 +46,18 @@ public extension UI.Container {
         
         private let _layout: Layout
         private let _view: UI.View.Custom
+#if os(iOS)
+        private var _virtualKeyboard = VirtualKeyboard()
+        private var _virtualKeyboardHeight: Float = 0 {
+            didSet {
+                guard self._virtualKeyboardHeight != oldValue else { return }
+                self.didChangeInsets()
+            }
+        }
+        private var _virtualKeyboardAnimation: IAnimationTask? {
+            willSet { self._virtualKeyboardAnimation?.cancel() }
+        }
+#endif
         
         public init(
             _ screen: Screen
@@ -66,7 +74,13 @@ public extension UI.Container {
         }
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
+            let inheritedInsets = self.inheritedInsets(interactive: interactive)
+            return .init(
+                top: inheritedInsets.top,
+                left: inheritedInsets.left,
+                right: inheritedInsets.right,
+                bottom: max(self._virtualKeyboardHeight, inheritedInsets.bottom)
+            )
         }
         
         public func didChangeInsets() {
@@ -123,6 +137,10 @@ public extension UI.Container {
 private extension UI.Container.Screen {
     
     func _setup() {
+#if os(iOS)
+        self._subscribeVirtualKeyboard()
+#endif
+        
         self.screen.container = self
         self.screen.setup()
         
@@ -130,11 +148,65 @@ private extension UI.Container.Screen {
     }
     
     func _destroy() {
+#if os(iOS)
+        self._unsubscribeVirtualKeyboard()
+#endif
         self.screen.container = nil
         self.screen.destroy()
     }
     
+#if os(iOS)
+    
+    func _subscribeVirtualKeyboard() {
+        self._virtualKeyboard.add(observer: self, priority: .public)
+    }
+    
+    func _unsubscribeVirtualKeyboard() {
+        self._virtualKeyboard.remove(observer: self)
+        self._virtualKeyboardAnimation?.cancel()
+    }
+    
+    func _updateVirtualKeyboardHeight(duration: TimeInterval, height: Float) {
+        guard abs(self._virtualKeyboardHeight - height) > .leastNonzeroMagnitude else { return }
+        self._virtualKeyboardAnimation?.cancel()
+        self._virtualKeyboardAnimation = Animation.default.run(
+            duration: duration,
+            processing: { [unowned self] progress in
+                self._virtualKeyboardHeight = self._virtualKeyboardHeight.lerp(height, progress: progress)
+            },
+            completion: { [unowned self] in
+                self._virtualKeyboardAnimation = nil
+                self._virtualKeyboardHeight = height
+                self.didChangeInsets()
+            }
+        )
+    }
+    
+#endif
+    
 }
+
+#if os(iOS)
+
+extension UI.Container.Screen : IVirtualKeyboardObserver {
+    
+    public func willShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+        self._updateVirtualKeyboardHeight(duration: info.duration, height: info.endFrame.height)
+    }
+    
+    public func didShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+    public func willHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+        self._updateVirtualKeyboardHeight(duration: info.duration, height: 0)
+    }
+    
+    public func didHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+}
+
+#endif
 
 extension UI.Container.Screen : IUIRootContentContainer {
 }

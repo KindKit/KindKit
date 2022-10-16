@@ -51,9 +51,10 @@ public extension IUIScreenDialogable where Self : IUIScreen {
         return self.dialogContentContainer?.dialogContainer
     }
     
-    @inlinable
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.dialogContentContainer?.dismiss(animated: animated, completion: completion)
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.dialogContentContainer else { return false }
+        return container.dismiss(animated: animated, completion: completion)
     }
     
 }

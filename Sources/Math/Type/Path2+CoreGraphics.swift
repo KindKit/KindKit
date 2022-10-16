@@ -24,7 +24,7 @@ public extension Path2 {
     }
     
     init(_ cgPath: CGPath) {
-        self.elements = cgPath.elements.compactMap({
+        self.elements = cgPath.elements.map({
             switch $0.type {
             case .moveToPoint: return .move(to: Point($0.points[0]))
             case .addLineToPoint: return .line(to: Point($0.points[0]))

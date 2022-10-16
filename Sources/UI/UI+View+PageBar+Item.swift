@@ -59,6 +59,20 @@ public extension UI.View.PageBar {
             self.modify(configure)
         }
         
+        public convenience init(
+            _ content: IUILayout
+        ) {
+            self.init(UI.View.Custom(content))
+        }
+        
+        public convenience init(
+            content: IUILayout,
+            configure: (Item) -> Void
+        ) {
+            self.init(content)
+            self.modify(configure)
+        }
+        
     }
     
 }

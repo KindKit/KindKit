@@ -11,12 +11,6 @@ public extension UI {
     final class ViewController : UIViewController {
         
         public let container: UI.Container.Root
-        public private(set) var virtualKeyboardHeight: Float {
-            didSet {
-                guard self.virtualKeyboardHeight != oldValue else { return }
-                self._updateSafeArea()
-            }
-        }
         public override var preferredStatusBarStyle: UIStatusBarStyle {
             return self.container.statusBar
         }
@@ -49,25 +43,18 @@ public extension UI {
                 }
             }
         }
-        private var _virtualKeyboard: VirtualKeyboard
-        private var _virtualKeyboardAnimation: IAnimationTask? {
-            willSet { self._virtualKeyboardAnimation?.cancel() }
-        }
         private var _owner: AnyObject?
         
         private init(
-            container: UI.Container.Root,
-            owner: AnyObject? = nil
+            owner: AnyObject? = nil,
+            container: UI.Container.Root
         ) {
             self.container = container
-            self.virtualKeyboardHeight = 0
-            self._virtualKeyboard = VirtualKeyboard()
             self._owner = owner
             
             super.init(nibName: nil, bundle: nil)
             
             self.container.delegate = self
-            self._virtualKeyboard.add(observer: self, priority: .public)
             UI.Container.BarController.shared.add(observer: self)
             
             if #available(iOS 13, *) {
@@ -76,14 +63,14 @@ public extension UI {
             }
         }
         
-        convenience init(
+        public convenience init(
             _ container: UI.Container.Root
         ) {
             self.init(container: container)
         }
         
-        public convenience init(
-            _ container: IUIRootContentContainer
+        public convenience init< Container : IUIRootContentContainer >(
+            _ container: Container
         ) {
             self.init(UI.Container.Root(
                 content: container
@@ -100,8 +87,8 @@ public extension UI {
             _ wireframe: Wireframe
         ) where Wireframe : AnyObject, Wireframe.Container == UI.Container.Root {
             self.init(
-                container: wireframe.container,
-                owner: wireframe
+                owner: wireframe,
+                container: wireframe.container
             )
         }
         
@@ -109,10 +96,10 @@ public extension UI {
             _ wireframe: Wireframe
         ) where Wireframe : AnyObject, Wireframe.Container : IUIRootContentContainer {
             self.init(
+                owner: wireframe,
                 container: UI.Container.Root(
                     content: wireframe.container
-                ),
-                owner: wireframe
+                )
             )
         }
         
@@ -204,24 +191,6 @@ extension UI.ViewController : IRootContainerDelegate {
     
 }
 
-extension UI.ViewController : IVirtualKeyboardObserver {
-    
-    public func willShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
-        self._updateVirtualKeyboardHeight(duration: info.duration, height: info.endFrame.height)
-    }
-    
-    public func didShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
-    }
-    
-    public func willHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
-        self._updateVirtualKeyboardHeight(duration: info.duration, height: 0)
-    }
-    
-    public func didHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
-    }
-    
-}
-
 extension UI.ViewController : IContainerBarControllerObserver {
     
     public func changed(_ barController: UI.Container.BarController) {
@@ -233,8 +202,6 @@ extension UI.ViewController : IContainerBarControllerObserver {
 private extension UI.ViewController {
     
     func _free() {
-        self._virtualKeyboard.remove(observer: self)
-        self._virtualKeyboardAnimation?.cancel()
         UI.Container.BarController.shared.remove(observer: self)
         NotificationCenter.default.removeObserver(self)
     }
@@ -271,38 +238,16 @@ private extension UI.ViewController {
     }
     
     func _safeArea() -> InsetFloat {
-        let safeArea: InsetFloat
         if #available(iOS 11.0, *) {
-            safeArea = InsetFloat(self.view.safeAreaInsets) + InsetFloat(self.additionalSafeAreaInsets)
+            return InsetFloat(self.view.safeAreaInsets) + InsetFloat(self.additionalSafeAreaInsets)
         } else {
-            safeArea = InsetFloat(
+            return InsetFloat(
                 top: Float(self.topLayoutGuide.length),
                 left: 0,
                 right: 0,
                 bottom: Float(self.bottomLayoutGuide.length)
             )
         }
-        return InsetFloat(
-            top: safeArea.top,
-            left: safeArea.left,
-            right: safeArea.right,
-            bottom: max(safeArea.bottom, self.virtualKeyboardHeight)
-        )
-    }
-    
-    func _updateVirtualKeyboardHeight(duration: TimeInterval, height: Float) {
-        guard abs(self.virtualKeyboardHeight - height) > .leastNonzeroMagnitude else { return }
-        self._virtualKeyboardAnimation?.cancel()
-        self._virtualKeyboardAnimation = Animation.default.run(
-            duration: duration,
-            processing: { [unowned self] progress in
-                self.virtualKeyboardHeight = self.virtualKeyboardHeight.lerp(height, progress: progress)
-            },
-            completion: { [unowned self] in
-                self._virtualKeyboardAnimation = nil
-                self.virtualKeyboardHeight = height
-            }
-        )
     }
     
     func _interfaceOrientation() -> UIInterfaceOrientation {

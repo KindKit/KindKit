@@ -37,35 +37,26 @@ public extension IUIScreenStackable where Self : IUIScreen {
         return self.stackContentContainer?.stackContainer
     }
     
-    @inlinable
-    func updateStack(animated: Bool, completion: (() -> Void)? = nil) {
-        guard let contentContainer = self.stackContentContainer else {
-            completion?()
-            return
-        }
-        guard let container = contentContainer.stackContainer else {
-            completion?()
-            return
-        }
+    @discardableResult
+    func stackUpdate(animated: Bool, completion: (() -> Void)? = nil) -> Bool {
+        guard let contentContainer = self.stackContentContainer else { return false }
+        guard let container = contentContainer.stackContainer else { return false }
         container.update(container: contentContainer, animated: animated, completion: completion)
+        return true
     }
     
-    @inlinable
-    func pop(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let stackContainer = self.stackContainer else {
-            completion?()
-            return
-        }
-        stackContainer.pop(animated: animated, completion: completion)
+    @discardableResult
+    func stackPop(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.stackContainer else { return false }
+        container.pop(animated: animated, completion: completion)
+        return true
     }
     
-    @inlinable
-    func popToRoot(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let stackContainer = self.stackContainer else {
-            completion?()
-            return
-        }
-        stackContainer.popToRoot(animated: animated, completion: completion)
+    @discardableResult
+    func stackPopToRoot(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.stackContainer else { return false }
+        container.popToRoot(animated: animated, completion: completion)
+        return true
     }
     
 }

@@ -8,7 +8,6 @@ public protocol IEnumLocalized : RawRepresentable where RawValue == String {
     
     var bundle: Bundle { get }
     var tables: [String] { get }
-    var localized: String { get }
     var `default`: Self? { get }
     
 }
@@ -30,15 +29,16 @@ public extension IEnumLocalized {
     var localized: String {
         let bundle = self.bundle
         let key = self.rawValue
-        var result = bundle.localizedString(forKey: key, value: nil, table: nil)
-        if result != key {
-            return result
-        }
+        var result: String
         for table in self.tables {
             result = bundle.localizedString(forKey: key, value: nil, table: table)
             if result != key {
                 return result
             }
+        }
+        result = bundle.localizedString(forKey: key, value: nil, table: nil)
+        if result != key {
+            return result
         }
         if let `default` = self.default {
             return `default`.localized
@@ -49,15 +49,16 @@ public extension IEnumLocalized {
     var contains: Bool {
         let bundle = self.bundle
         let key = self.rawValue
-        var result = bundle.localizedString(forKey: key, value: nil, table: nil)
-        if result != key {
-            return true
-        }
+        var result: String
         for table in self.tables {
             result = bundle.localizedString(forKey: key, value: nil, table: table)
             if result != key {
                 return true
             }
+        }
+        result = bundle.localizedString(forKey: key, value: nil, table: nil)
+        if result != key {
+            return true
         }
         if let `default` = self.default {
             return `default`.contains

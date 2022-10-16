@@ -295,7 +295,7 @@ private extension Graphics.Context {
         if let dash = stroke.dash {
             self._instance.setLineDash(
                 phase: dash.phase.cgFloat,
-                lengths: dash.lengths.compactMap({ $0.cgFloat })
+                lengths: dash.lengths.map({ $0.cgFloat })
             )
         } else {
             self._instance.setLineDash(phase: 0, lengths: [])

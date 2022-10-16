@@ -15,7 +15,7 @@ public protocol IUIContainer : AnyObject {
     var statusBarAnimation: UIStatusBarAnimation { get }
     var statusBarHidden: Bool { get }
     var supportedOrientations: UIInterfaceOrientationMask { get }
-    var viewController: UIViewController? { get }
+    var uiViewController: UIViewController? { get }
 #endif
     var isPresented: Bool { get }
     var view: IUIView { get }
@@ -48,5 +48,16 @@ public extension IUIContainer {
     func inheritedInsets(interactive: Bool) -> InsetFloat {
         return .zero
     }
+
+#if os(iOS)
+    
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let viewController = self.uiViewController else { return false }
+        viewController.dismiss(animated: animated, completion: completion)
+        return true
+    }
+    
+#endif
     
 }

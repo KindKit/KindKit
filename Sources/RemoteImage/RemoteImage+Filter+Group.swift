@@ -15,7 +15,7 @@ public extension RemoteImage.Filter {
         public init(
             _ filters: [IRemoteImageFilter]
         ) {
-            self.name = filters.compactMap({ $0.name }).joined(separator: "-")
+            self.name = filters.map({ $0.name }).joined(separator: "-")
             self._filters = filters
         }
         

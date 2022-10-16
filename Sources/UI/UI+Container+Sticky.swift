@@ -43,21 +43,21 @@ public extension UI.Container {
             return self._view
         }
         public private(set) var screen: IUIStickyScreen
-        public private(set) var overlay: UI.View.Bar {
+        public private(set) var sticky: UI.View.Bar {
             set {
-                guard self._overlay !== newValue else { return }
-                self._layout.overlay = UI.Layout.Item(newValue)
+                guard self._sticky !== newValue else { return }
+                self._layout.sticky = UI.Layout.Item(newValue)
             }
-            get { return self._overlay }
+            get { return self._sticky }
         }
-        public private(set) var overlayVisibility: Float {
-            set { self._layout.overlayVisibility = newValue }
-            get { return self._layout.overlayVisibility }
+        public private(set) var stickyVisibility: Float {
+            set { self._layout.stickyVisibility = newValue }
+            get { return self._layout.stickyVisibility }
             
         }
-        public private(set) var overlayHidden: Bool {
-            set { self._layout.overlayHidden = newValue }
-            get { return self._layout.overlayHidden }
+        public private(set) var stickyHidden: Bool {
+            set { self._layout.stickyHidden = newValue }
+            get { return self._layout.stickyHidden }
         }
         public var content: ContentContainer {
             set {
@@ -84,7 +84,7 @@ public extension UI.Container {
             get { return self._content }
         }
         
-        private var _overlay: UI.View.Bar
+        private var _sticky: UI.View.Bar
         private var _content: ContentContainer
         private var _layout: Layout
         private var _view: UI.View.Custom
@@ -95,13 +95,13 @@ public extension UI.Container {
         ) {
             self.screen = screen
             self.isPresented = false
-            self._overlay = screen.sticky
+            self._sticky = screen.sticky
             self._content = content
             self._layout = Layout(
                 content: UI.Layout.Item(content.view),
-                overlay: UI.Layout.Item(screen.sticky),
-                overlayVisibility: screen.stickyVisibility,
-                overlayHidden: screen.stickyHidden
+                sticky: UI.Layout.Item(screen.sticky),
+                stickyVisibility: screen.stickyVisibility,
+                stickyHidden: screen.stickyHidden
             )
             self._view = UI.View.Custom(self._layout)
             self._setup()
@@ -113,13 +113,13 @@ public extension UI.Container {
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
             let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if self._content === container, let overlaySize = self._layout.overlaySize {
+            if self._content === container, let stickySize = self._layout.stickySize {
                 let bottom: Float
-                if self.overlayHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
+                if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
                     if interactive == true {
-                        bottom = overlaySize.height * self.overlayVisibility
+                        bottom = stickySize.height * self.stickyVisibility
                     } else {
-                        bottom = overlaySize.height
+                        bottom = stickySize.height
                     }
                 } else {
                     bottom = 0
@@ -136,13 +136,13 @@ public extension UI.Container {
         
         public func didChangeInsets() {
             let inheritedInsets = self.inheritedInsets(interactive: true)
-            if self.overlayHidden == false {
-                self._overlay.alpha = self.overlayVisibility
+            if self.stickyHidden == false {
+                self._sticky.alpha = self.stickyVisibility
             } else {
-                self._overlay.alpha = 0
+                self._sticky.alpha = 0
             }
-            self._overlay.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
-            self._layout.overlayInset = inheritedInsets.bottom
+            self._sticky.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
+            self._layout.stickyInset = inheritedInsets.bottom
             self._content.didChangeInsets()
         }
         
@@ -187,8 +187,8 @@ public extension UI.Container {
             self._content.cancelHide(interactive: interactive)
         }
         
-        public func updateOverlay(animated: Bool, completion: (() -> Void)?) {
-            self._layout.overlayHidden = self.screen.stickyHidden
+        public func updateSticky(animated: Bool, completion: (() -> Void)?) {
+            self._layout.stickyHidden = self.screen.stickyHidden
             if self.isPresented == true {
                 self.didChangeInsets()
             }
@@ -294,7 +294,7 @@ extension UI.Container.Sticky : IUIHamburgerContentContainer where ContentContai
 extension UI.Container.Sticky : IContainerBarControllerObserver {
     
     public func changed(_ barController: UI.Container.BarController) {
-        self._layout.overlayVisibility = barController.visibility(.sticky)
+        self._layout.stickyVisibility = barController.visibility(.sticky)
     }
     
 }

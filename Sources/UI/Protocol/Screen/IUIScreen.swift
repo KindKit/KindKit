@@ -11,6 +11,12 @@ public protocol IUIScreen : AnyObject {
     
     var container: IUIContainer? { set get }
     var shouldInteractive: Bool { get }
+#if os(iOS)
+    var statusBar: UIStatusBarStyle { get }
+    var statusBarAnimation: UIStatusBarAnimation { get }
+    var statusBarHidden: Bool { get }
+    var supportedOrientations: UIInterfaceOrientationMask { get }
+#endif
     
     func setup()
     func destroy()
@@ -74,31 +80,15 @@ public extension IUIScreen {
 
 public extension IUIScreen {
     
-    #if os(iOS)
-    
-    var viewController: UIViewController? {
-        return self.container?.viewController
-    }
-    
-    #endif
-    
     func inheritedInsets(interactive: Bool = false) -> InsetFloat {
         return self.container?.inheritedInsets(interactive: interactive) ?? .zero
     }
-    
-}
 
 #if os(iOS)
-
-public protocol IScreenStatusable : AnyObject {
     
-    var statusBar: UIStatusBarStyle { get }
-    var statusBarAnimation: UIStatusBarAnimation { get }
-    var statusBarHidden: Bool { get }
-    
-}
-
-public extension IScreenStatusable where Self : IUIScreen {
+    var uiViewController: UIViewController? {
+        return self.container?.uiViewController
+    }
     
     var statusBar: UIStatusBarStyle {
         return .default
@@ -112,28 +102,24 @@ public extension IScreenStatusable where Self : IUIScreen {
         return false
     }
     
-    func setNeedUpdateStatusBar() {
-        self.container?.setNeedUpdateStatusBar()
-    }
-    
-}
-
-public protocol IScreenOrientable : AnyObject {
-    
-    var supportedOrientations: UIInterfaceOrientationMask { get }
-    
-}
-
-public extension IScreenOrientable where Self : IUIScreen {
-    
     var supportedOrientations: UIInterfaceOrientationMask {
         return .all
+    }
+    
+    func setNeedUpdateStatusBar() {
+        self.container?.setNeedUpdateStatusBar()
     }
     
     func setNeedUpdateOrientations() {
         self.container?.setNeedUpdateOrientations()
     }
     
-}
-
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.container else { return false }
+        return container.dismiss(animated: animated, completion: completion)
+    }
+    
 #endif
+    
+}

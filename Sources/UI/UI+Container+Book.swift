@@ -193,6 +193,10 @@ public extension UI.Container {
         }
         
         public func set(current: IUIBookContentContainer, animated: Bool, completion: (() -> Void)?) {
+            guard self._current?.container !== current else {
+            	completion?()
+                return
+            }
             let forward = Item(container: current)
             forward.container.parent = self
             if let current = self._current {

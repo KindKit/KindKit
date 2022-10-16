@@ -72,7 +72,7 @@ public extension Observer {
     }
     
     func notify< Priority : RawRepresentable >(priorities: [Priority], closure: (_ observer: T) -> Void) where Priority.RawValue == UInt {
-        self.notify(priorities: priorities.compactMap({ $0.rawValue }), closure: closure)
+        self.notify(priorities: priorities.map({ $0.rawValue }), closure: closure)
     }
     
     func notify(priorities: [UInt], closure: (_ observer: T) -> Void) {
@@ -112,7 +112,7 @@ public extension Observer {
     }
     
     func reverseNotify< Priority : RawRepresentable >(priorities: [Priority], closure: (_ observer: T) -> Void) where Priority.RawValue == UInt {
-        self.reverseNotify(priorities: priorities.compactMap({ $0.rawValue }), closure: closure)
+        self.reverseNotify(priorities: priorities.map({ $0.rawValue }), closure: closure)
     }
     
     func reverseNotify(priorities: [UInt], closure: (_ observer: T) -> Void) {

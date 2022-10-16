@@ -8,6 +8,11 @@ import UIKit
 
 public extension UIScreen {
     
+    static let kk_diagonalPerInch: Float = {
+        let bounds = UIScreen.main.nativeBounds
+        return Float(sqrt((bounds.width * bounds.width) + (bounds.height * bounds.height)))
+    }()
+    
     var kk_animationVelocity: Float {
         switch UIDevice.current.userInterfaceIdiom {
         case .phone: return Float(max(self.bounds.width, self.bounds.height) * 2.2)

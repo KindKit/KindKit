@@ -50,9 +50,11 @@ public extension IUIBookScreen {
         return self.container as? IUIBookContainer
     }
     
-    @inlinable
-    func reload(backward: Bool, forward: Bool) {
-        self.bookContainer?.reload(backward: backward, forward: forward)
+    @discardableResult
+    func reload(backward: Bool, forward: Bool) -> Bool {
+        guard let container = self.bookContainer else { return false }
+        container.reload(backward: backward, forward: forward)
+        return true
     }
     
 }

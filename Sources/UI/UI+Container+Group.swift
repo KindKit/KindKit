@@ -65,7 +65,7 @@ public extension UI.Container {
             get { return self._layout.barHidden }
         }
         public var containers: [IUIGroupContentContainer] {
-            return self._items.compactMap({ $0.container })
+            return self._items.map({ $0.container })
         }
         public var backward: IUIGroupContentContainer? {
             guard let current = self._current else { return nil }
@@ -110,7 +110,7 @@ public extension UI.Container {
                 barHidden: screen.groupBarHidden
             )
             self._view = UI.View.Custom(self._layout)
-            self._items = containers.compactMap({ Item(container: $0) })
+            self._items = containers.map({ Item(container: $0) })
             if let current = current {
                 if let index = self._items.firstIndex(where: { $0.container === current }) {
                     self._current = self._items[index]
@@ -223,15 +223,6 @@ public extension UI.Container {
             completion?()
         }
         
-        public func update(container: IUIGroupContentContainer, animated: Bool, completion: (() -> Void)?) {
-            guard let item = self._items.first(where: { $0.container === container }) else {
-                completion?()
-                return
-            }
-            item.update()
-            self._bar.items(self._items.compactMap({ $0.bar }))
-        }
-        
         public func set(containers: [IUIGroupContentContainer], current: IUIGroupContentContainer?, animated: Bool, completion: (() -> Void)?) {
             let oldCurrent = self._current
             let removeItems = self._items.filter({ item in
@@ -241,11 +232,11 @@ public extension UI.Container {
                 item.container.parent = nil
             }
             let inheritedInsets = self.inheritedInsets(interactive: true)
-            self._items = containers.compactMap({ Item(container: $0, insets: inheritedInsets) })
+            self._items = containers.map({ Item(container: $0, insets: inheritedInsets) })
             for item in self._items {
                 item.container.parent = self
             }
-            self._bar.items(self._items.compactMap({ $0.bar }))
+            self._bar.items(self._items.map({ $0.bar }))
             let newCurrent: Item?
             if current != nil {
                 if let exist = self._items.first(where: { $0.container === current }) {
@@ -293,6 +284,16 @@ public extension UI.Container {
             } else {
                 self._set(current: newCurrent, completion: completion)
             }
+        }
+        
+        public func update(container: IUIGroupContentContainer, animated: Bool, completion: (() -> Void)?) {
+            guard let item = self._items.first(where: { $0.container === container }) else {
+            	completion?()
+                return
+            }
+            item.update()
+            self._bar.items(self._items.map({ $0.bar }))
+            completion?()
         }
         
     }
@@ -374,14 +375,16 @@ private extension UI.Container.Group {
         for item in self._items {
             item.container.parent = self
         }
-        self._bar.items(self._items.compactMap({ $0.bar }))
+        self._bar.items(self._items.map({ $0.bar }))
         if let current = self._current {
             self._bar.selected(current.bar)
             self._layout.state = .idle(current: current.groupItem)
         }
         self.screen.setup()
-        
         UI.Container.BarController.shared.add(observer: self)
+        if let current = self._current {
+            self.screen.change(current: current.container)
+        }
     }
     
     func _destroy() {
@@ -408,6 +411,7 @@ private extension UI.Container.Group {
         self.setNeedUpdateOrientations()
         self.setNeedUpdateStatusBar()
 #endif
+        self.screen.change(current: current.container)
         completion?()
     }
     
@@ -444,6 +448,7 @@ private extension UI.Container.Group {
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
 #endif
+                    self.screen.change(current: forward.container)
                     completion?()
                 }
             )
@@ -461,6 +466,7 @@ private extension UI.Container.Group {
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
 #endif
+            self.screen.change(current: forward.container)
             completion?()
         }
     }
@@ -498,6 +504,7 @@ private extension UI.Container.Group {
                     self.setNeedUpdateOrientations()
                     self.setNeedUpdateStatusBar()
 #endif
+                    self.screen.change(current: backward.container)
                     completion?()
                 }
             )
@@ -515,6 +522,7 @@ private extension UI.Container.Group {
             self.setNeedUpdateOrientations()
             self.setNeedUpdateStatusBar()
 #endif
+            self.screen.change(current: backward.container)
             completion?()
         }
     }

@@ -40,7 +40,7 @@ public extension Api {
         public func urlRequest(provider: IApiProvider) throws -> URLRequest {
             var components = try self.path.urlComponents(provider: provider)
             do {
-                var params: [Api.Request.Parameter] = (components.queryItems ?? []).compactMap({
+                var params: [Api.Request.Parameter] = (components.queryItems ?? []).map({
                     if let value = $0.value {
                         return Api.Request.Parameter(name: .raw($0.name), value: .raw(value))
                     }
@@ -54,7 +54,7 @@ public extension Api {
                     }
                 }
                 if params.count > 0 {
-                    components.queryItems = params.compactMap({
+                    components.queryItems = params.map({
                         return URLQueryItem(name: $0.name.string, value: $0.value.string)
                     })
                 }

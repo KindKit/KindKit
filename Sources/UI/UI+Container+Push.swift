@@ -78,7 +78,7 @@ public extension UI.Container {
             }
         }
         public var containers: [IUIPushContentContainer] {
-            return self._items.compactMap({ return $0.container })
+            return self._items.map({ return $0.container })
         }
         public var previous: IUIPushContentContainer? {
             return self._previous?.container
@@ -205,6 +205,10 @@ public extension UI.Container {
         }
         
         public func present(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?) {
+            guard self._items.contains(where: { $0.container === container }) == false else {
+                completion?()
+                return
+            }
             container.parent = self
             let item = Item(container: container, available: self._view.bounds.size)
             self._items.append(item)

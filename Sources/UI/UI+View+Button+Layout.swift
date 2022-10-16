@@ -187,9 +187,9 @@ extension UI.View.Button {
                 if let item = self.secondary {
                     items.append(item)
                 }
-            }
-            if let item = self.primary {
-                items.append(item)
+                if let item = self.primary {
+                    items.append(item)
+                }
             }
             return items
         }

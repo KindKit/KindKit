@@ -31,9 +31,10 @@ public extension IUIScreenModalable where Self : IUIScreen {
         return self.modalContentContainer?.modalContainer
     }
     
-    @inlinable
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.modalContentContainer?.dismiss(animated: animated, completion: completion)
+    @discardableResult
+    func modalDismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.modalContentContainer else { return false }
+        return container.dismiss(animated: animated, completion: completion)
     }
     
 }
