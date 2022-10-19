@@ -71,7 +71,6 @@ public extension IUILayout {
         self.delegate?.updateIfNeeded(self)
     }
     
-    @inlinable
     func invalidate(item: UI.Layout.Item) {
     }
     

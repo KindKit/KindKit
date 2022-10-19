@@ -16,7 +16,11 @@ public extension UI.Container {
         public unowned var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
-                if self.parent == nil || self.parent?.isPresented == true {
+                if let parent = self.parent {
+                    if parent.isPresented == true {
+                        self.didChangeInsets()
+                    }
+                } else {
                     self.didChangeInsets()
                 }
             }

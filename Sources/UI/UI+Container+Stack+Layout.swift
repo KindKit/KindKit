@@ -13,28 +13,12 @@ extension UI.Container.Stack {
         var state: State {
             didSet {
                 guard self.state != oldValue else { return }
-                switch self.state {
-                case .idle(let current):
-                    if let cacheSize = self._cache[current] {
-                        self._cache = [ current : cacheSize ]
-                    } else {
-                        self._cache.removeAll()
-                    }
-                case .push, .pop:
-                    break
-                }
                 self.setNeedUpdate()
             }
         }
         
-        private var _cache: [UI.Layout.Item : SizeFloat] = [:]
-        
         init(_ state: State) {
             self.state = state
-        }
-        
-        public func invalidate(item: UI.Layout.Item) {
-            self._cache[item] = nil
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
@@ -93,12 +77,7 @@ private extension UI.Container.Stack.Layout {
     
     @inline(__always)
     func _size(item: UI.Layout.Item, available: SizeFloat) -> SizeFloat {
-        if let cacheSize = self._cache[item] {
-            return cacheSize
-        }
-        let itemSize = item.size(available: available)
-        self._cache[item] = itemSize
-        return itemSize
+        return item.size(available: available)
     }
     
 }

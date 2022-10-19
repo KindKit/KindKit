@@ -72,14 +72,7 @@ final class KKExternalView : UIView {
         super.layoutSubviews()
         
         if let content = self.content {
-            let bounds = self.bounds
-            let contentBounds = content.bounds
-            content.frame = CGRect(
-                x: (bounds.origin.x + (bounds.size.width / 2)) - (contentBounds.size.width / 2),
-                y: (bounds.origin.y + (bounds.size.height / 2)) - (contentBounds.size.height / 2),
-                width: contentBounds.size.width,
-                height: contentBounds.size.height
-            )
+            content.frame = self.bounds
         }
     }
     

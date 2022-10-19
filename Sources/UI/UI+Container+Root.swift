@@ -73,6 +73,9 @@ public extension UI.Container {
                     overlay.parent = nil
                 }
                 self._layout.overlay = self.overlay.flatMap({ UI.Layout.Item($0.view) })
+                if self.isPresented == true {
+                    self._layout.update()
+                }
                 if let overlay = self.overlay {
                     overlay.parent = self
                     if self.isPresented == true {
@@ -91,6 +94,9 @@ public extension UI.Container {
                 }
                 self.content.parent = nil
                 self._layout.content = UI.Layout.Item(self.content.view)
+                if self.isPresented == true {
+                    self._layout.update()
+                }
                 self.content.parent = self
                 if self.isPresented == true {
                     self.content.prepareShow(interactive: false)
