@@ -121,9 +121,9 @@ public extension UI.Container {
             )
             self._view = UI.View.Custom(self._layout)
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.kk_animationVelocity
+            self.animationVelocity = NSScreen.kk_animationVelocity
 #elseif os(iOS)
-            self.animationVelocity = UIScreen.main.kk_animationVelocity
+            self.animationVelocity = UIScreen.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
             self._view.gestures([ self._interactiveGesture ])
 #endif

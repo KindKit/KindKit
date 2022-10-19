@@ -118,7 +118,7 @@ public extension UI.Container {
             self._layout = Layout(content.flatMap({ UI.Layout.Item($0.view) }))
             self._view = UI.View.Custom(self._layout)
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.kk_animationVelocity
+            self.animationVelocity = NSScreen.kk_animationVelocity
 #elseif os(iOS)
             self.animationVelocity = Float(max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 3)
             self.interactiveLimit = 20

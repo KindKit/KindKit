@@ -79,12 +79,16 @@ public extension UI.Container {
         
         public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
             let inheritedInsets = self.inheritedInsets(interactive: interactive)
+#if os(macOS)
+            return inheritedInsets
+#elseif os(iOS)
             return .init(
                 top: inheritedInsets.top,
                 left: inheritedInsets.left,
                 right: inheritedInsets.right,
                 bottom: max(self._virtualKeyboardHeight, inheritedInsets.bottom)
             )
+#endif
         }
         
         public func didChangeInsets() {

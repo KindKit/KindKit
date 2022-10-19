@@ -103,9 +103,9 @@ public extension UI.Container {
             self.isPresented = false
             self.screen = screen
 #if os(macOS)
-            self.animationVelocity = NSScreen.main!.kk_animationVelocity
+            self.animationVelocity = NSScreen.kk_animationVelocity
 #elseif os(iOS)
-            self.animationVelocity = UIScreen.main.kk_animationVelocity
+            self.animationVelocity = UIScreen.kk_animationVelocity
 #endif
             self._bar = screen.groupBar
             self._layout = .init(
