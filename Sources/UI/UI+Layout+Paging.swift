@@ -42,6 +42,7 @@ public extension UI.Layout {
             self._items = items
         }
 
+        @inlinable
         public convenience init(
             direction: Direction,
             views: [IUIView]
@@ -50,24 +51,6 @@ public extension UI.Layout {
                 direction: direction,
                 items: views.map({ UI.Layout.Item($0) })
             )
-        }
-        
-        public func contains(view: IUIView) -> Bool {
-            guard let item = view.appearedItem else { return false }
-            return self.contains(item: item)
-        }
-        
-        public func contains(item: UI.Layout.Item) -> Bool {
-            return self.items.contains(item)
-        }
-        
-        public func index(view: IUIView) -> Int? {
-            guard let item = view.appearedItem else { return nil }
-            return self.index(item: item)
-        }
-        
-        public func index(item: UI.Layout.Item) -> Int? {
-            return self.items.firstIndex(of: item)
         }
         
         public func layout(bounds: RectFloat) -> SizeFloat {
@@ -143,6 +126,32 @@ public extension UI.Layout {
             return Array(self._items[s..<e])
         }
         
+    }
+    
+}
+
+public extension UI.Layout.Paging {
+    
+    @inlinable
+    func contains(view: IUIView) -> Bool {
+        guard let item = view.appearedItem else { return false }
+        return self.contains(item: item)
+    }
+    
+    @inlinable
+    func contains(item: UI.Layout.Item) -> Bool {
+        return self.items.contains(item)
+    }
+    
+    @inlinable
+    func index(view: IUIView) -> Int? {
+        guard let item = view.appearedItem else { return nil }
+        return self.index(item: item)
+    }
+    
+    @inlinable
+    func index(item: UI.Layout.Item) -> Int? {
+        return self.items.firstIndex(of: item)
     }
     
 }

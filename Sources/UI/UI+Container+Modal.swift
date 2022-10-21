@@ -116,7 +116,8 @@ public extension UI.Container {
             self.isPresented = false
             self.content = content
             self._layout = Layout(content.flatMap({ UI.Layout.Item($0.view) }))
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
 #if os(macOS)
             self.animationVelocity = NSScreen.kk_animationVelocity
 #elseif os(iOS)
@@ -214,6 +215,17 @@ public extension UI.Container {
             }
         }
         
+        public func present< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer {
+            wireframe.container.parent = self
+            let item = Item(owner: wireframe, container: wireframe.container)
+            self._items.append(item)
+            if self._current == nil {
+                self._present(modal: item, animated: animated, completion: completion)
+            } else {
+                completion?()
+            }
+        }
+        
         public func dismiss(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?) {
             guard let index = self._items.firstIndex(where: { $0.container === container }) else {
                 completion?()
@@ -232,6 +244,10 @@ public extension UI.Container {
                 self._items.remove(at: index)
                 completion?()
             }
+        }
+        
+        public func dismiss< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer {
+            self.dismiss(container: wireframe.container, animated: animated, completion: completion)
         }
         
     }

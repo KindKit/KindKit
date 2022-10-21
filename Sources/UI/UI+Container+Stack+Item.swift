@@ -47,7 +47,7 @@ extension UI.Container.Stack {
             )
             self.container = container
             self.owner = owner
-            self.item = UI.Layout.Item(UI.View.Custom(self._layout))
+            self.item = UI.Layout.Item(UI.View.Custom().content(self._layout))
         }
         
         func set(insets: InsetFloat) {

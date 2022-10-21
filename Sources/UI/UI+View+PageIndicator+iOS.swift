@@ -36,19 +36,6 @@ extension UI.View.PageIndicator {
 final class KKPageIndicatorView : UIPageControl {
     
     unowned var kkDelegate: KKPageIndicatorViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.PageIndicator?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -67,26 +54,13 @@ final class KKPageIndicatorView : UIPageControl {
 extension KKPageIndicatorView {
     
     func update(view: UI.View.PageIndicator) {
-        self._view = view
-        self.update(pageColor: view.pageColor)
-        self.update(currentPageColor: view.currentPageColor)
         self.update(currentPage: view.currentPage)
         self.update(numberOfPages: view.numberOfPages)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(pageColor: view.pageColor)
+        self.update(currentPageColor: view.currentPageColor)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.kkDelegate = view
-    }
-    
-    func update(pageColor: UI.Color?) {
-        self.pageIndicatorTintColor = pageColor?.native
-    }
-    
-    func update(currentPageColor: UI.Color?) {
-        self.currentPageIndicatorTintColor = currentPageColor?.native
     }
     
     func update(currentPage: Float) {
@@ -98,9 +72,24 @@ extension KKPageIndicatorView {
         self.setNeedsLayout()
     }
     
+    func update(pageColor: UI.Color?) {
+        self.pageIndicatorTintColor = pageColor?.native
+    }
+    
+    func update(currentPageColor: UI.Color?) {
+        self.currentPageIndicatorTintColor = currentPageColor?.native
+    }
+    
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

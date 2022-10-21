@@ -47,14 +47,14 @@ public extension UI.Container {
             return self._view
         }
         
-        private var _view: UI.View.Empty
+        private var _view: UI.View.Rect
         
         public init(
             _ color: UI.Color = .clear
         ) {
             self.isPresented = false
-            self._view = UI.View.Empty()
-                .color(color)
+            self._view = UI.View.Rect()
+                .fill(color)
         }
         
         public func insets(of content: IUIContainer, interactive: Bool) -> InsetFloat {
@@ -98,28 +98,14 @@ public extension UI.Container {
 extension UI.Container.None : IUIRootContentContainer {
 }
 
-extension UI.Container.None : IUIStackContentContainer {
-    
-    public var stackBar: UI.View.StackBar {
-        return .init(configure: {
-            $0.size = 50
-        })
-    }
-    
-    public var stackBarVisibility: Float {
-        return 1
-    }
-    
-    public var stackBarHidden: Bool {
-        return false
-    }
-    
-}
-
 extension UI.Container.None : IUIGroupContentContainer {
     
     public var groupItem: UI.View.GroupBar.Item {
-        return .init(UI.View.Empty().color(.red).cornerRadius(.auto))
+        let rect = UI.View.Rect()
+            .fill(.red)
+            .cornerRadius(.auto)
+        return .init()
+            .content(rect)
     }
     
 }
@@ -127,16 +113,26 @@ extension UI.Container.None : IUIGroupContentContainer {
 extension UI.Container.None : IUIPageContentContainer {
     
     public var pageItem: UI.View.PageBar.Item {
-        return .init(UI.View.Empty().color(.red).cornerRadius(.auto))
+        let rect = UI.View.Rect()
+            .fill(.red)
+            .cornerRadius(.auto)
+        return .init()
+            .content(rect)
     }
+    
+}
+
+extension UI.Container.None : IUIStackContentContainer {
+    
+    public var stackBar: UI.View.StackBar { .init().size(50) }
+    public var stackBarVisibility: Float { 1 }
+    public var stackBarHidden: Bool { false }
     
 }
 
 extension UI.Container.None : IUIBookContentContainer {
     
-    public var bookIdentifier: Any {
-        return self
-    }
+    public var bookIdentifier: Any { self }
     
 }
 
@@ -145,49 +141,27 @@ extension UI.Container.None : IUIHamburgerContentContainer {
 
 extension UI.Container.None : IHamburgerMenuContainer {
     
-    public var hamburgerSize: Float {
-        return 120
-    }
-    
-    public var hamburgerLimit: Float {
-        return 120
-    }
+    public var hamburgerSize: Float { 120 }
+    public var hamburgerLimit: Float { 120 }
     
 }
 
 extension UI.Container.None : IUIModalContentContainer {
     
-    public var modalSheetInset: InsetFloat? {
-        return nil
-    }
-    
-    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
-        return nil
-    }
+    public var modalColor: UI.Color { .white }
+    public var modalCornerRadius: UI.CornerRadius { .none }
+    public var modalSheetInset: InsetFloat? { nil }
+    public var modalSheetBackground: (IUIView & IUIViewAlphable)? { nil }
     
 }
 
 extension UI.Container.None : IUIDialogContentContainer {
     
-    public var dialogInset: InsetFloat {
-        return .zero
-    }
-    
-    public var dialogWidth: DialogContentContainerSize {
-        return .fill(before: 24, after: 24)
-    }
-    
-    public var dialogHeight: DialogContentContainerSize {
-        return .fill(before: 24, after: 24)
-    }
-    
-    public var dialogAlignment: DialogContentContainerAlignment {
-        return .center
-    }
-    
-    public var dialogBackground: (IUIView & IUIViewAlphable)? {
-        return nil
-    }
+    public var dialogInset: InsetFloat { .zero }
+    public var dialogWidth: DialogContentContainerSize { .fill(before: 24, after: 24) }
+    public var dialogHeight: DialogContentContainerSize { .fill(before: 24, after: 24) }
+    public var dialogAlignment: DialogContentContainerAlignment { .center }
+    public var dialogBackground: (IUIView & IUIViewAlphable)? { nil }
     
 }
 

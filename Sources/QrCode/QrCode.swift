@@ -7,22 +7,15 @@ import CoreImage
 
 public struct QrCode {
     
-    public enum ErrorCorrection : String {
-        case low = "L"
-        case medium = "M"
-        case quartile = "Q"
-        case high = "H"
-    }
-    
     public let data: Data
-    public let errorCorrection: ErrorCorrection
+    public let correction: Correction
     
     public init(
         data: Data,
-        errorCorrection: ErrorCorrection = .low
+        correction: Correction = .low
     ) {
         self.data = data
-        self.errorCorrection = errorCorrection
+        self.correction = correction
     }
     
     public func generate(
@@ -36,7 +29,7 @@ public struct QrCode {
         }
         qrFilter.setDefaults()
         qrFilter.setValue(self.data, forKey: "inputMessage")
-        qrFilter.setValue(self.errorCorrection.rawValue, forKey: "inputCorrectionLevel")
+        qrFilter.setValue(self.correction.string, forKey: "inputCorrectionLevel")
         guard let colorFilter = CIFilter(name: "CIFalseColor") else {
             return nil
         }

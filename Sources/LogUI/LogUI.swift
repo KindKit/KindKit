@@ -21,34 +21,3 @@ public struct LogUI {
     }
     
 }
-
-#if os(iOS) && targetEnvironment(simulator) && canImport(SwiftUI) && DEBUG
-
-import SwiftUI
-
-@available(macOS 10.15.0, *)
-@available(iOS 15.0, *)
-struct LogUI_Preview : PreviewProvider {
-    
-    static var target: LogUI.Target = {
-        let target = LogUI.Target()
-        Log.shared.append(target: target)
-        
-        Log.shared.log(level: .info, category: "Info", message: "Message #1")
-        Log.shared.log(level: .debug, category: "Debug", message: "Message #2")
-        Log.shared.log(level: .error, category: "Error", message: "Message #3")
-
-        return target
-    }()
-    
-    static var previews: some View {
-        UI.Container.Preview(
-            LogUI.container(
-                target: Self.target
-            )
-        )
-    }
-    
-}
-
-#endif

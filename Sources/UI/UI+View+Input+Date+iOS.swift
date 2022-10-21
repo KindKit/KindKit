@@ -36,28 +36,49 @@ extension UI.View.Input.Date {
 final class KKInputDateView : UITextField {
     
     unowned var kkDelegate: KKInputDateViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
+    var kkFormatter: DateFormatter? {
+        didSet {
+            guard self.kkFormatter != oldValue else { return }
+            if let formatter = self.kkFormatter {
+                self._picker.calendar = formatter.calendar
+                self._picker.locale = formatter.locale
+                self._picker.timeZone = formatter.timeZone
             }
+            self._applyText()
         }
-        get { super.frame }
     }
-    
-    private unowned var _view: UI.View.Input.Date?
-    private var _picker: UIDatePicker!
+    var kkSelected: Foundation.Date? {
+        didSet {
+            guard self.kkSelected != oldValue else { return }
+            if let selected = self.kkSelected {
+                self._picker.date = selected
+            }
+            self._applyText()
+        }
+    }
+    var kkTextInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self.kkTextInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+    var kkPlaceholderInset: UIEdgeInsets? {
+        didSet {
+            guard self.kkPlaceholderInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+
+    private var _picker: UIDatePicker
     
     override init(frame: CGRect) {
+        self._picker = UIDatePicker()
+
         super.init(frame: frame)
 
         self.clipsToBounds = true
         self.delegate = self
         
-        self._picker = UIDatePicker()
         if #available(iOS 13.4, *) {
             self._picker.preferredDatePickerStyle = .wheels
         }
@@ -70,19 +91,16 @@ final class KKInputDateView : UITextField {
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        let inset = view.placeholderInset ?? view.textInset
-        return Rect(bounds).inset(inset).cgRect
+        let inset = self.kkPlaceholderInset ?? self.kkTextInset
+        return bounds.inset(by: inset)
     }
     
 }
@@ -90,12 +108,11 @@ final class KKInputDateView : UITextField {
 extension KKInputDateView {
     
     func update(view: UI.View.Input.Date) {
-        self._view = view
         self.update(mode: view.mode)
-        self.update(minimumDate: view.minimumDate)
-        self.update(maximumDate: view.maximumDate)
-        self.update(selectedDate: view.selectedDate)
         self.update(formatter: view.formatter)
+        self.update(minimum: view.minimum)
+        self.update(maximum: view.maximum)
+        self.update(selected: view.selected)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -103,12 +120,6 @@ extension KKInputDateView {
         self.update(placeholderInset: view.placeholderInset)
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
@@ -116,26 +127,20 @@ extension KKInputDateView {
         self._picker.datePickerMode = mode.datePickerMode
     }
     
-    func update(minimumDate: Foundation.Date?) {
-        self._picker.minimumDate = minimumDate
-    }
-    
-    func update(maximumDate: Foundation.Date?) {
-        self._picker.maximumDate = maximumDate
-    }
-    
-    func update(selectedDate: Foundation.Date?) {
-        if let selectedDate = selectedDate {
-            self._picker.date = selectedDate
-        }
-        self._applyText()
-    }
-    
     func update(formatter: DateFormatter) {
-        self._picker.calendar = formatter.calendar
-        self._picker.locale = formatter.locale
-        self._picker.timeZone = formatter.timeZone
-        self._applyText()
+        self.kkFormatter = formatter
+    }
+    
+    func update(minimum: Foundation.Date?) {
+        self._picker.minimumDate = minimum
+    }
+    
+    func update(maximum: Foundation.Date?) {
+        self._picker.maximumDate = maximum
+    }
+    
+    func update(selected: Foundation.Date?) {
+        self.kkSelected = selected
     }
     
     func update(textFont: UI.Font) {
@@ -147,7 +152,7 @@ extension KKInputDateView {
     }
     
     func update(textInset: InsetFloat) {
-        self.setNeedsLayout()
+        self.kkTextInset = textInset.uiEdgeInsets
     }
     
     func update(placeholder: UI.View.Input.Placeholder?) {
@@ -162,7 +167,7 @@ extension KKInputDateView {
     }
     
     func update(placeholderInset: InsetFloat?) {
-        self.setNeedsLayout()
+        self.kkPlaceholderInset = placeholderInset?.uiEdgeInsets
     }
     
     func update(alignment: UI.Text.Alignment) {
@@ -175,7 +180,6 @@ extension KKInputDateView {
     
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }
@@ -183,13 +187,13 @@ extension KKInputDateView {
 private extension KKInputDateView {
     
     func _applyText() {
-        if let view = self._view, let selectedDate = view.selectedDate {
-            self.text = view.formatter.string(from: selectedDate)
+        if let formatter = self.kkFormatter, let selected = self.kkSelected {
+            self.text = formatter.string(from: selected)
         } else {
             self.text = nil
         }
     }
-    
+        
     @objc
     func _changed(_ sender: UIDatePicker) {
         self.kkDelegate?.select(self, date: sender.date)
@@ -201,7 +205,7 @@ extension KKInputDateView : UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         self.kkDelegate?.beginEditing(self)
-        if self._view?.selectedDate == nil {
+        if self.kkSelected == nil {
             self.kkDelegate?.select(self, date: self._picker.date)
         }
     }

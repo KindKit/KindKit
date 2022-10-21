@@ -21,6 +21,16 @@ public extension UI.View.Input {
             self.font = font
             self.color = color
         }
+        
+        public init< Localized : IEnumLocalized >(
+            text: Localized,
+            font: UI.Font,
+            color: UI.Color
+        ) {
+            self.text = text.localized
+            self.font = font
+            self.color = color
+        }
 
     }
     

@@ -25,6 +25,12 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.ZStack : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        for entity in self.entities {
+            entity.invalidate()
+        }
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         for entity in self.entities {
             entity.invalidate(item: item)

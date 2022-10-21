@@ -36,20 +36,19 @@ extension UI.View.Input.String {
 final class KKInputStringView : UITextField {
     
     unowned var kkDelegate: KKInputStringViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
+    var kkTextInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self.kkTextInset != oldValue else { return }
+            self.setNeedsLayout()
         }
-        get { super.frame }
     }
-    
-    private unowned var _view: UI.View.Input.String?
-    
+    var kkPlaceholderInset: UIEdgeInsets? {
+        didSet {
+            guard self.kkPlaceholderInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -62,27 +61,23 @@ final class KKInputStringView : UITextField {
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        let inset = view.placeholderInset ?? view.textInset
-        return Rect(bounds).inset(inset).cgRect
+        let inset = self.kkPlaceholderInset ?? self.kkTextInset
+        return bounds.inset(by: inset)
     }
-    
+
 }
 
 extension KKInputStringView {
     
     func update(view: UI.View.Input.String) {
-        self._view = view
         self.update(text: view.text)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
@@ -93,12 +88,6 @@ extension KKInputStringView {
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
         self.update(keyboard: view.keyboard)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
@@ -115,7 +104,7 @@ extension KKInputStringView {
     }
     
     func update(textInset: InsetFloat) {
-        self.setNeedsLayout()
+        self.kkTextInset = textInset.uiEdgeInsets
     }
     
     func update(editingColor: UI.Color?) {
@@ -134,7 +123,7 @@ extension KKInputStringView {
     }
     
     func update(placeholderInset: InsetFloat?) {
-        self.setNeedsLayout()
+        self.kkPlaceholderInset = placeholderInset?.uiEdgeInsets
     }
     
     func update(alignment: UI.Text.Alignment) {
@@ -158,7 +147,6 @@ extension KKInputStringView {
     
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

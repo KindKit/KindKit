@@ -6,15 +6,19 @@ import Foundation
 
 public protocol IUIScreenModalable : AnyObject {
     
+    var modalColor: UI.Color { get }
+    var modalCornerRadius: UI.CornerRadius { get }
     var modalPresentation: UI.Screen.Modal.Presentation { get }
     
 }
 
 public extension IUIScreenModalable {
     
-    var modalPresentation: UI.Screen.Modal.Presentation {
-        return .simple
-    }
+    var modalColor: UI.Color { .white }
+    
+    var modalCornerRadius: UI.CornerRadius { .none }
+    
+    var modalPresentation: UI.Screen.Modal.Presentation { .simple }
     
 }
 

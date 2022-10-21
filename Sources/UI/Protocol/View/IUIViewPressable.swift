@@ -39,21 +39,21 @@ public extension IUIViewPressable {
     @inlinable
     @discardableResult
     func onPressed(_ closure: (() -> Void)?) -> Self {
-        self.onPressed.set(closure)
+        self.onPressed.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressed(_ closure: ((Self) -> Void)?) -> Self {
-        self.onPressed.set(self, closure)
+        self.onPressed.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onPressed.set(sender, closure)
+        self.onPressed.link(sender, closure)
         return self
     }
     

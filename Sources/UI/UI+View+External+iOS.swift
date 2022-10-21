@@ -35,28 +35,16 @@ extension UI.View.External {
 
 final class KKExternalView : UIView {
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     var content: UIView? {
         willSet {
             self.content?.removeFromSuperview()
         }
         didSet {
             guard let content = self.content else { return }
+            content.frame = self.bounds
             self.addSubview(content)
         }
     }
-    
-    private unowned var _view: UI.View.External?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -81,23 +69,15 @@ final class KKExternalView : UIView {
 extension KKExternalView {
     
     func update(view: UI.View.External) {
-        self._view = view
         self.update(content: view.content)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
     }
     
-    func update(content: UIView) {
+    func update(content: UIView?) {
         self.content = content
     }
     
     func cleanup() {
         self.content = nil
-        self._view = nil
     }
     
 }

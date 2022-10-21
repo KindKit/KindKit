@@ -6,6 +6,8 @@ import Foundation
 
 public protocol IUICompositionLayoutEntity {
     
+    func invalidate()
+    
     func invalidate(item: UI.Layout.Item)
     
     @discardableResult
@@ -40,6 +42,10 @@ public extension UI.Layout {
         ) {
             self.inset = inset
             self.entity = entity
+        }
+        
+        public func invalidate() {
+            self.entity.invalidate()
         }
         
         public func invalidate(item: UI.Layout.Item) {

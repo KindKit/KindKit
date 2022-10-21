@@ -12,7 +12,7 @@ public protocol IGroupBarViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class GroupBar : IUIWidgetView, IUIViewReusable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class GroupBar : IUIWidgetView {
         
         public private(set) var body: UI.View.Bar
         public var items: [UI.View.GroupBar.Item] {
@@ -55,18 +55,12 @@ public extension UI.View {
         public init() {
             self._items = []
             self._contentLayout = ContentLayout()
-            self._contentView = UI.View.Custom(self._contentLayout)
+            self._contentView = UI.View.Custom()
+                .content(self._contentLayout)
             self.body = .init(
                 placement: .bottom,
                 content: self._contentView
             )
-        }
-        
-        public convenience init(
-            configure: (UI.View.GroupBar) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
         }
         
     }
@@ -103,6 +97,18 @@ public extension UI.View.GroupBar {
         return self
     }
     
+}
+
+extension UI.View.GroupBar : IUIViewReusable {
+}
+
+extension UI.View.GroupBar : IUIViewColorable {
+}
+
+extension UI.View.GroupBar : IUIViewAlphable {
+}
+
+extension UI.View.GroupBar : IUIViewLockable {
 }
 
 extension UI.View.GroupBar : IGroupBarItemViewDelegate {

@@ -13,84 +13,91 @@ extension LogUI {
         
         var container: IUIContainer?
         
-        private(set) lazy var stackBar = UI.View.StackBar(configure: {
-            $0.inset = .init(horizontal: 12, vertical: 8)
-            $0.leadings = [ self._autoScrollButton ]
-            $0.leadingsSpacing = 4
+        private(set) lazy var stackBar = UI.View.StackBar()
+            .inset(.init(horizontal: 12, vertical: 8))
+            .leadings([ self._autoScrollButton ])
+            .leadingsSpacing(4)
 #if os(iOS)
-            $0.center = self._searchView
-            $0.centerSpacing = 8
+            .center(
+                UI.View.Custom()
+                    .content(.composition(
+                        entity: .bubble(
+                            content: .margin(
+                                inset: .init(horizontal: 2, vertical: 2),
+                                entity: .view(self._searchInput)
+                            ),
+                            bubble: .view(self._searchBorder)
+                        )
+                    ))
+            )
+            .centerSpacing(8)
 #endif
-            $0.trailings = [ self._closeButton ]
-            $0.trailingsSpacing = 4
-            $0.color = .clear
-        })
+            .trailings([ self._closeButton ])
+            .trailingsSpacing(4)
+            .color(.white)
         
         private(set) lazy var layout = UI.Layout.List(direction: .vertical)
         
-        private(set) lazy var view = UI.View.Scroll(
-            content: self.layout,
-            configure: {
-                $0.direction = .vertical
-                $0.indicatorDirection = .vertical
-                $0.color = .white
-            }
-        )
+        private(set) lazy var view = UI.View.Scroll()
+            .content(self.layout)
+            .direction(.vertical)
+            .indicatorDirection(.vertical)
+            .color(.white)
         
 #if os(iOS)
         
-        private(set) lazy var _searchView = UI.View.Input.String(configure: {
-            $0.height = .fixed(44)
-            $0.textFont = .init(weight: .regular, size: 16)
-            $0.textColor = .black
-            $0.textInset = .init(horizontal: 12, vertical: 4)
-            $0.editingColor = .black
-            $0.placeholder = .init(
+        private(set) lazy var _searchBorder = UI.View.Rect()
+            .border(.manual(width: 1, color: .platinum))
+            .cornerRadius(.manual(radius: 4))
+            .fill(.red)
+        
+        private(set) lazy var _searchInput = UI.View.Input.String()
+            .height(.fixed(44))
+            .textFont(.init(weight: .regular, size: 16))
+            .textColor(.black)
+            .textInset(.init(horizontal: 12, vertical: 4))
+            .placeholder(.init(
                 text: "Enter filter",
                 font: .init(weight: .regular, size: 16),
                 color: .platinum
-            )
-            $0.color = .white
-            $0.border = .manual(width: 1, color: .platinum)
-            $0.cornerRadius = .manual(radius: 4)
-        })
+            ))
+            .editingColor(.black)
         
 #endif
         
-        private(set) lazy var _autoScrollButton = UI.View.Button(configure: {
-            $0.inset = .init(horizontal: 12, vertical: 4)
-            $0.height = .fixed(44)
-            $0.background = UI.View.Empty(configure: {
-                $0.cornerRadius = .manual(radius: 4)
-                $0.color = .glaucous
-            })
-            $0.primary = UI.View.Text(
-                text: "▼",
-                configure: {
-                    $0.textFont = .init(weight: .regular, size: 20)
-                    $0.textColor = .white
-                }
+        private(set) lazy var _autoScrollButton = UI.View.Button()
+            .inset(.init(horizontal: 12, vertical: 4))
+            .height(.fixed(44))
+            .background(
+                UI.View.Rect()
+                    .color(.white)
+                    .fill(.glaucous)
+                    .cornerRadius(.manual(radius: 4))
             )
-            $0.isSelected = true
-        })
+            .primary(
+                UI.View.Text()
+                    .text("▼")
+                    .textFont(.init(weight: .regular, size: 20))
+                    .textColor(.white)
+            )
+            .isSelected(true)
         
-        private(set) lazy var _closeButton: UI.View.Button = {
-            UI.View.Button(configure: {
-                $0.inset = .init(horizontal: 12, vertical: 4)
-                $0.height = .fixed(44)
-                $0.background = UI.View.Empty(configure: {
-                    $0.cornerRadius = .manual(radius: 4)
-                    $0.color = .glaucous
-                })
-                $0.primary = UI.View.Text(
-                    text: "✕",
-                    configure: {
-                        $0.textFont = .init(weight: .regular, size: 20)
-                        $0.textColor = .white
-                    }
-                )
-            })
-        }()
+        
+        private(set) lazy var _closeButton = UI.View.Button()
+            .inset(.init(horizontal: 12, vertical: 4))
+            .height(.fixed(44))
+            .background(
+                UI.View.Rect()
+                    .color(.white)
+                    .fill(.glaucous)
+                    .cornerRadius(.manual(radius: 4))
+            )
+            .primary(
+                UI.View.Text()
+                    .text("✕")
+                    .textFont(.init(weight: .regular, size: 20))
+                    .textColor(.white)
+            )
         
         private var _entities: [Entity]
         private var _search: String?
@@ -106,19 +113,21 @@ extension LogUI {
             self.view.onBeginDragging(self, {
                 $0._autoScrollButton.isSelected = false
             })
-            self._searchView.onPressedReturn(self, {
-                $0._searchView.endEditing()
-                $0._search = $0._searchView.text
+#if os(iOS)
+            self._searchInput.onPressedReturn(self, {
+                $0._searchInput.endEditing()
+                $0._search = $0._searchInput.text
                 $0._reload()
             })
-            self._autoScrollButton.onChangeStyle(self, {
-                guard let background = $0._autoScrollButton.background as? UI.View.Empty else { return }
+#endif
+            self._autoScrollButton.onStyle(self, {
+                guard let background = $0._autoScrollButton.background as? UI.View.Rect else { return }
                 guard let primary = $0._autoScrollButton.primary as? UI.View.Text else { return }
                 if $0._autoScrollButton.isSelected == true {
-                    background.color = .glaucous
+                    background.fill = .glaucous
                     primary.textColor = .white
                 } else {
-                    background.color = .platinum
+                    background.fill = .platinum
                     primary.textColor = .black
                 }
             }).onPressed(self, {
@@ -127,8 +136,8 @@ extension LogUI {
             })
             self._closeButton.onPressed(self, {
 #if os(iOS)
-                if $0._searchView.isEditing == true {
-                    $0._searchView.endEditing()
+                if $0._searchInput.isEditing == true {
+                    $0._searchInput.endEditing()
                 } else {
                     $0._pressedClose()
                 }
@@ -204,37 +213,48 @@ private extension LogUI.Screen {
     }
     
     func _cell(_ item: LogUI.Target.Item) -> UI.View.Cell {
-        return UI.View.Cell(
-            UI.View.Custom(.composition(
-                inset: .init(horizontal: 12, vertical: 8),
-                entity: .hAccessory(
-                    leading: .view(
-                        UI.View.Empty()
-                            .width(.fixed(4))
-                            .color(self._color(item))
-                            .cornerRadius(.auto)
-                    ),
-                    center: .margin(
-                        inset: .init(top: 0, left: 8, right: 0, bottom: 0),
-                        entity: .vStack(
-                            alignment: .fill,
-                            spacing: 4,
-                            entities: [
-                                .view(
-                                    UI.View.Text(item.category)
-                                        .textFont(.init(weight: .regular, size: 16))
-                                ),
-                                .view(
-                                    UI.View.Text(item.message)
-                                        .textFont(.init(weight: .regular, size: 14))
+        return UI.View.Cell()
+            .background(
+                UI.View.Color()
+                    .color(.white)
+            )
+            .content(
+                UI.View.Custom().content(
+                    .composition(
+                        inset: .init(horizontal: 12, vertical: 8),
+                        entity: .hAccessory(
+                            leading: .view(
+                                UI.View.Rect()
+                                    .width(.fixed(4))
+                                    .cornerRadius(.auto)
+                                    .fill(self._color(item))
+                                    .color(.white)
+                            ),
+                            center: .margin(
+                                inset: .init(top: 0, left: 8, right: 0, bottom: 0),
+                                entity: .vStack(
+                                    alignment: .fill,
+                                    spacing: 4,
+                                    entities: [
+                                        .view(
+                                            UI.View.Text()
+                                                .color(.white)
+                                                .text(item.category)
+                                                .textFont(.init(weight: .regular, size: 16))
+                                        ),
+                                        .view(
+                                            UI.View.Text()
+                                                .color(.white)
+                                                .text(item.message)
+                                                .textFont(.init(weight: .regular, size: 14))
+                                        )
+                                    ]
                                 )
-                            ]
+                            )
                         )
-                    ),
-                    filling: true
+                    )
                 )
-            ))
-        )
+            )
     }
     
     func _color(_ item: LogUI.Target.Item) -> UI.Color {

@@ -25,6 +25,11 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.Bubble : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        self.content.invalidate()
+        self.bubble.invalidate()
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         self.content.invalidate(item: item)
         self.bubble.invalidate(item: item)

@@ -188,9 +188,10 @@ public extension UI.Container {
                 trailing: trailing.flatMap({ UI.Layout.Item($0.view) }),
                 trailingSize: trailing?.hamburgerSize ?? 0
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
 #if os(iOS)
-            self._view.gestures([ self._pressedGesture, self._interactiveGesture ])
+                .gestures([ self._pressedGesture, self._interactiveGesture ])
 #endif
             self._setup()
         }
@@ -219,7 +220,10 @@ public extension UI.Container {
                         return true
                     }
                 }
-                self.hideLeading()
+                self.hideLeading(
+                    animated: true,
+                    completion: nil
+                )
                 return true
             case .trailing:
                 if let container = self._trailing {
@@ -227,7 +231,10 @@ public extension UI.Container {
                         return true
                     }
                 }
-                self.hideTrailing()
+                self.hideTrailing(
+                    animated: true,
+                    completion: nil
+                )
                 return true
             }
         }

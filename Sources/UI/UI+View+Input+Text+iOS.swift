@@ -36,35 +36,37 @@ extension UI.View.Input.Text {
 final class KKInputTextView : UIView {
     
     unowned var kkDelegate: KKInputTextViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
+    var kkTextInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self.kkTextInset != oldValue else { return }
+            self.setNeedsLayout()
         }
-        get { super.frame }
     }
-    
-    private unowned var _view: UI.View.Input.Text?
-    private var _placeholder: UILabel!
-    private var _input: UITextView!
+    var kkPlaceholderInset: UIEdgeInsets? {
+        didSet {
+            guard self.kkPlaceholderInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+
+    private var _placeholder: UILabel
+    private var _input: UITextView
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        self.clipsToBounds = true
-        
         self._placeholder = UILabel()
         self._placeholder.isHidden = true
-        self.addSubview(self._placeholder)
-        
+
         self._input = UITextView()
         self._input.backgroundColor = .clear
         self._input.textContainer.lineFragmentPadding = 0
         self._input.layoutManager.usesFontLeading = true
+
+        super.init(frame: frame)
+        
+        self.clipsToBounds = true
+        
+        self.addSubview(self._placeholder)
+        
         self._input.delegate = self
         self.addSubview(self._input)
     }
@@ -77,17 +79,13 @@ final class KKInputTextView : UIView {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        if let view = self._view {
-            let placeholderInset = view.placeholderInset ?? view.textInset
-            let placeholderFrame = bounds.inset(by: placeholderInset.uiEdgeInsets)
-            let placeholderSize = self._placeholder.sizeThatFits(placeholderFrame.size)
-            self._placeholder.frame = CGRect(
-                origin: placeholderFrame.origin,
-                size: CGSize(width: placeholderFrame.width, height: placeholderSize.height)
-            )
-        } else {
-            self._placeholder.frame = bounds
-        }
+        let placeholderInset = self.kkPlaceholderInset ?? self.kkTextInset
+        let placeholderFrame = bounds.inset(by: placeholderInset)
+        let placeholderSize = self._placeholder.sizeThatFits(placeholderFrame.size)
+        self._placeholder.frame = CGRect(
+            origin: placeholderFrame.origin,
+            size: CGSize(width: placeholderFrame.width, height: placeholderSize.height)
+        )
         self._input.frame = bounds
     }
     
@@ -96,7 +94,6 @@ final class KKInputTextView : UIView {
 extension KKInputTextView {
     
     func update(view: UI.View.Input.Text) {
-        self._view = view
         self.update(text: view.text)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
@@ -107,12 +104,6 @@ extension KKInputTextView {
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
         self.update(keyboard: view.keyboard)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
@@ -129,7 +120,7 @@ extension KKInputTextView {
     }
     
     func update(textInset: InsetFloat) {
-        self._input.setNeedsLayout()
+        self.kkTextInset = textInset.uiEdgeInsets
     }
     
     func update(editingColor: UI.Color?) {
@@ -148,7 +139,7 @@ extension KKInputTextView {
     }
     
     func update(placeholderInset: InsetFloat?) {
-        self.setNeedsLayout()
+        self.kkPlaceholderInset = placeholderInset?.uiEdgeInsets
     }
     
     func update(alignment: UI.Text.Alignment) {
@@ -173,7 +164,6 @@ extension KKInputTextView {
     
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

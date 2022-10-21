@@ -74,48 +74,9 @@ public extension UI.Layout {
             self._destroy()
         }
         
-        public func collapse(
-            duration: TimeInterval,
-            ease: IAnimationEase = Animation.Ease.Linear(),
-            completion: (() -> Void)? = nil
-        ) {
-            self._animation = Animation.default.run(
-                duration: duration,
-                ease: ease,
-                processing: { [unowned self] progress in
-                    self._state = .changing(progress)
-                    self.updateIfNeeded()
-                },
-                completion: { [unowned self] in
-                    self._animation = nil
-                    self._state = .collapsed
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
-                    completion?()
-                }
-            )
-        }
-        
-        public func expand(
-            duration: TimeInterval,
-            ease: IAnimationEase = Animation.Ease.Linear(),
-            completion: (() -> Void)? = nil
-        ) {
-            self._animation = Animation.default.run(
-                duration: duration,
-                ease: ease,
-                processing: { [unowned self] progress in
-                    self._state = .changing(progress.invert)
-                    self.updateIfNeeded()
-                },
-                completion: { [unowned self] in
-                    self._animation = nil
-                    self._state = .expanded
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
-                    completion?()
-                }
-            )
+        public func invalidate() {
+            self._contentSize = nil
+            self._detailSize = nil
         }
         
         public func invalidate(item: UI.Layout.Item) {
@@ -225,6 +186,54 @@ public extension UI.Layout {
             }
         }
         
+    }
+    
+}
+
+public extension UI.Layout.Expand {
+    
+    func collapse(
+        duration: TimeInterval,
+        ease: IAnimationEase = Animation.Ease.Linear(),
+        completion: (() -> Void)? = nil
+    ) {
+        self._animation = Animation.default.run(
+            duration: duration,
+            ease: ease,
+            processing: { [unowned self] progress in
+                self._state = .changing(progress)
+                self.updateIfNeeded()
+            },
+            completion: { [unowned self] in
+                self._animation = nil
+                self._state = .collapsed
+                self.setNeedForceUpdate()
+                self.updateIfNeeded()
+                completion?()
+            }
+        )
+    }
+    
+    func expand(
+        duration: TimeInterval,
+        ease: IAnimationEase = Animation.Ease.Linear(),
+        completion: (() -> Void)? = nil
+    ) {
+        self._animation = Animation.default.run(
+            duration: duration,
+            ease: ease,
+            processing: { [unowned self] progress in
+                self._state = .changing(progress.invert)
+                self.updateIfNeeded()
+            },
+            completion: { [unowned self] in
+                self._animation = nil
+                self._state = .expanded
+                self.setNeedForceUpdate()
+                self.updateIfNeeded()
+                completion?()
+            }
+        )
     }
     
 }

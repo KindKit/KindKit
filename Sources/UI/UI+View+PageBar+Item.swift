@@ -12,9 +12,19 @@ protocol IPageBarItemViewDelegate : AnyObject {
 
 public extension UI.View.PageBar {
     
-    final class Item : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Item : IUIWidgetView {
         
         public let body: UI.View.Custom
+        public var inset: InsetFloat {
+            set { self._layout.inset = newValue }
+            get { self._layout.inset }
+        }
+        public var content: IUIView? {
+            didSet {
+                guard self.content !== oldValue else { return }
+                self._layout.content = self.content.flatMap({ UI.Layout.Item($0) })
+            }
+        }
         public var isSelected: Bool {
             set {
                 guard self._isSelected != newValue else { return }
@@ -23,16 +33,6 @@ public extension UI.View.PageBar {
             }
             get { self._isSelected }
         }
-        public var inset: InsetFloat {
-            set { self._layout.inset = newValue }
-            get { self._layout.inset }
-        }
-        public var content: IUIView {
-            didSet {
-                guard self.content !== oldValue else { return }
-                self._layout.content = UI.Layout.Item(self.content)
-            }
-        }
         public let tapGesture = UI.Gesture.Tap()
         
         unowned var delegate: IPageBarItemViewDelegate?
@@ -40,37 +40,13 @@ public extension UI.View.PageBar {
         private var _layout: UI.View.PageBar.Item.Layout
         private var _isSelected: Bool = false
         
-        public init(
-            _ content: IUIView
-        ) {
-            self.content = content
-            self._layout = UI.View.PageBar.Item.Layout(content)
-            self.body = UI.View.Custom(self._layout)
+        public init() {
+            self._layout = .init()
+            self.body = .init()
+                .content(self._layout)
                 .gestures([ self.tapGesture ])
                 .shouldHighlighting(true)
             self._setup()
-        }
-        
-        public convenience init(
-            content: IUIView,
-            configure: (UI.View.PageBar.Item) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
-        }
-        
-        public convenience init(
-            _ content: IUILayout
-        ) {
-            self.init(UI.View.Custom(content))
-        }
-        
-        public convenience init(
-            content: IUILayout,
-            configure: (Item) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
         }
         
     }
@@ -79,12 +55,6 @@ public extension UI.View.PageBar {
 
 public extension UI.View.PageBar.Item {
     
-    @discardableResult
-    func content(_ value: IUIView) -> Self {
-        self.content = value
-        return self
-    }
-    
     @inlinable
     @discardableResult
     func inset(_ value: InsetFloat) -> Self {
@@ -92,6 +62,25 @@ public extension UI.View.PageBar.Item {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: IUIView?) -> Self {
+        self.content = value
+        return self
+    }
+    
+}
+
+extension UI.View.PageBar.Item : IUIViewReusable {
+}
+
+extension UI.View.PageBar.Item : IUIViewHighlightable {
+}
+
+extension UI.View.PageBar.Item : IUIViewSelectable {
+}
+
+extension UI.View.PageBar.Item : IUIViewLockable {
 }
 
 private extension UI.View.PageBar.Item {

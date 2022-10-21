@@ -128,9 +128,10 @@ public extension UI.Container {
                 content: content.flatMap({ UI.Layout.Item($0.view) }),
                 state: .idle
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
 #if os(iOS)
-            self._view.gestures([ self._interactiveGesture ])
+                .gestures([ self._interactiveGesture ])
 #endif
             self._items = []
             self._setup()

@@ -36,27 +36,15 @@ extension UI.View.Text {
 final class KKTextView : NSTextField {
     
     unowned var kkDelegate: KKControlViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     override var isFlipped: Bool {
         return true
     }
     
-    private unowned var _view: UI.View.Text?
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.drawsBackground = false
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.drawsBackground = true
         self.isBordered = false
         self.isBezeled = false
         self.isEditable = false
@@ -80,19 +68,14 @@ final class KKTextView : NSTextField {
 extension KKTextView {
     
     func update(view: UI.View.Text) {
-        self._view = view
         self.update(text: view.text)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(alignment: view.alignment)
         self.update(lineBreak: view.lineBreak)
         self.update(numberOfLines: view.numberOfLines)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
     }
     
     func update(text: String) {
@@ -119,8 +102,15 @@ extension KKTextView {
         self.maximumNumberOfLines = Int(numberOfLines)
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
+    }
+    
     func cleanup() {
-        self._view = nil
     }
     
 }

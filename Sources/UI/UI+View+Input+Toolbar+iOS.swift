@@ -41,8 +41,6 @@ extension UI.View.Input.Toolbar {
 final class KKInputToolbarView : UIToolbar {
     
     private var kkDelegate: KKInputToolbarViewDelegate?
-    
-    private unowned var _view: UI.View.Input.Toolbar?
             
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -59,13 +57,12 @@ final class KKInputToolbarView : UIToolbar {
 extension KKInputToolbarView {
     
     func update(view: UI.View.Input.Toolbar) {
-        self._view = view
         self.update(items: view.items)
         self.update(size: view.size)
         self.update(translucent: view.isTranslucent)
         self.update(barTintColor: view.barTintColor)
         self.update(contentTintColor: view.contentTintColor)
-        self.kk_update(color: view.color)
+        self.update(color: view.color)
         self.kkDelegate = view
     }
     
@@ -100,9 +97,12 @@ extension KKInputToolbarView {
         self.tintColor = contentTintColor.native
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

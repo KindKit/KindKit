@@ -37,27 +37,15 @@ final class KKAttributedTextView : NSTextField {
         
     unowned var kkDelegate: KKAttributedTextViewDelegate?
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     override var isFlipped: Bool {
         return true
     }
     
-    private unowned var _view: UI.View.AttributedText?
-    
     override init(frame: CGRect) {
         super.init(frame: .zero)
         
-        self.drawsBackground = false
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.drawsBackground = true
         self.isBordered = false
         self.isBezeled = false
         self.isEditable = false
@@ -81,21 +69,20 @@ final class KKAttributedTextView : NSTextField {
 extension KKAttributedTextView {
     
     func update(view: UI.View.AttributedText) {
-        self._view = view
         self.update(text: view.text, alignment: view.alignment)
         self.update(lineBreak: view.lineBreak)
         self.update(numberOfLines: view.numberOfLines)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.kkDelegate = view
     }
     
-    func update(text: NSAttributedString, alignment: UI.Text.Alignment?) {
-        self.attributedStringValue = text
+    func update(text: NSAttributedString?, alignment: UI.Text.Alignment?) {
+        if let text = text {
+            self.attributedStringValue = text
+        } else {
+            self.stringValue = ""
+        }
         if let alignment = alignment {
             self.alignment = alignment.nsTextAlignment
         }
@@ -115,9 +102,16 @@ extension KKAttributedTextView {
         self.maximumNumberOfLines = Int(numberOfLines)
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

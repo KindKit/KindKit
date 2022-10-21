@@ -53,6 +53,12 @@ private extension UI.Layout.Composition.VGrid {
 
 extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        for entity in self.entities {
+            entity.invalidate()
+        }
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         for entity in self.entities {
             entity.invalidate(item: item)

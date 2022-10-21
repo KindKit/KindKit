@@ -13,49 +13,58 @@ protocol KKCustomViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Custom : IUIView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Custom {
         
-        public var native: NativeView {
-            return self._view
-        }
-        public var isLoaded: Bool {
-            return self._reuse.isLoaded
-        }
-        public var bounds: RectFloat {
-            guard self.isLoaded == true else { return .zero }
-            return Rect(self._view.bounds)
-        }
         public private(set) unowned var appearedLayout: IUILayout?
         public unowned var appearedItem: UI.Layout.Item?
-        public private(set) var isVisible: Bool = false
-        public var isHidden: Bool = false {
+        public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
             didSet {
-                guard self.isHidden != oldValue else { return }
+                guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
-        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set { self._reuse.unloadBehaviour = newValue }
-            get { self._reuse.unloadBehaviour }
-        }
-        public var reuseCache: UI.Reuse.Cache? {
-            set { self._reuse.cache = newValue }
-            get { self._reuse.cache }
-        }
-        public var reuseName: String? {
-            set { self._reuse.name = newValue }
-            get { self._reuse.name }
-        }
-        public var width: UI.Size.Dynamic = .fit {
+        public var content: IUILayout? {
+            willSet {
+                guard self.content !== newValue else { return }
+                self.content?.view = nil
+            }
             didSet {
-                guard self.width != oldValue else { return }
+                guard self.content !== oldValue else { return }
+                self.content?.view = self
+                if self.isLoaded == true {
+                    self._view.update(content: self.content)
+                }
+                self.content?.setNeedForceUpdate()
                 self.setNeedForceLayout()
             }
         }
-        public var height: UI.Size.Dynamic = .fit {
+        public var contentSize: SizeFloat {
+            guard self.isLoaded == true else { return .zero }
+            return self._view.contentSize
+        }
+        public var gestures: [IUIGesture] {
+            set {
+                self._gestures = newValue
+                if self.isLoaded == true {
+                    self._view.update(gestures: newValue)
+                }
+            }
+            get { self._gestures }
+        }
+        public var color: UI.Color? {
             didSet {
-                guard self.height != oldValue else { return }
-                self.setNeedForceLayout()
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
+            }
+        }
+        public var alpha: Float = 1 {
+            didSet {
+                guard self.alpha != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(alpha: self.alpha)
+                }
             }
         }
         public var shouldHighlighting: Bool = false {
@@ -84,145 +93,31 @@ public extension UI.View {
             }
             get { self._isLocked }
         }
-        public var color: UI.Color? = nil {
+        public var isHidden: Bool = false {
             didSet {
-                guard self.color != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(color: self.color)
-                }
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.cornerRadius != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(cornerRadius: self.cornerRadius)
-                }
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.border != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(border: self.border)
-                }
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.shadow != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(shadow: self.shadow)
-                }
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.alpha != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(alpha: self.alpha)
-                }
-            }
-        }
-        public var gestures: [IUIGesture] {
-            set {
-                self._gestures = newValue
-                if self.isLoaded == true {
-                    self._view.update(gestures: newValue)
-                }
-            }
-            get { self._gestures }
-        }
-        public var content: IUILayout {
-            willSet {
-                guard self.content !== newValue else { return }
-                self.content.view = nil
-            }
-            didSet {
-                guard self.content !== oldValue else { return }
-                self.content.view = self
-                if self.isLoaded == true {
-                    self._view.update(content: self.content)
-                }
-                self.content.setNeedForceUpdate()
+                guard self.isHidden != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
-        public var contentSize: SizeFloat {
-            guard self.isLoaded == true else { return .zero }
-            return self._view.contentSize
-        }
+        public private(set) var isVisible: Bool = false
         public let onAppear: Signal.Empty< Void > = .init()
         public let onDisappear: Signal.Empty< Void > = .init()
         public let onVisible: Signal.Empty< Void > = .init()
         public let onVisibility: Signal.Empty< Void > = .init()
         public let onInvisible: Signal.Empty< Void > = .init()
-        public let onChangeStyle: Signal.Args< Void, Bool > = .init()
+        public let onStyle: Signal.Args< Void, Bool > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
-        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         private var _gestures: [IUIGesture] = []
         private var _isHighlighted: Bool = false
         private var _isLocked: Bool = false
         
-        public init(
-            _ content: IUILayout
-        ) {
-            self.content = content
-            self.content.view = self
-        }
-        
-        public convenience init(
-            content: IUILayout,
-            configure: (UI.View.Custom) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
+        public init() {
         }
         
         deinit {
             self._reuse.destroy()
-        }
-        
-        public func loadIfNeeded() {
-            self._reuse.loadIfNeeded()
-        }
-        
-        public func size(available: SizeFloat) -> SizeFloat {
-            guard self.isHidden == false else { return .zero }
-            return UI.Size.Dynamic.apply(
-                available: available,
-                width: self.width,
-                height: self.height,
-                sizeWithWidth: { self.content.size(available: Size(width: $0, height: available.height)) },
-                sizeWithHeight: { self.content.size(available: Size(width: available.width, height: $0)) },
-                size: { self.content.size(available: available) }
-            )
-        }
-        
-        public func appear(to layout: IUILayout) {
-            self.appearedLayout = layout
-            self.onAppear.emit()
-        }
-        
-        public func disappear() {
-            self._reuse.disappear()
-            self.appearedLayout = nil
-            self.onDisappear.emit()
-        }
-        
-        public func visible() {
-            self.isVisible = true
-            self.onVisible.emit()
-        }
-        
-        public func visibility() {
-            self.onVisibility.emit()
-        }
-        
-        public func invisible() {
-            self.isVisible = false
-            self.onInvisible.emit()
         }
 
     }
@@ -267,6 +162,105 @@ public extension UI.View.Custom {
         return self
     }
     
+}
+
+extension UI.View.Custom : IUIView {
+    
+    public var native: NativeView {
+        self._view
+    }
+    
+    public var isLoaded: Bool {
+        self._reuse.isLoaded
+    }
+    
+    public var bounds: RectFloat {
+        guard self.isLoaded == true else { return .zero }
+        return .init(self._view.bounds)
+    }
+    
+    public func loadIfNeeded() {
+        self._reuse.loadIfNeeded()
+    }
+    
+    public func size(available: SizeFloat) -> SizeFloat {
+        guard self.isHidden == false else { return .zero }
+        return self.size.apply(
+            available: available,
+            sizeWithWidth: {
+                guard let content = self.content else { return .init(width: $0, height: 0) }
+                return content.size(available: .init(width: $0, height: available.height))
+            },
+            sizeWithHeight: {
+                guard let content = self.content else { return .init(width: 0, height: $0) }
+                return content.size(available: .init(width: available.width, height: $0))
+            },
+            size: {
+                guard let content = self.content else { return .zero }
+                return content.size(available: available)
+            }
+        )
+    }
+    
+    public func appear(to layout: IUILayout) {
+        self.appearedLayout = layout
+        self.onAppear.emit()
+    }
+    
+    public func disappear() {
+        self._reuse.disappear()
+        self.appearedLayout = nil
+        self.onDisappear.emit()
+    }
+    
+    public func visible() {
+        self.isVisible = true
+        self.onVisible.emit()
+    }
+    
+    public func visibility() {
+        self.onVisibility.emit()
+    }
+    
+    public func invisible() {
+        self.isVisible = false
+        self.onInvisible.emit()
+    }
+    
+}
+
+extension UI.View.Custom : IUIViewReusable {
+    
+    public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self._reuse.unloadBehaviour = newValue }
+        get { self._reuse.unloadBehaviour }
+    }
+    
+    public var reuseCache: UI.Reuse.Cache? {
+        set { self._reuse.cache = newValue }
+        get { self._reuse.cache }
+    }
+    
+    public var reuseName: String? {
+        set { self._reuse.name = newValue }
+        get { self._reuse.name }
+    }
+    
+}
+
+extension UI.View.Custom : IUIViewDynamicSizeable {
+}
+
+extension UI.View.Custom : IUIViewColorable {
+}
+
+extension UI.View.Custom : IUIViewAlphable {
+}
+
+extension UI.View.Custom : IUIViewHighlightable {
+}
+
+extension UI.View.Custom : IUIViewLockable {
 }
 
 extension UI.View.Custom : KKCustomViewDelegate {

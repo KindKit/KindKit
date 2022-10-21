@@ -21,6 +21,7 @@ public protocol IUILayout : AnyObject {
     func setNeedUpdate()
     func updateIfNeeded()
     
+    func invalidate()
     func invalidate(item: UI.Layout.Item)
 
     func layout(bounds: RectFloat) -> SizeFloat
@@ -33,6 +34,12 @@ public protocol IUILayout : AnyObject {
 
 public extension IUILayout {
     
+    func invalidate() {
+    }
+    
+    func invalidate(item: UI.Layout.Item) {
+    }
+    
     @inlinable
     func setNeedForceUpdate(item: UI.Layout.Item? = nil) {
         if let item = item {
@@ -40,7 +47,12 @@ public extension IUILayout {
         }
         let forceParent: Bool
         if let delegate = self.delegate {
-            forceParent = delegate.setNeedUpdate(self)
+            if delegate.setNeedUpdate(self) == true {
+                self.invalidate()
+                forceParent = true
+            } else {
+                forceParent = false
+            }
         } else {
             forceParent = true
         }
@@ -69,9 +81,6 @@ public extension IUILayout {
     func update() {
         self.delegate?.setNeedUpdate(self)
         self.delegate?.updateIfNeeded(self)
-    }
-    
-    func invalidate(item: UI.Layout.Item) {
     }
     
     @inlinable

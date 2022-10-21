@@ -36,26 +36,15 @@ extension UI.View.Image {
 final class KKImageView : NSImageView {
     
     unowned var kkDelegate: KKControlViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     override var isFlipped: Bool {
         return true
     }
     
-    private unowned var _view: UI.View.Image?
-    
-    override init(frame: CGRect) {
+    override init(frame: NSRect) {
         super.init(frame: frame)
         
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.wantsLayer = true
         self.imageFrameStyle = .none
         self.imageAlignment = .alignCenter
     }
@@ -73,20 +62,15 @@ final class KKImageView : NSImageView {
 extension KKImageView {
     
     func update(view: UI.View.Image) {
-        self._view = view
         self.update(image: view.image)
         self.update(mode: view.mode)
         self.update(tintColor: view.tintColor)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
     }
     
-    func update(image: UI.Image) {
-        self.image = image.native
+    func update(image: UI.Image?) {
+        self.image = image?.native
     }
     
     func update(mode: UI.View.Image.Mode) {
@@ -101,8 +85,16 @@ extension KKImageView {
         self.contentTintColor = tintColor?.native
     }
     
+    func update(color: UI.Color?) {
+        guard let layer = self.layer else { return }
+        layer.backgroundColor = color?.native.cgColor
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
+    }
+    
     func cleanup() {
-        self._view = nil
     }
     
 }

@@ -20,10 +20,6 @@ public extension UI.Layout {
             self.view.appearedItem = self
         }
         
-        deinit {
-            self.view.appearedItem = nil
-        }
-        
     }
     
 }

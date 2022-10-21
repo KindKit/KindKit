@@ -63,63 +63,63 @@ public extension IUIViewInputable {
     @inlinable
     @discardableResult
     func onBeginEditing(_ closure: (() -> Void)?) -> Self {
-        self.onBeginEditing.set(closure)
+        self.onBeginEditing.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginEditing(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBeginEditing.set(self, closure)
+        self.onBeginEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBeginEditing.set(sender, closure)
+        self.onBeginEditing.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEditing(_ closure: (() -> Void)?) -> Self {
-        self.onEditing.set(closure)
+        self.onEditing.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEditing(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEditing.set(self, closure)
+        self.onEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEditing.set(sender, closure)
+        self.onEditing.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndEditing(_ closure: (() -> Void)?) -> Self {
-        self.onEndEditing.set(closure)
+        self.onEndEditing.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndEditing(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEndEditing.set(self, closure)
+        self.onEndEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEndEditing.set(sender, closure)
+        self.onEndEditing.link(sender, closure)
         return self
     }
     

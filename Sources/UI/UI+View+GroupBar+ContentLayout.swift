@@ -28,6 +28,12 @@ extension UI.View.GroupBar {
         init() {
         }
         
+        public func invalidate() {
+            for index in self._cache.startIndex ..< self._cache.endIndex {
+                self._cache[index] = nil
+            }
+        }
+        
         func invalidate(item: UI.Layout.Item) {
             if let index = self.items.firstIndex(of: item) {
                 self._cache[index] = nil

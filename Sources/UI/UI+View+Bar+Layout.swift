@@ -13,7 +13,7 @@ extension UI.View.Bar {
         var placement: UI.View.Bar.Placement {
             didSet { self.setNeedForceUpdate() }
         }
-        var size: Float? = nil {
+        var size: Float? {
             didSet { self.setNeedForceUpdate() }
         }
         var safeArea: InsetFloat = .zero {
@@ -25,8 +25,8 @@ extension UI.View.Bar {
         var content: UI.Layout.Item {
             didSet { self.setNeedForceUpdate(item: self.content) }
         }
-        var separatorItem: UI.Layout.Item? = nil {
-            didSet { self.setNeedForceUpdate(item: self.separatorItem) }
+        var separator: UI.Layout.Item? {
+            didSet { self.setNeedForceUpdate(item: self.separator) }
         }
         
         init(
@@ -44,12 +44,12 @@ extension UI.View.Bar {
             switch self.placement {
             case .top:
                 let separatorHeight: Float
-                if let separatorItem = self.separatorItem {
-                    let separatorSize = separatorItem.size(available: SizeFloat(
+                if let separator = self.separator {
+                    let separatorSize = separator.size(available: SizeFloat(
                         width: bounds.width,
                         height: .infinity
                     ))
-                    separatorItem.frame = RectFloat(
+                    separator.frame = RectFloat(
                         bottomLeft: safeBounds.bottomLeft,
                         size: separatorSize
                     )
@@ -82,12 +82,12 @@ extension UI.View.Bar {
                 )
             case .bottom:
                 let separatorHeight: Float
-                if let separatorItem = self.separatorItem {
-                    let separatorSize = separatorItem.size(available: SizeFloat(
+                if let separator = self.separator {
+                    let separatorSize = separator.size(available: SizeFloat(
                         width: bounds.width,
                         height: .infinity
                     ))
-                    separatorItem.frame = RectFloat(
+                    separator.frame = RectFloat(
                         topLeft: safeBounds.topLeft,
                         size: separatorSize
                     )
@@ -132,8 +132,8 @@ extension UI.View.Bar {
                 ))
                 height = contentSize.height
             }
-            if let separatorItem = self.separatorItem {
-                let separatorSize = separatorItem.size(available: SizeFloat(
+            if let separator = self.separator {
+                let separatorSize = separator.size(available: SizeFloat(
                     width: available.width - self.safeArea.horizontal,
                     height: .infinity
                 ))
@@ -149,8 +149,8 @@ extension UI.View.Bar {
             var items: [UI.Layout.Item] = [
                 self.background
             ]
-            if let separatorItem = self.separatorItem {
-                items.append(separatorItem)
+            if let separator = self.separator {
+                items.append(separator)
             }
             items.append(self.content)
             return items

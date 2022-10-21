@@ -35,16 +35,16 @@ extension UI.View.Progress {
 
 final class KKProgressView : UIView {
     
-    private unowned var _view: UI.View.Progress?
-    private var _progress: UIProgressView!
+    private var _progress: UIProgressView
     
     override init(frame: CGRect) {
+        self._progress = UIProgressView()
+
         super.init(frame: frame)
         
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
         
-        self._progress = UIProgressView()
         self.addSubview(self._progress)
     }
     
@@ -70,16 +70,15 @@ final class KKProgressView : UIView {
 extension KKProgressView {
     
     func update(view: UI.View.Progress) {
-        self._view = view
+        self.update(progress: view.progress)
         self.update(progressColor: view.progressColor)
         self.update(trackColor: view.trackColor)
-        self.update(progress: view.progress)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
+    }
+    
+    func update(progress: Float) {
+        self._progress.progress = progress
     }
     
     func update(progressColor: UI.Color?) {
@@ -90,12 +89,15 @@ extension KKProgressView {
         self._progress.trackTintColor = trackColor?.native
     }
     
-    func update(progress: Float) {
-        self._progress.progress = progress
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
     }
     
     func cleanup() {
-        self._view = nil
     }
     
 }

@@ -50,7 +50,7 @@ private extension Signal.Args {
 public extension Signal.Args {
     
     @discardableResult
-    func set(
+    func link(
         _ closure: ((Argument) -> Result)?
     ) -> ICancellable? {
         guard let closure = closure else {
@@ -63,7 +63,7 @@ public extension Signal.Args {
     }
     
     @discardableResult
-    func set(
+    func link(
         _ closure: (() -> Result)?
     ) -> ICancellable? {
         guard let closure = closure else {
@@ -76,7 +76,7 @@ public extension Signal.Args {
     }
 
     @discardableResult
-    func set< Sender : AnyObject >(
+    func link< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: ((Sender, Argument) -> Result)?
     ) -> ICancellable? {
@@ -90,7 +90,7 @@ public extension Signal.Args {
     }
     
     @discardableResult
-    func set< Sender : AnyObject >(
+    func link< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: ((Sender) -> Result)?
     ) -> ICancellable? {

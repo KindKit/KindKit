@@ -34,21 +34,7 @@ extension UI.View.AnimatedImage {
 }
 
 final class KKAnimatedImageView : UIImageView {
-    
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.AnimatedImage?
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -72,18 +58,13 @@ final class KKAnimatedImageView : UIImageView {
 extension KKAnimatedImageView {
     
     func update(view: UI.View.AnimatedImage) {
-        self._view = view
         self.update(images: view.images)
         self.update(duration: view.duration)
         self.update(repeat: view.repeat)
         self.update(mode: view.mode)
         self.update(tintColor: view.tintColor)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
     }
     
     func update(images: [UI.Image]) {
@@ -114,9 +95,16 @@ extension KKAnimatedImageView {
         self.tintColor = tintColor?.native
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
     func cleanup() {
         self.stopAnimating()
-        self._view = nil
     }
     
 }

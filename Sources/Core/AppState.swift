@@ -86,6 +86,7 @@ public final class AppState {
     }
     
     deinit {
+#if os(iOS)
         if let observer = self._becomeActiveObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -101,6 +102,7 @@ public final class AppState {
         if let observer = self._memoryWarningObserver {
             NotificationCenter.default.removeObserver(observer)
         }
+#endif
     }
     
     public func add(observer: IAppStateObserver, priority: ObserverPriority) {

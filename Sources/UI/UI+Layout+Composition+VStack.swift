@@ -39,6 +39,12 @@ private extension UI.Layout.Composition.VStack {
 
 extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        for entity in self.entities {
+            entity.invalidate()
+        }
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         for entity in self.entities {
             entity.invalidate(item: item)

@@ -119,13 +119,16 @@ public extension UI.Container {
                 barVisibility: screen.pageBarVisibility,
                 barHidden: screen.pageBarHidden
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
+#if os(iOS)
+                .gestures([ self._interactiveGesture ])
+#endif
 #if os(macOS)
             self.animationVelocity = NSScreen.kk_animationVelocity
 #elseif os(iOS)
             self.animationVelocity = UIScreen.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
-            self._view.gestures([ self._interactiveGesture ])
 #endif
             self._items = containers.map({ Item(container: $0) })
             if let current = current {

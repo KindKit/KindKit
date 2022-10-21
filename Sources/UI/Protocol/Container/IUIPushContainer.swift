@@ -20,17 +20,3 @@ public protocol IUIPushContainer : IUIContainer, IUIContainerParentable {
     func dismiss(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?)
     
 }
-
-public extension IUIPushContainer {
-    
-    @inlinable
-    func present(container: IUIPushContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.present(container: container, animated: animated, completion: completion)
-    }
-    
-    @inlinable
-    func dismiss(container: IUIPushContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.dismiss(container: container, animated: animated, completion: completion)
-    }
-    
-}

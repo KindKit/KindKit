@@ -168,147 +168,147 @@ public extension IUIGesture {
     @inlinable
     @discardableResult
     func onShouldBegin(_ closure: (() -> Bool?)?) -> Self {
-        self.onShouldBegin.set(closure)
+        self.onShouldBegin.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBegin(_ closure: ((Self) -> Bool?)?) -> Self {
-        self.onShouldBegin.set(self, closure)
+        self.onShouldBegin.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Bool?)?) -> Self {
-        self.onShouldBegin.set(sender, closure)
+        self.onShouldBegin.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously(_ closure: (() -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(closure)
+        self.onShouldSimultaneously.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously(_ closure: ((Self) -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(self, closure)
+        self.onShouldSimultaneously.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously(_ closure: ((NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(closure)
+        self.onShouldSimultaneously.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously(_ closure: ((Self, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(self, closure)
+        self.onShouldSimultaneously.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(sender, closure)
+        self.onShouldSimultaneously.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldSimultaneously< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldSimultaneously.set(sender, closure)
+        self.onShouldSimultaneously.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure(_ closure: (() -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(closure)
+        self.onShouldRequireFailure.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure(_ closure: ((Self) -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(self, closure)
+        self.onShouldRequireFailure.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure(_ closure: ((NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(closure)
+        self.onShouldRequireFailure.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure(_ closure: ((Self, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(self, closure)
+        self.onShouldRequireFailure.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(sender, closure)
+        self.onShouldRequireFailure.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldRequireFailure< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldRequireFailure.set(sender, closure)
+        self.onShouldRequireFailure.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy(_ closure: (() -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(closure)
+        self.onShouldBeRequiredToFailBy.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy(_ closure: ((Self) -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(self, closure)
+        self.onShouldBeRequiredToFailBy.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy(_ closure: ((NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(closure)
+        self.onShouldBeRequiredToFailBy.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy(_ closure: ((Self, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(self, closure)
+        self.onShouldBeRequiredToFailBy.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(sender, closure)
+        self.onShouldBeRequiredToFailBy.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onShouldBeRequiredToFailBy< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NativeGesture) -> Bool?)?) -> Self {
-        self.onShouldBeRequiredToFailBy.set(sender, closure)
+        self.onShouldBeRequiredToFailBy.link(sender, closure)
         return self
     }
     

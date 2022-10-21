@@ -6,18 +6,8 @@ import Foundation
 
 public extension UI.View {
 
-    final class External : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class External {
         
-        public var native: NativeView {
-            return self._view
-        }
-        public var isLoaded: Bool {
-            return self._reuse.isLoaded
-        }
-        public var bounds: RectFloat {
-            guard self.isLoaded == true else { return .zero }
-            return Rect(self._view.bounds)
-        }
         public private(set) unowned var appearedLayout: IUILayout?
         public unowned var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
@@ -27,77 +17,19 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set { self._reuse.unloadBehaviour = newValue }
-            get { self._reuse.unloadBehaviour }
-        }
-        public var reuseCache: UI.Reuse.Cache? {
-            set { self._reuse.cache = newValue }
-            get { self._reuse.cache }
-        }
-        public var reuseName: String? {
-            set { self._reuse.name = newValue }
-            get { self._reuse.name }
-        }
-        public var width: UI.Size.Static = .fill {
+        public var size: UI.Size.Static = .init(width: .fill, height: .fill) {
             didSet {
-                guard self.width != oldValue else { return }
+                guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
-        public var height: UI.Size.Static = .fill {
-            didSet {
-                guard self.height != oldValue else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var aspectRatio: Float? = nil {
+        public var aspectRatio: Float? {
             didSet {
                 guard self.aspectRatio != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.color != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(color: self.color)
-                }
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.cornerRadius != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(cornerRadius: self.cornerRadius)
-                }
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.border != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(border: self.border)
-                }
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.shadow != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(shadow: self.shadow)
-                }
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.alpha != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(alpha: self.alpha)
-                }
-            }
-        }
-        public var content: NativeView {
+        public var content: NativeView? {
             didSet {
                 guard self.content !== oldValue else { return }
                 if self.isLoaded == true {
@@ -112,63 +44,13 @@ public extension UI.View {
         public let onInvisible: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
-        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         
-        public init(
-            _ content: NativeView
-        ) {
-            self.content = content
-        }
-        
-        public convenience init(
-            content: NativeView,
-            configure: (UI.View.External) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
+        public init() {
         }
         
         deinit {
             self._reuse.destroy()
-        }
-        
-        public func loadIfNeeded() {
-            self._reuse.loadIfNeeded()
-        }
-        
-        public func size(available: SizeFloat) -> SizeFloat {
-            guard self.isHidden == false else { return .zero }
-            return UI.Size.Static.apply(
-                available: available,
-                width: self.width,
-                height: self.height,
-                aspectRatio: self.aspectRatio
-            )
-        }
-        
-        public func appear(to layout: IUILayout) {
-            self.appearedLayout = layout
-            self.onAppear.emit()
-        }
-        
-        public func disappear() {
-            self._reuse.disappear()
-            self.appearedLayout = nil
-            self.onDisappear.emit()
-        }
-        
-        public func visible() {
-            self.isVisible = true
-            self.onVisible.emit()
-        }
-        
-        public func visibility() {
-            self.onVisibility.emit()
-        }
-        
-        public func invisible() {
-            self.isVisible = false
-            self.onInvisible.emit()
         }
         
     }
@@ -176,13 +58,6 @@ public extension UI.View {
 }
 
 public extension UI.View.External {
-
-    @inlinable
-    @discardableResult
-    func aspectRatio(_ value: Float?) -> Self {
-        self.aspectRatio = value
-        return self
-    }
     
     @inlinable
     @discardableResult
@@ -191,4 +66,83 @@ public extension UI.View.External {
         return self
     }
     
+}
+
+extension UI.View.External : IUIView {
+    
+    public var native: NativeView {
+        self._view
+    }
+    
+    public var isLoaded: Bool {
+        self._reuse.isLoaded
+    }
+    
+    public var bounds: RectFloat {
+        guard self.isLoaded == true else { return .zero }
+        return .init(self._view.bounds)
+    }
+    
+    public func loadIfNeeded() {
+        self._reuse.loadIfNeeded()
+    }
+    
+    public func size(available: SizeFloat) -> SizeFloat {
+        guard self.isHidden == false else { return .zero }
+        return self.size.apply(
+            available: available,
+            aspectRatio: self.aspectRatio
+        )
+    }
+    
+    public func appear(to layout: IUILayout) {
+        self.appearedLayout = layout
+        self.onAppear.emit()
+    }
+    
+    public func disappear() {
+        self._reuse.disappear()
+        self.appearedLayout = nil
+        self.onDisappear.emit()
+    }
+    
+    public func visible() {
+        self.isVisible = true
+        self.onVisible.emit()
+    }
+    
+    public func visibility() {
+        self.onVisibility.emit()
+    }
+    
+    public func invisible() {
+        self.isVisible = false
+        self.onInvisible.emit()
+    }
+    
+}
+
+extension UI.View.External : IUIViewReusable {
+    
+    public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self._reuse.unloadBehaviour = newValue }
+        get { self._reuse.unloadBehaviour }
+    }
+    
+    public var reuseCache: UI.Reuse.Cache? {
+        set { self._reuse.cache = newValue }
+        get { self._reuse.cache }
+    }
+    
+    public var reuseName: String? {
+        set { self._reuse.name = newValue }
+        get { self._reuse.name }
+    }
+    
+}
+
+extension UI.View.External : IUIViewStaticSizeable {
+}
+
+extension UI.View.External : IUIViewAspectSizeable {
 }

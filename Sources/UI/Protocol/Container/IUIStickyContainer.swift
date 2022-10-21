@@ -13,11 +13,3 @@ public protocol IUIStickyContainer : IUIContainer, IUIContainerParentable {
     func updateSticky(animated: Bool, completion: (() -> Void)?)
     
 }
-
-public extension IUIStickyContainer {
-    
-    func updateSticky(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.updateSticky(animated: animated, completion: completion)
-    }
-    
-}

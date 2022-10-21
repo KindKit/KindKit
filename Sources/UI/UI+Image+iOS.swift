@@ -148,7 +148,7 @@ public extension UI.Image {
         return self.native.pngData()
     }
     
-    func withRenderingMode(renderingMode: UIImage.RenderingMode) -> UI.Image {
+    func with(renderingMode: UIImage.RenderingMode) -> UI.Image {
         return .init(self.native.withRenderingMode(renderingMode))
     }
     
@@ -228,7 +228,49 @@ public extension UI.Image {
         return .init(imageCopy)
     }
     
-    func scaleTo(size: SizeFloat) -> UI.Image? {
+    func round(
+        auto percent: PercentFloat,
+        edges: UI.CornerRadius.Edge = .all
+    ) -> UI.Image? {
+        return self.round(
+            radius: ceil(min(self.size.width - 1, self.size.height - 1)) * percent.value,
+            edges: edges
+        )
+    }
+    
+    func round(
+        radius: Float,
+        edges: UI.CornerRadius.Edge = .all
+    ) -> UI.Image? {
+        let radius = radius.cgFloat
+        let scale = self.scale.cgFloat
+        let rect = CGRect(origin: .zero, size: self.size.cgSize)
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
+        defer {
+            UIGraphicsEndImageContext()
+        }
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return nil
+        }
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: edges.uiRectCorner,
+            cornerRadii: .init(
+                width: radius,
+                height: radius
+            )
+        )
+        path.addClip()
+        self.native.draw(in: rect)
+        guard let image = context.makeImage() else {
+            return nil
+        }
+        return .init(UIImage(cgImage: image, scale: scale, orientation: .up))
+    }
+    
+    func scaleTo(
+        size: SizeFloat
+    ) -> UI.Image? {
         guard let cgImage = self.native.cgImage else {
             return nil
         }
@@ -238,15 +280,16 @@ public extension UI.Image {
         defer {
             UIGraphicsEndImageContext()
         }
-        if let context = UIGraphicsGetCurrentContext() {
-            context.translateBy(x: 0, y: CGFloat(aspectSize.height))
-            context.scaleBy(x: 1.0, y: -1.0)
-            context.draw(cgImage, in: CGRect(origin: .zero, size: aspectSize.cgSize))
-            if let image = context.makeImage() {
-                return .init(UIImage(cgImage: image, scale: scale, orientation: .up))
-            }
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return nil
         }
-        return nil
+        context.translateBy(x: 0, y: CGFloat(aspectSize.height))
+        context.scaleBy(x: 1.0, y: -1.0)
+        context.draw(cgImage, in: CGRect(origin: .zero, size: aspectSize.cgSize))
+        guard let image = context.makeImage() else {
+            return nil
+        }
+        return .init(UIImage(cgImage: image, scale: scale, orientation: .up))
     }
     
 }

@@ -69,7 +69,8 @@ public extension UI.Container {
             self.isPresented = false
             self.screen = screen
             self._layout = Layout()
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
             self._setup()
         }
         
@@ -275,6 +276,14 @@ extension UI.Container.Screen : IHamburgerMenuContainer where Screen : IUIScreen
 }
 
 extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScreenModalable {
+    
+    public var modalColor: UI.Color {
+        return self.screen.modalColor
+    }
+    
+    public var modalCornerRadius: UI.CornerRadius {
+        return self.screen.modalCornerRadius
+    }
     
     public var modalSheetInset: InsetFloat? {
         switch self.screen.modalPresentation {

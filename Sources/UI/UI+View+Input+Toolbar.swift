@@ -14,40 +14,10 @@ protocol KKInputToolbarViewDelegate : AnyObject {
 
 public extension UI.View.Input {
 
-    final class Toolbar : IUIAccessoryView, IUIViewReusable, IUIViewColorable {
+    final class Toolbar {
         
-        public var native: NativeView {
-            return self._view
-        }
-        public var isLoaded: Bool {
-            return self._reuse.isLoaded
-        }
-        public var bounds: RectFloat {
-            guard self.isLoaded == true else { return .zero }
-            return Rect(self._view.bounds)
-        }
         public private(set) unowned var parentView: IUIView?
-        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set { self._reuse.unloadBehaviour = newValue }
-            get { self._reuse.unloadBehaviour }
-        }
-        public var reuseCache: UI.Reuse.Cache? {
-            set { self._reuse.cache = newValue }
-            get { self._reuse.cache }
-        }
-        public var reuseName: Swift.String? {
-            set { self._reuse.name = newValue }
-            get { self._reuse.name }
-        }
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.color != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(color: self.color)
-                }
-            }
-        }
-        public var items: [IInputToolbarItem] {
+        public var items: [IInputToolbarItem] = [] {
             didSet {
                 if self.isLoaded == true {
                     self._view.update(items: self.items)
@@ -70,7 +40,7 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var barTintColor: UI.Color? = nil {
+        public var barTintColor: UI.Color? {
             didSet {
                 guard self.barTintColor != oldValue else { return }
                 if self.isLoaded == true {
@@ -86,47 +56,25 @@ public extension UI.View.Input {
                 }
             }
         }
+        public var color: UI.Color? {
+            didSet {
+                guard self.color != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(color: self.color)
+                }
+            }
+        }
         public let onAppear: Signal.Empty< Void > = .init()
         public let onDisappear: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
-        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         
-        public init(
-            _ items: [IInputToolbarItem]
-        ) {
-            self.items = items
-        }
-        
-        public convenience init(
-            items: [IInputToolbarItem],
-            configure: (UI.View.Input.Toolbar) -> Void
-        ) {
-            self.init(items)
-            self.modify(configure)
+        public init() {
         }
         
         deinit {
             self._reuse.destroy()
-        }
-        
-        public func loadIfNeeded() {
-            self._reuse.loadIfNeeded()
-        }
-        
-        public func size(available: SizeFloat) -> SizeFloat {
-            return Size(width: available.width, height: self.size)
-        }
-        
-        public func appear(to view: IUIView) {
-            self.parentView = view
-            self.onAppear.emit()
-        }
-        
-        public func disappear() {
-            self._reuse.disappear()
-            self.parentView = nil
-            self.onDisappear.emit()
         }
         
     }
@@ -170,6 +118,62 @@ public extension UI.View.Input.Toolbar {
         return self
     }
     
+}
+
+extension UI.View.Input.Toolbar : IUIAccessoryView {
+    
+    public var native: NativeView {
+        self._view
+    }
+    public var isLoaded: Bool {
+        self._reuse.isLoaded
+    }
+    public var bounds: RectFloat {
+        guard self.isLoaded == true else { return .zero }
+        return .init(self._view.bounds)
+    }
+    
+    public func loadIfNeeded() {
+        self._reuse.loadIfNeeded()
+    }
+    
+    public func size(available: SizeFloat) -> SizeFloat {
+        return .init(width: available.width, height: self.size)
+    }
+    
+    public func appear(to view: IUIView) {
+        self.parentView = view
+        self.onAppear.emit()
+    }
+    
+    public func disappear() {
+        self._reuse.disappear()
+        self.parentView = nil
+        self.onDisappear.emit()
+    }
+    
+}
+
+extension UI.View.Input.Toolbar : IUIViewReusable {
+    
+    public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self._reuse.unloadBehaviour = newValue }
+        get { self._reuse.unloadBehaviour }
+    }
+    
+    public var reuseCache: UI.Reuse.Cache? {
+        set { self._reuse.cache = newValue }
+        get { self._reuse.cache }
+    }
+    
+    public var reuseName: Swift.String? {
+        set { self._reuse.name = newValue }
+        get { self._reuse.name }
+    }
+    
+}
+
+extension UI.View.Input.Toolbar : IUIViewColorable {
 }
 
 extension UI.View.Input.Toolbar : KKInputToolbarViewDelegate {

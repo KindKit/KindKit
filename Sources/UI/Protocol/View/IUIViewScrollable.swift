@@ -103,105 +103,105 @@ public extension IUIViewScrollable {
     @inlinable
     @discardableResult
     func onBeginDragging(_ closure: (() -> Void)?) -> Self {
-        self.onBeginDragging.set(closure)
+        self.onBeginDragging.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginDragging(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBeginDragging.set(self, closure)
+        self.onBeginDragging.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginDragging< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBeginDragging.set(sender, closure)
+        self.onBeginDragging.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDragging(_ closure: (() -> Void)?) -> Self {
-        self.onDragging.set(closure)
+        self.onDragging.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDragging(_ closure: ((Self) -> Void)?) -> Self {
-        self.onDragging.set(self, closure)
+        self.onDragging.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDragging< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onDragging.set(sender, closure)
+        self.onDragging.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDragging(_ closure: ((Bool) -> Void)?) -> Self {
-        self.onEndDragging.set(closure)
+        self.onEndDragging.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDragging(_ closure: ((Self, Bool) -> Void)?) -> Self {
-        self.onEndDragging.set(self, closure)
+        self.onEndDragging.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDragging< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
-        self.onEndDragging.set(sender, closure)
+        self.onEndDragging.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginDecelerating(_ closure: (() -> Void)?) -> Self {
-        self.onBeginDecelerating.set(closure)
+        self.onBeginDecelerating.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginDecelerating(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBeginDecelerating.set(self, closure)
+        self.onBeginDecelerating.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginDecelerating< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBeginDecelerating.set(sender, closure)
+        self.onBeginDecelerating.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDecelerating(_ closure: (() -> Void)?) -> Self {
-        self.onEndDecelerating.set(closure)
+        self.onEndDecelerating.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDecelerating(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEndDecelerating.set(self, closure)
+        self.onEndDecelerating.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndDecelerating< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEndDecelerating.set(sender, closure)
+        self.onEndDecelerating.link(sender, closure)
         return self
     }
     

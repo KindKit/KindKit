@@ -50,6 +50,12 @@ extension UI.View.Button {
         init() {
         }
         
+        public func invalidate() {
+            self._cacheSpinnerSize = nil
+            self._cacheSecondarySize = nil
+            self._cachePrimarySize = nil
+        }
+        
         public func invalidate(item: UI.Layout.Item) {
             if self.spinner == item {
                 self._cacheSpinnerSize = nil

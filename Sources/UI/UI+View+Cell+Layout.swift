@@ -10,28 +10,37 @@ extension UI.View.Cell {
         
         unowned var delegate: IUILayoutDelegate?
         unowned var view: IUIView?
-        var content: UI.Layout.Item {
+        var background: UI.Layout.Item? {
+            didSet { self.setNeedForceUpdate() }
+        }
+        var content: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
         
-        init(
-            _ content: IUIView
-        ) {
-            self.content = UI.Layout.Item(content)
+        init() {
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            self.content.frame = bounds
+            self.background?.frame = bounds
+            self.content?.frame = bounds
             return bounds.size
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            let contentSize = self.content.size(available: available)
+            guard let content = self.content else { return .zero }
+            let contentSize = content.size(available: available)
             return Size(width: available.width, height: contentSize.height)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            return [ self.content ]
+            if let background = self.background, let content = self.content {
+                return [ background, content ]
+            } else if let background = self.background {
+                return [ background ]
+            } else if let content = self.content {
+                return [ content ]
+            }
+            return []
         }
         
     }

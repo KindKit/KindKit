@@ -139,13 +139,17 @@ public extension UI {
             if let containerView = self._containerView {
                 containerView.frame = self.view.bounds
             }
-            self._updateSafeArea()
+            if self.container.isPresented == true {
+                self.container.safeArea = self._safeArea()
+            }
         }
         
         @available(iOS 11.0, *)
         public override func viewSafeAreaInsetsDidChange() {
             super.viewSafeAreaInsetsDidChange()
-            self._updateSafeArea()
+            if self.container.isPresented == true {
+                self.container.safeArea = self._safeArea()
+            }
         }
         
         public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -226,15 +230,6 @@ private extension UI.ViewController {
             height = Float(UIApplication.shared.statusBarFrame.height)
         }
         return height
-    }
-    
-    func _updateSafeArea() {
-        if self.container.isPresented == true {
-            self.container.safeArea = self._safeArea()
-        }
-        if let containerView = self._containerView {
-            containerView.layoutIfNeeded()
-        }
     }
     
     func _safeArea() -> InsetFloat {

@@ -21,9 +21,6 @@ public extension IUIScreenViewable {
         return [ .top, .left, .right, .bottom ]
     }
     
-    func didChangeInsets() {
-    }
-    
 }
 
 public extension IUIScreenViewable where Self : IUIScreen, AssociatedView == UI.View.Scroll {

@@ -19,12 +19,3 @@ public protocol IUIBookContainer : IUIContainer, IUIContainerParentable {
     func set(current: IUIBookContentContainer, animated: Bool, completion: (() -> Void)?)
     
 }
-
-public extension IUIBookContainer {
-    
-    @inlinable
-    func set(current: IUIBookContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.set(current: current, animated: animated, completion: completion)
-    }
-    
-}

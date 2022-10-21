@@ -107,7 +107,8 @@ public extension UI.Container {
                 stickyVisibility: screen.stickyVisibility,
                 stickyHidden: screen.stickyHidden
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
             self._setup()
         }
         
@@ -281,6 +282,14 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
 }
 
 extension UI.Container.Sticky : IUIModalContentContainer where ContentContainer : IUIModalContentContainer {
+    
+    public var modalColor: UI.Color {
+        return self.content.modalColor
+    }
+    
+    public var modalCornerRadius: UI.CornerRadius {
+        return self.content.modalCornerRadius
+    }
     
     public var modalSheetInset: InsetFloat? {
         return self.content.modalSheetInset

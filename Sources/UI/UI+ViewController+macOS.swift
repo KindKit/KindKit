@@ -24,14 +24,15 @@ public extension UI {
                 if let containerView = self._containerView {
                     containerView.frame = self.view.bounds
                     self.view.addSubview(containerView)
+                    containerView.layoutSubtreeIfNeeded()
                 }
             }
         }
         private var _owner: AnyObject?
         
         private init(
-            container: UI.Container.Root,
-            owner: AnyObject? = nil
+            owner: AnyObject? = nil,
+            container: UI.Container.Root
         ) {
             self.container = container
             self._owner = owner
@@ -42,7 +43,7 @@ public extension UI {
             UI.Container.BarController.shared.add(observer: self)
         }
         
-        convenience init(
+        public convenience init(
             _ container: UI.Container.Root
         ) {
             self.init(container: container)
@@ -66,8 +67,8 @@ public extension UI {
             _ wireframe: Wireframe
         ) where Wireframe : AnyObject, Wireframe.Container == UI.Container.Root {
             self.init(
-                container: wireframe.container,
-                owner: wireframe
+                owner: wireframe,
+                container: wireframe.container
             )
         }
         
@@ -75,10 +76,10 @@ public extension UI {
             _ wireframe: Wireframe
         ) where Wireframe : AnyObject, Wireframe.Container : IUIRootContentContainer {
             self.init(
+                owner: wireframe,
                 container: UI.Container.Root(
                     content: wireframe.container
-                ),
-                owner: wireframe
+                )
             )
         }
         
@@ -91,7 +92,9 @@ public extension UI {
         }
         
         public override func loadView() {
-            self.view = NSView(frame: .zero)
+            let view = NSView(frame: .init(x: 0, y: 0, width: 800, height: 600))
+            view.translatesAutoresizingMaskIntoConstraints = false
+            self.view = view
         }
         
         public override func viewWillAppear() {
@@ -114,7 +117,9 @@ public extension UI {
             if let containerView = self._containerView {
                 containerView.frame = self.view.bounds
             }
-            self._updateSafeArea()
+            if self.container.isPresented == true {
+                self.container.safeArea = self._safeArea()
+            }
         }
                 
     }
@@ -137,15 +142,6 @@ private extension UI.ViewController {
     func _free() {
         UI.Container.BarController.shared.remove(observer: self)
         NotificationCenter.default.removeObserver(self)
-    }
-        
-    func _updateSafeArea() {
-        if self.container.isPresented == true {
-            self.container.safeArea = self._safeArea()
-        }
-        if let containerView = self._containerView {
-            containerView.layoutSubtreeIfNeeded()
-        }
     }
     
     func _safeArea() -> InsetFloat {

@@ -12,7 +12,7 @@ public protocol IPageBarViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class PageBar : IUIWidgetView, IUIViewReusable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class PageBar : IUIWidgetView {
         
         public private(set) var body: UI.View.Bar
         public var leading: IUIView? {
@@ -27,10 +27,10 @@ public extension UI.View {
                 self._contentLayout.trailing = self.trailing.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var indicator: IUIView {
+        public var indicator: IUIView? {
             didSet {
                 guard self.indicator !== oldValue else { return }
-                self._contentLayout.indicator = UI.Layout.Item(self.indicator)
+                self._contentLayout.indicator = self.indicator.flatMap({ UI.Layout.Item($0) })
             }
         }
         public var items: [UI.View.PageBar.Item] {
@@ -82,27 +82,15 @@ public extension UI.View {
         private var _transitionContentOffset: PointFloat?
         private var _transitionSelectedView: IUIView?
         
-        public init(
-            indicator: IUIView
-        ) {
-            self.indicator = indicator
-            self._contentLayout = ContentLayout(
-                indicator: indicator
-            )
-            self._contentView = UI.View.Scroll(self._contentLayout)
+        public init() {
+            self._contentLayout = ContentLayout()
+            self._contentView = UI.View.Scroll()
                 .direction(.horizontal)
+                .content(self._contentLayout)
             self.body = .init(
                 placement: .top,
                 content: self._contentView
             )
-        }
-        
-        public convenience init(
-            indicator: IUIView,
-            configure: (UI.View.PageBar) -> Void
-        ) {
-            self.init(indicator: indicator)
-            self.modify(configure)
         }
         
         public func beginTransition() {
@@ -154,7 +142,7 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
-    func indicator(_ value: IUIView) -> Self {
+    func indicator(_ value: IUIView?) -> Self {
         self.indicator = value
         return self
     }
@@ -189,6 +177,17 @@ public extension UI.View.PageBar {
     
 }
 
+extension UI.View.PageBar : IUIViewReusable {
+}
+
+extension UI.View.PageBar : IUIViewColorable {
+}
+
+extension UI.View.PageBar : IUIViewAlphable {
+}
+
+extension UI.View.PageBar : IUIViewLockable {
+}
 
 extension UI.View.PageBar : IPageBarItemViewDelegate {
     

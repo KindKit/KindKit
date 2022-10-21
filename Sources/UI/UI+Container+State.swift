@@ -89,10 +89,12 @@ public extension UI.Container {
             self.isPresented = false
             self._content = content
             self._layout = .init(content.flatMap({ UI.Layout.Item($0.view) }))
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
             self._setup()
         }
         
+        @inlinable
         public convenience init<
             Screen : IUIScreen & IUIScreenViewable
         >(

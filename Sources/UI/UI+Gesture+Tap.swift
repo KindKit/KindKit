@@ -134,7 +134,7 @@ public extension UI.Gesture {
         public let onTriggered: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
-        @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _gesture: Reusable.Content { self._reuse.content }
         
         public init() {
         }
@@ -168,21 +168,21 @@ public extension UI.Gesture.Tap {
     @inlinable
     @discardableResult
     func onTriggered(_ closure: (() -> Void)?) -> Self {
-        self.onTriggered.set(closure)
+        self.onTriggered.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onTriggered(_ closure: ((Self) -> Void)?) -> Self {
-        self.onTriggered.set(self, closure)
+        self.onTriggered.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onTriggered.set(sender, closure)
+        self.onTriggered.link(sender, closure)
         return self
     }
     

@@ -16,7 +16,7 @@ extension UI.View.PageBar {
         var trailing: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
-        var indicator: UI.Layout.Item {
+        var indicator: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
         var indicatorState: IndicatorState = .empty {
@@ -37,10 +37,13 @@ extension UI.View.PageBar {
         
         private var _cache: [SizeFloat?] = []
 
-        init(
-            indicator: IUIView
-        ) {
-            self.indicator = UI.Layout.Item(indicator)
+        init() {
+        }
+        
+        public func invalidate() {
+            for index in self._cache.startIndex ..< self._cache.endIndex {
+                self._cache[index] = nil
+            }
         }
         
         func invalidate(item: UI.Layout.Item) {
@@ -124,15 +127,17 @@ extension UI.View.PageBar {
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             var items = self.visible(items: self.items, for: bounds)
-            switch self.indicatorState {
-            case .empty:
-                break
-            case .alias(let current):
-                self.indicator.frame = current.frame
-                items.append(self.indicator)
-            case .transition(let current, let next, let progress):
-                self.indicator.frame = current.frame.lerp(next.frame, progress: progress)
-                items.append(self.indicator)
+            if let indicator = self.indicator {
+                switch self.indicatorState {
+                case .empty:
+                    break
+                case .alias(let current):
+                    indicator.frame = current.frame
+                    items.append(indicator)
+                case .transition(let current, let next, let progress):
+                    indicator.frame = current.frame.lerp(next.frame, progress: progress)
+                    items.append(indicator)
+                }
             }
             if let item = self.leading {
                 item.frame = RectFloat(

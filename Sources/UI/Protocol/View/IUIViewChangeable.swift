@@ -24,21 +24,21 @@ public extension IUIViewChangeable {
     @inlinable
     @discardableResult
     func onChange(_ closure: (() -> Void)?) -> Self {
-        self.onChange.set(closure)
+        self.onChange.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onChange(_ closure: ((Self) -> Void)?) -> Self {
-        self.onChange.set(self, closure)
+        self.onChange.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onChange< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onChange.set(sender, closure)
+        self.onChange.link(sender, closure)
         return self
     }
     

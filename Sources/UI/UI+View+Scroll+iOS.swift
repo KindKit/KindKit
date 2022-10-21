@@ -36,7 +36,7 @@ extension UI.View.Scroll {
 final class KKScrollView : UIScrollView {
     
     unowned var kkDelegate: KKScrollViewDelegate?
-    var needLayoutContent: Bool {
+    var needLayoutContent: Bool = true {
         didSet {
             if self.needLayoutContent == true {
                 self.setNeedsLayout()
@@ -48,11 +48,10 @@ final class KKScrollView : UIScrollView {
             let oldValue = super.frame
             if oldValue != newValue {
                 super.frame = newValue
-                if let view = self._view {
-                    self.kk_update(cornerRadius: view.cornerRadius)
-                    self.kk_updateShadowPath()
-                }
                 if oldValue.size != newValue.size {
+                    if self.window != nil {
+                        self._layoutManager.invalidate()
+                    }
                     self.needLayoutContent = true
                 }
             }
@@ -69,23 +68,17 @@ final class KKScrollView : UIScrollView {
         get { super.contentSize }
     }
     
-    private unowned var _view: UI.View.Scroll?
     private var _contentView: UIView!
     private var _refreshView: UIRefreshControl!
     private var _layoutManager: UI.Layout.Manager!
-    private var _visibleInset: InsetFloat {
+    private var _visibleInset: InsetFloat = .zero {
         didSet {
             guard self._visibleInset != oldValue else { return }
             self.setNeedsLayout()
         }
     }
-    private var _isLayout: Bool
     
     override init(frame: CGRect) {
-        self.needLayoutContent = true
-        self._visibleInset = .zero
-        self._isLayout = false
-        
         super.init(frame: frame)
 
         if #available(iOS 11.0, *) {
@@ -119,7 +112,7 @@ final class KKScrollView : UIScrollView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        self._safeLayout({
+        do {
             let bounds = self.bounds
             if self.needLayoutContent == true {
                 self.needLayoutContent = false
@@ -150,7 +143,7 @@ final class KKScrollView : UIScrollView {
                 bounds: RectFloat(bounds),
                 inset: self._visibleInset
             )
-        })
+        }
     }
     
     @available(iOS 11.0, *)
@@ -165,7 +158,6 @@ final class KKScrollView : UIScrollView {
 extension KKScrollView {
     
     func update(view: UI.View.Scroll) {
-        self._view = view
         self.update(direction: view.direction)
         self.update(indicatorDirection: view.indicatorDirection)
         self.update(delaysContentTouches: view.delaysContentTouches)
@@ -176,21 +168,13 @@ extension KKScrollView {
         self.update(content: view.content)
         self.update(refreshColor: view.refreshColor)
         self.update(isRefreshing: view.isRefreshing)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
-    func update(locked: Bool) {
-        self.isScrollEnabled = locked == false
-    }
-    
-    func update(content: IUILayout) {
+    func update(content: IUILayout?) {
         self._layoutManager.layout = content
         self.needLayoutContent = true
     }
@@ -260,10 +244,21 @@ extension KKScrollView {
         }
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
+    func update(locked: Bool) {
+        self.isScrollEnabled = locked == false
+    }
+    
     func cleanup() {
         self._layoutManager.layout = nil
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }
@@ -289,14 +284,6 @@ private extension KKScrollView {
             bottom: contentInset.bottom - safeArea.bottom,
             right: contentInset.right - safeArea.right
         )
-    }
-    
-    func _safeLayout(_ action: () -> Void) {
-        if self._isLayout == false {
-            self._isLayout = true
-            action()
-            self._isLayout = false
-        }
     }
     
 }

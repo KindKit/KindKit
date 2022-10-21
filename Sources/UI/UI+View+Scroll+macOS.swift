@@ -39,15 +39,13 @@ final class KKScrollView : NSScrollView {
     var needLayoutContent: Bool = true {
         didSet {
             if self.needLayoutContent == true {
-                self.documentView?.needsLayout = true
+                self._documentView.needsLayout = true
                 self.contentView.needsLayout = true
             }
         }
     }
     override var contentSize: CGSize {
-        set {
-            self.documentView?.frame = NSRect(origin: self.frame.origin, size: newValue)
-        }
+        set { self._documentView.frame = NSRect(origin: .zero, size: newValue) }
         get { super.contentSize }
     }
     override var frame: CGRect {
@@ -55,11 +53,10 @@ final class KKScrollView : NSScrollView {
             let oldValue = super.frame
             if oldValue != newValue {
                 super.frame = newValue
-                if let view = self._view {
-                    self.kk_update(cornerRadius: view.cornerRadius)
-                    self.kk_updateShadowPath()
-                }
                 if oldValue.size != newValue.size {
+                    if self.window != nil {
+                        self._layoutManager.invalidate()
+                    }
                     self.needLayoutContent = true
                 }
             }
@@ -70,7 +67,8 @@ final class KKScrollView : NSScrollView {
         return true
     }
     
-    private unowned var _view: UI.View.Scroll?
+    private var _contentView: KKScrollContentView!
+    private var _documentView: KKScrollDocumentView!
     private var _layoutManager: UI.Layout.Manager!
     private var _visibleInset: InsetFloat = .zero {
         didSet {
@@ -78,15 +76,22 @@ final class KKScrollView : NSScrollView {
             self.needLayoutContent = true
         }
     }
-    private var _isLayout: Bool = false
     private var _isLocked: Bool = false
     
-    override init(frame: CGRect) {
+    override init(frame: NSRect) {
         super.init(frame: frame)
         
+        self._contentView = KKScrollContentView(owner: self)
+        self._documentView = KKScrollDocumentView(owner: self)
+        
+        self.contentView = self._contentView
+        self.documentView = self._documentView
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.drawsBackground = true
         self.autohidesScrollers = true
-        self.contentView = KKScrollContentView(owner: self)
-        self.documentView = KKScrollDocumentView(owner: self)
+        self.automaticallyAdjustsContentInsets = false
+        
+        self._layoutManager = .init(contentView: self._documentView, delegate: self)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self._startDragging(_:)), name: Self.willStartLiveScrollNotification, object: self)
         NotificationCenter.default.addObserver(self, selector: #selector(self._dragging(_:)), name: Self.didLiveScrollNotification, object: self)
@@ -99,13 +104,6 @@ final class KKScrollView : NSScrollView {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        self.documentView = nil
-    }
-    
-    override func scrollWheel(with event: NSEvent) {
-        if self._isLocked == false {
-            super.scrollWheel(with: event)
-        }
     }
 
     override func viewWillMove(toSuperview superview: NSView?) {
@@ -116,52 +114,48 @@ final class KKScrollView : NSScrollView {
         }
     }
     
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        guard self._isLocked == false else {
+            return nil
+        }
+        return super.hitTest(point)
+    }
+    
     func layoutContent() {
-        self._safeLayout({
-            let bounds = self.bounds
-            if self.needLayoutContent == true {
-                self.needLayoutContent = false
-                
-                let layoutBounds = RectFloat(
-                    x: 0,
-                    y: 0,
-                    width: Float(bounds.size.width),
-                    height: Float(bounds.size.height)
-                )
-                self._layoutManager.layout(bounds: layoutBounds)
-                self.contentSize = self._layoutManager.size.cgSize
-                self.kkDelegate?.update(self, contentSize: self._layoutManager.size)
-            }
-            self._layoutManager.visible(
-                bounds: RectFloat(self.contentView.documentVisibleRect),
-                inset: self._visibleInset
-            )
-        })
+        if self.needLayoutContent == true {
+            self.needLayoutContent = false
+            
+            let bounds = RectFloat(self.bounds)
+            self._layoutManager.layout(bounds: bounds)
+            self.contentSize = self._layoutManager.size.cgSize
+            self.kkDelegate?.update(self, contentSize: self._layoutManager.size)
+        }
+        do {
+            let visibleRect = RectFloat(self.contentView.documentVisibleRect)
+            self._layoutManager.visible(bounds: visibleRect, inset: self._visibleInset)
+        }
     }
     
 }
-    
+
 final class KKScrollContentView : NSClipView {
     
-    unowned var _owner: KKScrollView
     override var isFlipped: Bool {
         return true
     }
+    
+    unowned var _owner: KKScrollView
 
     init(owner: KKScrollView) {
         self._owner = owner
         
         super.init(frame: CGRect.zero)
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layout() {
-        super.layout()
-        
-        self._owner.layoutContent()
     }
     
     override func scroll(to newOrigin: NSPoint) {
@@ -174,15 +168,18 @@ final class KKScrollContentView : NSClipView {
 
 final class KKScrollDocumentView : NSView {
     
-    unowned var _owner: KKScrollView
     override var isFlipped: Bool {
         return true
     }
+    
+    unowned var _owner: KKScrollView
 
     init(owner: KKScrollView) {
         self._owner = owner
         
         super.init(frame: CGRect.zero)
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
@@ -200,7 +197,6 @@ final class KKScrollDocumentView : NSView {
 extension KKScrollView {
     
     func update(view: UI.View.Scroll) {
-        self._view = view
         self.update(direction: view.direction)
         self.update(indicatorDirection: view.indicatorDirection)
         self.update(visibleInset: view.visibleInset)
@@ -208,21 +204,13 @@ extension KKScrollView {
         self.update(contentSize: view.contentSize)
         self.update(contentOffset: view.contentOffset, normalized: true)
         self.update(content: view.content)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
-    func update(locked: Bool) {
-        self._isLocked = locked
-    }
-    
-    func update(content: IUILayout) {
+    func update(content: IUILayout?) {
         self._layoutManager.layout = content
         self.needLayoutContent = true
     }
@@ -266,23 +254,26 @@ extension KKScrollView {
         self.scroll(validContentOffset)
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native ?? .clear
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
+    }
+    
+    func update(locked: Bool) {
+        self._isLocked = locked
+    }
+    
     func cleanup() {
         self._layoutManager.layout = nil
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }
 
 private extension KKScrollView {
-    
-    func _safeLayout(_ action: () -> Void) {
-        if self._isLayout == false {
-            self._isLayout = true
-            action()
-            self._isLayout = false
-        }
-    }
     
     @objc
     func _startDragging(_ sender: Any) {

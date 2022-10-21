@@ -25,6 +25,9 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.Space : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
     }
     

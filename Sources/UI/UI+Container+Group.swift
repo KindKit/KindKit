@@ -113,7 +113,8 @@ public extension UI.Container {
                 barVisibility: screen.groupBarVisibility,
                 barHidden: screen.groupBarHidden
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
             self._items = containers.map({ Item(container: $0) })
             if let current = current {
                 if let index = self._items.firstIndex(where: { $0.container === current }) {

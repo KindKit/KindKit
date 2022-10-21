@@ -6,24 +6,16 @@ import Foundation
 
 public protocol IUIViewDynamicSizeable : AnyObject {
     
-    var width: UI.Size.Dynamic { set get }
-    
-    var height: UI.Size.Dynamic { set get }
+    var size: UI.Size.Dynamic { set get }
     
 }
 
 public extension IUIViewDynamicSizeable where Self : IUIWidgetView, Body : IUIViewDynamicSizeable {
     
     @inlinable
-    var width: UI.Size.Dynamic {
-        set { self.body.width = newValue }
-        get { self.body.width }
-    }
-    
-    @inlinable
-    var height: UI.Size.Dynamic {
-        set { self.body.height = newValue }
-        get { self.body.height }
+    var size: UI.Size.Dynamic {
+        set { self.body.size = newValue }
+        get { self.body.size }
     }
     
 }
@@ -31,15 +23,41 @@ public extension IUIViewDynamicSizeable where Self : IUIWidgetView, Body : IUIVi
 public extension IUIViewDynamicSizeable {
     
     @inlinable
+    var width: UI.Size.Dynamic.Dimension {
+        set { self.size.width = newValue }
+        get { self.size.width }
+    }
+    
+    @inlinable
+    var height: UI.Size.Dynamic.Dimension {
+        set { self.size.height = newValue }
+        get { self.size.height }
+    }
+    
+    @inlinable
     @discardableResult
-    func width(_ value: UI.Size.Dynamic) -> Self {
+    func size(_ width: UI.Size.Dynamic.Dimension, _ height: UI.Size.Dynamic.Dimension) -> Self {
+        self.size = .init(width: width, height: height)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: UI.Size.Dynamic) -> Self {
+        self.size = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func width(_ value: UI.Size.Dynamic.Dimension) -> Self {
         self.width = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func height(_ value: UI.Size.Dynamic) -> Self {
+    func height(_ value: UI.Size.Dynamic.Dimension) -> Self {
         self.height = value
         return self
     }

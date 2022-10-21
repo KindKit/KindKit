@@ -32,42 +32,42 @@ public extension IUIAnyView {
     @inlinable
     @discardableResult
     func onAppear(_ closure: (() -> Void)?) -> Self {
-        self.onAppear.set(closure)
+        self.onAppear.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onAppear(_ closure: ((Self) -> Void)?) -> Self {
-        self.onAppear.set(self, closure)
+        self.onAppear.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onAppear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onAppear.set(sender, closure)
+        self.onAppear.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDisappear(_ closure: (() -> Void)?) -> Self {
-        self.onDisappear.set(closure)
+        self.onDisappear.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDisappear(_ closure: ((Self) -> Void)?) -> Self {
-        self.onDisappear.set(self, closure)
+        self.onDisappear.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDisappear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onDisappear.set(sender, closure)
+        self.onDisappear.link(sender, closure)
         return self
     }
     

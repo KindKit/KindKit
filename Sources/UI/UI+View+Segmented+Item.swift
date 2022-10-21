@@ -17,4 +17,12 @@ public extension UI.View.Segmented {
     
 }
 
+public extension UI.View.Segmented.Item {
+    
+    static func string< Localized : IEnumLocalized >(_ string: Localized) -> Self {
+        return .string(string.localized)
+    }
+    
+}
+
 #endif

@@ -6,32 +6,18 @@ import Foundation
 
 public extension UI.View {
 
-    final class Button : IUIWidgetView, IUIViewReusable, IUIViewDynamicSizeable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Button : IUIWidgetView {
         
         public private(set) var body: UI.View.Control
+        public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
+            didSet {
+                guard self.size != oldValue else { return }
+                self.setNeedForceLayout()
+            }
+        }
         public var inset: InsetFloat {
             set { self._layout.inset = newValue }
             get { self._layout.inset }
-        }
-        public var width: UI.Size.Dynamic = .fit {
-            didSet {
-                guard self.width != oldValue else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var height: UI.Size.Dynamic = .fit {
-            didSet {
-                guard self.height != oldValue else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var isSelected: Bool {
-            set {
-                guard self._isSelected != newValue else { return }
-                self._isSelected = newValue
-                self.triggeredChangeStyle(false)
-            }
-            get { self._isSelected }
         }
         public var alignment: Alignment {
             set { self._layout.alignment = newValue }
@@ -46,10 +32,6 @@ public extension UI.View {
         public var spinnerPosition: SpinnerPosition {
             set { self._layout.spinnerPosition = newValue }
             get { self._layout.spinnerPosition }
-        }
-        public var spinnerAnimating: Bool {
-            set { self._layout.spinnerAnimating = newValue }
-            get { self._layout.spinnerAnimating }
         }
         public var primary: IUIView? {
             didSet { self._layout.primary = self.primary.flatMap({ UI.Layout.Item($0) }) }
@@ -69,37 +51,37 @@ public extension UI.View {
             set { self._layout.secondaryInset = newValue }
             get { self._layout.secondaryInset }
         }
+        public var isAnimating: Bool {
+            set { self._layout.spinnerAnimating = newValue }
+            get { self._layout.spinnerAnimating }
+        }
+        public var isSelected: Bool {
+            set {
+                guard self._isSelected != newValue else { return }
+                self._isSelected = newValue
+                self.triggeredChangeStyle(false)
+            }
+            get { self._isSelected }
+        }
         
         private var _layout: Layout
         private var _isSelected: Bool = false
         
         public init() {
             self._layout = Layout()
-            self.body = .init(
-                content: self._layout,
-                configure: {
-                    $0.shouldHighlighting = true
-                    $0.shouldPressed = true
-                }
-            )
-        }
-        
-        public convenience init(
-            configure: (UI.View.Button) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
+            self.body = .init()
+                .content(self._layout)
+                .shouldHighlighting(true)
+                .shouldPressed(true)
         }
         
         public func size(available: SizeFloat) -> SizeFloat {
             guard self.isHidden == false else { return .zero }
-            return UI.Size.Dynamic.apply(
+            return self.size.apply(
                 available: available,
-                width: self.width,
-                height: self.height,
-                sizeWithWidth: { return self.body.size(available: Size(width: $0, height: available.height)) },
-                sizeWithHeight: { return self.body.size(available: Size(width: available.width, height: $0)) },
-                size: { return self.body.size(available: available) }
+                sizeWithWidth: { self.body.size(available: .init(width: $0, height: available.height)) },
+                sizeWithHeight: { self.body.size(available: .init(width: available.width, height: $0)) },
+                size: { self.body.size(available: available) }
             )
         }
         
@@ -134,13 +116,6 @@ public extension UI.View.Button {
     @discardableResult
     func spinnerPosition(_ value: SpinnerPosition) -> Self {
         self.spinnerPosition = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func spinnerAnimating(_ value: Bool) -> Self {
-        self.spinnerAnimating = value
         return self
     }
     
@@ -186,4 +161,25 @@ public extension UI.View.Button {
         return self
     }
     
+}
+
+extension UI.View.Button : IUIViewReusable {
+}
+
+extension UI.View.Button : IUIViewDynamicSizeable {
+}
+
+extension UI.View.Button : IUIViewAnimatable {
+}
+
+extension UI.View.Button : IUIViewHighlightable {
+}
+
+extension UI.View.Button : IUIViewSelectable {
+}
+
+extension UI.View.Button : IUIViewLockable {
+}
+
+extension UI.View.Button : IUIViewPressable {
 }

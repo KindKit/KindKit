@@ -13,32 +13,33 @@ extension UI.View.SwipeCell {
         var state: State = .idle {
             didSet { self.setNeedUpdate() }
         }
-        var content: UI.Layout.Item {
+        var background: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
-        var leading: UI.Layout.Item? = nil {
+        var content: UI.Layout.Item? {
+            didSet { self.setNeedForceUpdate() }
+        }
+        var leading: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
         var leadingSize: Float = 0 {
             didSet { self.setNeedForceUpdate() }
         }
-        var trailing: UI.Layout.Item? = nil {
+        var trailing: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }
         var trailingSize: Float = 0 {
             didSet { self.setNeedForceUpdate() }
         }
 
-        init(
-            _ content: IUIView
-        ) {
-            self.content = UI.Layout.Item(content)
+        init() {
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
+            self.background?.frame = bounds
             switch self.state {
             case .idle:
-                self.content.frame = bounds
+                self.content?.frame = bounds
             case .leading(let progress):
                 if let leading = self.leading {
                     let contentBeginFrame = bounds
@@ -60,10 +61,10 @@ extension UI.View.SwipeCell {
                         width: self.leadingSize,
                         height: bounds.size.height
                     )
-                    self.content.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    self.content?.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
                     leading.frame = leadingBeginFrame.lerp(leadingEndedFrame, progress: progress.value)
                 } else {
-                    self.content.frame = bounds
+                    self.content?.frame = bounds
                 }
             case .trailing(let progress):
                 if let trailing = self.trailing {
@@ -86,42 +87,81 @@ extension UI.View.SwipeCell {
                         width: self.trailingSize,
                         height: bounds.size.height
                     )
-                    self.content.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
+                    self.content?.frame = contentBeginFrame.lerp(contentEndedFrame, progress: progress.value)
                     trailing.frame = trailingBeginFrame.lerp(trailingEndedFrame, progress: progress.value)
                 } else {
-                    self.content.frame = bounds
+                    self.content?.frame = bounds
                 }
             }
             return bounds.size
         }
         
         func size(available: SizeFloat) -> SizeFloat {
-            let contentSize = self.content.size(available: available)
+            guard let content = self.content else { return .zero }
+            let contentSize = content.size(available: available)
             switch self.state {
-            case .idle: break
+            case .idle:
+                break
             case .leading:
-                guard let leading = self.leading else { break }
-                let leadingSize = leading.size(available: SizeFloat(width: self.leadingSize, height: contentSize.height))
-                return Size(width: available.width, height: max(contentSize.height, leadingSize.height))
+                if let leading = self.leading {
+                    let leadingSize = leading.size(available: SizeFloat(width: self.leadingSize, height: contentSize.height))
+                    return Size(width: available.width, height: max(contentSize.height, leadingSize.height))
+                }
             case .trailing:
-                guard let trailing = self.trailing else { break }
-                let trailingSize = trailing.size(available: SizeFloat(width: self.trailingSize, height: contentSize.height))
-                return Size(width: available.width, height: max(contentSize.height, trailingSize.height))
+                if let trailing = self.trailing {
+                    let trailingSize = trailing.size(available: SizeFloat(width: self.trailingSize, height: contentSize.height))
+                    return Size(width: available.width, height: max(contentSize.height, trailingSize.height))
+                }
             }
             return Size(width: available.width, height: contentSize.height)
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
-            var items: [UI.Layout.Item] = [ self.content ]
             switch self.state {
-            case .leading where self.leading != nil:
-                items.insert(self.leading!, at: 0)
-            case .trailing where self.trailing != nil:
-                items.insert(self.trailing!, at: 0)
-            default:
-                break
+            case .idle:
+                if let background = self.background, let content = self.content {
+                    return [ background, content ]
+                } else if let background = self.background {
+                    return [ background ]
+                } else if let content = self.content {
+                    return [ content ]
+                }
+            case .leading:
+                if let background = self.background, let content = self.content {
+                    if let leading = self.leading {
+                        return [ background, leading, content ]
+                    }
+                    return [ background, content ]
+                } else if let background = self.background {
+                    if let leading = self.leading {
+                        return [ background, leading ]
+                    }
+                    return [ background ]
+                } else if let content = self.content {
+                    if let leading = self.leading {
+                        return [ leading, content ]
+                    }
+                    return [ content ]
+                }
+            case .trailing:
+                if let background = self.background, let content = self.content {
+                    if let trailing = self.trailing {
+                        return [ background, trailing, content ]
+                    }
+                    return [ background, content ]
+                } else if let background = self.background {
+                    if let trailing = self.trailing {
+                        return [ background, trailing ]
+                    }
+                    return [ background ]
+                } else if let content = self.content {
+                    if let trailing = self.trailing {
+                        return [ trailing, content ]
+                    }
+                    return [ content ]
+                }
             }
-            return items
+            return []
         }
         
     }

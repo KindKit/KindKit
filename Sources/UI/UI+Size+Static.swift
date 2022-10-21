@@ -5,12 +5,19 @@
 import Foundation
 
 public extension UI.Size {
-
-    enum Static : Equatable {
+    
+    struct Static : Equatable {
         
-        case fill
-        case percent(PercentFloat)
-        case fixed(Float)
+        public var width: Dimension?
+        public var height: Dimension?
+        
+        public init(
+            width: Dimension?,
+            height: Dimension?
+        ) {
+            self.width = width
+            self.height = height
+        }
         
     }
     
@@ -19,96 +26,44 @@ public extension UI.Size {
 public extension UI.Size.Static {
     
     @inlinable
-    static func apply(
-        available: Float,
-        behaviour: UI.Size.Static
-    ) -> Float {
-        switch behaviour {
-        case .fill:
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available)
-        case .fixed(let value):
-            return max(0, value)
-        case .percent(let value):
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available * value.value)
-        }
-    }
-    
-    @inlinable
-    static func apply(
+    func apply(
         available: SizeFloat,
-        width: UI.Size.Static?,
-        height: UI.Size.Static?,
         aspectRatio: Float?
     ) -> SizeFloat {
         if let aspectRatio = aspectRatio {
-            return Self.apply(
-                available: available,
-                width: width,
-                height: height,
-                aspectRatio: aspectRatio
-            )
+            if let width = self.width {
+                let w = width.apply(available: available.width)
+                if w > .leastNonzeroMagnitude {
+                    return Size(width: w, height: w / aspectRatio)
+                }
+            } else if let height = self.height {
+                let h = height.apply(available: available.height)
+                if h > .leastNonzeroMagnitude {
+                    return Size(width: h * aspectRatio, height: h)
+                }
+            }
+            return .zero
         }
-        return Self.apply(
-            available: available,
-            width: width,
-            height: height
-        )
+        return self.apply(available: available)
     }
     
     @inlinable
-    static func apply(
-        available: SizeFloat,
-        width: UI.Size.Static?,
-        height: UI.Size.Static?,
-        aspectRatio: Float
-    ) -> SizeFloat {
-        if let width = width {
-            let w = Self.apply(available: available.width, behaviour: width)
-            if w > .leastNonzeroMagnitude {
-                return Size(width: w, height: w / aspectRatio)
-            }
-        } else if let height = height {
-            let h = Self.apply(available: available.height, behaviour: height)
-            if h > .leastNonzeroMagnitude {
-                return Size(width: h * aspectRatio, height: h)
-            }
-        }
-        return .zero
-    }
-    
-    @inlinable
-    static func apply(
-        available: SizeFloat,
-        width: UI.Size.Static?,
-        height: UI.Size.Static?
+    func apply(
+        available: SizeFloat
     ) -> SizeFloat {
         let w: Float
-        if let width = width {
-            w = Self.apply(available: available.width, behaviour: width)
+        if let width = self.width {
+            w = width.apply(available: available.width)
         } else {
             w = 0
         }
         let h: Float
-        if let height = height {
-            h = Self.apply(available: available.height, behaviour: height)
+        if let height = self.height {
+            h = height.apply(available: available.height)
         } else {
             h = 0
         }
         return Size(width: w, height: h)
-    }
-    
-    @inlinable
-    static func apply(
-        available: SizeFloat,
-        width: UI.Size.Static,
-        height: UI.Size.Static
-    ) -> SizeFloat {
-        return Size(
-            width: Self.apply(available: available.width, behaviour: width),
-            height: Self.apply(available: available.height, behaviour: height)
-        )
     }
     
 }

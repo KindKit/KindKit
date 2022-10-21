@@ -9,8 +9,22 @@ import UIKit
 
 public extension UI.View {
     
-    final class Cell : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Cell : IUIWidgetView {
         
+        public private(set) var body: UI.View.Custom
+        public var background: IUIView? {
+            didSet {
+                guard self.background !== oldValue else { return }
+                self._layout.background = self.background.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public var content: IUIView? {
+            didSet {
+                guard self.content !== oldValue else { return }
+                self._layout.content = self.content.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public var shouldPressed: Bool = true
         public var isSelected: Bool {
             set {
                 guard self._isSelected != newValue else { return }
@@ -19,41 +33,23 @@ public extension UI.View {
             }
             get { self._isSelected }
         }
-        public var shouldPressed: Bool = true
-        public var content: IUIView {
-            didSet {
-                guard self.content !== oldValue else { return }
-                self._layout.content = UI.Layout.Item(self.content)
-            }
-        }
 #if os(iOS)
         public let pressedGesture = UI.Gesture.Tap()
 #endif
-        public private(set) var body: UI.View.Custom
         public let onPressed: Signal.Empty< Void > = .init()
         
-        private var _layout: Layout
         private var _isSelected: Bool = false
+        private var _layout: Layout
         
-        public init(
-            _ content: IUIView
-        ) {
-            self.content = content
-            self._layout = Layout(content)
-            self.body = UI.View.Custom(self._layout)
-                .shouldHighlighting(true)
+        public init() {
+            self._layout = Layout()
+            self.body = UI.View.Custom()
+                .content(self._layout)
 #if os(iOS)
                 .gestures([ self.pressedGesture ])
 #endif
+                .shouldHighlighting(true)
             self._setup()
-        }
-        
-        public convenience init(
-            content: IUIView,
-            configure: (UI.View.Cell) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
         }
         
     }
@@ -61,6 +57,13 @@ public extension UI.View {
 }
 
 public extension UI.View.Cell {
+    
+    @inlinable
+    @discardableResult
+    func background(_ value: IUIView) -> Self {
+        self.background = value
+        return self
+    }
     
     @inlinable
     @discardableResult
@@ -81,4 +84,22 @@ private extension UI.View.Cell {
 #endif
     }
     
+}
+
+extension UI.View.Cell : IUIViewReusable {
+}
+
+extension UI.View.Cell : IUIViewDynamicSizeable {
+}
+
+extension UI.View.Cell : IUIViewHighlightable {
+}
+
+extension UI.View.Cell : IUIViewSelectable {
+}
+
+extension UI.View.Cell : IUIViewLockable {
+}
+
+extension UI.View.Cell : IUIViewPressable {
 }

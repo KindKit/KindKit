@@ -29,6 +29,7 @@ public final class Database {
         self._connection = connection
     }
     
+    @inlinable
     public convenience init(
         filename: String,
         readonly: Bool = false,

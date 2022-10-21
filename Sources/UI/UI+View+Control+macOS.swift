@@ -39,31 +39,17 @@ final class KKControlView : NSControl {
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     override var isFlipped: Bool {
         return true
     }
     
-    private unowned var _view: UI.View.Control?
     private var _layoutManager: UI.Layout.Manager!
-    private var _isLayout: Bool
     
-    override init(frame: CGRect) {
-        self._isLayout = false
-        
+    override init(frame: NSRect) {
         super.init(frame: frame)
         
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.wantsLayer = true
         
         self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
     }
@@ -83,11 +69,9 @@ final class KKControlView : NSControl {
     override func layout() {
         super.layout()
         
-        self._safeLayout({
-            let bounds = RectFloat(self.bounds)
-            self._layoutManager.layout(bounds: bounds)
-            self._layoutManager.visible(bounds: bounds)
-        })
+        let bounds = RectFloat(self.bounds)
+        self._layoutManager.layout(bounds: bounds)
+        self._layoutManager.visible(bounds: bounds)
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -134,21 +118,25 @@ final class KKControlView : NSControl {
 extension KKControlView {
     
     func update(view: UI.View.Control) {
-        self._view = view
         self.update(content: view.content)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
-    func update(content: IUILayout) {
+    func update(content: IUILayout?) {
         self._layoutManager.layout = content
         self.needsLayout = true
+    }
+    
+    func update(color: UI.Color?) {
+        guard let layer = self.layer else { return }
+        layer.backgroundColor = color?.native.cgColor
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
     }
     
     func update(locked: Bool) {
@@ -158,19 +146,6 @@ extension KKControlView {
     func cleanup() {
         self._layoutManager.layout = nil
         self.kkDelegate = nil
-        self._view = nil
-    }
-    
-}
-
-private extension KKControlView {
-    
-    func _safeLayout(_ action: () -> Void) {
-        if self._isLayout == false {
-            self._isLayout = true
-            action()
-            self._isLayout = false
-        }
     }
     
 }

@@ -2,9 +2,11 @@
 //  KindKit
 //
 
-#if os(iOS)
-
 import Foundation
+
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
 
 protocol KKInputSecureViewDelegate : AnyObject {
     
@@ -17,98 +19,19 @@ protocol KKInputSecureViewDelegate : AnyObject {
 
 public extension UI.View.Input {
     
-    final class Secure : IUIView, IUIViewReusable, IUIViewInputable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Secure {
         
-        public var native: NativeView {
-            return self._view
-        }
-        public var isLoaded: Bool {
-            return self._reuse.isLoaded
-        }
-        public var bounds: RectFloat {
-            guard self.isLoaded == true else { return .zero }
-            return Rect(self._view.bounds)
-        }
         public private(set) unowned var appearedLayout: IUILayout?
         public unowned var appearedItem: UI.Layout.Item?
-        public private(set) var isVisible: Bool = false
-        public var isHidden: Bool = false {
+        public var size: UI.Size.Static = .init(width: .fill, height: .fixed(28)) {
             didSet {
-                guard self.isHidden != oldValue else { return }
+                guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set { self._reuse.unloadBehaviour = newValue }
-            get { self._reuse.unloadBehaviour }
-        }
-        public var reuseCache: UI.Reuse.Cache? {
-            set { self._reuse.cache = newValue }
-            get { self._reuse.cache }
-        }
-        public var reuseName: Swift.String? {
-            set { self._reuse.name = newValue }
-            get { self._reuse.name }
-        }
-        public var isEditing: Bool {
-            guard self.isLoaded == true else { return false }
-            return self._view.isFirstResponder
-        }
-        public var width: UI.Size.Static = .fill {
-            didSet {
-                guard self.width != oldValue else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var height: UI.Size.Static = .fixed(29) {
-            didSet {
-                guard self.height != oldValue else { return }
-                self.setNeedForceLayout()
-            }
-        }
-        public var color: UI.Color? = nil {
-            didSet {
-                guard self.color != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(color: self.color)
-                }
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.cornerRadius != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(cornerRadius: self.cornerRadius)
-                }
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.border != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(border: self.border)
-                }
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.shadow != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(shadow: self.shadow)
-                }
-            }
-        }
-        public var alpha: Float = 1 {
-            didSet {
-                guard self.alpha != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(alpha: self.alpha)
-                }
             }
         }
         public var text: Swift.String {
             set {
-                guard self.text != newValue else { return }
+                guard self._text != newValue else { return }
                 self._text = newValue
                 if self.isLoaded == true {
                     self._view.update(text: self._text)
@@ -148,7 +71,7 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var placeholder: UI.View.Input.Placeholder? = nil {
+        public var placeholder: UI.View.Input.Placeholder? {
             didSet {
                 guard self.placeholder != oldValue else { return }
                 if self.isLoaded == true {
@@ -190,6 +113,13 @@ public extension UI.View.Input {
             }
         }
 #endif
+        public var isHidden: Bool = false {
+            didSet {
+                guard self.isHidden != oldValue else { return }
+                self.setNeedForceLayout()
+            }
+        }
+        public private(set) var isVisible: Bool = false
         public let onAppear: Signal.Empty< Void > = .init()
         public let onDisappear: Signal.Empty< Void > = .init()
         public let onVisible: Signal.Empty< Void > = .init()
@@ -201,77 +131,14 @@ public extension UI.View.Input {
         public let onPressedReturn: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
-        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         private var _text: Swift.String = ""
         
         public init() {
         }
         
-        public convenience init(
-            configure: (UI.View.Input.Secure) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
-        }
-        
         deinit {
             self._reuse.destroy()
-        }
-        
-        public func loadIfNeeded() {
-            self._reuse.loadIfNeeded()
-        }
-        
-        public func size(available: SizeFloat) -> SizeFloat {
-            guard self.isHidden == false else { return .zero }
-            return UI.Size.Static.apply(
-                available: available,
-                width: self.width,
-                height: self.height
-            )
-        }
-        
-        public func appear(to layout: IUILayout) {
-            self.appearedLayout = layout
-#if os(iOS)
-            self.toolbar?.appear(to: self)
-#endif
-            self.onAppear.emit()
-        }
-        
-        public func disappear() {
-#if os(iOS)
-            self.toolbar?.disappear()
-#endif
-            self._reuse.disappear()
-            self.appearedLayout = nil
-            self.onDisappear.emit()
-        }
-        
-        public func visible() {
-            self.isVisible = true
-            self.onVisible.emit()
-        }
-        
-        public func visibility() {
-            self.onVisibility.emit()
-        }
-        
-        public func invisible() {
-            self.isVisible = false
-            self.onInvisible.emit()
-        }
-        
-        @discardableResult
-        public func startEditing() -> Self {
-            self._view.becomeFirstResponder()
-            return self
-        }
-        
-        @discardableResult
-        public func endEditing() -> Self {
-            self._view.endEditing(false)
-            return self
         }
         
     }
@@ -360,21 +227,121 @@ public extension UI.View.Input.Secure {
     @inlinable
     @discardableResult
     func onPressedReturn(_ closure: (() -> Void)?) -> Self {
-        self.onPressedReturn.set(closure)
+        self.onPressedReturn.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressedReturn(_ closure: ((Self) -> Void)?) -> Self {
-        self.onPressedReturn.set(self, closure)
+        self.onPressedReturn.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onPressedReturn.set(sender, closure)
+        self.onPressedReturn.link(sender, closure)
+        return self
+    }
+    
+}
+
+extension UI.View.Input.Secure : IUIView {
+    
+    public var native: NativeView {
+        self._view
+    }
+    
+    public var isLoaded: Bool {
+        self._reuse.isLoaded
+    }
+    
+    public var bounds: RectFloat {
+        guard self.isLoaded == true else { return .zero }
+        return .init(self._view.bounds)
+    }
+    
+    public func loadIfNeeded() {
+        self._reuse.loadIfNeeded()
+    }
+    
+    public func size(available: SizeFloat) -> SizeFloat {
+        guard self.isHidden == false else { return .zero }
+        return self.size.apply(available: available)
+    }
+    
+    public func appear(to layout: IUILayout) {
+        self.appearedLayout = layout
+#if os(iOS)
+        self.toolbar?.appear(to: self)
+#endif
+        self.onAppear.emit()
+    }
+    
+    public func disappear() {
+#if os(iOS)
+        self.toolbar?.disappear()
+#endif
+        self._reuse.disappear()
+        self.appearedLayout = nil
+        self.onDisappear.emit()
+    }
+    
+    public func visible() {
+        self.isVisible = true
+        self.onVisible.emit()
+    }
+    
+    public func visibility() {
+        self.onVisibility.emit()
+    }
+    
+    public func invisible() {
+        self.isVisible = false
+        self.onInvisible.emit()
+    }
+    
+}
+
+extension UI.View.Input.Secure : IUIViewReusable {
+    
+    public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self._reuse.unloadBehaviour = newValue }
+        get { self._reuse.unloadBehaviour }
+    }
+    
+    public var reuseCache: UI.Reuse.Cache? {
+        set { self._reuse.cache = newValue }
+        get { self._reuse.cache }
+    }
+    
+    public var reuseName: Swift.String? {
+        set { self._reuse.name = newValue }
+        get { self._reuse.name }
+    }
+    
+}
+
+extension UI.View.Input.Secure : IUIViewStaticSizeable {
+}
+
+extension UI.View.Input.Secure : IUIViewInputable {
+    
+    public var isEditing: Bool {
+        guard self.isLoaded == true else { return false }
+        return self._view.isFirstResponder
+    }
+    
+    @discardableResult
+    public func startEditing() -> Self {
+        self._view.becomeFirstResponder()
+        return self
+    }
+    
+    @discardableResult
+    public func endEditing() -> Self {
+        self._view.endEditing(false)
         return self
     }
     

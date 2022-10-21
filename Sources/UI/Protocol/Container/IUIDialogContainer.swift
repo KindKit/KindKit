@@ -19,17 +19,3 @@ public protocol IUIDialogContainer : IUIContainer, IUIContainerParentable {
     func dismiss(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?)
     
 }
-
-public extension IUIDialogContainer {
-    
-    @inlinable
-    func present(container: IUIDialogContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.present(container: container, animated: animated, completion: completion)
-    }
-    
-    @inlinable
-    func dismiss(container: IUIDialogContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.dismiss(container: container, animated: animated, completion: completion)
-    }
-    
-}

@@ -11,9 +11,56 @@ import UIKit
 
 public extension UI.View {
     
-    final class SwipeCell : IUIWidgetView, IUIViewReusable, IUIViewHighlightable, IUIViewSelectable, IUIViewLockable, IUIViewPressable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class SwipeCell : IUIWidgetView {
         
         public let body: UI.View.Custom
+        public var shouldPressed: Bool = true
+        public var background: IUIView? {
+            didSet {
+                guard self.background !== oldValue else { return }
+                self._layout.background = self.background.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public var content: IUIView? {
+            didSet {
+                guard self.content !== oldValue else { return }
+                self._layout.content = self.content.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public private(set) var leading: IUIView? {
+            didSet {
+                guard self.leading !== oldValue else { return }
+                self._layout.leading = self.leading.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public var leadingSize: Float {
+            set { self._layout.leadingSize = newValue }
+            get { self._layout.leadingSize }
+        }
+        public var isShowedLeading: Bool {
+            switch self._layout.state {
+            case .leading: return true
+            default: return false
+            }
+        }
+        public var leadingLimit: Float = 0
+        public var trailing: IUIView? {
+            didSet {
+                guard self.trailing !== oldValue else { return }
+                self._layout.trailing = self.trailing.flatMap({ UI.Layout.Item($0) })
+            }
+        }
+        public var trailingSize: Float {
+            set { self._layout.trailingSize = newValue }
+            get { self._layout.trailingSize }
+        }
+        public var isShowedTrailing: Bool {
+            switch self._layout.state {
+            case .trailing: return true
+            default: return false
+            }
+        }
+        public var trailingLimit: Float = 0
         public var isSelected: Bool {
             set {
                 guard self._isSelected != newValue else { return }
@@ -22,55 +69,6 @@ public extension UI.View {
             }
             get { self._isSelected }
         }
-        public var shouldPressed: Bool = true
-        public var content: IUIView {
-            didSet {
-                guard self.content !== oldValue else { return }
-                self._layout.content = UI.Layout.Item(self.content)
-            }
-        }
-        public var isShowedLeading: Bool {
-            switch self._layout.state {
-            case .leading: return true
-            default: return false
-            }
-        }
-        public private(set) var leading: IUIView? {
-            didSet {
-                guard self.leading !== oldValue else { return }
-                if let view = self.leading {
-                    self._layout.leading = UI.Layout.Item(view)
-                } else {
-                    self._layout.leading = nil
-                }
-            }
-        }
-        public var leadingSize: Float {
-            set { self._layout.leadingSize = newValue }
-            get { self._layout.leadingSize }
-        }
-        public var leadingLimit: Float = 0
-        public var isShowedTrailing: Bool {
-            switch self._layout.state {
-            case .trailing: return true
-            default: return false
-            }
-        }
-        public var trailing: IUIView? {
-            didSet {
-                guard self.trailing !== oldValue else { return }
-                if let view = self.trailing {
-                    self._layout.trailing = UI.Layout.Item(view)
-                } else {
-                    self._layout.trailing = nil
-                }
-            }
-        }
-        public var trailingSize: Float {
-            set { self._layout.trailingSize = newValue }
-            get { self._layout.trailingSize }
-        }
-        public var trailingLimit: Float = 0
         public var animationVelocity: Float
 #if os(iOS)
         public let pressedGesture = UI.Gesture.Tap()
@@ -90,17 +88,15 @@ public extension UI.View {
             willSet { self._animation?.cancel() }
         }
         
-        public init(
-            _ content: IUIView
-        ) {
-            self.content = content
+        public init() {
 #if os(macOS)
             self.animationVelocity = Float(NSScreen.main!.frame.width * 2)
 #elseif os(iOS)
             self.animationVelocity = Float(UIScreen.main.bounds.width * 2)
 #endif
-            self._layout = Layout(content)
-            self.body = UI.View.Custom(self._layout)
+            self._layout = Layout()
+            self.body = UI.View.Custom()
+                .content(self._layout)
                 .shouldHighlighting(true)
 #if os(iOS)
                 .gestures([ self.pressedGesture, self.interactiveGesture ])
@@ -108,162 +104,8 @@ public extension UI.View {
             self._setup()
         }
         
-        public convenience init(
-            content: IUIView,
-            configure: (UI.View.SwipeCell) -> Void
-        ) {
-            self.init(content)
-            self.modify(configure)
-        }
-        
         deinit {
             self._destroy()
-        }
-        
-        public func showLeading(animated: Bool, completion: (() -> Void)? = nil) {
-            switch self._layout.state {
-            case .idle:
-                if animated == true {
-                    self._animation = Animation.default.run(
-                        duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
-                        ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
-                            self._layout.state = .leading(progress: progress)
-                            self._layout.updateIfNeeded()
-                        },
-                        completion: { [unowned self] in
-                            self._animation = nil
-                            self._layout.state = .leading(progress: .one)
-                            self.onLeading.emit(true)
-                            completion?()
-                        }
-                    )
-                } else {
-                    self._layout.state = .leading(progress: .one)
-                    self.onLeading.emit(true)
-                    completion?()
-                }
-            case .leading:
-                self.onLeading.emit(true)
-                completion?()
-                break
-            case .trailing:
-                self.hideTrailing(animated: animated, completion: { [unowned self] in
-                    self.showLeading(animated: animated, completion: completion)
-                })
-            }
-        }
-        
-        public func hideLeading(animated: Bool, completion: (() -> Void)? = nil) {
-            switch self._layout.state {
-            case .leading:
-                if animated == true {
-                    self._animation = Animation.default.run(
-                        duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
-                        ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
-                            self._layout.state = .leading(progress: progress.invert)
-                            self._layout.updateIfNeeded()
-                        },
-                        completion: { [unowned self] in
-                            self._animation = nil
-                            self._layout.state = .idle
-                            self.onLeading.emit(false)
-                            completion?()
-                        }
-                    )
-                } else {
-                    self._layout.state = .idle
-                    self.onLeading.emit(false)
-                    completion?()
-                }
-            default:
-                completion?()
-                self.onLeading.emit(false)
-                break
-            }
-        }
-        
-        public func showTrailing(animated: Bool, completion: (() -> Void)? = nil) {
-            switch self._layout.state {
-            case .idle:
-                if animated == true {
-                    self._animation = Animation.default.run(
-                        duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
-                        ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
-                            self._layout.state = .trailing(progress: progress)
-                            self._layout.updateIfNeeded()
-                        },
-                        completion: { [unowned self] in
-                            self._animation = nil
-                            self._layout.state = .trailing(progress: .one)
-                            self.onTrailing.emit(true)
-                            completion?()
-                        }
-                    )
-                } else {
-                    self._layout.state = .trailing(progress: .one)
-                    self.onTrailing.emit(true)
-                    completion?()
-                }
-            case .leading:
-                self.hideLeading(animated: animated, completion: { [unowned self] in
-                    self.showTrailing(animated: animated, completion: completion)
-                })
-            case .trailing:
-                completion?()
-                self.onTrailing.emit(true)
-                break
-            }
-        }
-        
-        public func hideTrailing(animated: Bool, completion: (() -> Void)? = nil) {
-            switch self._layout.state {
-            case .trailing:
-                if animated == true {
-                    self._animation = Animation.default.run(
-                        duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
-                        ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
-                            self._layout.state = .trailing(progress: progress.invert)
-                            self._layout.updateIfNeeded()
-                        },
-                        completion: { [unowned self] in
-                            self._animation = nil
-                            self._layout.state = .idle
-                            self.onTrailing.emit(false)
-                            completion?()
-                        }
-                    )
-                } else {
-                    self._layout.state = .idle
-                    self.onTrailing.emit(false)
-                    completion?()
-                }
-            default:
-                completion?()
-                self.onTrailing.emit(false)
-                break
-            }
-        }
-        
-        @discardableResult
-        public func content(_ value: IUIView) -> Self {
-            self.content = value
-            return self
-        }
-        
-        @discardableResult
-        public func leading(_ value: IUIView?) -> Self {
-            self.leading = value
-            return self
-        }
-        
-        @discardableResult
-        public func trailing(_ value: IUIView?) -> Self {
-            self.trailing = value
-            return self
         }
         
     }
@@ -271,6 +113,156 @@ public extension UI.View {
 }
 
 public extension UI.View.SwipeCell {
+    
+    func showLeading(animated: Bool, completion: (() -> Void)? = nil) {
+        switch self._layout.state {
+        case .idle:
+            if animated == true {
+                self._animation = Animation.default.run(
+                    duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
+                    ease: Animation.Ease.QuadraticInOut(),
+                    processing: { [unowned self] progress in
+                        self._layout.state = .leading(progress: progress)
+                        self._layout.updateIfNeeded()
+                    },
+                    completion: { [unowned self] in
+                        self._animation = nil
+                        self._layout.state = .leading(progress: .one)
+                        self.onLeading.emit(true)
+                        completion?()
+                    }
+                )
+            } else {
+                self._layout.state = .leading(progress: .one)
+                self.onLeading.emit(true)
+                completion?()
+            }
+        case .leading:
+            self.onLeading.emit(true)
+            completion?()
+            break
+        case .trailing:
+            self.hideTrailing(animated: animated, completion: { [unowned self] in
+                self.showLeading(animated: animated, completion: completion)
+            })
+        }
+    }
+    
+    func hideLeading(animated: Bool, completion: (() -> Void)? = nil) {
+        switch self._layout.state {
+        case .leading:
+            if animated == true {
+                self._animation = Animation.default.run(
+                    duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
+                    ease: Animation.Ease.QuadraticInOut(),
+                    processing: { [unowned self] progress in
+                        self._layout.state = .leading(progress: progress.invert)
+                        self._layout.updateIfNeeded()
+                    },
+                    completion: { [unowned self] in
+                        self._animation = nil
+                        self._layout.state = .idle
+                        self.onLeading.emit(false)
+                        completion?()
+                    }
+                )
+            } else {
+                self._layout.state = .idle
+                self.onLeading.emit(false)
+                completion?()
+            }
+        default:
+            completion?()
+            self.onLeading.emit(false)
+            break
+        }
+    }
+    
+    func showTrailing(animated: Bool, completion: (() -> Void)? = nil) {
+        switch self._layout.state {
+        case .idle:
+            if animated == true {
+                self._animation = Animation.default.run(
+                    duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
+                    ease: Animation.Ease.QuadraticInOut(),
+                    processing: { [unowned self] progress in
+                        self._layout.state = .trailing(progress: progress)
+                        self._layout.updateIfNeeded()
+                    },
+                    completion: { [unowned self] in
+                        self._animation = nil
+                        self._layout.state = .trailing(progress: .one)
+                        self.onTrailing.emit(true)
+                        completion?()
+                    }
+                )
+            } else {
+                self._layout.state = .trailing(progress: .one)
+                self.onTrailing.emit(true)
+                completion?()
+            }
+        case .leading:
+            self.hideLeading(animated: animated, completion: { [unowned self] in
+                self.showTrailing(animated: animated, completion: completion)
+            })
+        case .trailing:
+            completion?()
+            self.onTrailing.emit(true)
+            break
+        }
+    }
+    
+    func hideTrailing(animated: Bool, completion: (() -> Void)? = nil) {
+        switch self._layout.state {
+        case .trailing:
+            if animated == true {
+                self._animation = Animation.default.run(
+                    duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
+                    ease: Animation.Ease.QuadraticInOut(),
+                    processing: { [unowned self] progress in
+                        self._layout.state = .trailing(progress: progress.invert)
+                        self._layout.updateIfNeeded()
+                    },
+                    completion: { [unowned self] in
+                        self._animation = nil
+                        self._layout.state = .idle
+                        self.onTrailing.emit(false)
+                        completion?()
+                    }
+                )
+            } else {
+                self._layout.state = .idle
+                self.onTrailing.emit(false)
+                completion?()
+            }
+        default:
+            completion?()
+            self.onTrailing.emit(false)
+            break
+        }
+    }
+    
+}
+
+public extension UI.View.SwipeCell {
+    
+    @discardableResult
+    func content(_ value: IUIView) -> Self {
+        self.content = value
+        return self
+    }
+    
+    @discardableResult
+    func leading(_ value: IUIView?) -> Self {
+        self.leading = value
+        return self
+    }
+    
+    @discardableResult
+    func trailing(_ value: IUIView?) -> Self {
+        self.trailing = value
+        return self
+    }
     
     @inlinable
     @discardableResult
@@ -314,63 +306,63 @@ public extension UI.View.SwipeCell {
     @inlinable
     @discardableResult
     func onLeading(_ closure: ((Bool) -> Void)?) -> Self {
-        self.onLeading.set(closure)
+        self.onLeading.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onLeading(_ closure: ((Self, Bool) -> Void)?) -> Self {
-        self.onLeading.set(self, closure)
+        self.onLeading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onLeading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
-        self.onLeading.set(sender, closure)
+        self.onLeading.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onTrailing(_ closure: ((Bool) -> Void)?) -> Self {
-        self.onTrailing.set(closure)
+        self.onTrailing.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onTrailing(_ closure: ((Self, Bool) -> Void)?) -> Self {
-        self.onTrailing.set(self, closure)
+        self.onTrailing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onTrailing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
-        self.onTrailing.set(sender, closure)
+        self.onTrailing.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressed(_ closure: (() -> Void)?) -> Self {
-        self.onPressed.set(closure)
+        self.onPressed.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressed(_ closure: ((Self) -> Void)?) -> Self {
-        self.onPressed.set(self, closure)
+        self.onPressed.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onPressed.set(sender, closure)
+        self.onPressed.link(sender, closure)
         return self
     }
     
@@ -391,8 +383,9 @@ private extension UI.View.SwipeCell {
             })
         self.interactiveGesture
             .onShouldBegin(self, {
+                guard let content = $0.content else { return false }
                 guard $0.leading != nil || $0.trailing != nil else { return false }
-                let translation = $0.interactiveGesture.translation(in: self.content)
+                let translation = $0.interactiveGesture.translation(in: content)
                 guard abs(translation.x) >= abs(translation.y) else { return false }
                 return true
             })
@@ -601,4 +594,22 @@ private extension UI.View.SwipeCell {
     
 #endif
     
+}
+
+extension UI.View.SwipeCell : IUIViewReusable {
+}
+
+extension UI.View.SwipeCell : IUIViewDynamicSizeable {
+}
+
+extension UI.View.SwipeCell : IUIViewHighlightable {
+}
+
+extension UI.View.SwipeCell : IUIViewSelectable {
+}
+
+extension UI.View.SwipeCell : IUIViewLockable {
+}
+
+extension UI.View.SwipeCell : IUIViewPressable {
 }

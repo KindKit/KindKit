@@ -35,24 +35,10 @@ extension UI.View.Gradient {
 
 final class KKGradientView : UIView {
     
-    typealias View = IUIView & IUIViewCornerRadiusable & IUIViewShadowable
-    
     override class var layerClass: AnyClass {
         return CAGradientLayer.self
     }
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: View?
+
     private var _layer: CAGradientLayer {
         return super.layer as! CAGradientLayer
     }
@@ -72,29 +58,36 @@ final class KKGradientView : UIView {
 extension KKGradientView {
     
     func update(view: UI.View.Gradient) {
-        self._view = view
         self.update(fill: view.fill)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
     }
     
-    func update(fill: UI.View.Gradient.Fill) {
-        switch fill.mode {
-        case .axial: self._layer.type = .axial
-        case .radial: self._layer.type = .radial
+    func update(fill: UI.View.Gradient.Fill?) {
+        if let fill = fill {
+            switch fill.mode {
+            case .axial: self._layer.type = .axial
+            case .radial: self._layer.type = .radial
+            }
+            self._layer.colors = fill.points.map({ $0.color.cgColor })
+            self._layer.locations = fill.points.map({ NSNumber(value: $0.location) })
+            self._layer.startPoint = fill.start.cgPoint
+            self._layer.endPoint = fill.end.cgPoint
+            self._layer.isHidden = false
+        } else {
+            self._layer.isHidden = true
         }
-        self._layer.colors = fill.points.map({ $0.color.cgColor })
-        self._layer.locations = fill.points.map({ NSNumber(value: $0.location) })
-        self._layer.startPoint = fill.start.cgPoint
-        self._layer.endPoint = fill.end.cgPoint
+    }
+    
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
     }
     
     func cleanup() {
-        self._view = nil
     }
     
 }

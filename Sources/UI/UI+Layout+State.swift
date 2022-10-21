@@ -65,6 +65,7 @@ public extension UI.Layout {
             self.data = data
         }
         
+        @inlinable
         public convenience init(
             state: State,
             insets: [State : InsetFloat] = [:],
@@ -86,6 +87,7 @@ public extension UI.Layout {
             })
         }
         
+        @inlinable
         public convenience init(
             state: State,
             insets: [State : InsetFloat] = [:],
@@ -109,89 +111,6 @@ public extension UI.Layout {
         
         deinit {
             self._destroy()
-        }
-        
-        public func set(state: State, inset: InsetFloat) {
-            self._data(state: state, update: { $0.inset = inset })
-            if self._internalState.contains(state: state) == true {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func inset(state: State) -> InsetFloat? {
-            return self.data[state]?.inset
-        }
-        
-        public func set(state: State, alignment: Alignment) {
-            self._data(state: state, update: { $0.alignment = alignment })
-            if self._internalState.contains(state: state) == true {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func alignment(state: State) -> Alignment? {
-            return self.data[state]?.alignment
-        }
-        
-        public func set(state: State, item: UI.Layout.Item?) {
-            self._data(state: state, update: { $0.item = item })
-            if self._internalState.contains(state: state) == true {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func item(state: State) -> UI.Layout.Item? {
-            return self.data[state]?.item
-        }
-        
-        public func set(state: State, view: IUIView?) {
-            self._data(state: state, update: { $0.view = view })
-            if self._internalState.contains(state: state) == true {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func view(state: State) -> IUIView? {
-            return self.data[state]?.view
-        }
-        
-        public func set(state: State, data: Data?) {
-            self.data[state] = data
-            if self._internalState.contains(state: state) == true {
-                self.setNeedForceUpdate()
-            }
-        }
-        
-        public func data(state: State) -> Data? {
-            return self.data[state]
-        }
-        
-        public func animate(
-            delay: TimeInterval = 0,
-            duration: TimeInterval,
-            ease: IAnimationEase = Animation.Ease.Linear(),
-            transition: Transition,
-            state: State,
-            completion: (() -> Void)? = nil
-        ) {
-            let fromState = self.state
-            self._animation = Animation.default.run(
-                delay: delay,
-                duration: duration,
-                ease: ease,
-                processing: { [unowned self] progress in
-                    self._internalState = .animation(transition: transition, from: fromState, to: state, progress: progress)
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
-                },
-                completion: { [unowned self] in
-                    self._animation = nil
-                    self._internalState = .idle(state: state)
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
-                    completion?()
-                }
-            )
         }
         
         public func layout(bounds: RectFloat) -> SizeFloat {
@@ -240,6 +159,93 @@ public extension UI.Layout {
             return items
         }
         
+    }
+    
+}
+
+public extension UI.Layout.State {
+    
+    func set(state: State, inset: InsetFloat) {
+        self._data(state: state, update: { $0.inset = inset })
+        if self._internalState.contains(state: state) == true {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func inset(state: State) -> InsetFloat? {
+        return self.data[state]?.inset
+    }
+    
+    func set(state: State, alignment: Alignment) {
+        self._data(state: state, update: { $0.alignment = alignment })
+        if self._internalState.contains(state: state) == true {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func alignment(state: State) -> Alignment? {
+        return self.data[state]?.alignment
+    }
+    
+    func set(state: State, item: UI.Layout.Item?) {
+        self._data(state: state, update: { $0.item = item })
+        if self._internalState.contains(state: state) == true {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func item(state: State) -> UI.Layout.Item? {
+        return self.data[state]?.item
+    }
+    
+    func set(state: State, view: IUIView?) {
+        self._data(state: state, update: { $0.view = view })
+        if self._internalState.contains(state: state) == true {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func view(state: State) -> IUIView? {
+        return self.data[state]?.view
+    }
+    
+    func set(state: State, data: Data?) {
+        self.data[state] = data
+        if self._internalState.contains(state: state) == true {
+            self.setNeedForceUpdate()
+        }
+    }
+    
+    func data(state: State) -> Data? {
+        return self.data[state]
+    }
+    
+    func animate(
+        delay: TimeInterval = 0,
+        duration: TimeInterval,
+        ease: IAnimationEase = Animation.Ease.Linear(),
+        transition: Transition,
+        state: State,
+        completion: (() -> Void)? = nil
+    ) {
+        let fromState = self.state
+        self._animation = Animation.default.run(
+            delay: delay,
+            duration: duration,
+            ease: ease,
+            processing: { [unowned self] progress in
+                self._internalState = .animation(transition: transition, from: fromState, to: state, progress: progress)
+                self.setNeedForceUpdate()
+                self.updateIfNeeded()
+            },
+            completion: { [unowned self] in
+                self._animation = nil
+                self._internalState = .idle(state: state)
+                self.setNeedForceUpdate()
+                self.updateIfNeeded()
+                completion?()
+            }
+        )
     }
     
 }

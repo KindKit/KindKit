@@ -37,7 +37,6 @@ final class KKStepperView : UIView {
     
     unowned var kkDelegate: KKStepperViewDelegate?
     
-    private unowned var _view: UI.View.Stepper?
     private var _stepper: UIStepper!
     
     override init(frame: CGRect) {
@@ -72,25 +71,16 @@ final class KKStepperView : UIView {
 extension KKStepperView {
     
     func update(view: UI.View.Stepper) {
-        self._view = view
         self.update(minValue: view.minValue)
         self.update(maxValue: view.maxValue)
         self.update(stepValue: view.stepValue)
         self.update(value: view.value)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(isAutorepeat: view.isAutorepeat)
         self.update(isWraps: view.isWraps)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
-    }
-    
-    func update(locked: Bool) {
-        self._stepper.isEnabled = locked == false
     }
     
     func update(minValue: Float) {
@@ -109,6 +99,14 @@ extension KKStepperView {
         self._stepper.value = Double(value)
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
     func update(isAutorepeat: Bool) {
         self._stepper.autorepeat = isAutorepeat
     }
@@ -117,9 +115,12 @@ extension KKStepperView {
         self._stepper.wraps = isWraps
     }
     
+    func update(locked: Bool) {
+        self._stepper.isEnabled = locked == false
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

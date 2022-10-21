@@ -62,63 +62,63 @@ public extension IUIView {
     @inlinable
     @discardableResult
     func onVisible(_ closure: (() -> Void)?) -> Self {
-        self.onVisible.set(closure)
+        self.onVisible.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onVisible(_ closure: ((Self) -> Void)?) -> Self {
-        self.onVisible.set(self, closure)
+        self.onVisible.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onVisible< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onVisible.set(sender, closure)
+        self.onVisible.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onVisibility(_ closure: (() -> Void)?) -> Self {
-        self.onVisibility.set(closure)
+        self.onVisibility.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onVisibility(_ closure: ((Self) -> Void)?) -> Self {
-        self.onVisibility.set(self, closure)
+        self.onVisibility.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onVisibility< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onVisibility.set(sender, closure)
+        self.onVisibility.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onInvisible(_ closure: (() -> Void)?) -> Self {
-        self.onInvisible.set(closure)
+        self.onInvisible.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onInvisible(_ closure: ((Self) -> Void)?) -> Self {
-        self.onInvisible.set(self, closure)
+        self.onInvisible.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onInvisible< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onInvisible.set(sender, closure)
+        self.onInvisible.link(sender, closure)
         return self
     }
     

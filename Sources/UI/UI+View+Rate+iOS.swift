@@ -35,19 +35,6 @@ extension UI.View.Rate {
 
 final class KKRateView : UIView {
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.Rate?
     private var _itemSize: SizeFloat {
         didSet {
             guard self._itemSize != oldValue else { return }
@@ -119,19 +106,14 @@ final class KKRateView : UIView {
 extension KKRateView {
     
     func update(view: UI.View.Rate) {
-        self._view = view
         self.update(itemSize: view.itemSize)
         self.update(itemSpacing: view.itemSpacing)
         self.update(numberOfItem: view.numberOfItem)
         self.update(rounding: view.rounding)
         self.update(states: view.states)
         self.update(rating: view.rating)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
     }
     
     func update(itemSize: SizeFloat) {
@@ -158,8 +140,15 @@ extension KKRateView {
         self._rating = rating
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
     func cleanup() {
-        self._view = nil
     }
     
 }

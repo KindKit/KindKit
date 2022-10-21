@@ -37,19 +37,6 @@ final class KKAttributedTextView : UILabel {
         
     unowned var kkDelegate: KKAttributedTextViewDelegate?
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.AttributedText?
     private var _tapGesture: UITapGestureRecognizer!
     
     override init(frame: CGRect) {
@@ -79,20 +66,15 @@ final class KKAttributedTextView : UILabel {
 extension KKAttributedTextView {
     
     func update(view: UI.View.AttributedText) {
-        self._view = view
         self.update(text: view.text, alignment: view.alignment)
         self.update(lineBreak: view.lineBreak)
         self.update(numberOfLines: view.numberOfLines)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.kkDelegate = view
     }
     
-    func update(text: NSAttributedString, alignment: UI.Text.Alignment?) {
+    func update(text: NSAttributedString?, alignment: UI.Text.Alignment?) {
         self.attributedText = text
         if let alignment = alignment {
             self.textAlignment = alignment.nsTextAlignment
@@ -113,9 +95,16 @@ extension KKAttributedTextView {
         self.numberOfLines = Int(numberOfLines)
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

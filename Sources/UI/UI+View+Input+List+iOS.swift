@@ -36,29 +36,51 @@ extension UI.View.Input.List {
 final class KKInputListView : UITextField {
     
     unowned var kkDelegate: KKInputListViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
+    var kkItems: [IInputListItem] = [] {
+        didSet {
+            self._picker.reloadAllComponents()
+            self._applyText()
         }
-        get { super.frame }
     }
-    
-    private unowned var _view: UI.View.Input.List?
-    private var _picker: UIPickerView!
+    var kkSelected: IInputListItem? {
+        didSet {
+            guard self.kkSelected !== oldValue else { return }
+            let animated = self.isFirstResponder
+            if let selected = self.kkSelected {
+                if let index = self.kkItems.firstIndex(where: { $0 === selected }) {
+                    self._picker.selectRow(index, inComponent: 0, animated: animated)
+                } else {
+                    self._picker.selectRow(0, inComponent: 0, animated: animated)
+                }
+            } else {
+                self._picker.selectRow(0, inComponent: 0, animated: animated)
+            }
+            self._applyText()
+        }
+    }
+    var kkTextInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self.kkTextInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+    var kkPlaceholderInset: UIEdgeInsets? {
+        didSet {
+            guard self.kkPlaceholderInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+
+    private var _picker: UIPickerView
     
     override init(frame: CGRect) {
-        
+        self._picker = UIPickerView()
+
         super.init(frame: frame)
         
         self.clipsToBounds = true
         self.delegate = self
         
-        self._picker = UIPickerView()
         self._picker.dataSource = self
         self._picker.delegate = self
         self.inputView = self._picker
@@ -69,27 +91,23 @@ final class KKInputListView : UITextField {
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        return Rect(bounds).inset(view.textInset).cgRect
+        return bounds.inset(by: self.kkTextInset)
     }
 
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
-        guard let view = self._view else { return bounds }
-        let inset = view.placeholderInset ?? view.textInset
-        return Rect(bounds).inset(inset).cgRect
+        let inset = self.kkPlaceholderInset ?? self.kkTextInset
+        return bounds.inset(by: inset)
     }
-    
+
 }
 
 extension KKInputListView {
     
     func update(view: UI.View.Input.List) {
-        self._view = view
         self.update(items: view.items)
         self.update(selected: view.selected, userInteraction: false)
         self.update(textFont: view.textFont)
@@ -99,34 +117,15 @@ extension KKInputListView {
         self.update(placeholderInset: view.placeholderInset)
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
     func update(items: [IInputListItem]) {
-        self._picker.reloadAllComponents()
-        self._applyText()
+        self.kkItems = items
     }
     
     func update(selected: IInputListItem?, userInteraction: Bool) {
-        if userInteraction == false {
-            let animated = self.isFirstResponder
-            if let view = self._view, let selected = selected {
-                if let index = view.items.firstIndex(where: { $0 === selected }) {
-                    self._picker.selectRow(index, inComponent: 0, animated: animated)
-                } else {
-                    self._picker.selectRow(0, inComponent: 0, animated: animated)
-                }
-            } else {
-                self._picker.selectRow(0, inComponent: 0, animated: animated)
-            }
-        }
-        self._applyText()
+        self.kkSelected = selected
     }
     
     func update(textFont: UI.Font) {
@@ -138,7 +137,7 @@ extension KKInputListView {
     }
     
     func update(textInset: InsetFloat) {
-        self.setNeedsLayout()
+        self.kkTextInset = textInset.uiEdgeInsets
     }
     
     func update(placeholder: UI.View.Input.Placeholder?) {
@@ -153,7 +152,7 @@ extension KKInputListView {
     }
     
     func update(placeholderInset: InsetFloat?) {
-        self.setNeedsLayout()
+        self.kkPlaceholderInset = placeholderInset?.uiEdgeInsets
     }
     
     func update(alignment: UI.Text.Alignment) {
@@ -166,7 +165,6 @@ extension KKInputListView {
     
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }
@@ -174,7 +172,7 @@ extension KKInputListView {
 private extension KKInputListView {
     
     func _applyText() {
-        if let view = self._view, let selected = view.selected {
+        if let selected = self.kkSelected {
             self.text = selected.title
         } else {
             self.text = nil
@@ -187,8 +185,8 @@ extension KKInputListView : UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         self.kkDelegate?.beginEditing(self)
-        if self._view?.selected == nil, let firstItem = self._view?.items.first {
-            self.kkDelegate?.select(self, appearedItem: firstItem)
+        if self.kkSelected == nil, let firstItem = self.kkItems.first {
+            self.kkDelegate?.select(self, item: firstItem)
         }
     }
     
@@ -209,8 +207,7 @@ extension KKInputListView : UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        guard let view = self._view else { return 0 }
-        return view.items.count
+        return self.kkItems.count
     }
     
 }
@@ -218,15 +215,13 @@ extension KKInputListView : UIPickerViewDataSource {
 extension KKInputListView : UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        guard let view = self._view else { return nil }
-        return view.items[row].title
+        return self.kkItems[row].title
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let view = self._view else { return }
-        let selected = view.items[row]
-        if view.selected !== selected {
-            self.kkDelegate?.select(self, appearedItem: selected)
+        let selected = self.kkItems[row]
+        if self.kkSelected !== selected {
+            self.kkDelegate?.select(self, item: selected)
         }
     }
     

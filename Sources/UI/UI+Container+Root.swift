@@ -130,7 +130,8 @@ public extension UI.Container {
                 overlay: overlay.flatMap({ UI.Layout.Item($0.view) }),
                 content: UI.Layout.Item(content.view)
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
             self._setup()
         }
         

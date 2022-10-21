@@ -6,38 +6,28 @@ import Foundation
 
 public extension UI.Size {
 
-    enum Dynamic : Equatable {
+    struct Dynamic : Equatable {
         
-        case fill
-        case percent(PercentFloat)
-        case fixed(Float)
-        case morph(PercentFloat)
-        case fit
+        public var width: Dimension
+        public var height: Dimension
         
-    }
-    
-}
-
-public extension UI.Size.Dynamic {
-    
-    @available(iOS, deprecated: 10)
-    static func `static`(_ size: UI.Size.Static) -> UI.Size.Dynamic {
-        switch size {
-        case .fill: return .fill
-        case .percent(let value): return .percent(value)
-        case .fixed(let value): return .fixed(value)
+        public init(
+            width: Dimension,
+            height: Dimension
+        ) {
+            self.width = width
+            self.height = height
         }
+        
     }
     
 }
 
 public extension UI.Size.Dynamic {
     
+    @inlinable
     var isStatic: Bool {
-        switch self {
-        case .fill, .percent, .fixed: return true
-        case .morph, .fit: return false
-        }
+        return self.width.isStatic == true && self.height.isStatic == true
     }
     
 }
@@ -45,41 +35,15 @@ public extension UI.Size.Dynamic {
 public extension UI.Size.Dynamic {
     
     @inlinable
-    static func apply(
-        available: Float,
-        behaviour: UI.Size.Dynamic,
-        calculate: () -> Float
-    ) -> Float? {
-        switch behaviour {
-        case .fixed(let value):
-            return UI.Size.Static.apply(available: available, behaviour: .fixed(value))
-        case .percent(let value):
-            return UI.Size.Static.apply(available: available, behaviour: .percent(value))
-        case .fill:
-            return UI.Size.Static.apply(available: available, behaviour: .fill)
-        case .morph(let percent):
-            let r = calculate()
-            guard r.isInfinite == false else { return nil }
-            return max(0, r * percent.value)
-        case .fit:
-            let r = calculate()
-            guard r.isInfinite == false else { return nil }
-            return max(0, r)
-        }
-    }
-    
-    @inlinable
-    static func apply(
+    func apply(
         available: SizeFloat,
-        width: UI.Size.Dynamic,
-        height: UI.Size.Dynamic,
         sizeWithWidth: (_ width: Float) -> SizeFloat,
         sizeWithHeight: (_ height: Float) -> SizeFloat,
         size: () -> SizeFloat
     ) -> SizeFloat {
         let rw, rh: Float
-        switch (width, height) {
-        case (.fill, fill):
+        switch (self.width, self.height) {
+        case (.fill, .fill):
             if available.width.isInfinite == false {
                 rw = max(0, available.width)
             } else {
@@ -90,14 +54,14 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.fixed(let w), fill):
+        case (.fixed(let w), .fill):
             rw = max(0, w)
             if available.height.isInfinite == false {
                 rh = max(0, available.height)
             } else {
                 rh = 0
             }
-        case (.percent(let w), fill):
+        case (.percent(let w), .fill):
             if available.width.isInfinite == false {
                 rw = max(0, available.width * w.value)
             } else {
@@ -108,7 +72,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.morph(let w), fill):
+        case (.morph(let w), .fill):
             if available.height.isInfinite == false {
                 rh = max(0, available.height)
             } else {
@@ -120,7 +84,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rw = 0
             }
-        case (.fit, fill):
+        case (.fit, .fill):
             if available.height.isInfinite == false {
                 rh = max(0, available.height)
             } else {
@@ -274,7 +238,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.fill, fit):
+        case (.fill, .fit):
             if available.width.isInfinite == false {
                 rw = max(0, available.width)
             } else {
@@ -286,7 +250,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.fixed(let w), fit):
+        case (.fixed(let w), .fit):
             rw = max(0, w)
             let s = sizeWithWidth(rw)
             if s.height.isInfinite == false {
@@ -294,7 +258,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.percent(let w), fit):
+        case (.percent(let w), .fit):
             if available.width.isInfinite == false {
                 rw = max(0, available.width * w.value)
             } else {
@@ -306,7 +270,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.morph(let w), fit):
+        case (.morph(let w), .fit):
             let s = size()
             if s.width.isInfinite == false {
                 rw = max(0, s.width * w.value)
@@ -318,7 +282,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-        case (.fit, fit):
+        case (.fit, .fit):
             let s = size()
             if s.width.isInfinite == false {
                 rw = s.width

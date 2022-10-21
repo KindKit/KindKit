@@ -46,6 +46,10 @@ extension UI.Container.Modal {
             self.content = content
         }
         
+        public func invalidate() {
+            self._cache.removeAll(keepingCapacity: true)
+        }
+        
         public func invalidate(item: UI.Layout.Item) {
             self._cache[item] = nil
         }

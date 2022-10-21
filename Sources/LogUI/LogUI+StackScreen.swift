@@ -18,12 +18,11 @@ public extension LogUI {
             )
         }
         
-        private let _backgroundView: UI.View.Empty
+        private let _backgroundView: UI.View.Rect
         
         init() {
-            self._backgroundView = UI.View.Empty(configure: {
-                $0.color = .black.with(alpha: 0.5)
-            })
+            self._backgroundView = UI.View.Rect()
+                .fill(.black.with(alpha: 0.5))
         }
         
     }

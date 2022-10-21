@@ -4,7 +4,9 @@
 
 import Foundation
 
-#if os(iOS)
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
 
 protocol KKPanGestureDelegate : KKGestureDelegate {
     
@@ -127,7 +129,7 @@ public extension UI.Gesture {
         public let onEnd: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
-        @inline(__always) private var _gesture: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _gesture: Reusable.Content { self._reuse.content }
 
         public init() {
         }
@@ -153,84 +155,84 @@ public extension UI.Gesture.Pan {
     @inlinable
     @discardableResult
     func onBegin(_ closure: (() -> Void)?) -> Self {
-        self.onBegin.set(closure)
+        self.onBegin.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBegin(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBegin.set(self, closure)
+        self.onBegin.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBegin.set(sender, closure)
+        self.onBegin.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onChange(_ closure: (() -> Void)?) -> Self {
-        self.onChange.set(closure)
+        self.onChange.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onChange(_ closure: ((Self) -> Void)?) -> Self {
-        self.onChange.set(self, closure)
+        self.onChange.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onChange< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onChange.set(sender, closure)
+        self.onChange.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onCancel(_ closure: (() -> Void)?) -> Self {
-        self.onCancel.set(closure)
+        self.onCancel.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onCancel(_ closure: ((Self) -> Void)?) -> Self {
-        self.onCancel.set(self, closure)
+        self.onCancel.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onCancel< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onCancel.set(sender, closure)
+        self.onCancel.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEnd(_ closure: (() -> Void)?) -> Self {
-        self.onEnd.set(closure)
+        self.onEnd.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEnd(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEnd.set(self, closure)
+        self.onEnd.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEnd.set(sender, closure)
+        self.onEnd.link(sender, closure)
         return self
     }
     

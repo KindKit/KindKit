@@ -2,9 +2,11 @@
 //  KindKit
 //
 
-#if os(iOS)
-
 import Foundation
+
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
 
 protocol KKWebViewDelegate : AnyObject {
     
@@ -19,80 +21,39 @@ protocol KKWebViewDelegate : AnyObject {
 
 public extension UI.View {
 
-    final class Web : IUIView, IUIViewReusable, IUIViewStaticSizeable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class Web {
         
-        public var native: NativeView {
-            return self._view
-        }
-        public var isLoaded: Bool {
-            return self._reuse.isLoaded
-        }
-        public var bounds: RectFloat {
-            guard self.isLoaded == true else { return .zero }
-            return Rect(self._view.bounds)
-        }
         public private(set) unowned var appearedLayout: IUILayout?
         public unowned var appearedItem: UI.Layout.Item?
-        public private(set) var isVisible: Bool = false
-        public var isHidden: Bool = false {
+        public var size: UI.Size.Static = .init(width: .fill, height: .fill) {
             didSet {
-                guard self.isHidden != oldValue else { return }
+                guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
             }
         }
-        public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
-            set { self._reuse.unloadBehaviour = newValue }
-            get { self._reuse.unloadBehaviour }
-        }
-        public var reuseCache: UI.Reuse.Cache? {
-            set { self._reuse.cache = newValue }
-            get { self._reuse.cache }
-        }
-        public var reuseName: String? {
-            set { self._reuse.name = newValue }
-            get { self._reuse.name }
-        }
-        public var width: UI.Size.Static = .fill {
+        public var request: Request? {
             didSet {
-                guard self.width != oldValue else { return }
-                self.setNeedForceLayout()
+                guard self.request != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(request: self.request)
+                }
             }
         }
-        public var height: UI.Size.Static = .fill {
+        public private(set) var state: State = .empty
+        public private(set) var contentSize: SizeFloat = .zero
+        public var contentInset: InsetFloat = .zero {
             didSet {
-                guard self.height != oldValue else { return }
-                self.setNeedForceLayout()
+                guard self.contentInset != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(contentInset: self.contentInset)
+                }
             }
         }
-        public var color: UI.Color? = nil {
+        public var color: UI.Color? {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.kk_update(color: self.color)
-                }
-            }
-        }
-        public var cornerRadius: UI.CornerRadius = .none {
-            didSet {
-                guard self.cornerRadius != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(cornerRadius: self.cornerRadius)
-                }
-            }
-        }
-        public var border: UI.Border = .none {
-            didSet {
-                guard self.border != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(border: self.border)
-                }
-            }
-        }
-        public var shadow: UI.Shadow? = nil {
-            didSet {
-                guard self.shadow != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.kk_update(shadow: self.shadow)
+                    self._view.update(color: self.color)
                 }
             }
         }
@@ -100,7 +61,7 @@ public extension UI.View {
             didSet {
                 guard self.alpha != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.kk_update(alpha: self.alpha)
+                    self._view.update(alpha: self.alpha)
                 }
             }
         }
@@ -112,24 +73,13 @@ public extension UI.View {
                 }
             }
         }
-        public var contentInset: InsetFloat = .zero {
+        public var isHidden: Bool = false {
             didSet {
-                guard self.contentInset != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(contentInset: self.contentInset)
-                }
+                guard self.isHidden != oldValue else { return }
+                self.setNeedForceLayout()
             }
         }
-        public private(set) var contentSize: SizeFloat = .zero
-        public var request: Request? {
-            didSet {
-                guard self.request != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(request: self.request)
-                }
-            }
-        }
-        public private(set) var state: State = .empty
+        public private(set) var isVisible: Bool = false
         public let onAppear: Signal.Empty< Void > = .init()
         public let onDisappear: Signal.Empty< Void > = .init()
         public let onVisible: Signal.Empty< Void > = .init()
@@ -141,11 +91,12 @@ public extension UI.View {
         public let onDecideNavigation: Signal.Args< NavigationPolicy?, URLRequest > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
-        @inline(__always) private var _view: Reusable.Content { return self._reuse.content }
+        @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         
         public init() {
         }
         
+        @inlinable
         public convenience init(
             configure: (UI.View.Web) -> Void
         ) {
@@ -155,44 +106,6 @@ public extension UI.View {
         
         deinit {
             self._reuse.destroy()
-        }
-        
-        public func loadIfNeeded() {
-            self._reuse.loadIfNeeded()
-        }
-        
-        public func size(available: SizeFloat) -> SizeFloat {
-            guard self.isHidden == false else { return .zero }
-            return UI.Size.Static.apply(
-                available: available,
-                width: self.width,
-                height: self.height
-            )
-        }
-        
-        public func appear(to layout: IUILayout) {
-            self.appearedLayout = layout
-            self.onAppear.emit()
-        }
-        
-        public func disappear() {
-            self._reuse.disappear()
-            self.appearedLayout = nil
-            self.onDisappear.emit()
-        }
-        
-        public func visible() {
-            self.isVisible = true
-            self.onVisible.emit()
-        }
-        
-        public func visibility() {
-            self.onVisibility.emit()
-        }
-        
-        public func invisible() {
-            self.isVisible = false
-            self.onInvisible.emit()
         }
         
     }
@@ -209,14 +122,22 @@ public extension UI.View.Web {
         return self._view.canGoForward
     }
     
+    func evaluate< Result >(
+        javaScript: String,
+        success: @escaping (Result) -> Void,
+        failure: @escaping (Error) -> Void
+    ) {
+        self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
+    }
+    
 }
 
 public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func enablePinchGesture(_ value: Bool) -> Self {
-        self.enablePinchGesture = value
+    func request(_ value: Request) -> Self {
+        self.request = value
         return self
     }
     
@@ -229,8 +150,8 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func request(_ value: Request) -> Self {
-        self.request = value
+    func enablePinchGesture(_ value: Bool) -> Self {
+        self.enablePinchGesture = value
         return self
     }
     
@@ -253,113 +174,180 @@ public extension UI.View.Web {
     @inlinable
     @discardableResult
     func onContentSize(_ closure: (() -> Void)?) -> Self {
-        self.onContentSize.set(closure)
+        self.onContentSize.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onContentSize(_ closure: ((Self) -> Void)?) -> Self {
-        self.onContentSize.set(self, closure)
+        self.onContentSize.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onContentSize< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onContentSize.set(sender, closure)
+        self.onContentSize.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginLoading(_ closure: (() -> Void)?) -> Self {
-        self.onBeginLoading.set(closure)
+        self.onBeginLoading.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginLoading(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBeginLoading.set(self, closure)
+        self.onBeginLoading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onBeginLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBeginLoading.set(sender, closure)
+        self.onBeginLoading.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndLoading(_ closure: (() -> Void)?) -> Self {
-        self.onEndLoading.set(closure)
+        self.onEndLoading.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndLoading(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEndLoading.set(self, closure)
+        self.onEndLoading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onEndLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEndLoading.set(sender, closure)
+        self.onEndLoading.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDecideNavigation(_ closure: (() -> NavigationPolicy?)?) -> Self {
-        self.onDecideNavigation.set(closure)
+        self.onDecideNavigation.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDecideNavigation(_ closure: ((Self) -> NavigationPolicy?)?) -> Self {
-        self.onDecideNavigation.set(self, closure)
+        self.onDecideNavigation.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDecideNavigation(_ closure: ((URLRequest) -> NavigationPolicy?)?) -> Self {
-        self.onDecideNavigation.set(closure)
+        self.onDecideNavigation.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDecideNavigation(_ closure: ((Self, URLRequest) -> NavigationPolicy?)?) -> Self {
-        self.onDecideNavigation.set(self, closure)
+        self.onDecideNavigation.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
     func onDecideNavigation< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, URLRequest) -> NavigationPolicy?)?) -> Self {
-        self.onDecideNavigation.set(sender, closure)
+        self.onDecideNavigation.link(sender, closure)
         return self
     }
     
 }
 
-public extension UI.View.Web {
+extension UI.View.Web : IUIView {
     
-    func evaluate< Result >(
-        javaScript: String,
-        success: @escaping (Result) -> Void,
-        failure: @escaping (Error) -> Void
-    ) {
-        self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
+    public var native: NativeView {
+        self._view
     }
     
+    public var isLoaded: Bool {
+        self._reuse.isLoaded
+    }
+    
+    public var bounds: RectFloat {
+        guard self.isLoaded == true else { return .zero }
+        return .init(self._view.bounds)
+    }
+    
+    public func loadIfNeeded() {
+        self._reuse.loadIfNeeded()
+    }
+    
+    public func size(available: SizeFloat) -> SizeFloat {
+        guard self.isHidden == false else { return .zero }
+        return self.size.apply(available: available)
+    }
+    
+    public func appear(to layout: IUILayout) {
+        self.appearedLayout = layout
+        self.onAppear.emit()
+    }
+    
+    public func disappear() {
+        self._reuse.disappear()
+        self.appearedLayout = nil
+        self.onDisappear.emit()
+    }
+    
+    public func visible() {
+        self.isVisible = true
+        self.onVisible.emit()
+    }
+    
+    public func visibility() {
+        self.onVisibility.emit()
+    }
+    
+    public func invisible() {
+        self.isVisible = false
+        self.onInvisible.emit()
+    }
+    
+}
+
+extension UI.View.Web : IUIViewReusable {
+    
+    public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
+        set { self._reuse.unloadBehaviour = newValue }
+        get { self._reuse.unloadBehaviour }
+    }
+    
+    public var reuseCache: UI.Reuse.Cache? {
+        set { self._reuse.cache = newValue }
+        get { self._reuse.cache }
+    }
+    
+    public var reuseName: String? {
+        set { self._reuse.name = newValue }
+        get { self._reuse.name }
+    }
+    
+}
+
+extension UI.View.Web : IUIViewStaticSizeable {
+}
+
+extension UI.View.Web : IUIViewColorable {
+}
+
+extension UI.View.Web : IUIViewAlphable {
 }
 
 extension UI.View.Web : KKWebViewDelegate {

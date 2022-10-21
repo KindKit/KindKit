@@ -37,17 +37,6 @@ final class KKSegmentedView : UISegmentedControl {
     
     unowned var kkDelegate: KKSegmentedViewDelegate?
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
     var items: [UI.View.Segmented.Item] = [] {
         willSet {
             self.removeAllSegments()
@@ -61,8 +50,6 @@ final class KKSegmentedView : UISegmentedControl {
             }
         }
     }
-    
-    private unowned var _view: UI.View.Segmented?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -81,21 +68,12 @@ final class KKSegmentedView : UISegmentedControl {
 extension KKSegmentedView {
     
     func update(view: UI.View.Segmented) {
-        self._view = view
         self.update(items: view.items)
         self.update(selected: view.selected)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.kkDelegate = view
-    }
-    
-    func update(locked: Bool) {
-        self.isEnabled = locked == false
     }
     
     func update(items: [UI.View.Segmented.Item]) {
@@ -114,9 +92,20 @@ extension KKSegmentedView {
         }
     }
     
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
+    func update(locked: Bool) {
+        self.isEnabled = locked == false
+    }
+    
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }

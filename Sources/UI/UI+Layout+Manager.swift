@@ -36,6 +36,13 @@ extension UI.Layout {
         }
         
         @inline(__always)
+        func invalidate() {
+            if let layout = self.layout {
+                layout.invalidate()
+            }
+        }
+        
+        @inline(__always)
         mutating func layout(bounds: RectFloat) {
             if let layout = self.layout {
                 self.size = layout.layout(bounds: bounds)

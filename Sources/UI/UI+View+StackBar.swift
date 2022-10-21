@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.View {
 
-    final class StackBar : IUIWidgetView, IUIViewLockable, IUIViewColorable, IUIViewBorderable, IUIViewCornerRadiusable, IUIViewShadowable, IUIViewAlphable {
+    final class StackBar : IUIWidgetView {
         
         public let body: UI.View.Bar
         public var size: Float? {
@@ -82,111 +82,17 @@ public extension UI.View {
         
         public init() {
             self._contentLayout = UI.Layout.Composition(
-                inset: Inset(horizontal: 8, vertical: 4),
-                entity: UI.Layout.Composition.None()
+                inset: .init(horizontal: 8, vertical: 4),
+                entity: .none()
             )
-            self._contentView = UI.View.Custom(self._contentLayout)
+            self._contentView = UI.View.Custom()
+                .content(self._contentLayout)
             self.body = .init(
                 placement: .top,
                 content: self._contentView
             )
         }
         
-        public convenience init(
-            configure: (UI.View.StackBar) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
-        }
-        
-    }
-    
-}
-
-public extension UI.View.StackBar {
-    
-    @inlinable
-    @discardableResult
-    func inset(_ value: InsetFloat) -> Self {
-        self.inset = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func header(_ value: IUIView?) -> Self {
-        self.header = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func headerSpacing(_ value: Float) -> Self {
-        self.headerSpacing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func leadings(_ value: [IUIView]) -> Self {
-        self.leadings = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func leadingsSpacing(_ value: Float) -> Self {
-        self.leadingsSpacing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func center(_ value: IUIView?) -> Self {
-        self.center = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func centerFilling(_ value: Bool) -> Self {
-        self.centerFilling = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func centerSpacing(_ value: Float) -> Self {
-        self.centerSpacing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func trailings(_ value: [IUIView]) -> Self {
-        self.trailings = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func trailingsSpacing(_ value: Float) -> Self {
-        self.trailingsSpacing = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func footer(_ value: IUIView?) -> Self {
-        self.footer = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func footerSpacing(_ value: Float) -> Self {
-        self.footerSpacing = value
-        return self
     }
     
 }
@@ -368,4 +274,104 @@ private extension UI.View.StackBar {
         )
     }
     
+}
+
+public extension UI.View.StackBar {
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: InsetFloat) -> Self {
+        self.inset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func header(_ value: IUIView?) -> Self {
+        self.header = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func headerSpacing(_ value: Float) -> Self {
+        self.headerSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadings(_ value: [IUIView]) -> Self {
+        self.leadings = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadingsSpacing(_ value: Float) -> Self {
+        self.leadingsSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func center(_ value: IUIView?) -> Self {
+        self.center = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerFilling(_ value: Bool) -> Self {
+        self.centerFilling = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerSpacing(_ value: Float) -> Self {
+        self.centerSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailings(_ value: [IUIView]) -> Self {
+        self.trailings = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailingsSpacing(_ value: Float) -> Self {
+        self.trailingsSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func footer(_ value: IUIView?) -> Self {
+        self.footer = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func footerSpacing(_ value: Float) -> Self {
+        self.footerSpacing = value
+        return self
+    }
+    
+}
+
+extension UI.View.StackBar : IUIViewReusable {
+}
+
+extension UI.View.StackBar : IUIViewColorable {
+}
+
+extension UI.View.StackBar : IUIViewAlphable {
+}
+
+extension UI.View.StackBar : IUIViewLockable {
 }

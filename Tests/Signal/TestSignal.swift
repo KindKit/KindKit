@@ -11,7 +11,7 @@ class TestSignal : XCTestCase {
         let signal = Signal.Empty< Void >()
         do {
             var isEmit = false
-            let slot = signal.set({
+            let slot = signal.link({
                 isEmit = true
             })
             signal.emit()
@@ -21,7 +21,7 @@ class TestSignal : XCTestCase {
         }
         do {
             var isEmit = false
-            let slot = signal.set({
+            let slot = signal.link({
                 isEmit = true
             })
             slot?.cancel()
@@ -59,7 +59,7 @@ class TestSignal : XCTestCase {
     func testOptional() {
         let signal = Signal.Empty< Bool? >()
         do {
-            signal.set({
+            signal.link({
                 return true
             })
             if signal.emit() != true {

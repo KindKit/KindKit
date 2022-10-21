@@ -50,7 +50,7 @@ private extension Signal.Empty {
 public extension Signal.Empty {
     
     @discardableResult
-    func set(
+    func link(
         _ closure: (() -> Result)?
     ) -> ICancellable? {
         guard let closure = closure else {
@@ -63,7 +63,7 @@ public extension Signal.Empty {
     }
 
     @discardableResult
-    func set< Sender : AnyObject >(
+    func link< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: ((Sender) -> Result)?
     ) -> ICancellable? {

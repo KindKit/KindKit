@@ -35,33 +35,36 @@ extension UI.View.External {
 
 final class KKExternalView : NSView {
     
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    override var isFlipped: Bool {
-        return true
-    }
     var content: NSView? {
         willSet {
             self.content?.removeFromSuperview()
         }
         didSet {
             guard let content = self.content else { return }
+            content.frame = self.bounds
             self.addSubview(content)
         }
     }
+    override var isFlipped: Bool {
+        return true
+    }
     
-    private unowned var _view: UI.View.External?
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
+        if let hitView = super.hitTest(point) {
+            if hitView === self {
+                return nil
+            }
+        }
         return nil
     }
     
@@ -78,21 +81,15 @@ final class KKExternalView : NSView {
 extension KKExternalView {
     
     func update(view: UI.View.External) {
-        self._view = view
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(content: view.content)
     }
     
-    func update(content: NSView) {
+    func update(content: NSView?) {
         self.content = content
     }
     
     func cleanup() {
-        self._view = nil
+        self.content = nil
     }
     
 }

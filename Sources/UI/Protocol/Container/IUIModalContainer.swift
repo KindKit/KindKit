@@ -16,18 +16,11 @@ public protocol IUIModalContainer : IUIContainer, IUIContainerParentable {
 #endif
     
     func present(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?)
+    
+    func present< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer
+    
     func dismiss(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?)
     
-}
-
-public extension IUIModalContainer {
-    
-    func present(container: IUIModalContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.present(container: container, animated: animated, completion: completion)
-    }
-    
-    func dismiss(container: IUIModalContentContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.dismiss(container: container, animated: animated, completion: completion)
-    }
+    func dismiss< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer
     
 }

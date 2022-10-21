@@ -97,13 +97,15 @@ public extension UI.Container {
 #endif
             self._root = Item(container: root)
             self._layout = Layout(.idle(current: self._root.item))
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
 #if os(iOS)
                 .gestures([ self._interactiveGesture ])
 #endif
             self._setup()
         }
         
+        @inlinable
         public convenience init<
             RootScreen : IUIScreen & IUIScreenStackable & IUIScreenViewable
         >(
@@ -166,7 +168,10 @@ public extension UI.Container {
                 return true
             }
             if self._items.count > 0 {
-                self.popToRoot()
+                self.popToRoot(
+                    animated: true,
+                    completion: nil
+                )
                 return true
             }
             return self._root.container.activate()
@@ -419,6 +424,14 @@ extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScree
 }
 
 extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreenModalable {
+    
+    public var modalColor: UI.Color {
+        return self.screen.modalColor
+    }
+    
+    public var modalCornerRadius: UI.CornerRadius {
+        return self.screen.modalCornerRadius
+    }
     
     public var modalSheetInset: InsetFloat? {
         switch self.screen.modalPresentation {

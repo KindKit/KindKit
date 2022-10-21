@@ -28,6 +28,9 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.View : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
     }
     

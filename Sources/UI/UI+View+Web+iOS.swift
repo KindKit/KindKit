@@ -37,19 +37,7 @@ extension UI.View.Web {
 final class KKWebView : WKWebView {
         
     unowned var kkDelegate: KKWebViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.Web?
+
     private var _enablePinchGesture: Bool = true
     
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
@@ -78,27 +66,13 @@ final class KKWebView : WKWebView {
 extension KKWebView {
     
     func update(view: UI.View.Web) {
-        self._view = view
-        self.update(enablePinchGesture: view.enablePinchGesture)
         self.update(contentInset: view.contentInset)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
+        self.update(enablePinchGesture: view.enablePinchGesture)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.kkDelegate = view
         self.scrollView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
         self.update(request: view.request)
-    }
-    
-    func update(enablePinchGesture: Bool) {
-        self._enablePinchGesture = enablePinchGesture
-    }
-    
-    func update(contentInset: InsetFloat) {
-        self.scrollView.contentInset = contentInset.uiEdgeInsets
-        self.scrollView.scrollIndicatorInsets = contentInset.uiEdgeInsets
     }
     
     func update(request: UI.View.Web.Request?) {
@@ -119,6 +93,32 @@ extension KKWebView {
         }
     }
     
+    func update(contentInset: InsetFloat) {
+        self.scrollView.contentInset = contentInset.uiEdgeInsets
+        self.scrollView.scrollIndicatorInsets = contentInset.uiEdgeInsets
+    }
+    
+    func update(enablePinchGesture: Bool) {
+        self._enablePinchGesture = enablePinchGesture
+    }
+    
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
+    func cleanup() {
+        self.kkDelegate = nil
+        self.stopLoading()
+        self.load(URLRequest(url: URL(string: "about:blank")!))
+        self.frame = .zero
+        self.scrollView.removeObserver(self, forKeyPath: "contentSize")
+        self.frame = UIScreen.main.bounds
+    }
+    
     func evaluate< Result >(
         javaScript: String,
         success: @escaping (Result) -> Void,
@@ -133,16 +133,6 @@ extension KKWebView {
                 failure(WKError(WKError.javaScriptResultTypeIsUnsupported))
             }
         })
-    }
-    
-    func cleanup() {
-        self.kkDelegate = nil
-        self._view = nil
-        self.stopLoading()
-        self.load(URLRequest(url: URL(string: "about:blank")!))
-        self.frame = .zero
-        self.scrollView.removeObserver(self, forKeyPath: "contentSize")
-        self.frame = UIScreen.main.bounds
     }
     
 }

@@ -131,9 +131,10 @@ public extension UI.Container {
                 inset: inset,
                 content: content.flatMap({ UI.Layout.Item($0.view) })
             )
-            self._view = UI.View.Custom(self._layout)
+            self._view = UI.View.Custom()
+                .content(self._layout)
 #if os(iOS)
-            self._view.gestures([ self._interactiveGesture ])
+                .gestures([ self._interactiveGesture ])
 #endif
             self._items = []
             self._setup()
@@ -351,10 +352,11 @@ private extension UI.Container.Push {
     
     func _didPresent(push: Item) {
         if let duration = push.container.pushDuration {
-            let timer = Timer(interval: duration, delay: 0, repeating: 0)
-            timer.onFinished(self._timerTriggered)
-            timer.start()
-            self._timer = timer
+            self._timer = Timer(interval: duration, delay: 0, repeating: 0)
+                .onFinished(self, { $0._timerTriggered() })
+                .start()
+        } else {
+            self._timer = nil
         }
     }
     

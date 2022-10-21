@@ -37,6 +37,12 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.VAccessory : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        self.leading?.invalidate()
+        self.center.invalidate()
+        self.trailing?.invalidate()
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         self.leading?.invalidate(item: item)
         self.center.invalidate(item: item)

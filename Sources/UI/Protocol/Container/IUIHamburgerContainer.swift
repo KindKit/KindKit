@@ -23,26 +23,6 @@ public protocol IUIHamburgerContainer : IUIContainer, IUIContainerParentable {
 
 public extension IUIHamburgerContainer {
     
-    @inlinable
-    func showLeading(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.showLeading(animated: animated, completion: completion)
-    }
-    
-    @inlinable
-    func hideLeading(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.hideLeading(animated: animated, completion: completion)
-    }
-    
-    @inlinable
-    func showTrailing(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.showTrailing(animated: animated, completion: completion)
-    }
-    
-    @inlinable
-    func hideTrailing(animated: Bool = true, completion: (() -> Void)? = nil) {
-        self.hideTrailing(animated: animated, completion: completion)
-    }
-    
     func set(leading: IHamburgerMenuContainer, animated: Bool = true, completion: (() -> Void)? = nil) {
         guard self.leading !== leading else {
         	completion?()

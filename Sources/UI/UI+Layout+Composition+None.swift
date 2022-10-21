@@ -17,6 +17,9 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.None : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
     }
     

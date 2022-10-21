@@ -25,6 +25,10 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.Margin : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        self.entity.invalidate()
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         self.entity.invalidate(item: item)
     }

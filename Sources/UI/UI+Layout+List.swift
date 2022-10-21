@@ -83,6 +83,7 @@ public extension UI.Layout {
             self._cache = Array< SizeFloat? >(repeating: nil, count: items.count)
         }
 
+        @inlinable
         public convenience init(
             direction: Direction,
             alignment: Alignment = .fill,
@@ -101,6 +102,12 @@ public extension UI.Layout {
         
         deinit {
             self._destroy()
+        }
+        
+        public func invalidate() {
+            for index in self._cache.startIndex ..< self._cache.endIndex {
+                self._cache[index] = nil
+            }
         }
         
         public func invalidate(item: UI.Layout.Item) {

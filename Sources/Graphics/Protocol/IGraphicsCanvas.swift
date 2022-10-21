@@ -8,9 +8,9 @@ import Foundation
 
 public protocol IGraphicsCanvas : AnyObject {
     
-    var view: UI.View.Graphics? { get }
+    var view: UI.View.Canvas? { get }
     
-    func attach(view: UI.View.Graphics)
+    func attach(view: UI.View.Canvas)
     func detach()
     
     func resize(_ size: SizeFloat)

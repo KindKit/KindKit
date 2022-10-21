@@ -25,6 +25,11 @@ public extension UI.Layout.Composition {
 
 extension UI.Layout.Composition.Overlay : IUICompositionLayoutEntity {
     
+    public func invalidate() {
+        self.content.invalidate()
+        self.overlay.invalidate()
+    }
+    
     public func invalidate(item: UI.Layout.Item) {
         self.content.invalidate(item: item)
         self.overlay.invalidate(item: item)

@@ -33,36 +33,25 @@ extension UI.View.Custom {
     
 }
 
-final class KKCustomView : NSControl {
+final class KKCustomView : NSView {
         
     unowned var kkDelegate: KKCustomViewDelegate?
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
+    override var isFlipped: Bool {
+        return true
     }
     
-    private unowned var _view: UI.View.Custom?
     private var _layoutManager: UI.Layout.Manager!
-    private var _gestures: [IUIGesture]
-    private var _isLayout: Bool
+    private var _gestures: [IUIGesture] = []
+    private var _isLocked: Bool = false
     
     override init(frame: CGRect) {
-        self._gestures = []
-        self._isLayout = false
-        
         super.init(frame: frame)
         
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.wantsLayer = true
         
         self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
     }
@@ -82,24 +71,24 @@ final class KKCustomView : NSControl {
     override func layout() {
         super.layout()
         
-        self._safeLayout({
-            let bounds = RectFloat(self.bounds)
-            self._layoutManager.layout(bounds: bounds)
-            self._layoutManager.visible(bounds: bounds)
-        })
+        let bounds = RectFloat(self.bounds)
+        self._layoutManager.layout(bounds: bounds)
+        self._layoutManager.visible(bounds: bounds)
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
-        if let hitView = super.hitTest(point) {
-            if hitView === self {
-                let shouldHighlighting = self.kkDelegate?.shouldHighlighting(self)
-                let shouldGestures = self._gestures.contains(where: { $0.isEnabled == true })
-                if shouldHighlighting == false && shouldGestures == false {
-                    return nil
-                }
+        guard self._isLocked == false else {
+            return nil
+        }
+        let hitView = super.hitTest(point)
+        if hitView === self {
+            let shouldHighlighting = self.kkDelegate?.shouldHighlighting(self)
+            let shouldGestures = self._gestures.contains(where: { $0.isEnabled == true })
+            if shouldHighlighting == false && shouldGestures == false {
+                return nil
             }
         }
-        return nil
+        return hitView
     }
     
 }
@@ -107,16 +96,11 @@ final class KKCustomView : NSControl {
 extension KKCustomView {
     
     func update(view: UI.View.Custom) {
-        self._view = view
         self.update(gestures: view.gestures)
         self.update(content: view.content)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
@@ -130,13 +114,22 @@ extension KKCustomView {
         }
     }
     
-    func update(content: IUILayout) {
+    func update(content: IUILayout?) {
         self._layoutManager.layout = content
         self.needsLayout = true
     }
     
+    func update(color: UI.Color?) {
+        guard let layer = self.layer else { return }
+        layer.backgroundColor = color?.native.cgColor
+    }
+    
+    func update(alpha: Float) {
+        self.alphaValue = CGFloat(alpha)
+    }
+    
     func update(locked: Bool) {
-        self.isEnabled = locked == false
+        self._isLocked = locked
     }
     
     func cleanup() {
@@ -146,7 +139,6 @@ extension KKCustomView {
         }
         self._gestures.removeAll()
         self.kkDelegate = nil
-        self._view = nil
     }
     
     func add(gesture: IUIGesture) {
@@ -161,18 +153,6 @@ extension KKCustomView {
             self._gestures.remove(at: index)
         }
         self.removeGestureRecognizer(gesture.native)
-    }
-    
-}
-
-private extension KKCustomView {
-    
-    func _safeLayout(_ action: () -> Void) {
-        if self._isLayout == false {
-            self._isLayout = true
-            action()
-            self._isLayout = false
-        }
     }
     
 }

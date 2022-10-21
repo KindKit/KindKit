@@ -36,19 +36,7 @@ extension UI.View.Switch {
 final class KKSwitchView : UIView {
     
     unowned var kkDelegate: KKSwitchViewDelegate?
-    override var frame: CGRect {
-        set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.kk_update(cornerRadius: view.cornerRadius)
-                self.kk_updateShadowPath()
-            }
-        }
-        get { super.frame }
-    }
-    
-    private unowned var _view: UI.View.Switch?
+
     private var _switch: UISwitch
     
     override init(frame: CGRect) {
@@ -84,23 +72,18 @@ final class KKSwitchView : UIView {
 extension KKSwitchView {
     
     func update(view: UI.View.Switch) {
-        self._view = view
+        self.update(value: view.value)
         self.update(thumbColor: view.thumbColor)
         self.update(offColor: view.offColor)
         self.update(onColor: view.onColor)
-        self.update(value: view.value)
+        self.update(color: view.color)
+        self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
-        self.kk_update(color: view.color)
-        self.kk_update(border: view.border)
-        self.kk_update(cornerRadius: view.cornerRadius)
-        self.kk_update(shadow: view.shadow)
-        self.kk_update(alpha: view.alpha)
-        self.kk_updateShadowPath()
         self.kkDelegate = view
     }
     
-    func update(locked: Bool) {
-        self._switch.isEnabled = locked == false
+    func update(value: Bool) {
+        self._switch.isOn = value
     }
     
     func update(thumbColor: UI.Color?) {
@@ -115,13 +98,20 @@ extension KKSwitchView {
         self._switch.onTintColor = onColor?.native
     }
     
-    func update(value: Bool) {
-        self._switch.isOn = value
+    func update(color: UI.Color?) {
+        self.backgroundColor = color?.native
+    }
+    
+    func update(alpha: Float) {
+        self.alpha = CGFloat(alpha)
+    }
+    
+    func update(locked: Bool) {
+        self._switch.isEnabled = locked == false
     }
     
     func cleanup() {
         self.kkDelegate = nil
-        self._view = nil
     }
     
 }
