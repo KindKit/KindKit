@@ -220,6 +220,11 @@ public extension UI.Layout.State {
         return self.data[state]
     }
     
+    func reset() {
+        self.data = [:]
+        self.setNeedForceUpdate()
+    }
+    
     func animate(
         delay: TimeInterval = 0,
         duration: TimeInterval,

@@ -35,14 +35,14 @@ public extension FlowOperator {
             self._pipelineReceived1 = []
             self._pipelineReceived2 = []
             self._subscription1 = pipeline1.subscribe(
-                onReceiveValue: { [unowned self] in self._receive1(value: $0) },
-                onReceiveError: { [unowned self] in self._receive1(error: $0) },
-                onCompleted: { [unowned self] in self._completed() }
+                onReceiveValue: { [weak self] in self?._receive1(value: $0) },
+                onReceiveError: { [weak self] in self?._receive1(error: $0) },
+                onCompleted: { [weak self] in self?._completed() }
             )
             self._subscription2 = pipeline2.subscribe(
-                onReceiveValue: { [unowned self] in self._receive2(value: $0) },
-                onReceiveError: { [unowned self] in self._receive2(error: $0) },
-                onCompleted: { [unowned self] in self._completed() }
+                onReceiveValue: { [weak self] in self?._receive2(value: $0) },
+                onReceiveError: { [weak self] in self?._receive2(error: $0) },
+                onCompleted: { [weak self] in self?._completed() }
             )
         }
         

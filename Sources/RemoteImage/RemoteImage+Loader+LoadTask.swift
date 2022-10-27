@@ -59,10 +59,12 @@ private extension RemoteImage.Loader.LoadTask {
                 self.task = self.query.remote(
                     provider: self.provider,
                     queue: self.workQueue,
-                    download: { [unowned self] progress in
+                    download: { [weak self] progress in
+                        guard let self = self else { return }
                         self.progress(progress: Float(progress.fractionCompleted))
                     },
-                    success: { [unowned self] data, image in
+                    success: { [weak self] data, image in
+                        guard let self = self else { return }
                         do {
                             try self.cache.set(data: data, image: image, query: self.query)
                             self.finish(image: image)
@@ -70,7 +72,8 @@ private extension RemoteImage.Loader.LoadTask {
                             self.finish(error: error)
                         }
                     },
-                    failure: { [unowned self] error in
+                    failure: { [weak self] error in
+                        guard let self = self else { return }
                         self.finish(error: error)
                     }
                 )

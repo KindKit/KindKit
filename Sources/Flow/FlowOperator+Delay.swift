@@ -34,7 +34,8 @@ public extension FlowOperator {
         
         public func receive(value: Input.Success) {
             self._task = DispatchWorkItem.kk_async(
-                block: { [unowned self] in
+                block: { [weak self] in
+                    guard let self = self else { return }
                     self._task = nil
                     self._next.send(value: value)
                     self._next.completed()
@@ -46,7 +47,8 @@ public extension FlowOperator {
         
         public func receive(error: Input.Failure) {
             self._task = DispatchWorkItem.kk_async(
-                block: { [unowned self] in
+                block: { [weak self] in
+                    guard let self = self else { return }
                     self._task = nil
                     self._next.send(error: error)
                     self._next.completed()

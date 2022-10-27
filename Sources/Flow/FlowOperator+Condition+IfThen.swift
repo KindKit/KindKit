@@ -27,9 +27,9 @@ public extension FlowOperator.Condition {
             self._if = `if`
             self._then = then
             self._thenSubscription = then.subscribe(
-                onReceiveValue: { [unowned self] in self._receive(value: $0) },
-                onReceiveError: { [unowned self] in self._receive(error: $0) },
-                onCompleted: { [unowned self] in self._completed() }
+                onReceiveValue: { [weak self] in self?._receive(value: $0) },
+                onReceiveError: { [weak self] in self?._receive(error: $0) },
+                onCompleted: { [weak self] in self?._completed() }
             )
         }
         

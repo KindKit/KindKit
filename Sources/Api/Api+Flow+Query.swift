@@ -75,7 +75,7 @@ private extension Api.Flow.Query {
             request: try self._request(input),
             response: self._response(input),
             queue: self._queue,
-            completed: { [unowned self] in self._completed(date, input, $0) }
+            completed: { [weak self] in self?._completed(date, input, $0) }
         )
     }
 
@@ -84,8 +84,8 @@ private extension Api.Flow.Query {
         switch self._validation(input, output, Date().timeIntervalSince(date)) {
         case .retry(let delay):
             self._task = DispatchWorkItem.kk_async(
-                block: { [unowned self] in
-                    self._run(date, input)
+                block: { [weak self] in
+                    self?._run(date, input)
                 },
                 queue: self._queue,
                 delay: delay

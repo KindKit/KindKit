@@ -32,8 +32,8 @@ extension Api.Query {
             self.queue = queue
             self.onCompleted = onCompleted
             self._workQueue = DispatchQueue.global(qos: .userInitiated)
-            self._workItem = DispatchWorkItem(block: { [unowned self] in
-                self._perform()
+            self._workItem = DispatchWorkItem(block: { [weak self] in
+                self?._perform()
             })
             self._workQueue.sync(execute: self._workItem)
         }

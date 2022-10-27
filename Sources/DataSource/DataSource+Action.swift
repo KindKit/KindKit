@@ -46,7 +46,7 @@ public extension DataSource {
                 request: try self._request(params),
                 response: self._response(params),
                 queue: .main,
-                completed: { [unowned self] in self._completed($0) }
+                completed: { [weak self] in self?._completed($0) }
             )
         }
         
