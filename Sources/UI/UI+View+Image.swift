@@ -95,7 +95,7 @@ public extension UI.View.Image {
     
     @inlinable
     @discardableResult
-    func image(_ value: UI.Image) -> Self {
+    func image(_ value: UI.Image?) -> Self {
         self.image = value
         return self
     }
