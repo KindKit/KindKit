@@ -195,7 +195,8 @@ private extension Api.Query.Task {
             print(self.debugString())
         }
 #endif
-        self.queue.async(execute: {
+        self.queue.sync(flags: .barrier, execute: {
+            guard self._canceled == false else { return }
             self.onCompleted(result)
         })
     }
