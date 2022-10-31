@@ -13,7 +13,6 @@ public extension StringFormatter {
         public let formatter: ByteCountFormatter
         
         public init(
-            format: String,
             units: ByteCountFormatter.Units,
             style: ByteCountFormatter.CountStyle
         ) {
