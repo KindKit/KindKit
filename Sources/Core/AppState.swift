@@ -68,13 +68,13 @@ public final class AppState {
             forName: UIApplication.didEnterBackgroundNotification,
             object: nil,
             queue: OperationQueue.main,
-            using: { [weak self] in self?._didEnterForeground($0) }
+            using: { [weak self] in self?._didEnterBackground($0) }
         )
         self._enterBackgroundObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.willEnterForegroundNotification,
             object: nil,
             queue: OperationQueue.main,
-            using: { [weak self] in self?._didEnterBackground($0) }
+            using: { [weak self] in self?._didEnterForeground($0) }
         )
         self._memoryWarningObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didReceiveMemoryWarningNotification,

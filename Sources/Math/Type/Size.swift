@@ -54,6 +54,11 @@ public extension Size {
     }
     
     @inlinable
+    var area: Value {
+        return self.width * self.height
+    }
+    
+    @inlinable
     var aspectRatio: Value {
         return self.width / self.height
     }

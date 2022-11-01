@@ -9,19 +9,20 @@ public extension RemoteImage {
     final class Cache {
 
         public private(set) var name: String
-        public private(set) var memory: [String: UI.Image]
+        public private(set) var config: Config
         public private(set) var url: URL
         
-        private let _appState: AppState
-        private var _fileManager: FileManager
-        private var _queue: DispatchQueue
+        private var _memory: [String: UI.Image] = [:]
+        private let _appState = AppState()
+        private var _fileManager = FileManager.default
+        private var _queue: DispatchQueue = DispatchQueue(label: "KindKit.RemoteImage.Cache")
 
-        public init(name: String) throws {
+        public init(
+            name: String,
+            config: Config = .init()
+        ) throws {
             self.name = name
-            self.memory = [:]
-            self._appState = .init()
-            self._fileManager = FileManager.default
-            self._queue = DispatchQueue(label: "KindKit.RemoteImage.Cache")
+            self.config = config
             if let cachePath = self._fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first {
                 self.url = cachePath
             } else {
@@ -63,7 +64,9 @@ public extension RemoteImage.Cache {
     }
     
     func isExist(key: String) -> Bool {
-        let memoryImage = self._queue.sync(execute: { return self.memory[key] })
+        let memoryImage = self._queue.sync(execute: {
+            return self._memory[key]
+        })
         if memoryImage != nil {
             return true
         }
@@ -86,15 +89,19 @@ public extension RemoteImage.Cache {
     }
 
     func image(key: String) -> UI.Image? {
-        let memoryImage = self._queue.sync(execute: { return self.memory[key] })
+        let memoryImage = self._queue.sync(execute: {
+            return self._memory[key]
+        })
         if let image = memoryImage {
             return image
         }
         let url = self.url.appendingPathComponent(key)
         if let image = UI.Image(url: url) {
-            self._queue.sync(flags: .barrier, execute: {
-                self.memory[key] = image
-            })
+            if self._canStoreInMemory(image: image) == true {
+                self._queue.sync(flags: .barrier, execute: {
+                    self._memory[key] = image
+                })
+            }
             return image
         }
         return nil
@@ -117,9 +124,11 @@ public extension RemoteImage.Cache {
     func set(data: Data, image: UI.Image, key: String) throws {
         let url = self.url.appendingPathComponent(key)
         try data.write(to: url, options: .atomic)
-        self._queue.sync(flags: .barrier, execute: {
-            self.memory[key] = image
-        })
+        if self._canStoreInMemory(image: image) == true {
+            self._queue.sync(flags: .barrier, execute: {
+                self._memory[key] = image
+            })
+        }
     }
     
 }
@@ -138,7 +147,7 @@ public extension RemoteImage.Cache {
 
     func remove(key: String) throws {
         self._queue.sync(flags: .barrier, execute: {
-            _ = self.memory.removeValue(forKey: key)
+            _ = self._memory.removeValue(forKey: key)
         })
         let url = self.url.appendingPathComponent(key)
         if self._fileManager.fileExists(atPath: url.path) == true {
@@ -171,7 +180,7 @@ public extension RemoteImage.Cache {
 
     func cleanupMemory() {
         self._queue.sync(flags: .barrier, execute: {
-            self.memory.removeAll()
+            self._memory.removeAll()
         })
     }
 
@@ -187,6 +196,7 @@ private extension RemoteImage.Cache {
         self._appState.remove(observer: self)
     }
     
+    @inline(__always)
     func _key(_ query: IRemoteImageQuery) -> String? {
         let key = query.key
         if let sha256 = key.kk_sha256 {
@@ -195,12 +205,18 @@ private extension RemoteImage.Cache {
         return nil
     }
     
+    @inline(__always)
     func _key(_ query: IRemoteImageQuery, _ filter: IRemoteImageFilter) -> String? {
         let key = "{\(filter.name)}{\(query.key)}"
         if let sha256 = key.kk_sha256 {
             return sha256
         }
         return nil
+    }
+    
+    @inline(__always)
+    func _canStoreInMemory(image: UI.Image) -> Bool {
+        return image.size.area < self.config.memory.maxImageArea
     }
     
 }
