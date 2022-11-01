@@ -111,7 +111,7 @@ extension UI.Container.Push {
         }
         
         func height(item: UI.Container.Push.Item) -> Float {
-            return item.size.height + self.inset.top + self.inheritedInset.top
+            return self.inset.top + self.inheritedInset.top + item.size.height
         }
         
     }

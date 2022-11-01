@@ -307,8 +307,9 @@ private extension UI.Container.Push {
     func _present(push: Item, animated: Bool, completion: (() -> Void)?) {
         self._current = push
         if animated == true {
+            let size = self._layout.inset.top + self._layout.inheritedInset.top + push.size.height
             self._animation = Animation.default.run(
-                duration: TimeInterval(push.size.height / self.animationVelocity),
+                duration: TimeInterval(size / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: {
                     self._layout.state = .present(push: push, progress: .zero)
@@ -375,8 +376,9 @@ private extension UI.Container.Push {
     func _dismiss(push: Item, animated: Bool, completion: (() -> Void)?) {
         push.container.prepareHide(interactive: false)
         if animated == true {
+            let size = self._layout.inset.top + self._layout.inheritedInset.top + push.size.height
             self._animation = Animation.default.run(
-                duration: TimeInterval(push.size.height / self.animationVelocity),
+                duration: TimeInterval(size / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 processing: { [unowned self] progress in
                     self._layout.state = .dismiss(push: push, progress: progress)
