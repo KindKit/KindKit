@@ -13,6 +13,7 @@ public protocol IUIGroupContainer : IUIContainer, IUIContainerParentable {
     var backward: IUIGroupContentContainer? { get }
     var current: IUIGroupContentContainer? { get }
     var forward: IUIGroupContentContainer? { get }
+    var allowAnimationUserInteraction: Bool { set get }
     var animationVelocity: Float { set get }
     
     func updateBar(animated: Bool, completion: (() -> Void)?)

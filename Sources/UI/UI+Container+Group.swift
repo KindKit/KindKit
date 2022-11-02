@@ -84,6 +84,7 @@ public extension UI.Container {
             guard let index = self._items.firstIndex(where: { $0 === current }) else { return nil }
             return index < self._items.count - 1 ? self._items[index + 1].container : nil
         }
+        public var allowAnimationUserInteraction: Bool = true
         public var animationVelocity: Float
         
         private var _bar: UI.View.GroupBar
@@ -312,7 +313,7 @@ extension UI.Container.Group : IGroupBarViewDelegate {
         if self._current === item {
             _ = self.activate()
         } else {
-            self.set(current: item.container, animated: true, completion: nil)
+            self.set(current: item.container, animated: self.allowAnimationUserInteraction, completion: nil)
         }
     }
     
