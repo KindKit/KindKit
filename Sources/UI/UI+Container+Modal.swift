@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Modal : IUIModalContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -295,7 +295,8 @@ private extension UI.Container.Modal {
     
     func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
-            self._dismiss(modal: current, animated: animated, completion: { [unowned self] in
+            self._dismiss(modal: current, animated: animated, completion: { [weak self] in
+                guard let self = self else { return }
                 self._present(modal: next, animated: animated, completion: completion)
             })
         } else {
@@ -309,18 +310,21 @@ private extension UI.Container.Modal {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .present(modal: modal, progress: .zero)
                     if self.isPresented == true {
                         modal.container.didChangeInsets()
                         modal.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .present(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(modal: modal)
                     if self.isPresented == true {
@@ -341,7 +345,8 @@ private extension UI.Container.Modal {
     }
     
     func _dismiss(current: Item, previous: Item?, animated: Bool, completion: (() -> Void)?) {
-        self._dismiss(modal: current, animated: animated, completion: { [unowned self] in
+        self._dismiss(modal: current, animated: animated, completion: { [weak self] in
+            guard let self = self else { return }
             self._current = previous
             if let previous = previous {
                 self._present(modal: previous, animated: animated, completion: completion)
@@ -357,11 +362,13 @@ private extension UI.Container.Modal {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .dismiss(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .empty
                     modal.container.finishHide(interactive: false)
@@ -408,11 +415,13 @@ private extension UI.Container.Modal {
             self._animation = Animation.default.run(
                 duration: TimeInterval(height / self.animationVelocity),
                 elapsed: TimeInterval(deltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .dismiss(modal: current, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishInteractiveAnimation()
                 }
             )
@@ -421,11 +430,13 @@ private extension UI.Container.Modal {
             let baseProgress = Percent(deltaLocation / pow(height, 1.5))
             self._animation = Animation.default.run(
                 duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .present(modal: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )

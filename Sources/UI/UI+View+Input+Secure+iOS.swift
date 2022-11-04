@@ -35,7 +35,7 @@ extension UI.View.Input.Secure {
 
 final class KKInputSecureView : UITextField {
     
-    unowned var kkDelegate: KKInputSecureViewDelegate?
+    weak var kkDelegate: KKInputSecureViewDelegate?
     var kkTextInset: UIEdgeInsets = .zero {
         didSet {
             guard self.kkTextInset != oldValue else { return }

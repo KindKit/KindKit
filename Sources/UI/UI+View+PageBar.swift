@@ -73,7 +73,7 @@ public extension UI.View {
             }
             get { self._selected }
         }
-        public unowned var delegate: IPageBarViewDelegate?
+        public weak var delegate: IPageBarViewDelegate?
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Scroll

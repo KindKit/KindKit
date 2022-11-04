@@ -26,7 +26,7 @@ public extension UI.Container {
     
     final class Root : IUIContainer {
         
-        public unowned var delegate: IRootContainerDelegate?
+        public weak var delegate: IRootContainerDelegate?
         public var shouldInteractive: Bool {
             return self.content.shouldInteractive
         }

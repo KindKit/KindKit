@@ -8,7 +8,7 @@ extension Slot.Args.Empty {
     
     final class Simple< Result, Argument > : Slot.Args.Base< Result, Argument > {
         
-        unowned var signal: ISignal?
+        weak var signal: ISignal?
         let closure: () -> Result
         
         init(
@@ -24,7 +24,7 @@ extension Slot.Args.Empty {
             self.cancel()
         }
         
-        override func perform(_ argument: Argument) -> Result {
+        override func perform(_ argument: Argument) throws -> Result {
             return self.closure()
         }
         

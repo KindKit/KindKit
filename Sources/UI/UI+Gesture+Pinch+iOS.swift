@@ -35,7 +35,7 @@ extension UI.Gesture.Pinch {
 
 final class KKPinchGesture : UIPinchGestureRecognizer {
     
-    unowned var kkDelegate: KKPinchGestureDelegate?
+    weak var kkDelegate: KKPinchGestureDelegate?
     
     override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)

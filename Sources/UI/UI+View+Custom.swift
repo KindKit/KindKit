@@ -8,6 +8,7 @@ protocol KKCustomViewDelegate : AnyObject {
     
     func shouldHighlighting(_ view: KKCustomView) -> Bool
     func set(_ view: KKCustomView, highlighted: Bool)
+    func hasHit(_ view: KKCustomView, point: PointFloat) -> Bool
     
 }
 
@@ -15,8 +16,8 @@ public extension UI.View {
 
     final class Custom {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
             didSet {
                 guard self.size != oldValue else { return }
@@ -105,6 +106,7 @@ public extension UI.View {
         public let onVisible: Signal.Empty< Void > = .init()
         public let onVisibility: Signal.Empty< Void > = .init()
         public let onInvisible: Signal.Empty< Void > = .init()
+        public let onHit: Signal.Args< Bool?, PointFloat > = .init()
         public let onStyle: Signal.Args< Void, Bool > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
@@ -263,6 +265,9 @@ extension UI.View.Custom : IUIViewHighlightable {
 extension UI.View.Custom : IUIViewLockable {
 }
 
+extension UI.View.Custom : IUIViewHitable {
+}
+
 extension UI.View.Custom : KKCustomViewDelegate {
     
     func shouldHighlighting(_ view: KKCustomView) -> Bool {
@@ -274,6 +279,14 @@ extension UI.View.Custom : KKCustomViewDelegate {
             self._isHighlighted = highlighted
             self.triggeredChangeStyle(true)
         }
+    }
+    
+    func hasHit(_ view: KKCustomView, point: PointFloat) -> Bool {
+        return self.onHit.emit(point, default: { [unowned self] in
+            let shouldHighlighting = self.shouldHighlighting
+            let shouldGestures = self.gestures.contains(where: { $0.isEnabled })
+            return shouldHighlighting == true || shouldGestures == true
+        })
     }
     
 }

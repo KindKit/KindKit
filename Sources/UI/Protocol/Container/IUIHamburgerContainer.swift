@@ -30,7 +30,8 @@ public extension IUIHamburgerContainer {
         }
         if animated == true {
             if self.isShowedLeading == true {
-                self.hideLeading(animated: animated, completion: { [unowned self] in
+                self.hideLeading(animated: animated, completion: { [weak self] in
+                    guard let self = self else { return }
                     self.leading = leading
                     self.showLeading(animated: animated, completion: completion)
                 })
@@ -51,7 +52,8 @@ public extension IUIHamburgerContainer {
         }
         if animated == true {
             if self.isShowedTrailing == true {
-                self.hideTrailing(animated: animated, completion: { [unowned self] in
+                self.hideTrailing(animated: animated, completion: { [weak self] in
+                    guard let self = self else { return }
                     self.trailing = trailing
                     self.showTrailing(animated: animated, completion: completion)
                 })

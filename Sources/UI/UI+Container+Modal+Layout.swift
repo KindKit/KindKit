@@ -8,8 +8,8 @@ extension UI.Container.Modal {
     
     final class Layout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var state: State = .empty {
             didSet {
                 guard self.state != oldValue else { return }

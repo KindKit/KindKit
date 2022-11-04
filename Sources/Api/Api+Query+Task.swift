@@ -6,13 +6,13 @@ import Foundation
 
 extension Api.Query {
 
-    final class Task< Response : IApiResponse > : IApiTaskQuery {
+    final class Task< Provider : IApiProvider, Response : IApiResponse > : IApiTaskQuery {
 
         typealias ProgressClosure = (_ progress: Progress) -> Void
         typealias CompleteClosure = (_ response: Response.Result) -> Void
 
         var task: URLSessionTask
-        let provider: IApiProvider
+        let provider: Provider
         let createAt: Date
 
         let request: Api.Request
@@ -29,7 +29,7 @@ extension Api.Query {
         private var _canceled: Bool
         
         init(
-            provider: IApiProvider,
+            provider: Provider,
             session: URLSession,
             request: Api.Request,
             response: Response,

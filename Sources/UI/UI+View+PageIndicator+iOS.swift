@@ -35,7 +35,7 @@ extension UI.View.PageIndicator {
 
 final class KKPageIndicatorView : UIPageControl {
     
-    unowned var kkDelegate: KKPageIndicatorViewDelegate?
+    weak var kkDelegate: KKPageIndicatorViewDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)

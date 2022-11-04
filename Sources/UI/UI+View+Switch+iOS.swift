@@ -35,7 +35,7 @@ extension UI.View.Switch {
 
 final class KKSwitchView : UIView {
     
-    unowned var kkDelegate: KKSwitchViewDelegate?
+    weak var kkDelegate: KKSwitchViewDelegate?
 
     private var _switch: UISwitch
     

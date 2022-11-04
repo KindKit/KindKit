@@ -8,8 +8,8 @@ extension Slot.Args.Empty {
     
     final class Sender< Sender : AnyObject, Result, Argument > : Slot.Args.Base< Result, Argument > {
         
-        unowned var signal: ISignal?
-        unowned var sender: Sender!
+        weak var signal: ISignal?
+        weak var sender: Sender?
         let closure: (Sender) -> Result
         
         init(
@@ -27,8 +27,9 @@ extension Slot.Args.Empty {
             self.cancel()
         }
         
-        override func perform(_ argument: Argument) -> Result {
-            return self.closure(self.sender)
+        override func perform(_ argument: Argument) throws -> Result {
+            guard let sender = self.sender else { throw Slot.Error.notHaveSender }
+            return self.closure(sender)
         }
         
         override func cancel() {

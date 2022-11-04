@@ -35,7 +35,7 @@ extension UI.View.Scroll {
 
 final class KKScrollView : NSScrollView {
     
-    unowned var kkDelegate: KKScrollViewDelegate?
+    weak var kkDelegate: KKScrollViewDelegate?
     var needLayoutContent: Bool = true {
         didSet {
             if self.needLayoutContent == true {

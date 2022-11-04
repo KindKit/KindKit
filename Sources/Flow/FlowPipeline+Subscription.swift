@@ -11,7 +11,7 @@ extension FlowPipeline {
         typealias Success = FlowPipeline.Output.Success
         typealias Failure = FlowPipeline.Output.Failure
         
-        unowned var pipeline: FlowPipeline?
+        weak var pipeline: FlowPipeline?
         
         private let onReceiveValue: (Success) -> Void
         private let onReceiveError: (Failure) -> Void

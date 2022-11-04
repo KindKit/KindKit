@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Dialog : IUIDialogContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -297,11 +297,13 @@ extension UI.Container.Dialog {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .present(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .idle
                         dialog.container.finishShow(interactive: false)
@@ -357,11 +359,13 @@ extension UI.Container.Dialog {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .dismiss(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .idle
                         self._layout.dialogItem = nil
@@ -431,14 +435,16 @@ private extension UI.Container.Dialog {
             let viewAlphable = self._layout.dialogItem?.container.view as? IUIViewAlphable
             self._animation = Animation.default.run(
                 duration: TimeInterval(size / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     if let view = viewAlphable {
                         view.alpha(progress.invert.value)
                     }
                     self._layout.state = .dismiss(progress: baseProgress + progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     if let view = viewAlphable {
                         view.alpha(1)
                     }
@@ -448,11 +454,13 @@ private extension UI.Container.Dialog {
         } else {
             self._animation = Animation.default.run(
                 duration: TimeInterval((size * abs(baseProgress.value)) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .dismiss(progress: baseProgress * progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )

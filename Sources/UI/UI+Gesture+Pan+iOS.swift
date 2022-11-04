@@ -35,7 +35,7 @@ extension UI.Gesture.Pan {
 
 final class KKPanGesture : UIPanGestureRecognizer {
     
-    unowned var kkDelegate: KKPanGestureDelegate?
+    weak var kkDelegate: KKPanGestureDelegate?
     
     override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)

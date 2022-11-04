@@ -8,8 +8,8 @@ public extension UI.Layout {
 
     final class State< State : Equatable & Hashable > : IUILayout {
         
-        public unowned var delegate: IUILayoutDelegate?
-        public unowned var view: IUIView?
+        public weak var delegate: IUILayoutDelegate?
+        public weak var view: IUIView?
         public var inset: InsetFloat = .zero {
             didSet {
                 guard self.inset != oldValue else { return }
@@ -238,12 +238,14 @@ public extension UI.Layout.State {
             delay: delay,
             duration: duration,
             ease: ease,
-            processing: { [unowned self] progress in
+            processing: { [weak self] progress in
+                guard let self = self else { return }
                 self._internalState = .animation(transition: transition, from: fromState, to: state, progress: progress)
                 self.setNeedForceUpdate()
                 self.updateIfNeeded()
             },
-            completion: { [unowned self] in
+            completion: { [weak self] in
+                guard let self = self else { return }
                 self._animation = nil
                 self._internalState = .idle(state: state)
                 self.setNeedForceUpdate()

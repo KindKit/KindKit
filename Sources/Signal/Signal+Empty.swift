@@ -103,10 +103,29 @@ public extension Signal.Empty where Result == Void {
     
     func emit() {
         if let slot = self.slot {
-            slot.perform()
+            do {
+                try slot.perform()
+            } catch Slot.Error.notHaveSender {
+                self.slot = nil
+            } catch {
+            }
         }
-        for slot in self.slots {
-            slot.perform()
+        do {
+            let slots = self.slots
+            var needRemove: [Slot.Empty.Base< Result >] = []
+            for slot in slots {
+                do {
+                    try slot.perform()
+                } catch Slot.Error.notHaveSender {
+                    needRemove.append(slot)
+                } catch {
+                }
+            }
+            if needRemove.isEmpty == false {
+                self.slots.removeAll(where: { slot in
+                    needRemove.contains(where: { slot === $0 })
+                })
+            }
         }
     }
     
@@ -116,42 +135,47 @@ public extension Signal.Empty where Result : IOptionalConvertible {
     
     func emit() -> Optional< Result.Wrapped > {
         if let slot = self.slot {
-            if let result = slot.perform().asOptional {
-                return result
+            do {
+                if let result = try slot.perform().asOptional {
+                    return result
+                }
+            } catch Slot.Error.notHaveSender {
+                self.slot = nil
+            } catch {
             }
         }
-        for slot in self.slots {
-            if let result = slot.perform().asOptional {
-                return result
+        do {
+            let slots = self.slots
+            var needRemove: [Slot.Empty.Base< Result >] = []
+            for slot in slots {
+                do {
+                    if let result = try slot.perform().asOptional {
+                        return result
+                    }
+                } catch Slot.Error.notHaveSender {
+                    needRemove.append(slot)
+                } catch {
+                }
+            }
+            if needRemove.isEmpty == false {
+                self.slots.removeAll(where: { slot in
+                    needRemove.contains(where: { slot === $0 })
+                })
             }
         }
         return nil
     }
     
     func emit(default: () -> Result.Wrapped) -> Result.Wrapped {
-        if let slot = self.slot {
-            if let result = slot.perform().asOptional {
-                return result
-            }
-        }
-        for slot in self.slots {
-            if let result = slot.perform().asOptional {
-                return result
-            }
+        if let result = self.emit() {
+            return result
         }
         return `default`()
     }
     
     func emit(default: @autoclosure () -> Result.Wrapped) -> Result.Wrapped {
-        if let slot = self.slot {
-            if let result = slot.perform().asOptional {
-                return result
-            }
-        }
-        for slot in self.slots {
-            if let result = slot.perform().asOptional {
-                return result
-            }
+        if let result = self.emit() {
+            return result
         }
         return `default`()
     }

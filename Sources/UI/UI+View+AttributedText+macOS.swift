@@ -35,7 +35,7 @@ extension UI.View.AttributedText {
 
 final class KKAttributedTextView : NSTextField {
         
-    unowned var kkDelegate: KKAttributedTextViewDelegate?
+    weak var kkDelegate: KKAttributedTextViewDelegate?
     
     override var isFlipped: Bool {
         return true

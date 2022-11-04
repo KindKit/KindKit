@@ -8,8 +8,8 @@ public extension UI.Layout {
 
     final class Paging : IUILayout {
         
-        public unowned var delegate: IUILayoutDelegate?
-        public unowned var view: IUIView?
+        public weak var delegate: IUILayoutDelegate?
+        public weak var view: IUIView?
         public var direction: Direction {
             didSet {
                 guard self.direction != oldValue else { return }

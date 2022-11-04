@@ -35,7 +35,7 @@ extension UI.View.Input.List {
 
 final class KKInputListView : UITextField {
     
-    unowned var kkDelegate: KKInputListViewDelegate?
+    weak var kkDelegate: KKInputListViewDelegate?
     var kkItems: [IInputListItem] = [] {
         didSet {
             self._picker.reloadAllComponents()

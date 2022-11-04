@@ -35,7 +35,7 @@ extension UI.View.Image {
 
 final class KKImageView : NSImageView {
     
-    unowned var kkDelegate: KKControlViewDelegate?
+    weak var kkDelegate: KKControlViewDelegate?
     override var isFlipped: Bool {
         return true
     }

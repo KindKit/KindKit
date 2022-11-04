@@ -35,7 +35,7 @@ extension UI.View.Scroll {
 
 final class KKScrollView : UIScrollView {
     
-    unowned var kkDelegate: KKScrollViewDelegate?
+    weak var kkDelegate: KKScrollViewDelegate?
     var needLayoutContent: Bool = true {
         didSet {
             if self.needLayoutContent == true {
@@ -113,26 +113,20 @@ final class KKScrollView : UIScrollView {
         super.layoutSubviews()
         
         do {
-            let bounds = self.bounds
+            let bounds = RectFloat(self.bounds)
             if self.needLayoutContent == true {
-                self.needLayoutContent = false
-                
                 let layoutBounds: RectFloat
+                self.needLayoutContent = false
                 if #available(iOS 11.0, *) {
-                    let inset = self.adjustedContentInset
-                    layoutBounds = RectFloat(
-                        x: 0,
-                        y: 0,
-                        width: Float(bounds.size.width - (inset.left + inset.right)),
-                        height: Float(bounds.size.height - (inset.top + inset.bottom))
-                    )
+                    layoutBounds = .init(
+                    	origin: .zero,
+                    	size: bounds.size.inset(self.adjustedContentInset)
+                	)
                 } else {
-                    layoutBounds = RectFloat(
-                        x: 0,
-                        y: 0,
-                        width: Float(bounds.size.width),
-                        height: Float(bounds.size.height)
-                    )
+                    layoutBounds = .init(
+                    	origin: .zero,
+                    	size: bounds.size
+                	)
                 }
                 self._layoutManager.layout(bounds: layoutBounds)
                 let size = self._layoutManager.size
@@ -140,7 +134,7 @@ final class KKScrollView : UIScrollView {
                 self.kkDelegate?.update(self, contentSize: size)
             }
             self._layoutManager.visible(
-                bounds: RectFloat(bounds),
+                bounds: bounds,
                 inset: self._visibleInset
             )
         }
@@ -272,12 +266,7 @@ private extension KKScrollView {
     
     func _scrollIndicatorInsets() -> UIEdgeInsets {
         let contentInset = self.contentInset
-        let safeArea: UIEdgeInsets
-        if #available(iOS 11.0, *) {
-            safeArea = self.safeAreaInsets
-        } else {
-            safeArea = .zero
-        }
+        let safeArea = self.safeAreaInsets
         return UIEdgeInsets(
             top: contentInset.top - safeArea.top,
             left: contentInset.left - safeArea.left,

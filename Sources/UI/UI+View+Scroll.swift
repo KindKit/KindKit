@@ -38,8 +38,8 @@ public extension UI.View {
     
     final class Scroll {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Dynamic = .init(width: .fill, height: .fill) {
             didSet {
                 guard self.size != oldValue else { return }
@@ -286,11 +286,13 @@ public extension UI.View.Scroll {
             self._animation = Animation.default.run(
                 duration: TimeInterval(deltaContentOffset / velocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     let contentOffset = beginContentOffset.lerp(endContentOffset, progress: progress.value)
                     self.contentOffset(contentOffset)
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._scrollToTop()
                     completion?()

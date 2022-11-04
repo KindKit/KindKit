@@ -35,7 +35,7 @@ extension UI.View.Stepper {
 
 final class KKStepperView : UIView {
     
-    unowned var kkDelegate: KKStepperViewDelegate?
+    weak var kkDelegate: KKStepperViewDelegate?
     
     private var _stepper: UIStepper!
     

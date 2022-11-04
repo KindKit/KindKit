@@ -8,8 +8,8 @@ extension UI.Container.Stack.Item {
     
     final class Layout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var bar: UI.Layout.Item {
             didSet {
                 guard self.bar != oldValue else { return }

@@ -10,7 +10,7 @@ public extension Animation {
     
     final class DisplayLink {
         
-        unowned var delegate: IAnimationQueueDelegate?
+        weak var delegate: IAnimationQueueDelegate?
         
         var isRunning: Bool {
             return CVDisplayLinkIsRunning(self._displayLink)

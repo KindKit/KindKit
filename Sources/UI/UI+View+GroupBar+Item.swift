@@ -34,7 +34,7 @@ public extension UI.View.GroupBar {
             get { self._isSelected }
         }
         
-        unowned var delegate: IGroupBarItemViewDelegate?
+        weak var delegate: IGroupBarItemViewDelegate?
         
         private var _layout: UI.View.GroupBar.Item.Layout
         private var _tapGesture = UI.Gesture.Tap()

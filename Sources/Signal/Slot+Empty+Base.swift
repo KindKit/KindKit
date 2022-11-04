@@ -8,7 +8,7 @@ extension Slot.Empty {
     
     class Base< Result > : Slot.Base {
         
-        func perform() -> Result {
+        func perform() throws -> Result {
             fatalError()
         }
         

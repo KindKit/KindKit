@@ -8,7 +8,7 @@ extension FlowPipeline {
     
     final class Tail : IFlowPipe {
         
-        unowned var pipeline: FlowPipeline?
+        weak var pipeline: FlowPipeline?
         
         init< Tail : IFlowOperator >(_ tail: Tail) {
             tail.subscribe(next: self)

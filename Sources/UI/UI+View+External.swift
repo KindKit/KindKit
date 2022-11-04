@@ -8,8 +8,8 @@ public extension UI.View {
 
     final class External {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public private(set) var isVisible: Bool = false
         public var isHidden: Bool = false {
             didSet {

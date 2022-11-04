@@ -35,7 +35,7 @@ extension UI.View.AttributedText {
 
 final class KKAttributedTextView : UILabel {
         
-    unowned var kkDelegate: KKAttributedTextViewDelegate?
+    weak var kkDelegate: KKAttributedTextViewDelegate?
     
     private var _tapGesture: UITapGestureRecognizer!
     

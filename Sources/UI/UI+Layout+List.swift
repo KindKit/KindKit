@@ -8,8 +8,8 @@ public extension UI.Layout {
 
     final class List : IUILayout {
         
-        public unowned var delegate: IUILayoutDelegate?
-        public unowned var view: IUIView?
+        public weak var delegate: IUILayoutDelegate?
+        public weak var view: IUIView?
         public var direction: Direction {
             didSet {
                 guard self.direction != oldValue else { return }
@@ -332,14 +332,16 @@ private extension UI.Layout.List {
             delay: animation.delay,
             duration: animation.duration,
             ease: animation.ease,
-            processing: { [unowned self] progress in
+            processing: { [weak self] progress in
+                guard let self = self else { return }
                 for operation in self._operations {
                     operation.progress = progress
                 }
                 self.setNeedForceUpdate()
                 self.updateIfNeeded()
             },
-            completion: { [unowned self] in
+            completion: { [weak self] in
+                guard let self = self else { return }
                 for operation in self._operations {
                     switch operation.type {
                     case .delete:

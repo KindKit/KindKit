@@ -35,7 +35,7 @@ extension UI.View.Input.String {
 
 final class KKInputStringView : UITextField {
     
-    unowned var kkDelegate: KKInputStringViewDelegate?
+    weak var kkDelegate: KKInputStringViewDelegate?
     var kkTextInset: UIEdgeInsets = .zero {
         didSet {
             guard self.kkTextInset != oldValue else { return }

@@ -8,8 +8,8 @@ extension Slot.Args {
     
     final class Sender< Sender : AnyObject, Result, Argument > : Slot.Args.Base< Result, Argument > {
         
-        unowned var signal: ISignal?
-        unowned var sender: Sender!
+        weak var signal: ISignal?
+        weak var sender: Sender!
         let closure: (Sender, Argument) -> Result
         
         init(

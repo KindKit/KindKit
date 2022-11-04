@@ -10,7 +10,7 @@ public extension Animation {
     
     final class DisplayLink : NSObject {
         
-        unowned var delegate: IAnimationQueueDelegate?
+        weak var delegate: IAnimationQueueDelegate?
         
         var isRunning: Bool {
             return self._displayLink != nil

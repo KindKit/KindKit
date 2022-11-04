@@ -20,7 +20,7 @@ public extension IUIWidgetView {
     }
     
     @inlinable
-    unowned var appearedItem: UI.Layout.Item? {
+    var appearedItem: UI.Layout.Item? {
         set { self.body.appearedItem = newValue }
         get { self.body.appearedItem }
     }

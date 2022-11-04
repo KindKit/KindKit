@@ -53,7 +53,7 @@ final class KKMaskView : NSView {
         return true
     }
     
-    private unowned var _view: UI.View.Mask?
+    private weak var _view: UI.View.Mask?
     private var _layoutManager: UI.Layout.Manager!
     
     override init(frame: NSRect) {

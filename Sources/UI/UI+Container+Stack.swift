@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Stack< Screen : IUIStackScreen > : IUIStackContainer, IUIContainerScreenable {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -514,7 +514,8 @@ private extension UI.Container.Stack {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .push(current: current.item, forward: forward.item, progress: .zero)
                     if self.isPresented == true {
                         forward.container.didChangeInsets()
@@ -522,14 +523,16 @@ private extension UI.Container.Stack {
                         forward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .push(current: current.item, forward: forward.item, progress: progress)
                     self._layout.updateIfNeeded()
                     if hideBar == true {
                         UI.Container.BarController.shared.set(.group, visibility: groupBarOldVisibility.lerp(groupBarNewVisibility, progress: progress))
                     }
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(current: forward.item)
                     if self.isPresented == true {
@@ -584,7 +587,8 @@ private extension UI.Container.Stack {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .pop(backward: backward.item, current: current.item, progress: .zero)
                     if self.isPresented == true {
                         backward.container.didChangeInsets()
@@ -592,14 +596,16 @@ private extension UI.Container.Stack {
                         backward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .pop(backward: backward.item, current: current.item, progress: progress)
                     self._layout.updateIfNeeded()
                     if hideBar == true {
                         UI.Container.BarController.shared.set(.group, visibility: groupBarOldVisibility.lerp(groupBarNewVisibility, progress: progress))
                     }
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(current: backward.item)
                     if self.isPresented == true {
@@ -682,14 +688,16 @@ private extension UI.Container.Stack {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval(deltaLocation.x / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .pop(backward: backward.item, current: current.item, progress: progress)
                     self._layout.updateIfNeeded()
                     if self._interactiveGroupBottomBar == true {
                         UI.Container.BarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: progress))
                     }
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishInteractiveAnimation(backward: backward, current: current)
                 }
             )
@@ -697,14 +705,16 @@ private extension UI.Container.Stack {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval((layoutSize.width - deltaLocation.x) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .pop(backward: backward.item, current: current.item, progress: progress.invert)
                     self._layout.updateIfNeeded()
                     if self._interactiveGroupBottomBar == true {
                         UI.Container.BarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: progress.invert))
                     }
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation(backward: backward, current: current)
                 }
             )

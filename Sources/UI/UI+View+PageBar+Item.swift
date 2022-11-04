@@ -35,7 +35,7 @@ public extension UI.View.PageBar {
         }
         public let tapGesture = UI.Gesture.Tap()
         
-        unowned var delegate: IPageBarItemViewDelegate?
+        weak var delegate: IPageBarItemViewDelegate?
         
         private var _layout: UI.View.PageBar.Item.Layout
         private var _isSelected: Bool = false

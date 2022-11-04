@@ -8,8 +8,8 @@ extension UI.View.PageBar {
     
     final class ContentLayout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var leading: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }

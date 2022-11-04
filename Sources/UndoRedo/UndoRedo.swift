@@ -6,7 +6,7 @@ import Foundation
 
 public final class UndoRedo {
     
-    public unowned var delegate: IUndoRedoDelegate
+    public weak var delegate: IUndoRedoDelegate?
     public private(set) var isEnabled: Bool
     public var isTracking: Bool {
         return self._scope != nil
@@ -52,18 +52,20 @@ public extension UndoRedo {
     }
     
     func undo() {
+        guard let delegate = self.delegate else { return }
         guard self.canUndo == true else { return }
         let scope = self._undoStack.removeLast()
         self._redoStack.append(scope)
-        scope.undo(self.delegate)
+        scope.undo(delegate)
         self._notifyRefresh()
     }
     
     func redo() {
+        guard let delegate = self.delegate else { return }
         guard self.canRedo == true else { return }
         let scope = self._redoStack.removeLast()
         self._undoStack.append(scope)
-        scope.redo(self.delegate)
+        scope.redo(delegate)
         self._notifyRefresh()
     }
     

@@ -8,8 +8,8 @@ extension UI.View.GroupBar {
     
     final class ContentLayout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var items: [UI.Layout.Item] = [] {
             didSet {
                 self._cache = Array< SizeFloat? >(repeating: nil, count: self.items.count)

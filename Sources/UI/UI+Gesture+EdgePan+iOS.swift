@@ -35,7 +35,7 @@ extension UI.Gesture.EdgePan {
 
 final class KKEdgePanGesture : UIScreenEdgePanGestureRecognizer {
     
-    unowned var kkDelegate: KKEdgePanGestureDelegate?
+    weak var kkDelegate: KKEdgePanGestureDelegate?
     
     override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)

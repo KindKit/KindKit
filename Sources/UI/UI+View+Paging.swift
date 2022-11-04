@@ -34,8 +34,8 @@ public extension UI.View {
 
     final class Paging {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Dynamic = .init(width: .fill, height: .fill) {
             didSet {
                 guard self.size != oldValue else { return }
@@ -101,7 +101,7 @@ public extension UI.View {
                 self.linkedPageable?.numberOfPages = self.numberOfPages
             }
         }
-        public unowned var linkedPageable: IUIViewPageable? {
+        public weak var linkedPageable: IUIViewPageable? {
             willSet {
                 guard self.linkedPageable !== newValue else { return }
                 self.linkedPageable?.linkedPageable = nil
@@ -163,13 +163,12 @@ public extension UI.View {
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         private var _isLocked: Bool = false
         private var _currentPage: Float = 0
-        private var _observer: Observer< IUIPagingViewObserver >
+        private var _observer: Observer< IUIPagingViewObserver > = .init()
         private var _animation: IAnimationTask? {
             willSet { self._animation?.cancel() }
         }
         
         public init() {
-            self._observer = Observer()
         }
         
         deinit {
@@ -211,7 +210,8 @@ public extension UI.View.Paging {
                 self._animation = Animation.default.run(
                     duration: duration,
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self.currentPage = oldPage.lerp(newPage, progress: progress)
                     },
                     completion: {

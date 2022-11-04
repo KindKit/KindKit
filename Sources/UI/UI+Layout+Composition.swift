@@ -24,8 +24,8 @@ public extension UI.Layout {
     
     final class Composition : IUILayout {
         
-        public unowned var delegate: IUILayoutDelegate?
-        public unowned var view: IUIView?
+        public weak var delegate: IUILayoutDelegate?
+        public weak var view: IUIView?
         public var inset: InsetFloat {
             didSet {
                 guard self.inset != oldValue else { return }

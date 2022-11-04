@@ -21,8 +21,8 @@ public extension UI.View.Input {
     
     final class Secure {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Static = .init(width: .fill, height: .fixed(28)) {
             didSet {
                 guard self.size != oldValue else { return }

@@ -10,8 +10,8 @@ public extension UI.View {
 
     final class Blur {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var style: UIBlurEffect.Style = .regular {
             didSet {
                 guard self.style != oldValue else { return }

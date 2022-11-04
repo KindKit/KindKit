@@ -12,8 +12,8 @@ public extension UI.View {
 
     final class Rate {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var itemSize: SizeFloat = .init(width: 40, height: 40) {
             didSet {
                 guard self.itemSize != oldValue else { return }

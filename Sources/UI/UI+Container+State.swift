@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class State : IUIStateContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {

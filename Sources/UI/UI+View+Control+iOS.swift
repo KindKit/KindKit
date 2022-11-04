@@ -35,7 +35,7 @@ extension UI.View.Control {
 
 final class KKControlView : UIControl {
         
-    unowned var kkDelegate: KKControlViewDelegate?
+    weak var kkDelegate: KKControlViewDelegate?
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }

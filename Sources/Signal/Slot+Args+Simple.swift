@@ -8,7 +8,7 @@ extension Slot.Args {
     
     final class Simple< Result, Argument > : Slot.Args.Base< Result, Argument > {
         
-        unowned var signal: ISignal?
+        weak var signal: ISignal?
         let closure: (Argument) -> Result
         
         init(

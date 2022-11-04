@@ -35,7 +35,7 @@ extension UI.View.Input.Date {
 
 final class KKInputDateView : UITextField {
     
-    unowned var kkDelegate: KKInputDateViewDelegate?
+    weak var kkDelegate: KKInputDateViewDelegate?
     var kkFormatter: DateFormatter? {
         didSet {
             guard self.kkFormatter != oldValue else { return }

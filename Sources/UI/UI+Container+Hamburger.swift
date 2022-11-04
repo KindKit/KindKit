@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Hamburger : IUIHamburgerContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -376,11 +376,13 @@ private extension UI.Container.Hamburger {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .leading(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .leading(progress: .one)
                         leading.finishShow(interactive: interactive)
@@ -396,7 +398,8 @@ private extension UI.Container.Hamburger {
             completion?()
             break
         case .trailing:
-            self._hideTrailing(interactive: interactive, animated: animated, completion: { [unowned self] in
+            self._hideTrailing(interactive: interactive, animated: animated, completion: { [weak self] in
+                guard let self = self else { return }
                 self._showLeading(interactive: interactive, animated: animated, completion: completion)
             })
         }
@@ -414,11 +417,13 @@ private extension UI.Container.Hamburger {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .leading(progress: progress.invert)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .idle
                         leading.finishHide(interactive: interactive)
@@ -448,11 +453,13 @@ private extension UI.Container.Hamburger {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .trailing(progress: progress)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .trailing(progress: .one)
                         trailing.finishShow(interactive: interactive)
@@ -465,7 +472,8 @@ private extension UI.Container.Hamburger {
                 completion?()
             }
         case .leading:
-            self._hideLeading(interactive: interactive, animated: animated, completion: { [unowned self] in
+            self._hideLeading(interactive: interactive, animated: animated, completion: { [weak self] in
+                guard let self = self else { return }
                 self._showTrailing(interactive: interactive, animated: animated, completion: completion)
             })
         case .trailing:
@@ -486,11 +494,13 @@ private extension UI.Container.Hamburger {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._layout.state = .trailing(progress: progress.invert)
                         self._layout.updateIfNeeded()
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .idle
                         trailing.finishHide(interactive: interactive)
@@ -591,11 +601,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         elapsed: TimeInterval(delta / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .leading(progress: progress)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .leading(progress: .one)
                             leading.finishShow(interactive: true)
@@ -605,11 +617,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         elapsed: TimeInterval((self._layout.leadingSize - delta) / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .leading(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
                             leading.cancelShow(interactive: true)
@@ -622,11 +636,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         elapsed: TimeInterval(delta / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .trailing(progress: .one)
                             trailing.finishShow(interactive: true)
@@ -636,11 +652,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         elapsed: TimeInterval((self._layout.trailingSize - delta) / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
                             trailing.cancelShow(interactive: true)
@@ -658,11 +676,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         elapsed: TimeInterval(delta / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .leading(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
                             leading.finishHide(interactive: true)
@@ -672,11 +692,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         elapsed: TimeInterval((self._layout.leadingSize - delta) / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .leading(progress: progress)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .leading(progress: .one)
                             leading.cancelHide(interactive: true)
@@ -694,11 +716,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         elapsed: TimeInterval(delta / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress.invert)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .idle
                             trailing.finishHide(interactive: true)
@@ -708,11 +732,13 @@ private extension UI.Container.Hamburger {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         elapsed: TimeInterval((self._layout.trailingSize - delta) / self.animationVelocity),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress)
                             self._layout.updateIfNeeded()
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._resetInteractiveAnimation()
                             self._layout.state = .trailing(progress: .one)
                             trailing.cancelHide(interactive: true)

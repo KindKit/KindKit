@@ -195,10 +195,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 self._animation = Animation.default.run(
                     duration: TimeInterval(self.threshold / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._set(state: .showing(progress: progress))
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._set(state: .showed)
                     }
@@ -209,10 +211,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 self._animation = Animation.default.run(
                     duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._set(state: .showing(progress: baseProgress + (baseProgress.invert * progress)))
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._set(state: .showed)
                     }
@@ -221,10 +225,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 self._animation = Animation.default.run(
                     duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._set(state: .showing(progress: baseProgress - (baseProgress * progress)))
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._set(state: .hided)
                     }
@@ -235,10 +241,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 self._animation = Animation.default.run(
                     duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._set(state: .hiding(progress: baseProgress - (baseProgress * progress)))
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._set(state: .showed)
                     }
@@ -247,10 +255,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 self._animation = Animation.default.run(
                     duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
-                    processing: { [unowned self] progress in
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
                         self._set(state: .hiding(progress: baseProgress + (baseProgress.invert * progress)))
                     },
-                    completion: { [unowned self] in
+                    completion: { [weak self] in
+                        guard let self = self else { return }
                         self._animation = nil
                         self._set(state: .hided)
                     }
@@ -268,10 +278,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self.threshold / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .hiding(progress:  progress))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .hided)
                             completion?()
@@ -285,10 +297,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval(self.threshold / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .showing(progress: progress))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .showed)
                             completion?()
@@ -302,10 +316,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .showing(progress: baseProgress + (baseProgress.invert * progress)))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .showed)
                             completion?()
@@ -315,10 +331,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .showing(progress: baseProgress - (baseProgress * progress)))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .hided)
                             completion?()
@@ -330,10 +348,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval((self.threshold * baseProgress.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .hiding(progress: baseProgress - (baseProgress * progress)))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .showed)
                             completion?()
@@ -343,10 +363,12 @@ private extension UI.View.Scroll.Extension.HidingBar {
                     self._animation = Animation.default.run(
                         duration: TimeInterval((self.threshold * baseProgress.invert.value) / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
-                        processing: { [unowned self] progress in
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
                             self._set(state: .hiding(progress: baseProgress + (baseProgress.invert * progress)))
                         },
-                        completion: { [unowned self] in
+                        completion: { [weak self] in
+                            guard let self = self else { return }
                             self._animation = nil
                             self._set(state: .hided)
                             completion?()

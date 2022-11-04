@@ -35,7 +35,7 @@ extension UI.View.Switch {
 
 final class KKSwitchView : NSView {
     
-    unowned var kkDelegate: KKSwitchViewDelegate?
+    weak var kkDelegate: KKSwitchViewDelegate?
         
     override var isFlipped: Bool {
         return true

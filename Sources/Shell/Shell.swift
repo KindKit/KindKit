@@ -52,20 +52,20 @@ public final class Shell {
         self._process.standardOutput = self._outputPipe
         self._process.standardError = self._errorPipe
         
-        self._outputPipe.fileHandleForReading.readabilityHandler = { [unowned self] handler in
+        self._outputPipe.fileHandleForReading.readabilityHandler = { [weak self] handler in
             let data = handler.availableData
-            self._queue.async(execute: { [unowned self] in
-                self.onOutput?(data)
+            self?._queue.async(execute: { [weak self] in
+                self?.onOutput?(data)
             })
         }
-        self._errorPipe.fileHandleForReading.readabilityHandler = { [unowned self] handler in
+        self._errorPipe.fileHandleForReading.readabilityHandler = { [weak self] handler in
             let data = handler.availableData
-            self._queue.async(execute: { [unowned self] in
-                self.onError?(data)
+            self?._queue.async(execute: { [weak self] in
+                self?.onError?(data)
             })
         }
-        self._process.terminationHandler = { [unowned self] process in
-            self.onCompletion?(Self._result(process.terminationStatus))
+        self._process.terminationHandler = { [weak self] process in
+            self?.onCompletion?(Self._result(process.terminationStatus))
         }
         
         self._process.launch()

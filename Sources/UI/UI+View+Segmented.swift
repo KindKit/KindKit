@@ -18,8 +18,8 @@ public extension UI.View {
 
     final class Segmented {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Static = .init(width: .fill, height: .fixed(32)) {
             didSet {
                 guard self.size != oldValue else { return }

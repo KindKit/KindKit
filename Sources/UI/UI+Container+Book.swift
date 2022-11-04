@@ -13,7 +13,7 @@ public extension UI.Container {
 
     final class Book< Screen : IUIBookScreen > : IUIBookContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -347,7 +347,8 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: .zero)
                     if self.isPresented == true {
                         forward.container.didChangeInsets()
@@ -355,11 +356,13 @@ private extension UI.Container.Book {
                         forward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(current: forward.bookItem)
                     if self.isPresented == true {
@@ -406,7 +409,8 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: .zero)
                     if self.isPresented == true {
                         backward.container.didChangeInsets()
@@ -414,11 +418,13 @@ private extension UI.Container.Book {
                         backward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(current: backward.bookItem)
                     if self.isPresented == true {
@@ -575,11 +581,13 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishForwardInteractiveAnimation()
                 }
             )
@@ -587,11 +595,13 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishBackwardInteractiveAnimation()
                 }
             )
@@ -599,11 +609,13 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )
@@ -611,11 +623,13 @@ private extension UI.Container.Book {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )

@@ -45,7 +45,7 @@ public extension UI.View {
             }
             get { self._selected }
         }
-        public unowned var delegate: IGroupBarViewDelegate?
+        public weak var delegate: IGroupBarViewDelegate?
         
         private var _contentLayout: ContentLayout
         private var _contentView: UI.View.Custom

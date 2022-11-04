@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Push : IUIPushContainer {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -98,7 +98,8 @@ public extension UI.Container {
         private var _layout: Layout
         private var _view: UI.View.Custom
 #if os(iOS)
-        private var _interactiveGesture = UI.Gesture.Pan().enabled(false)
+        private var _interactiveGesture = UI.Gesture.Pan()
+            .enabled(false)
         private var _interactiveBeginLocation: PointFloat?
 #endif
         private var _items: [Item]
@@ -254,18 +255,17 @@ extension UI.Container.Push : IUIRootContentContainer {
 private extension UI.Container.Push {
     
     func _setup() {
+        self._view.onHit(self, {
+            guard let current = $0._current else { return false }
+            guard current.container.shouldInteractive == true else { return false }
+            return current.container.view.isContains($1, from: $0._view)
+        })
 #if os(iOS)
         self._interactiveGesture
             .onShouldBeRequiredToFailBy(self, {
                 guard let content = $0.content else { return true }
                 guard let view = $1.view else { return false }
                 return content.view.native.kk_isChild(of: view, recursive: true)
-            })
-            .onShouldBegin(self, {
-                guard let current = $0._current else { return false }
-                guard current.container.shouldInteractive == true else { return false }
-                guard $0._interactiveGesture.contains(in: current.container.view) == true else { return false }
-                return true
             })
             .onBegin(self, { $0._beginInteractiveGesture() })
             .onChange(self, { $0._changeInteractiveGesture() })
@@ -311,18 +311,21 @@ private extension UI.Container.Push {
             self._animation = Animation.default.run(
                 duration: TimeInterval(size / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: {
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .present(push: push, progress: .zero)
                     if self.isPresented == true {
                         push.container.prepareShow(interactive: false)
                         push.container.didChangeInsets()
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .present(push: push, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(push: push)
                     self._didPresent(push: push)
@@ -380,11 +383,13 @@ private extension UI.Container.Push {
             self._animation = Animation.default.run(
                 duration: TimeInterval(size / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .dismiss(push: push, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .empty
                     push.container.finishHide(interactive: false)
@@ -444,11 +449,13 @@ private extension UI.Container.Push {
             self._animation = Animation.default.run(
                 duration: TimeInterval(height / self.animationVelocity),
                 elapsed: TimeInterval(-deltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .dismiss(push: current, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishInteractiveAnimation()
                 }
             )
@@ -457,11 +464,13 @@ private extension UI.Container.Push {
             let baseProgress = Percent(deltaLocation / pow(height, 1.5))
             self._animation = Animation.default.run(
                 duration: TimeInterval((height * baseProgress.value) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .present(push: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )

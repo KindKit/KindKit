@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Group< Screen : IUIGroupScreen > : IUIGroupContainer, IUIContainerScreenable {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -431,7 +431,8 @@ private extension UI.Container.Group {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.groupItem, next: forward.groupItem, progress: .zero)
                     if self.isPresented == true {
                         forward.container.didChangeInsets()
@@ -439,10 +440,12 @@ private extension UI.Container.Group {
                         forward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .forward(current: current.groupItem, next: forward.groupItem, progress: progress)
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._bar.selected(forward.bar)
                     self._layout.state = .idle(current: forward.groupItem)
@@ -487,7 +490,8 @@ private extension UI.Container.Group {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.groupItem, next: backward.groupItem, progress: .zero)
                     if self.isPresented == true {
                         backward.container.didChangeInsets()
@@ -495,10 +499,12 @@ private extension UI.Container.Group {
                         backward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._layout.state = .backward(current: current.groupItem, next: backward.groupItem, progress: progress)
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._bar.selected(backward.bar)
                     self._layout.state = .idle(current: backward.groupItem)

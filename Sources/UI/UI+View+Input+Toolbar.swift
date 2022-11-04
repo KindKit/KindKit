@@ -16,7 +16,7 @@ public extension UI.View.Input {
 
     final class Toolbar {
         
-        public private(set) unowned var parentView: IUIView?
+        public private(set) weak var parentView: IUIView?
         public var items: [IInputToolbarItem] = [] {
             didSet {
                 if self.isLoaded == true {

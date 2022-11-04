@@ -35,7 +35,7 @@ extension UI.View.Input.Text {
 
 final class KKInputTextView : UIView {
     
-    unowned var kkDelegate: KKInputTextViewDelegate?
+    weak var kkDelegate: KKInputTextViewDelegate?
     var kkTextInset: UIEdgeInsets = .zero {
         didSet {
             guard self.kkTextInset != oldValue else { return }

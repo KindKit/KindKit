@@ -8,8 +8,8 @@ extension UI.View.SwipeCell {
     
     final class Layout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var state: State = .idle {
             didSet { self.setNeedUpdate() }
         }

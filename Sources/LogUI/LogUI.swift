@@ -11,8 +11,8 @@ public struct LogUI {
     ) -> UI.Container.Stack< StackScreen > {
         let screen = Screen(target: target)
         let stackScreen = StackScreen()
-        screen.onClose = { [unowned stackScreen] in
-            stackScreen.modalDismiss()
+        screen.onClose = { [weak stackScreen] in
+            stackScreen?.modalDismiss()
         }
         return UI.Container.Stack(
             screen: stackScreen,

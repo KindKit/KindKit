@@ -35,7 +35,7 @@ extension UI.View.Segmented {
 
 final class KKSegmentedView : UISegmentedControl {
     
-    unowned var kkDelegate: KKSegmentedViewDelegate?
+    weak var kkDelegate: KKSegmentedViewDelegate?
     
     var items: [UI.View.Segmented.Item] = [] {
         willSet {

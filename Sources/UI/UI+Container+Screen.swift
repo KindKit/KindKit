@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Screen< Screen : IUIScreen & IUIScreenViewable > : IUIScreenContainer, IUIContainerScreenable {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -180,10 +180,12 @@ private extension UI.Container.Screen {
         self._virtualKeyboardAnimation?.cancel()
         self._virtualKeyboardAnimation = Animation.default.run(
             duration: duration,
-            processing: { [unowned self] progress in
+            processing: { [weak self] progress in
+                guard let self = self else { return }
                 self._virtualKeyboardHeight = self._virtualKeyboardHeight.lerp(height, progress: progress)
             },
-            completion: { [unowned self] in
+            completion: { [weak self] in
+                guard let self = self else { return }
                 self._virtualKeyboardAnimation = nil
                 self._virtualKeyboardHeight = height
                 self.didChangeInsets()

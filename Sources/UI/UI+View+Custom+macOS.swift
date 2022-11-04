@@ -35,7 +35,7 @@ extension UI.View.Custom {
 
 final class KKCustomView : NSView {
         
-    unowned var kkDelegate: KKCustomViewDelegate?
+    weak var kkDelegate: KKCustomViewDelegate?
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }
@@ -82,9 +82,7 @@ final class KKCustomView : NSView {
         }
         let hitView = super.hitTest(point)
         if hitView === self {
-            let shouldHighlighting = self.kkDelegate?.shouldHighlighting(self)
-            let shouldGestures = self._gestures.contains(where: { $0.isEnabled == true })
-            if shouldHighlighting == false && shouldGestures == false {
+            if self.kkDelegate?.hasHit(self, point: .init(point)) == false {
                 return nil
             }
         }

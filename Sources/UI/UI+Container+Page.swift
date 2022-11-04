@@ -13,7 +13,7 @@ public extension UI.Container {
     
     final class Page< Screen : IUIPageScreen > : IUIPageContainer, IUIContainerScreenable {
         
-        public unowned var parent: IUIContainer? {
+        public weak var parent: IUIContainer? {
             didSet {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
@@ -463,7 +463,8 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._bar.beginTransition()
                     self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: .zero)
                     if self.isPresented == true {
@@ -472,12 +473,14 @@ private extension UI.Container.Page {
                         forward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress)
                     self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._bar.finishTransition(to: forward.bar)
                     self._layout.state = .idle(current: forward.pageItem)
@@ -522,7 +525,8 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
-                preparing: { [unowned self] in
+                preparing: { [weak self] in
+                    guard let self = self else { return }
                     self._bar.beginTransition()
                     self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: .zero)
                     if self.isPresented == true {
@@ -531,12 +535,14 @@ private extension UI.Container.Page {
                         backward.container.prepareShow(interactive: false)
                     }
                 },
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress)
                     self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._animation = nil
                     self._bar.finishTransition(to: backward.bar)
                     self._layout.state = .idle(current: backward.pageItem)
@@ -640,12 +646,14 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress)
                     self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishForwardInteractiveAnimation()
                 }
             )
@@ -653,12 +661,14 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress)
                     self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._finishBackwardInteractiveAnimation()
                 }
             )
@@ -666,12 +676,14 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress.invert)
                     self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )
@@ -679,12 +691,14 @@ private extension UI.Container.Page {
             self._animation = Animation.default.run(
                 duration: TimeInterval(layoutSize.width / self.animationVelocity),
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
-                processing: { [unowned self] progress in
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress.invert)
                     self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress.invert)
                     self._layout.updateIfNeeded()
                 },
-                completion: { [unowned self] in
+                completion: { [weak self] in
+                    guard let self = self else { return }
                     self._cancelInteractiveAnimation()
                 }
             )

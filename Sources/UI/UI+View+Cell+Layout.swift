@@ -8,8 +8,8 @@ extension UI.View.Cell {
     
     final class Layout : IUILayout {
         
-        unowned var delegate: IUILayoutDelegate?
-        unowned var view: IUIView?
+        weak var delegate: IUILayoutDelegate?
+        weak var view: IUIView?
         var background: UI.Layout.Item? {
             didSet { self.setNeedForceUpdate() }
         }

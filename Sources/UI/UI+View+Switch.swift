@@ -14,8 +14,8 @@ public extension UI.View {
 
     final class Switch {
         
-        public private(set) unowned var appearedLayout: IUILayout?
-        public unowned var appearedItem: UI.Layout.Item?
+        public private(set) weak var appearedLayout: IUILayout?
+        public weak var appearedItem: UI.Layout.Item?
         public var size: UI.Size.Static = .init(width: .fixed(51), height: .fixed(31)) {
             didSet {
                 guard self.size != oldValue else { return }

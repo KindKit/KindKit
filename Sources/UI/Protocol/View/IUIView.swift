@@ -123,6 +123,12 @@ public extension IUIView {
     }
     
     @inlinable
+    func isContains(_ point: PointFloat, from: IUIView) -> Bool {
+        let localPoint = self.native.convert(point.cgPoint, from: from.native)
+        return self.native.bounds.contains(localPoint)
+    }
+    
+    @inlinable
     func setNeedForceLayout() {
         if let layout = self.appearedLayout {
             if let item = self.appearedItem {

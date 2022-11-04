@@ -6,7 +6,9 @@ import Foundation
 
 public protocol IApiQuery : ICancellable {
 
-    var provider: IApiProvider { get }
+    associatedtype Provider: IApiProvider
+    
+    var provider: Provider { get }
     var createAt: Date { get }
 
     func redirect(request: URLRequest) -> URLRequest?

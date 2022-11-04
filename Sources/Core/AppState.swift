@@ -39,7 +39,7 @@ public extension IAppStateObserver {
 public final class AppState {
     
     private var _active: Bool?
-    private let _observer: Observer< IAppStateObserver >
+    private let _observer: Observer< IAppStateObserver > = .init()
     
 #if os(iOS)
     private var _becomeActiveObserver: NSObjectProtocol?
@@ -50,7 +50,6 @@ public final class AppState {
 #endif
     
     public init() {
-        self._observer = Observer()
 #if os(iOS)
         self._becomeActiveObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification,

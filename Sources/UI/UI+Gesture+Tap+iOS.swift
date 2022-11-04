@@ -35,7 +35,7 @@ extension UI.Gesture.Tap {
 
 final class KKTapGesture : UITapGestureRecognizer {
     
-    unowned var kkDelegate: KKTapGestureDelegate?
+    weak var kkDelegate: KKTapGestureDelegate?
     
     override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)

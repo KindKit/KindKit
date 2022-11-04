@@ -8,7 +8,7 @@ public extension Graphics {
 
     final class Node {
         
-        public unowned var owner: IGraphicsNodeOwner? {
+        public weak var owner: IGraphicsNodeOwner? {
             didSet {
                 guard self.owner !== oldValue else { return }
                 self._didUpdate(owner: self.owner)
@@ -21,7 +21,7 @@ public extension Graphics {
             }
         }
         public private(set) var childs: [Graphics.Node]
-        public unowned var content: IGraphicsNodeContent? {
+        public weak var content: IGraphicsNodeContent? {
             didSet {
                 guard self.content !== oldValue else { return }
                 self.owner?.setNeedRedraw()

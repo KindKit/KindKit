@@ -8,8 +8,8 @@ public extension UI.Layout {
 
     final class Expand : IUILayout {
         
-        public unowned var delegate: IUILayoutDelegate?
-        public unowned var view: IUIView?
+        public weak var delegate: IUILayoutDelegate?
+        public weak var view: IUIView?
         public var contentInset: InsetFloat {
             didSet { self.setNeedForceUpdate() }
         }
@@ -200,11 +200,13 @@ public extension UI.Layout.Expand {
         self._animation = Animation.default.run(
             duration: duration,
             ease: ease,
-            processing: { [unowned self] progress in
+            processing: { [weak self] progress in
+                guard let self = self else { return }
                 self._state = .changing(progress)
                 self.updateIfNeeded()
             },
-            completion: { [unowned self] in
+            completion: { [weak self] in
+                guard let self = self else { return }
                 self._animation = nil
                 self._state = .collapsed
                 self.setNeedForceUpdate()
@@ -222,11 +224,13 @@ public extension UI.Layout.Expand {
         self._animation = Animation.default.run(
             duration: duration,
             ease: ease,
-            processing: { [unowned self] progress in
+            processing: { [weak self] progress in
+                guard let self = self else { return }
                 self._state = .changing(progress.invert)
                 self.updateIfNeeded()
             },
-            completion: { [unowned self] in
+            completion: { [weak self] in
+                guard let self = self else { return }
                 self._animation = nil
                 self._state = .expanded
                 self.setNeedForceUpdate()

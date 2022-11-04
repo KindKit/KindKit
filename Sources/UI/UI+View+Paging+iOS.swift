@@ -35,7 +35,7 @@ extension UI.View.Paging {
 
 final class KKPagingView : UIScrollView {
     
-    unowned var kkDelegate: KKPagingViewDelegate?
+    weak var kkDelegate: KKPagingViewDelegate?
     var needLayoutContent: Bool = true {
         didSet {
             if self.needLayoutContent == true {
@@ -124,16 +124,15 @@ final class KKPagingView : UIScrollView {
                 let bounds = RectFloat(self.bounds)
                 let layoutBounds: RectFloat
                 if #available(iOS 11.0, *) {
-                    let inset = InsetFloat(self.adjustedContentInset)
-                    layoutBounds = RectFloat(
-                        origin: .zero,
-                        size: bounds.size.inset(inset)
-                    )
+                    layoutBounds = .init(
+                    	origin: .zero,
+                    	size: bounds.size.inset(self.adjustedContentInset)
+                	)
                 } else {
-                    layoutBounds = RectFloat(
-                        origin: .zero,
-                        size: bounds.size
-                    )
+                    layoutBounds = .init(
+                    	origin: .zero,
+                    	size: bounds.size
+                	)
                 }
                 self._layoutManager.layout(bounds: layoutBounds)
                 let size = self._layoutManager.size
