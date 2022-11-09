@@ -100,10 +100,4 @@ extension UI.View.Bar : IUIViewColorable {
 }
 
 extension UI.View.Bar : IUIViewAlphable {
-    
-    public var alpha: Float {
-        set { self._background.alpha = newValue }
-        get { self._background.alpha }
-    }
-    
 }
