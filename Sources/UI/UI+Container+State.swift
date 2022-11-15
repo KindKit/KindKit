@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -53,7 +53,7 @@ public extension UI.Container {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
                         content.finishHide(interactive: false)
-                        content.didChangeInsets()
+                        content.refreshParentInset()
                     }
                     content.parent = nil
                 }
@@ -62,7 +62,7 @@ public extension UI.Container {
                     self._layout.content = UI.Layout.Item(content.view)
                     content.parent = self
                     if self.isPresented == true {
-                        content.didChangeInsets()
+                        content.refreshParentInset()
                         content.prepareShow(interactive: false)
                         content.finishShow(interactive: false)
                     }
@@ -71,8 +71,8 @@ public extension UI.Container {
                 }
                 if self.isPresented == true {
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                 }
             }
@@ -103,12 +103,21 @@ public extension UI.Container {
             self.init(UI.Container.Screen(screen))
         }
         
-        public func insets(of content: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
+        public func apply(contentInset: UI.Container.Inset) {
+            self.content?.apply(contentInset: contentInset)
         }
         
-        public func didChangeInsets() {
-            self.content?.didChangeInsets()
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            return self.parentInset()
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            guard let content = self._content else { return .zero }
+            return content.contentInset()
+        }
+        
+        public func refreshParentInset() {
+            self.content?.refreshParentInset()
         }
         
         public func activate() -> Bool {

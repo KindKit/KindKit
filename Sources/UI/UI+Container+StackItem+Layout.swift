@@ -4,7 +4,7 @@
 
 import Foundation
 
-extension UI.Container.Stack.Item {
+extension UI.Container.StackItem {
     
     final class Layout : IUILayout {
         

@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -58,7 +58,7 @@ public extension UI.Container {
             get { self._bar }
         }
         public var barSize: Float {
-            get { self._layout.barSize }
+            self._layout.barSize
         }
         public private(set) var barVisibility: Float {
             set { self._layout.barVisibility = newValue }
@@ -96,12 +96,12 @@ public extension UI.Container {
         private var _interactiveGesture = UI.Gesture.Pan()
         private var _interactiveBeginLocation: PointFloat?
         private var _interactiveCurrentIndex: Int?
-        private var _interactiveBackward: Item?
-        private var _interactiveCurrent: Item?
-        private var _interactiveForward: Item?
+        private var _interactiveBackward: UI.Container.PageItem?
+        private var _interactiveCurrent: UI.Container.PageItem?
+        private var _interactiveForward: UI.Container.PageItem?
 #endif
-        private var _items: [Item]
-        private var _current: Item?
+        private var _items: [UI.Container.PageItem]
+        private var _current: UI.Container.PageItem?
         private var _animation: IAnimationTask? {
             willSet { self._animation?.cancel() }
         }
@@ -130,7 +130,7 @@ public extension UI.Container {
             self.animationVelocity = UIScreen.kk_animationVelocity
             self.interactiveLimit = Float(UIScreen.main.bounds.width * 0.33)
 #endif
-            self._items = containers.map({ Item(container: $0) })
+            self._items = containers.map({ UI.Container.PageItem($0) })
             if let current = current {
                 if let index = self._items.firstIndex(where: { $0.container === current }) {
                     self._current = self._items[index]
@@ -147,37 +147,61 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if self._items.contains(where: { $0.container === container }) == true {
-                let top: Float
-                if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
-                    let barSize = self.barSize
-                    let barVisibility = self.barVisibility
-                    if interactive == true {
-                        top = barSize * barVisibility
-                    } else {
-                        top = barSize
-                    }
-                } else {
-                    top = 0
-                }
-                return InsetFloat(
-                    top: inheritedInsets.top + top,
-                    left: inheritedInsets.left,
-                    right: inheritedInsets.right,
-                    bottom: inheritedInsets.bottom
-                )
+        public func apply(contentInset: UI.Container.Inset) {
+            for item in self._items {
+                item.container.apply(contentInset: contentInset)
             }
-            return inheritedInsets
         }
         
-        public func didChangeInsets() {
-            let inheritedInsets = self.inheritedInsets(interactive: true)
-            self._bar.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
-            self._layout.barOffset = inheritedInsets.top
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            let parentInset = self.parentInset()
+            if self._items.contains(where: { $0.container === container }) == true {
+                if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
+                    return parentInset.top(
+                        natural: self.barSize,
+                        interactive: self.barSize * self.barVisibility
+                    )
+                }
+            }
+            return parentInset
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            let contentInset: UI.Container.Inset
+            switch self._layout.state {
+            case .empty:
+                contentInset = .zero
+            case .idle(let current):
+                contentInset = current.container.contentInset()
+            case .forward(let current, let next, let progress):
+                let currentInset = current.container.contentInset()
+                let nextInset = next.container.contentInset()
+                contentInset = currentInset.lerp(nextInset, progress: progress)
+            case .backward(let current, let next, let progress):
+                let currentInset = current.container.contentInset()
+                let nextInset = next.container.contentInset()
+                contentInset = currentInset.lerp(nextInset, progress: progress)
+            }
+            if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
+                return contentInset.top(
+                    natural: self.barSize,
+                    interactive: self.barSize * self.barVisibility
+                )
+            }
+            return contentInset
+        }
+        
+        public func refreshParentInset() {
+            let parentInset = self.parentInset()
+            self._bar.safeArea(.init(
+                top: 0,
+                left: parentInset.interactive.left,
+                right: parentInset.interactive.right,
+                bottom: 0
+            ))
+            self._layout.barOffset = parentInset.interactive.top
             for item in self._items {
-                item.container.didChangeInsets()
+                item.container.refreshParentInset()
             }
         }
         
@@ -235,7 +259,7 @@ public extension UI.Container {
             self.barVisibility = self.screen.pageBarVisibility
             self.barHidden = self.screen.pageBarHidden
             if self.isPresented == true {
-                self.didChangeInsets()
+                self.refreshParentInset()
             }
             completion?()
         }
@@ -258,13 +282,13 @@ public extension UI.Container {
             for item in removeItems {
                 item.container.parent = nil
             }
-            let inheritedInsets = self.inheritedInsets(interactive: true)
-            self._items = containers.map({ Item(container: $0, insets: inheritedInsets) })
+            let parentInset = self.parentInset()
+            self._items = containers.map({ UI.Container.PageItem($0, parentInset.interactive) })
             for item in self._items {
                 item.container.parent = self
             }
             self._bar.items(self._items.map({ $0.bar }))
-            let newCurrent: Item?
+            let newCurrent: UI.Container.PageItem?
             if current != nil {
                 if let exist = self._items.first(where: { $0.container === current }) {
                     newCurrent = exist
@@ -418,7 +442,7 @@ private extension UI.Container.Page {
         self._bar.items(self._items.map({ $0.bar }))
         if let current = self._current {
             self._bar.selected(current.bar)
-            self._layout.state = .idle(current: current.pageItem)
+            self._layout.state = .idle(current: current)
         }
         self.screen.setup()
         UI.Container.BarController.shared.add(observer: self)
@@ -435,40 +459,40 @@ private extension UI.Container.Page {
     }
     
     func _set(
-        current: Item,
+        current: UI.Container.PageItem,
         completion: (() -> Void)?
     ) {
         self._bar.selected(current.bar)
-        self._layout.state = .idle(current: current.pageItem)
+        self._layout.state = .idle(current: current)
         if self.isPresented == true {
-            current.container.didChangeInsets()
+            current.container.refreshParentInset()
             current.container.prepareShow(interactive: false)
             current.container.finishShow(interactive: false)
         }
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
         self.screen.change(current: current.container)
         completion?()
     }
     
     func _set(
-        current: Item,
-        forward: Item,
+        current: UI.Container.PageItem,
+        forward: UI.Container.PageItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
                     self._bar.beginTransition()
-                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: .zero)
+                    self._layout.state = .forward(current: current, next: forward, progress: .zero)
                     if self.isPresented == true {
-                        forward.container.didChangeInsets()
+                        forward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
                         forward.container.prepareShow(interactive: false)
                     }
@@ -476,21 +500,21 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress)
-                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._bar.finishTransition(to: forward.bar)
-                    self._layout.state = .idle(current: forward.pageItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        forward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: forward)
+                    current.container.finishHide(interactive: false)
+                    forward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self.screen.change(current: forward.container)
                     completion?()
@@ -498,17 +522,18 @@ private extension UI.Container.Page {
             )
         } else {
             self._bar.selected(forward.bar)
-            self._layout.state = .idle(current: forward.pageItem)
+            self._layout.state = .idle(current: forward)
             if self.isPresented == true {
-                forward.container.didChangeInsets()
+                forward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 forward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self.screen.change(current: forward.container)
             completion?()
@@ -516,21 +541,21 @@ private extension UI.Container.Page {
     }
     
     func _set(
-        current: Item,
-        backward: Item,
+        current: UI.Container.PageItem,
+        backward: UI.Container.PageItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
                     self._bar.beginTransition()
-                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: .zero)
+                    self._layout.state = .backward(current: current, next: backward, progress: .zero)
                     if self.isPresented == true {
-                        backward.container.didChangeInsets()
+                        backward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
                         backward.container.prepareShow(interactive: false)
                     }
@@ -538,21 +563,21 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress)
-                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._bar.finishTransition(to: backward.bar)
-                    self._layout.state = .idle(current: backward.pageItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        backward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: backward)
+                    current.container.finishHide(interactive: false)
+                    backward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self.screen.change(current: backward.container)
                     completion?()
@@ -560,17 +585,18 @@ private extension UI.Container.Page {
             )
         } else {
             self._bar.selected(backward.bar)
-            self._layout.state = .idle(current: backward.pageItem)
+            self._layout.state = .idle(current: backward)
             if self.isPresented == true {
-                backward.container.didChangeInsets()
+                backward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self.screen.change(current: backward.container)
             completion?()
@@ -610,10 +636,10 @@ private extension UI.Container.Page {
             if let forward = self._interactiveForward {
                 let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._bar.transition(to: forward.bar, progress: progress)
-                self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
+                self._layout.state = .forward(current: current, next: forward, progress: progress)
             } else {
                 self._bar.selected(current.bar)
-                self._layout.state = .idle(current: current.pageItem)
+                self._layout.state = .idle(current: current)
             }
         } else if deltaLocation > 0 {
             if let index = self._interactiveCurrentIndex, self._interactiveBackward == nil {
@@ -625,15 +651,16 @@ private extension UI.Container.Page {
             if let backward = self._interactiveBackward {
                 let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
                 self._bar.transition(to: backward.bar, progress: progress)
-                self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
+                self._layout.state = .backward(current: current, next: backward, progress: progress)
             } else {
                 self._bar.selected(current.bar)
-                self._layout.state = .idle(current: current.pageItem)
+                self._layout.state = .idle(current: current)
             }
         } else {
             self._bar.selected(current.bar)
-            self._layout.state = .idle(current: current.pageItem)
+            self._layout.state = .idle(current: current)
         }
+        self.refreshContentInset()
     }
     
     func _endInteractiveGesture(_ canceled: Bool) {
@@ -649,8 +676,9 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress)
-                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -664,8 +692,9 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress)
-                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -679,8 +708,9 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: forward.bar, progress: progress.invert)
-                    self._layout.state = .forward(current: current.pageItem, next: forward.pageItem, progress: progress.invert)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress.invert)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -694,8 +724,9 @@ private extension UI.Container.Page {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._bar.transition(to: backward.bar, progress: progress.invert)
-                    self._layout.state = .backward(current: current.pageItem, next: backward.pageItem, progress: progress.invert)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress.invert)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -711,7 +742,7 @@ private extension UI.Container.Page {
         self._resetInteractiveAnimation()
         if let current = self._interactiveForward {
             self._bar.finishTransition(to: current.bar)
-            self._layout.state = .idle(current: current.pageItem)
+            self._layout.state = .idle(current: current)
             self._current = current
             self.screen.change(current: current.container)
         }
@@ -719,9 +750,10 @@ private extension UI.Container.Page {
         self._interactiveCurrent?.container.finishHide(interactive: true)
         self._interactiveBackward?.container.cancelShow(interactive: true)
         self.screen.finishInteractiveToForward()
+        self.refreshContentInset()
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
     }
     
@@ -732,7 +764,7 @@ private extension UI.Container.Page {
         self._resetInteractiveAnimation()
         if let current = backward {
             self._bar.finishTransition(to: current.bar)
-            self._layout.state = .idle(current: current.pageItem)
+            self._layout.state = .idle(current: current)
             self._current = current
             self.screen.change(current: current.container)
         }
@@ -740,9 +772,10 @@ private extension UI.Container.Page {
         current?.container.finishHide(interactive: true)
         backward?.container.finishShow(interactive: true)
         self.screen.finishInteractiveToBackward()
+        self.refreshContentInset()
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
     }
     
@@ -753,15 +786,16 @@ private extension UI.Container.Page {
         self._resetInteractiveAnimation()
         if let current = current {
             self._bar.finishTransition(to: current.bar)
-            self._layout.state = .idle(current: current.pageItem)
+            self._layout.state = .idle(current: current)
         }
         forward?.container.cancelShow(interactive: true)
         current?.container.cancelHide(interactive: true)
         backward?.container.cancelShow(interactive: true)
         self.screen.cancelInteractive()
+        self.refreshContentInset()
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
     }
     

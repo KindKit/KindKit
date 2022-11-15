@@ -31,13 +31,13 @@ extension UI.Container.Book {
             case .empty:
                 break
             case .idle(let current):
-                current.frame = bounds
+                current.viewItem.frame = bounds
             case .forward(let current, let next, let progress):
-                current.frame = currentFrame.lerp(backwardFrame, progress: progress)
-                next.frame = forwardFrame.lerp(currentFrame, progress: progress)
+                current.viewItem.frame = currentFrame.lerp(backwardFrame, progress: progress)
+                next.viewItem.frame = forwardFrame.lerp(currentFrame, progress: progress)
             case .backward(let current, let next, let progress):
-                current.frame = currentFrame.lerp(forwardFrame, progress: progress)
-                next.frame = backwardFrame.lerp(currentFrame, progress: progress)
+                current.viewItem.frame = currentFrame.lerp(forwardFrame, progress: progress)
+                next.viewItem.frame = backwardFrame.lerp(currentFrame, progress: progress)
             }
             return bounds.size
         }
@@ -49,9 +49,9 @@ extension UI.Container.Book {
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             switch self.state {
             case .empty: return []
-            case .idle(let current): return [ current ]
-            case .forward(let current, let next, _): return [ current, next ]
-            case .backward(let current, let next, _): return [ next, current ]
+            case .idle(let current): return [ current.viewItem ]
+            case .forward(let current, let next, _): return [ current.viewItem, next.viewItem ]
+            case .backward(let current, let next, _): return [ next.viewItem, current.viewItem ]
             }
         }
         

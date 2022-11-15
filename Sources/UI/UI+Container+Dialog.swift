@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -59,7 +59,7 @@ public extension UI.Container {
             return self._view
         }
         public var content: (IUIContainer & IUIContainerParentable)? {
-            didSet {
+            willSet {
                 if let content = self.content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
@@ -67,12 +67,14 @@ public extension UI.Container {
                     }
                     content.parent = nil
                 }
+            }
+            didSet {
                 self._layout.content = self.content.flatMap({ UI.Layout.Item($0.view) })
                 if let content = self.content {
                     content.parent = self
                     if self.isPresented == true {
-                        content.prepareHide(interactive: false)
-                        content.finishHide(interactive: false)
+                        content.prepareShow(interactive: false)
+                        content.finishShow(interactive: false)
                     }
                 }
             }
@@ -96,12 +98,12 @@ public extension UI.Container {
 #if os(iOS)
         private var _interactiveGesture = UI.Gesture.Pan().enabled(false)
         private var _interactiveBeginLocation: PointFloat?
-        private var _interactiveDialogItem: Item?
+        private var _interactiveDialogItem: UI.Container.DialogItem?
         private var _interactiveDialogSize: SizeFloat?
 #endif
-        private var _items: [Item]
-        private var _previous: Item?
-        private var _current: Item? {
+        private var _items: [UI.Container.DialogItem]
+        private var _previous: UI.Container.DialogItem?
+        private var _current: UI.Container.DialogItem? {
             didSet {
 #if os(iOS)
                 self._interactiveGesture.isEnabled = self._current != nil
@@ -141,15 +143,30 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
+        public func apply(contentInset: UI.Container.Inset) {
+            for container in self.containers {
+                container.apply(contentInset: contentInset)
+            }
+            if let content = self.content {
+                content.apply(contentInset: contentInset)
+            }
         }
         
-        public func didChangeInsets() {
-            self._layout.inset = self.inheritedInsets(interactive: true)
-            self.content?.didChangeInsets()
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            return self.parentInset()
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            guard let content = self.content else { return .zero }
+            return content.contentInset()
+        }
+        
+        public func refreshParentInset() {
+            let parentInset = self.parentInset()
+            self._layout.inset = parentInset.interactive
+            self.content?.refreshParentInset()
             for container in self.containers {
-                container.didChangeInsets()
+                container.refreshParentInset()
             }
         }
         
@@ -208,7 +225,7 @@ public extension UI.Container {
         
         public func present(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?) {
             container.parent = self
-            let item = Item(container: container, available: self._view.bounds.size)
+            let item = UI.Container.DialogItem(container, self._view.bounds.size)
             self._items.append(item)
             if self._current == nil {
                 self._present(dialog: item, animated: animated, completion: completion)
@@ -247,18 +264,23 @@ extension UI.Container.Dialog : IUIRootContentContainer {
 extension UI.Container.Dialog {
     
     func _setup() {
+        self._view.onHit(self, {
+            guard let current = $0._current else { return false }
+            guard current.container.shouldInteractive == true else { return false }
+            return current.container.view.isContains($1, from: $0._view)
+        })
 #if os(iOS)
         self._interactiveGesture
-            .onShouldBeRequiredToFailBy(self, {
-                guard let content = $0.content else { return true }
-                guard let view = $1.view else { return false }
-                return content.view.native.kk_isChild(of: view, recursive: true)
-            })
             .onShouldBegin(self, {
                 guard let current = $0._current else { return false }
                 guard current.container.shouldInteractive == true else { return false }
                 guard $0._interactiveGesture.contains(in: current.container.view) == true else { return false }
                 return true
+            })
+            .onShouldBeRequiredToFailBy(self, {
+                guard let content = $0.content else { return true }
+                guard let view = $1.view else { return false }
+                return content.view.native.kk_isChild(of: view, recursive: true)
             })
             .onBegin(self, { $0._beginInteractiveGesture() })
             .onChange(self, { $0._changeInteractiveGesture() })
@@ -272,7 +294,7 @@ extension UI.Container.Dialog {
         self._animation = nil
     }
     
-    func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {
+    func _present(current: UI.Container.DialogItem?, next: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
             self._dismiss(dialog: current, animated: animated, completion: { [weak self] in
                 guard let self = self else { return }
@@ -283,16 +305,16 @@ extension UI.Container.Dialog {
         }
     }
     
-    func _present(dialog: Item, animated: Bool, completion: (() -> Void)?) {
+    func _present(dialog: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
         self._current = dialog
         self._layout.dialogItem = dialog
         self._layout.state = .present(progress: .zero)
         if self.isPresented == true {
-            dialog.container.didChangeInsets()
+            dialog.container.refreshParentInset()
         }
         if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareShow(interactive: false)
-            if animated == true {
+            if self.isPresented == true && animated == true {
                 let size = self._layout._size(dialog: dialog, size: dialogSize)
                 self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
@@ -301,15 +323,17 @@ extension UI.Container.Dialog {
                         guard let self = self else { return }
                         self._layout.state = .present(progress: progress)
                         self._layout.updateIfNeeded()
+                        self.refreshContentInset()
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
                         self._layout.state = .idle
                         dialog.container.finishShow(interactive: false)
+                        self.refreshContentInset()
 #if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
+                        self.refreshOrientations()
+                        self.refreshStatusBar()
 #endif
                         completion?()
                     }
@@ -317,24 +341,26 @@ extension UI.Container.Dialog {
             } else {
                 dialog.container.finishShow(interactive: false)
                 self._layout.state = .idle
+                self.refreshContentInset()
 #if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
+                self.refreshOrientations()
+                self.refreshStatusBar()
 #endif
                 completion?()
             }
         } else {
             self._layout.state = .idle
             self._layout.dialogItem = nil
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             completion?()
         }
     }
     
-    func _dismiss(current: Item, previous: Item?, animated: Bool, completion: (() -> Void)?) {
+    func _dismiss(current: UI.Container.DialogItem, previous: UI.Container.DialogItem?, animated: Bool, completion: (() -> Void)?) {
         self._dismiss(dialog: current, animated: animated, completion: { [weak self] in
             guard let self = self else { return }
             self._current = previous
@@ -346,15 +372,15 @@ extension UI.Container.Dialog {
         })
     }
     
-    func _dismiss(dialog: Item, animated: Bool, completion: (() -> Void)?) {
+    func _dismiss(dialog: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
         self._layout.dialogItem = dialog
         self._layout.state = .dismiss(progress: .zero)
         if self.isPresented == true {
-            dialog.container.didChangeInsets()
+            dialog.container.refreshParentInset()
         }
         if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareHide(interactive: false)
-            if animated == true {
+            if self.isPresented == true && animated == true {
                 let size = self._layout._size(dialog: dialog, size: dialogSize)
                 self._animation = Animation.default.run(
                     duration: TimeInterval(size / self.animationVelocity),
@@ -363,6 +389,7 @@ extension UI.Container.Dialog {
                         guard let self = self else { return }
                         self._layout.state = .dismiss(progress: progress)
                         self._layout.updateIfNeeded()
+                        self.refreshContentInset()
                     },
                     completion: { [weak self] in
                         guard let self = self else { return }
@@ -370,9 +397,10 @@ extension UI.Container.Dialog {
                         self._layout.state = .idle
                         self._layout.dialogItem = nil
                         dialog.container.finishHide(interactive: false)
+                        self.refreshContentInset()
 #if os(iOS)
-                        self.setNeedUpdateOrientations()
-                        self.setNeedUpdateStatusBar()
+                        self.refreshOrientations()
+                        self.refreshStatusBar()
 #endif
                         completion?()
                     }
@@ -381,18 +409,20 @@ extension UI.Container.Dialog {
                 dialog.container.finishHide(interactive: false)
                 self._layout.state = .idle
                 self._layout.dialogItem = nil
+                self.refreshContentInset()
 #if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
+                self.refreshOrientations()
+                self.refreshStatusBar()
 #endif
                 completion?()
             }
         } else {
             self._layout.state = .idle
             self._layout.dialogItem = nil
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             completion?()
         }
@@ -420,6 +450,7 @@ private extension UI.Container.Dialog {
         let deltaLocation = currentLocation - beginLocation
         let progress = self._layout._progress(dialog: dialogItem, size: dialogSize, delta: deltaLocation)
         self._layout.state = .dismiss(progress: progress)
+        self.refreshContentInset()
     }
     
     func _endInteractiveGesture(_ canceled: Bool) {
@@ -442,6 +473,7 @@ private extension UI.Container.Dialog {
                     }
                     self._layout.state = .dismiss(progress: baseProgress + progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -458,6 +490,7 @@ private extension UI.Container.Dialog {
                     guard let self = self else { return }
                     self._layout.state = .dismiss(progress: baseProgress * progress.invert)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -482,15 +515,17 @@ private extension UI.Container.Dialog {
                 self._current = nil
                 self._layout.state = .idle
                 self._layout.dialogItem = nil
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
+                self.refreshContentInset()
+                self.refreshOrientations()
+                self.refreshStatusBar()
             }
         } else {
             self._current = nil
             self._layout.state = .idle
             self._layout.dialogItem = nil
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshContentInset()
+            self.refreshOrientations()
+            self.refreshStatusBar()
         }
     }
     
@@ -500,8 +535,9 @@ private extension UI.Container.Dialog {
             current.container.cancelHide(interactive: true)
         }
         self._layout.state = .idle
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshContentInset()
+        self.refreshOrientations()
+        self.refreshStatusBar()
     }
     
     func _resetInteractiveAnimation() {

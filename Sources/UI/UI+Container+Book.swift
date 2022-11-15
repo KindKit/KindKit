@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -67,13 +67,13 @@ public extension UI.Container {
         private var _interactiveGesture = UI.Gesture.Pan()
         private var _interactiveBeginLocation: PointFloat?
         private var _interactiveCurrentIndex: Int?
-        private var _interactiveBackward: Item?
-        private var _interactiveCurrent: Item?
-        private var _interactiveForward: Item?
+        private var _interactiveBackward: BookItem?
+        private var _interactiveCurrent: BookItem?
+        private var _interactiveForward: BookItem?
 #endif
-        private var _backward: Item?
-        private var _current: Item?
-        private var _forward: Item?
+        private var _backward: BookItem?
+        private var _current: BookItem?
+        private var _forward: BookItem?
         private var _animation: IAnimationTask? {
             willSet { self._animation?.cancel() }
         }
@@ -102,19 +102,48 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
-        }
-        
-        public func didChangeInsets() {
+        public func apply(contentInset: UI.Container.Inset) {
             if let item = self._backward {
-                item.container.didChangeInsets()
+                item.container.apply(contentInset: contentInset)
             }
             if let item = self._current {
-                item.container.didChangeInsets()
+                item.container.apply(contentInset: contentInset)
             }
             if let item = self._forward {
-                item.container.didChangeInsets()
+                item.container.apply(contentInset: contentInset)
+            }
+        }
+        
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            return self.parentInset()
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            switch self._layout.state {
+            case .empty:
+                return .zero
+            case .idle(let curr):
+                return curr.container.contentInset()
+            case .forward(let curr, let next, let progress):
+                let currInset = curr.container.contentInset()
+                let nextInset = next.container.contentInset()
+                return currInset.lerp(nextInset, progress: progress)
+            case .backward(let curr, let next, let progress):
+                let currInset = curr.container.contentInset()
+                let nextInset = next.container.contentInset()
+                return currInset.lerp(nextInset, progress: progress)
+            }
+        }
+        
+        public func refreshParentInset() {
+            if let item = self._backward {
+                item.container.refreshParentInset()
+            }
+            if let item = self._current {
+                item.container.refreshParentInset()
+            }
+            if let item = self._forward {
+                item.container.refreshParentInset()
             }
         }
         
@@ -170,16 +199,16 @@ public extension UI.Container {
         }
         
         public func reload(backward: Bool, forward: Bool) {
-            let newBackward: Item?
-            let newForward: Item?
+            let newBackward: BookItem?
+            let newForward: BookItem?
             if let item = self._current {
                 if backward == true {
-                    newBackward = self.screen.backwardContainer(item.container).flatMap({ Item(container: $0) })
+                    newBackward = self.screen.backwardContainer(item.container).flatMap({ BookItem($0) })
                 } else {
                     newBackward = nil
                 }
                 if forward == true {
-                    newForward = self.screen.forwardContainer(item.container).flatMap({ Item(container: $0) })
+                    newForward = self.screen.forwardContainer(item.container).flatMap({ BookItem($0) })
                 } else {
                     newForward = nil
                 }
@@ -202,7 +231,7 @@ public extension UI.Container {
             	completion?()
                 return
             }
-            let forward = Item(container: current)
+            let forward = BookItem(current)
             forward.container.parent = self
             if let current = self._current {
                 self._set(current: current, forward: forward, animated: animated, completion: completion)
@@ -288,22 +317,22 @@ private extension UI.Container.Book {
         self.screen.container = self
         let initial = self.screen.initialContainer()
         if let backward = self.screen.backwardContainer(initial) {
-            let item = Item(container: backward)
+            let item = UI.Container.BookItem(backward)
             self._backward = item
             item.container.parent = self
         }
         do {
-            let item = Item(container: initial)
+            let item = UI.Container.BookItem(initial)
             self._current = item
             item.container.parent = self
         }
         if let forward = self.screen.forwardContainer(initial) {
-            let item = Item(container: forward)
+            let item = UI.Container.BookItem(forward)
             self._forward = item
             item.container.parent = self
         }
         if let current = self._current {
-            self._layout.state = .idle(current: current.bookItem)
+            self._layout.state = .idle(current: current)
         } else {
             self._layout.state = .empty
         }
@@ -318,18 +347,19 @@ private extension UI.Container.Book {
     }
     
     func _set(
-        current: Item,
+        current: UI.Container.BookItem,
         completion: (() -> Void)?
     ) {
-        self._layout.state = .idle(current: current.bookItem)
+        self._layout.state = .idle(current: current)
         if self.isPresented == true {
-            current.container.didChangeInsets()
+            current.container.refreshParentInset()
             current.container.prepareShow(interactive: false)
             current.container.finishShow(interactive: false)
         }
+        self.refreshContentInset()
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
         self._didSet(
             current: current,
@@ -338,40 +368,38 @@ private extension UI.Container.Book {
     }
     
     func _set(
-        current: Item,
-        forward: Item,
+        current: UI.Container.BookItem,
+        forward: UI.Container.BookItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: .zero)
-                    if self.isPresented == true {
-                        forward.container.didChangeInsets()
-                        current.container.prepareHide(interactive: false)
-                        forward.container.prepareShow(interactive: false)
-                    }
+                    self._layout.state = .forward(current: current, next: forward, progress: .zero)
+                    forward.container.refreshParentInset()
+                    current.container.prepareHide(interactive: false)
+                    forward.container.prepareShow(interactive: false)
                 },
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
-                    self._layout.state = .idle(current: forward.bookItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        forward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: forward)
+                    current.container.finishHide(interactive: false)
+                    forward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self._didSet(
                         current: forward,
@@ -380,17 +408,18 @@ private extension UI.Container.Book {
                 }
             )
         } else {
-            self._layout.state = .idle(current: forward.bookItem)
+            self._layout.state = .idle(current: forward)
             if self.isPresented == true {
-                forward.container.didChangeInsets()
+                forward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 forward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self._didSet(
                 current: forward,
@@ -400,40 +429,38 @@ private extension UI.Container.Book {
     }
     
     func _set(
-        current: Item,
-        backward: Item,
+        current: UI.Container.BookItem,
+        backward: UI.Container.BookItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: .zero)
-                    if self.isPresented == true {
-                        backward.container.didChangeInsets()
-                        current.container.prepareHide(interactive: false)
-                        backward.container.prepareShow(interactive: false)
-                    }
+                    self._layout.state = .backward(current: current, next: backward, progress: .zero)
+                    backward.container.refreshParentInset()
+                    current.container.prepareHide(interactive: false)
+                    backward.container.prepareShow(interactive: false)
                 },
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
-                    self._layout.state = .idle(current: backward.bookItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        backward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: backward)
+                    current.container.finishHide(interactive: false)
+                    backward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self._didSet(
                         current: backward,
@@ -442,17 +469,18 @@ private extension UI.Container.Book {
                 }
             )
         } else {
-            self._layout.state = .idle(current: backward.bookItem)
+            self._layout.state = .idle(current: backward)
             if self.isPresented == true {
-                backward.container.didChangeInsets()
+                backward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self._didSet(
                 current: backward,
@@ -462,11 +490,11 @@ private extension UI.Container.Book {
     }
     
     func _didSet(
-        current: Item,
+        current: UI.Container.BookItem,
         completion: (() -> Void)?
     ) {
-        let newBackward = self.screen.backwardContainer(current.container).flatMap({ Item(container: $0) })
-        let newForward = self.screen.forwardContainer(current.container).flatMap({ Item(container: $0) })
+        let newBackward = self.screen.backwardContainer(current.container).flatMap({ UI.Container.BookItem($0) })
+        let newForward = self.screen.forwardContainer(current.container).flatMap({ UI.Container.BookItem($0) })
         self._update(
             newBackward: newBackward,
             newCurrent: current,
@@ -480,12 +508,12 @@ private extension UI.Container.Book {
     }
     
     func _update(
-        newBackward: Item?,
-        newCurrent: Item?,
-        newForward: Item?,
-        oldBackward: Item?,
-        oldCurrent: Item?,
-        oldForward: Item?
+        newBackward: UI.Container.BookItem?,
+        newCurrent: UI.Container.BookItem?,
+        newForward: UI.Container.BookItem?,
+        oldBackward: UI.Container.BookItem?,
+        oldCurrent: UI.Container.BookItem?,
+        oldForward: UI.Container.BookItem?
     ) {
         self._backward = newBackward
         if let item = newBackward {
@@ -545,30 +573,31 @@ private extension UI.Container.Book {
         if deltaLocation < 0 {
             if self._forward != nil && self._interactiveForward == nil {
                 self._forward?.container.prepareShow(interactive: true)
-                self._forward?.container.didChangeInsets()
+                self._forward?.container.refreshParentInset()
                 self._interactiveForward = self._forward
             }
             if let forward = self._interactiveForward {
                 let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
-                self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
+                self._layout.state = .forward(current: current, next: forward, progress: progress)
             } else {
-                self._layout.state = .idle(current: current.bookItem)
+                self._layout.state = .idle(current: current)
             }
         } else if deltaLocation > 0 {
             if self._backward != nil && self._interactiveBackward == nil {
                 self._backward?.container.prepareShow(interactive: true)
-                self._backward?.container.didChangeInsets()
+                self._backward?.container.refreshParentInset()
                 self._interactiveBackward = self._backward
             }
             if let backward = self._interactiveBackward {
                 let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
-                self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
+                self._layout.state = .backward(current: current, next: backward, progress: progress)
             } else {
-                self._layout.state = .idle(current: current.bookItem)
+                self._layout.state = .idle(current: current)
             }
         } else {
-            self._layout.state = .idle(current: current.bookItem)
+            self._layout.state = .idle(current: current)
         }
+        self.refreshContentInset()
     }
     
     func _endInteractiveGesture(_ canceled: Bool) {
@@ -583,8 +612,9 @@ private extension UI.Container.Book {
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -597,8 +627,9 @@ private extension UI.Container.Book {
                 elapsed: TimeInterval(absDeltaLocation / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -611,8 +642,9 @@ private extension UI.Container.Book {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.bookItem, next: forward.bookItem, progress: progress.invert)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress.invert)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -625,8 +657,9 @@ private extension UI.Container.Book {
                 elapsed: TimeInterval((layoutSize.width - absDeltaLocation) / self.animationVelocity),
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.bookItem, next: backward.bookItem, progress: progress.invert)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress.invert)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -644,7 +677,7 @@ private extension UI.Container.Book {
         let forward = self._interactiveForward
         self._resetInteractiveAnimation()
         if let current = forward {
-            self._layout.state = .idle(current: current.bookItem)
+            self._layout.state = .idle(current: current)
         }
         forward?.container.finishShow(interactive: true)
         current?.container.finishHide(interactive: true)
@@ -653,8 +686,9 @@ private extension UI.Container.Book {
             self._finishInteractiveAnimation(current: current)
         }
         self.screen.finishInteractiveToForward()
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshContentInset()
+        self.refreshOrientations()
+        self.refreshStatusBar()
     }
     
     func _finishBackwardInteractiveAnimation() {
@@ -663,7 +697,7 @@ private extension UI.Container.Book {
         let forward = self._interactiveForward
         self._resetInteractiveAnimation()
         if let current = backward {
-            self._layout.state = .idle(current: current.bookItem)
+            self._layout.state = .idle(current: current)
         }
         forward?.container.cancelShow(interactive: true)
         current?.container.finishHide(interactive: true)
@@ -673,15 +707,16 @@ private extension UI.Container.Book {
         }
         self._resetInteractiveAnimation()
         self.screen.finishInteractiveToBackward()
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshContentInset()
+        self.refreshOrientations()
+        self.refreshStatusBar()
     }
     
-    func _finishInteractiveAnimation(current: Item) {
+    func _finishInteractiveAnimation(current: UI.Container.BookItem) {
         self._update(
-            newBackward: self.screen.backwardContainer(current.container).flatMap({ Item(container: $0) }),
+            newBackward: self.screen.backwardContainer(current.container).flatMap({ UI.Container.BookItem($0) }),
             newCurrent: current,
-            newForward: self.screen.forwardContainer(current.container).flatMap({ Item(container: $0) }),
+            newForward: self.screen.forwardContainer(current.container).flatMap({ UI.Container.BookItem($0) }),
             oldBackward: self._backward,
             oldCurrent: self._current,
             oldForward: self._forward
@@ -695,14 +730,15 @@ private extension UI.Container.Book {
         let forward = self._interactiveForward
         self._resetInteractiveAnimation()
         if let current = current {
-            self._layout.state = .idle(current: current.bookItem)
+            self._layout.state = .idle(current: current)
         }
         forward?.container.cancelShow(interactive: true)
         current?.container.cancelHide(interactive: true)
         backward?.container.cancelShow(interactive: true)
         self.screen.cancelInteractive()
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshContentInset()
+        self.refreshOrientations()
+        self.refreshStatusBar()
     }
     
     func _resetInteractiveAnimation() {

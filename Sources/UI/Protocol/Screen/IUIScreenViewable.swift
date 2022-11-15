@@ -11,7 +11,7 @@ public protocol IUIScreenViewable : AnyObject {
     var view: AssociatedView { get }
     var overlayEdge: UI.Edge { get }
     
-    func didChangeInsets()
+    func apply(inset: UI.Container.Inset)
     
 }
 
@@ -25,14 +25,13 @@ public extension IUIScreenViewable {
 
 public extension IUIScreenViewable where Self : IUIScreen, AssociatedView == UI.View.Scroll {
     
-    func didChangeInsets() {
-        let inheritedInsets = self.inheritedInsets()
+    func apply(inset: UI.Container.Inset, in view: UI.View.Scroll) {
         let overlayEdge = self.overlayEdge
-        self.view.contentInset = .init(
-            top: overlayEdge.contains(.top) ? inheritedInsets.top : 0,
-            left: overlayEdge.contains(.left) ? inheritedInsets.left : 0,
-            right: overlayEdge.contains(.right) ? inheritedInsets.right : 0,
-            bottom: overlayEdge.contains(.bottom) ? inheritedInsets.bottom : 0
+        view.contentInset = .init(
+            top: overlayEdge.contains(.top) ? inset.natural.top : 0,
+            left: overlayEdge.contains(.left) ? inset.natural.left : 0,
+            right: overlayEdge.contains(.right) ? inset.natural.right : 0,
+            bottom: overlayEdge.contains(.bottom) ? inset.natural.bottom : 0
         )
     }
     

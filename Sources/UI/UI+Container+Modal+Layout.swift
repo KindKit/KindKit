@@ -17,11 +17,11 @@ extension UI.Container.Modal {
                 case .empty:
                     break
                 case .idle(let modal):
-                    self._cache[modal.item] = nil
+                    self._cache[modal.viewItem] = nil
                 case .present(let modal, _):
-                    self._cache[modal.item] = nil
+                    self._cache[modal.viewItem] = nil
                 case .dismiss(let modal, _):
-                    self._cache[modal.item] = nil
+                    self._cache[modal.viewItem] = nil
                 }
                 self.setNeedUpdate()
             }
@@ -71,8 +71,8 @@ extension UI.Container.Modal {
                     modalInset = .zero
                 }
                 let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(item: modal.item, available: modalBounds.size)
-                modal.item.frame = Rect(bottom: modalBounds.bottom, size: modalSize)
+                let modalSize = self._size(item: modal.viewItem, available: modalBounds.size)
+                modal.viewItem.frame = Rect(bottom: modalBounds.bottom, size: modalSize)
             case .present(let modal, let progress):
                 let modalInset: InsetFloat
                 if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
@@ -83,10 +83,10 @@ extension UI.Container.Modal {
                     modalInset = .zero
                 }
                 let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(item: modal.item, available: modalBounds.size)
+                let modalSize = self._size(item: modal.viewItem, available: modalBounds.size)
                 let beginRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
                 let endRect = Rect(bottom: modalBounds.bottom, size: modalSize)
-                modal.item.frame = beginRect.lerp(endRect, progress: progress)
+                modal.viewItem.frame = beginRect.lerp(endRect, progress: progress)
             case .dismiss(let modal, let progress):
                 let modalInset: InsetFloat
                 if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground, let sheetItem = modal.sheetBackgroundItem {
@@ -97,10 +97,10 @@ extension UI.Container.Modal {
                     modalInset = .zero
                 }
                 let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(item: modal.item, available: modalBounds.size)
+                let modalSize = self._size(item: modal.viewItem, available: modalBounds.size)
                 let beginRect = Rect(bottom: modalBounds.bottom, size: modalSize)
                 let endRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
-                modal.item.frame = beginRect.lerp(endRect, progress: progress)
+                modal.viewItem.frame = beginRect.lerp(endRect, progress: progress)
             }
             return bounds.size
         }
@@ -120,17 +120,17 @@ extension UI.Container.Modal {
                 if let item = modal.sheetBackgroundItem {
                     items.append(item)
                 }
-                items.append(modal.item)
+                items.append(modal.viewItem)
             case .present(let modal, _):
                 if let item = modal.sheetBackgroundItem {
                     items.append(item)
                 }
-                items.append(modal.item)
+                items.append(modal.viewItem)
             case .dismiss(let modal, _):
                 if let item = modal.sheetBackgroundItem {
                     items.append(item)
                 }
-                items.append(modal.item)
+                items.append(modal.viewItem)
             }
             return items
         }

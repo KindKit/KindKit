@@ -10,23 +10,33 @@ extension UI.Container.Push {
         
         weak var delegate: IUILayoutDelegate?
         weak var view: IUIView?
-        var state: State = .empty {
-            didSet {
-                guard self.state != oldValue else { return }
+        var state: UI.Container.Push.State {
+            set {
+                guard self._layout.state != newValue else { return }
+                self._layout.state = newValue
                 self.setNeedUpdate()
             }
+            get { self._layout.state }
         }
         var inset: InsetFloat {
-            didSet {
-                guard self.inset != oldValue else { return }
-                self.setNeedUpdate()
-            }
+            set { self._layout.inset = newValue }
+            get { self._layout.inset }
         }
-        var inheritedInset: InsetFloat = .zero {
-            didSet {
-                guard self.inheritedInset != oldValue else { return }
+        var parentInset: InsetFloat {
+            set {
+                guard self._layout.parentInset != newValue else { return }
+                self._layout.parentInset = newValue
                 self.setNeedUpdate()
             }
+            get { self._layout.parentInset }
+        }
+        var contentInset: InsetFloat {
+            set {
+                guard self._layout.contentInset != newValue else { return }
+                self._layout.contentInset = newValue
+                self.setNeedUpdate()
+            }
+            get { self._layout.contentInset }
         }
         var content: UI.Layout.Item? {
             didSet {
@@ -35,59 +45,36 @@ extension UI.Container.Push {
             }
         }
         
+        private var _layout: Queue
+        private var _view: UI.View.Custom
+        private var _viewItem: UI.Layout.Item
+        
         init(
             inset: InsetFloat,
             content: UI.Layout.Item?
         ) {
-            self.inset = inset
             self.content = content
+            self._layout = .init(inset: inset)
+            self._view = .init().content(self._layout)
+            self._viewItem = .init(self._view)
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
             if let content = self.content {
                 content.frame = bounds
             }
-            switch self.state {
+            switch self._layout.state {
             case .empty:
                 break
             case .idle(let push):
-                let inset = self.inset + self.inheritedInset
-                push.item.frame = RectFloat(
-                    x: bounds.origin.x + inset.left,
-                    y: bounds.origin.y + inset.top,
-                    width: bounds.size.width - (inset.left + inset.right),
-                    height: push.size.height
-                )
-            case .present(let push, let progress):
-                let inset = self.inset + self.inheritedInset
-                let beginRect = RectFloat(
-                    x: bounds.origin.x + inset.left,
-                    y: bounds.origin.y - push.size.height,
-                    width: bounds.size.width - (inset.left + inset.right),
-                    height: push.size.height
-                )
-                let endRect = RectFloat(
-                    x: bounds.origin.x + inset.left,
-                    y: bounds.origin.y + inset.top,
-                    width: bounds.size.width - (inset.left + inset.right),
-                    height: push.size.height
-                )
-                push.item.frame = beginRect.lerp(endRect, progress: progress)
-            case .dismiss(let push, let progress):
-                let inset = self.inset + self.inheritedInset
-                let beginRect = RectFloat(
-                    x: bounds.origin.x + inset.left,
-                    y: bounds.origin.y + inset.top,
-                    width: bounds.size.width - (inset.left + inset.right),
-                    height: push.size.height
-                )
-                let endRect = RectFloat(
-                    x: bounds.origin.x + inset.left,
-                    y: bounds.origin.y - push.size.height,
-                    width: bounds.size.width - (inset.left + inset.right),
-                    height: push.size.height
-                )
-                push.item.frame = beginRect.lerp(endRect, progress: progress)
+                let inset = self._inset(item: push)
+                self._viewItem.frame = bounds.inset(inset)
+            case .present(let push, _):
+                let inset = self._inset(item: push)
+                self._viewItem.frame = bounds.inset(inset)
+            case .dismiss(let push, _):
+                let inset = self._inset(item: push)
+                self._viewItem.frame = bounds.inset(inset)
             }
             return bounds.size
         }
@@ -101,19 +88,50 @@ extension UI.Container.Push {
             if let content = self.content {
                 items.append(content)
             }
-            switch self.state {
-            case .empty: break
-            case .idle(let push): items.append(push.item)
-            case .present(let push, _): items.append(push.item)
-            case .dismiss(let push, _): items.append(push.item)
-            }
+            items.append(self._viewItem)
             return items
         }
         
-        func height(item: UI.Container.Push.Item) -> Float {
-            return self.inset.top + self.inheritedInset.top + item.size.height
+    }
+    
+}
+
+private extension UI.Container.Push.Layout {
+    
+    func _inset(item: UI.Container.PushItem) -> InsetFloat {
+        if item.container.pushOptions.contains(.useContentInset) == true {
+            return .init(
+                top: self.parentInset.top != self.contentInset.top ? self.contentInset.top : 0,
+                left: self.parentInset.left != self.contentInset.left ? self.contentInset.left : 0,
+                right: self.parentInset.right != self.contentInset.right ? self.contentInset.right : 0,
+                bottom: self.parentInset.bottom != self.contentInset.bottom ? self.contentInset.bottom : 0
+            )
         }
-        
+        return .zero
+    }
+    
+}
+
+extension UI.Container.Push.Layout {
+    
+    func duration(item: UI.Container.PushItem, velocity: Float) -> TimeInterval {
+        return self._layout.duration(item: item, velocity: velocity)
+    }
+    
+    func cancelDuration(item: UI.Container.PushItem, progress: PercentFloat, velocity: Float) -> TimeInterval {
+        return self._layout.cancelDuration(item: item, progress: progress, velocity: velocity)
+    }
+    
+}
+
+extension UI.Container.Push.Layout {
+    
+    func delta(item: UI.Container.PushItem, begin: PointFloat, current: PointFloat) -> Float {
+        return self._layout.delta(item: item, begin: begin, current: current)
+    }
+    
+    func progress(item: UI.Container.PushItem, delta: Float) -> PercentFloat {
+        return self._layout.progress(item: item, delta: delta)
     }
     
 }

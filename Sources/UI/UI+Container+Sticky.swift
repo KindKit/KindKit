@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -69,20 +69,20 @@ public extension UI.Container {
                 if self.isPresented == true {
                     self._content.prepareHide(interactive: false)
                     self._content.finishHide(interactive: false)
-                    self._content.didChangeInsets()
+                    self._content.refreshParentInset()
                 }
                 self._content.parent = nil
                 self._content = newValue
                 self._content.parent = self
                 self._layout.content = UI.Layout.Item(self._content.view)
                 if self.isPresented == true {
-                    self._content.didChangeInsets()
+                    self._content.refreshParentInset()
                     self._content.prepareShow(interactive: false)
                     self._content.finishShow(interactive: false)
                 }
 #if os(iOS)
-                self.setNeedUpdateOrientations()
-                self.setNeedUpdateStatusBar()
+                self.refreshOrientations()
+                self.refreshStatusBar()
 #endif
             }
             get { self._content }
@@ -116,39 +116,52 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if self._content === container, let stickySize = self._layout.stickySize {
-                let bottom: Float
-                if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
-                    if interactive == true {
-                        bottom = stickySize.height * self.stickyVisibility
-                    } else {
-                        bottom = stickySize.height
-                    }
-                } else {
-                    bottom = 0
-                }
-                return InsetFloat(
-                    top: inheritedInsets.top,
-                    left: inheritedInsets.left,
-                    right: inheritedInsets.right,
-                    bottom: inheritedInsets.bottom + bottom
-                )
-            }
-            return inheritedInsets
+        public func apply(contentInset: UI.Container.Inset) {
+            self._content.apply(contentInset: contentInset)
         }
         
-        public func didChangeInsets() {
-            let inheritedInsets = self.inheritedInsets(interactive: true)
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            let parentInset = self.parentInset()
+            if self._content === container, let stickySize = self._layout.stickySize {
+                if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
+                    return parentInset.bottom(
+                        natural: stickySize.height,
+                        interactive: stickySize.height * self.stickyVisibility
+                    )
+                }
+            }
+            return parentInset
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            let contentInset = self._content.contentInset()
+            guard let stickySize = self._layout.stickySize else {
+                return contentInset
+            }
+            if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
+                return contentInset.bottom(
+                    natural: stickySize.height,
+                    interactive: stickySize.height * self.stickyVisibility
+                )
+            }
+            return contentInset
+        }
+        
+        public func refreshParentInset() {
+            let contentInset = self.contentInset()
             if self.stickyHidden == false {
                 self._sticky.alpha = self.stickyVisibility
             } else {
                 self._sticky.alpha = 0
             }
-            self._sticky.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
-            self._layout.stickyInset = inheritedInsets.bottom
-            self._content.didChangeInsets()
+            self._sticky.safeArea(.init(
+                top: 0,
+                left: contentInset.interactive.left,
+                right: contentInset.interactive.right,
+                bottom: 0
+            ))
+            self._layout.stickyInset = contentInset.interactive.bottom
+            self._content.refreshParentInset()
         }
         
         public func activate() -> Bool {
@@ -195,7 +208,7 @@ public extension UI.Container {
         public func updateSticky(animated: Bool, completion: (() -> Void)?) {
             self._layout.stickyHidden = self.screen.stickyHidden
             if self.isPresented == true {
-                self.didChangeInsets()
+                self.refreshParentInset()
             }
         }
         

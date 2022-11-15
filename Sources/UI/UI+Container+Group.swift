@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -58,7 +58,7 @@ public extension UI.Container {
             get { self._bar }
         }
         public var barSize: Float {
-            get { self._layout.barSize }
+            self._layout.barSize
         }
         public private(set) var barVisibility: Float {
             set { self._layout.barVisibility = newValue }
@@ -90,8 +90,8 @@ public extension UI.Container {
         private var _bar: UI.View.GroupBar
         private var _layout: Layout
         private var _view: UI.View.Custom
-        private var _items: [Item]
-        private var _current: Item?
+        private var _items: [UI.Container.GroupItem]
+        private var _current: UI.Container.GroupItem?
         private var _animation: IAnimationTask? {
             willSet { self._animation?.cancel() }
         }
@@ -116,7 +116,7 @@ public extension UI.Container {
             )
             self._view = UI.View.Custom()
                 .content(self._layout)
-            self._items = containers.map({ Item(container: $0) })
+            self._items = containers.map({ UI.Container.GroupItem($0) })
             if let current = current {
                 if let index = self._items.firstIndex(where: { $0.container === current }) {
                     self._current = self._items[index]
@@ -133,42 +133,66 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if self._items.contains(where: { $0.container === container }) == true {
-                let bottom: Float
-                if self.barHidden == false && UI.Container.BarController.shared.hidden(.group) == false {
-                    let barSize = self.barSize
-                    let barVisibility = self.barVisibility
-                    if interactive == true {
-                        bottom = barSize * barVisibility
-                    } else {
-                        bottom = barSize
-                    }
-                } else {
-                    bottom = 0
-                }
-                return InsetFloat(
-                    top: inheritedInsets.top,
-                    left: inheritedInsets.left,
-                    right: inheritedInsets.right,
-                    bottom: inheritedInsets.bottom + bottom
-                )
+        public func apply(contentInset: UI.Container.Inset) {
+            for item in self._items {
+                item.container.apply(contentInset: contentInset)
             }
-            return inheritedInsets
         }
         
-        public func didChangeInsets() {
-            let inheritedInsets = self.inheritedInsets(interactive: true)
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            let parentInset = self.parentInset()
+            if self._items.contains(where: { $0.container === container }) == true {
+                if self.barHidden == false && UI.Container.BarController.shared.hidden(.group) == false {
+                    return parentInset.bottom(
+                        natural: self.barSize,
+                        interactive: self.barSize * self.barVisibility
+                    )
+                }
+            }
+            return parentInset
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            let contentInset: UI.Container.Inset
+            switch self._layout.state {
+            case .empty:
+                contentInset = .zero
+            case .idle(let current):
+                contentInset = current.container.contentInset()
+            case .forward(let current, let next, let progress):
+                let currentInset = current.container.contentInset()
+                let nextInset = next.container.contentInset()
+                contentInset = currentInset.lerp(nextInset, progress: progress)
+            case .backward(let current, let next, let progress):
+                let currentInset = current.container.contentInset()
+                let nextInset = next.container.contentInset()
+                contentInset = currentInset.lerp(nextInset, progress: progress)
+            }
+            if self.barHidden == false && UI.Container.BarController.shared.hidden(.group) == false {
+                return contentInset.bottom(
+                    natural: self.barSize,
+                    interactive: self.barSize * self.barVisibility
+                )
+            }
+            return contentInset
+        }
+        
+        public func refreshParentInset() {
+            let parentInset = self.parentInset()
             if self.barHidden == false {
                 self._bar.alpha = self.barVisibility
             } else {
                 self._bar.alpha = 0
             }
-            self._bar.safeArea(InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: 0))
-            self._layout.barOffset = inheritedInsets.bottom
+            self._bar.safeArea(.init(
+                top: 0,
+                left: parentInset.interactive.left,
+                right: parentInset.interactive.right,
+                bottom: 0
+            ))
+            self._layout.barOffset = parentInset.interactive.bottom
             for item in self._items {
-                item.container.didChangeInsets()
+                item.container.refreshParentInset()
             }
         }
         
@@ -225,7 +249,7 @@ public extension UI.Container {
             self.bar = self.screen.groupBar
             self.barVisibility = self.screen.groupBarVisibility
             self.barHidden = self.screen.groupBarHidden
-            self.didChangeInsets()
+            self.refreshParentInset()
             completion?()
         }
         
@@ -237,13 +261,13 @@ public extension UI.Container {
             for item in removeItems {
                 item.container.parent = nil
             }
-            let inheritedInsets = self.inheritedInsets(interactive: true)
-            self._items = containers.map({ Item(container: $0, insets: inheritedInsets) })
+            let parentInset = self.parentInset()
+            self._items = containers.map({ UI.Container.GroupItem($0, parentInset.interactive) })
             for item in self._items {
                 item.container.parent = self
             }
             self._bar.items(self._items.map({ $0.bar }))
-            let newCurrent: Item?
+            let newCurrent: UI.Container.GroupItem?
             if current != nil {
                 if let exist = self._items.first(where: { $0.container === current }) {
                     newCurrent = exist
@@ -384,7 +408,7 @@ private extension UI.Container.Group {
         self._bar.items(self._items.map({ $0.bar }))
         if let current = self._current {
             self._bar.selected(current.bar)
-            self._layout.state = .idle(current: current.groupItem)
+            self._layout.state = .idle(current: current)
         }
         self.screen.setup()
         UI.Container.BarController.shared.add(observer: self)
@@ -403,59 +427,59 @@ private extension UI.Container.Group {
     }
     
     func _set(
-        current: Item,
+        current: UI.Container.GroupItem,
         completion: (() -> Void)?
     ) {
         self._bar.selected(current.bar)
-        self._layout.state = .idle(current: current.groupItem)
+        self._layout.state = .idle(current: current)
         if self.isPresented == true {
-            current.container.didChangeInsets()
+            current.container.refreshParentInset()
             current.container.prepareShow(interactive: false)
             current.container.finishShow(interactive: false)
         }
 #if os(iOS)
-        self.setNeedUpdateOrientations()
-        self.setNeedUpdateStatusBar()
+        self.refreshOrientations()
+        self.refreshStatusBar()
 #endif
         self.screen.change(current: current.container)
         completion?()
     }
     
     func _set(
-        current: Item,
-        forward: Item,
+        current: UI.Container.GroupItem,
+        forward: UI.Container.GroupItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.groupItem, next: forward.groupItem, progress: .zero)
+                    self._layout.state = .forward(current: current, next: forward, progress: .zero)
                     if self.isPresented == true {
-                        forward.container.didChangeInsets()
+                        forward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
                         forward.container.prepareShow(interactive: false)
                     }
                 },
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .forward(current: current.groupItem, next: forward.groupItem, progress: progress)
+                    self._layout.state = .forward(current: current, next: forward, progress: progress)
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._bar.selected(forward.bar)
-                    self._layout.state = .idle(current: forward.groupItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        forward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: forward)
+                    current.container.finishHide(interactive: false)
+                    forward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self.screen.change(current: forward.container)
                     completion?()
@@ -463,17 +487,18 @@ private extension UI.Container.Group {
             )
         } else {
             self._bar.selected(forward.bar)
-            self._layout.state = .idle(current: forward.groupItem)
+            self._layout.state = .idle(current: forward)
             if self.isPresented == true {
-                forward.container.didChangeInsets()
+                forward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 forward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self.screen.change(current: forward.container)
             completion?()
@@ -481,40 +506,40 @@ private extension UI.Container.Group {
     }
     
     func _set(
-        current: Item,
-        backward: Item,
+        current: UI.Container.GroupItem,
+        backward: UI.Container.GroupItem,
         animated: Bool,
         completion: (() -> Void)?
     ) {
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.contentSize.width / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.groupItem, next: backward.groupItem, progress: .zero)
+                    self._layout.state = .backward(current: current, next: backward, progress: .zero)
                     if self.isPresented == true {
-                        backward.container.didChangeInsets()
+                        backward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
                         backward.container.prepareShow(interactive: false)
                     }
                 },
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._layout.state = .backward(current: current.groupItem, next: backward.groupItem, progress: progress)
+                    self._layout.state = .backward(current: current, next: backward, progress: progress)
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._bar.selected(backward.bar)
-                    self._layout.state = .idle(current: backward.groupItem)
-                    if self.isPresented == true {
-                        current.container.finishHide(interactive: false)
-                        backward.container.finishShow(interactive: false)
-                    }
+                    self._layout.state = .idle(current: backward)
+                    current.container.finishHide(interactive: false)
+                    backward.container.finishShow(interactive: false)
+                    self.refreshContentInset()
 #if os(iOS)
-                    self.setNeedUpdateOrientations()
-                    self.setNeedUpdateStatusBar()
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
 #endif
                     self.screen.change(current: backward.container)
                     completion?()
@@ -522,17 +547,18 @@ private extension UI.Container.Group {
             )
         } else {
             self._bar.selected(backward.bar)
-            self._layout.state = .idle(current: backward.groupItem)
+            self._layout.state = .idle(current: backward)
             if self.isPresented == true {
-                backward.container.didChangeInsets()
+                backward.container.refreshParentInset()
                 current.container.prepareHide(interactive: false)
                 backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }
+            self.refreshContentInset()
 #if os(iOS)
-            self.setNeedUpdateOrientations()
-            self.setNeedUpdateStatusBar()
+            self.refreshOrientations()
+            self.refreshStatusBar()
 #endif
             self.screen.change(current: backward.container)
             completion?()

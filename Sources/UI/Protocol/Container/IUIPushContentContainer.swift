@@ -8,6 +8,8 @@ public protocol IUIPushContentContainer : IUIContainer, IUIContainerParentable {
     
     var pushContainer: IUIPushContainer? { get }
     
+    var pushPlacement: UI.Push.Placement { get }
+    var pushOptions: UI.Push.Options { get }
     var pushDuration: TimeInterval? { get }
     
 }

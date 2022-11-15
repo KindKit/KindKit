@@ -132,7 +132,7 @@ extension UI.ViewController : IRootContainerDelegate {
 extension UI.ViewController : IContainerBarControllerObserver {
     
     public func changed(_ barController: UI.Container.BarController) {
-        self.container.didChangeInsets()
+        self.container.didChangeInset()
     }
     
 }

@@ -20,15 +20,19 @@ public protocol IUIContainer : AnyObject {
     var isPresented: Bool { get }
     var view: IUIView { get }
     
+    func apply(contentInset: UI.Container.Inset)
+    
+    func parentInset() -> UI.Container.Inset
+    func parentInset(for container: IUIContainer) -> UI.Container.Inset
+    func contentInset() -> UI.Container.Inset
+
+    func refreshParentInset()
+    func refreshContentInset()
 #if os(iOS)
-    func setNeedUpdateStatusBar()
-    func setNeedUpdateOrientations()
+    func refreshStatusBar()
+    func refreshOrientations()
 #endif
-    
-    func inheritedInsets(interactive: Bool) -> InsetFloat
-    func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat
-    func didChangeInsets()
-    
+
     func activate() -> Bool
     
     func didChangeAppearance()
@@ -45,7 +49,7 @@ public protocol IUIContainer : AnyObject {
 
 public extension IUIContainer {
     
-    func inheritedInsets(interactive: Bool) -> InsetFloat {
+    func parentInset() -> UI.Container.Inset {
         return .zero
     }
 

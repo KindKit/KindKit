@@ -11,6 +11,8 @@ import UIKit
 
 public protocol IRootContainerDelegate : AnyObject {
     
+    func updateContentInset()
+    
 #if os(iOS)
     
     func viewController() -> UIViewController?
@@ -50,7 +52,7 @@ public extension UI.Container {
         public private(set) var isPresented: Bool {
             didSet {
                 guard self.isPresented != oldValue else { return }
-                self.didChangeInsets()
+                self.refreshParentInset()
             }
         }
         public var view: IUIView {
@@ -62,37 +64,17 @@ public extension UI.Container {
                 self._layout.statusBar = self.statusBarSubstrate.flatMap({ UI.Layout.Item($0) })
             }
         }
-        public var overlay: IUIRootContentContainer? {
-            didSet {
-                guard self.overlay !== oldValue else { return }
-                if let overlay = self.overlay {
-                    if self.isPresented == true {
-                        overlay.prepareHide(interactive: false)
-                        overlay.finishHide(interactive: false)
-                    }
-                    overlay.parent = nil
-                }
-                self._layout.overlay = self.overlay.flatMap({ UI.Layout.Item($0.view) })
-                if self.isPresented == true {
-                    self._layout.update()
-                }
-                if let overlay = self.overlay {
-                    overlay.parent = self
-                    if self.isPresented == true {
-                        overlay.prepareShow(interactive: false)
-                        overlay.finishShow(interactive: false)
-                    }
-                }
-            }
-        }
         public var content: IUIRootContentContainer {
-            didSet {
-                guard self.content !== oldValue else { return }
+            willSet {
+                guard self.content !== newValue else { return }
                 if self.isPresented == true {
                     self.content.prepareHide(interactive: false)
                     self.content.finishHide(interactive: false)
                 }
                 self.content.parent = nil
+            }
+            didSet {
+                guard self.content !== oldValue else { return }
                 self._layout.content = UI.Layout.Item(self.content.view)
                 if self.isPresented == true {
                     self._layout.update()
@@ -108,7 +90,7 @@ public extension UI.Container {
             didSet {
                 guard self.safeArea != oldValue else { return }
                 if self.isPresented == true {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -118,16 +100,13 @@ public extension UI.Container {
         
         public init(
             statusBarSubstrate: (IUIView & IUIViewStaticSizeable)? = nil,
-            overlay: IUIRootContentContainer? = nil,
             content: IUIRootContentContainer
         ) {
             self.isPresented = false
             self.statusBarSubstrate = statusBarSubstrate
-            self.overlay = overlay
             self.content = content
             self._layout = Layout(
                 statusBar: statusBarSubstrate.flatMap({ UI.Layout.Item($0) }),
-                overlay: overlay.flatMap({ UI.Layout.Item($0.view) }),
                 content: UI.Layout.Item(content.view)
             )
             self._view = UI.View.Custom()
@@ -139,77 +118,74 @@ public extension UI.Container {
             self._destroy()
         }
         
+        public func apply(contentInset: UI.Container.Inset) {
+            self.content.apply(contentInset: contentInset)
+        }
+        
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            if self.content === container {
+                return .init(self.safeArea)
+            }
+            return .zero
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            let baseInset = UI.Container.Inset(self.safeArea)
+            let contentInset = self.content.contentInset()
+            return baseInset + contentInset
+        }
+        
+        public func refreshParentInset() {
+            self.content.refreshParentInset()
+        }
+        
+        public func refreshContentInset() {
+            self.delegate?.updateContentInset()
+        }
+        
 #if os(iOS)
         
-        public func setNeedUpdateStatusBar() {
+        public func refreshStatusBar() {
             self.delegate?.updateStatusBar()
         }
         
-        public func setNeedUpdateOrientations() {
+        public func refreshOrientations() {
             self.delegate?.updateOrientations()
         }
         
 #endif
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            if self.overlay === container {
-                return self.safeArea
-            } else if self.content === container {
-                return self.safeArea
-            }
-            return .zero
-        }
-        
-        public func didChangeInsets() {
-            self.overlay?.didChangeInsets()
-            self.content.didChangeInsets()
-        }
-        
         public func activate() -> Bool {
-            if let overlay = self.overlay {
-                if overlay.activate() == true {
-                    return true
-                }
-            }
             return self.content.activate()
         }
         
         public func didChangeAppearance() {
-            if let overlay = self.overlay {
-                overlay.didChangeAppearance()
-            }
             self.content.didChangeAppearance()
         }
         
         public func prepareShow(interactive: Bool) {
-            self.overlay?.prepareShow(interactive: interactive)
             self.content.prepareShow(interactive: interactive)
         }
         
         public func finishShow(interactive: Bool) {
             self.isPresented = true
-            self.overlay?.finishShow(interactive: interactive)
             self.content.finishShow(interactive: interactive)
         }
         
         public func cancelShow(interactive: Bool) {
-            self.overlay?.cancelShow(interactive: interactive)
             self.content.cancelShow(interactive: interactive)
         }
         
         public func prepareHide(interactive: Bool) {
-            self.overlay?.prepareHide(interactive: interactive)
             self.content.prepareHide(interactive: interactive)
         }
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
-            self.overlay?.finishHide(interactive: interactive)
             self.content.finishHide(interactive: interactive)
         }
         
         public func cancelHide(interactive: Bool) {
-            self.overlay?.cancelHide(interactive: interactive)
             self.content.cancelHide(interactive: interactive)
         }
         
@@ -220,7 +196,6 @@ public extension UI.Container {
 private extension UI.Container.Root {
     
     func _setup() {
-        self.overlay?.parent = self
         self.content.parent = self
     }
     

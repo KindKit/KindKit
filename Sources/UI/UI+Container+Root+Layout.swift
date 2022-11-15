@@ -16,12 +16,6 @@ extension UI.Container.Root {
                 self.setNeedUpdate()
             }
         }
-        var overlay: UI.Layout.Item? {
-            didSet {
-                guard self.overlay != oldValue else { return }
-                self.setNeedUpdate()
-            }
-        }
         var content: UI.Layout.Item {
             didSet {
                 guard self.content != oldValue else { return }
@@ -31,18 +25,13 @@ extension UI.Container.Root {
         
         init(
             statusBar: UI.Layout.Item?,
-            overlay: UI.Layout.Item?,
             content: UI.Layout.Item
         ) {
             self.statusBar = statusBar
-            self.overlay = overlay
             self.content = content
         }
         
         func layout(bounds: RectFloat) -> SizeFloat {
-            if let overlay = self.overlay {
-                overlay.frame = bounds
-            }
             if let statusBar = self.statusBar {
                 let statusBarSize = statusBar.size(available: SizeFloat(
                     width: bounds.size.width,
@@ -69,9 +58,6 @@ extension UI.Container.Root {
             ]
             if let statusBar = self.statusBar {
                 items.append(statusBar)
-            }
-            if let overlay = self.overlay {
-                items.append(overlay)
             }
             return items
         }

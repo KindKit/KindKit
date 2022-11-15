@@ -152,9 +152,8 @@ extension LogUI {
             self.target.remove(observer: self)
         }
         
-        func didChangeInsets() {
-            let inheritedInsets = self.inheritedInsets()
-            self.view.contentInset = inheritedInsets
+        func apply(inset: UI.Container.Inset) {
+            self.view.contentInset = inset.natural
             self._scrollToBottom()
         }
         

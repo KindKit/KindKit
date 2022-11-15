@@ -31,20 +31,6 @@ public extension UI.Layout {
                 }
             }
         }
-        public var insets: [State : InsetFloat] {
-            return self.data.mapValues({ $0.inset })
-        }
-        public var alignments: [State : Alignment] {
-            return self.data.mapValues({ $0.alignment })
-        }
-        public var items: [State : UI.Layout.Item] {
-            var result: [State : UI.Layout.Item] = [:]
-            for data in self.data {
-                guard let item = data.value.item else { continue }
-                result[data.key] = item
-            }
-            return result
-        }
         public private(set) var data: [State : Data]
         
         private var _internalState: InternalState {
@@ -63,50 +49,6 @@ public extension UI.Layout {
         ) {
             self._internalState = .idle(state: state)
             self.data = data
-        }
-        
-        @inlinable
-        public convenience init(
-            state: State,
-            insets: [State : InsetFloat] = [:],
-            alignments: [State : Alignment] = [:],
-            items: [State : UI.Layout.Item]
-        ) {
-            self.init(
-                state: state,
-                data: [:]
-            )
-            insets.forEach({
-                self.set(state: $0.key, inset: $0.value)
-            })
-            alignments.forEach({
-                self.set(state: $0.key, alignment: $0.value)
-            })
-            items.forEach({
-                self.set(state: $0.key, item: $0.value)
-            })
-        }
-        
-        @inlinable
-        public convenience init(
-            state: State,
-            insets: [State : InsetFloat] = [:],
-            alignments: [State : Alignment] = [:],
-            views: [State : IUIView]
-        ) {
-            self.init(
-                state: state,
-                data: [:]
-            )
-            insets.forEach({
-                self.set(state: $0.key, inset: $0.value)
-            })
-            alignments.forEach({
-                self.set(state: $0.key, alignment: $0.value)
-            })
-            views.forEach({
-                self.set(state: $0.key, view: $0.value)
-            })
         }
         
         deinit {
@@ -416,36 +358,6 @@ public extension IUILayout {
         return .init(
             state: state,
             data: data
-        )
-    }
-    
-    @inlinable
-    static func state< State : Equatable & Hashable >(
-        state: State,
-        insets: [State : InsetFloat] = [:],
-        alignments: [State : UI.Layout.State< State >.Alignment] = [:],
-        items: [State : UI.Layout.Item]
-    ) -> UI.Layout.State< State > {
-        return .init(
-            state: state,
-            insets: insets,
-            alignments: alignments,
-            items: items
-        )
-    }
-    
-    @inlinable
-    static func state< State : Equatable & Hashable >(
-        state: State,
-        insets: [State : InsetFloat] = [:],
-        alignments: [State : UI.Layout.State< State >.Alignment] = [:],
-        views: [State : IUIView]
-    ) -> UI.Layout.State< State > {
-        return .init(
-            state: state,
-            insets: insets,
-            alignments: alignments,
-            views: views
         )
     }
     

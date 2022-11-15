@@ -4,39 +4,39 @@
 
 import Foundation
 
-extension UI.Container.Modal {
+extension UI.Container {
     
-    final class Item {
+    final class ModalItem {
         
-        let owner: AnyObject?
         let container: IUIModalContentContainer
+        let owner: AnyObject?
         let view: UI.View.Mask
-        let item: UI.Layout.Item
+        let viewItem: UI.Layout.Item
         let sheetInset: InsetFloat?
         let sheetBackground: (IUIView & IUIViewAlphable)?
         let sheetBackgroundItem: UI.Layout.Item?
         
         init(
-            owner: AnyObject? = nil,
-            container: IUIModalContentContainer
+            _ container: IUIModalContentContainer,
+            _ owner: AnyObject? = nil
         ) {
-            self.owner = owner
             self.container = container
+            self.owner = owner
             self.view = UI.View.Mask()
                 .content(container.view)
                 .cornerRadius(container.modalCornerRadius)
                 .color(container.modalColor)
-            self.item = UI.Layout.Item(self.view)
+            self.viewItem = UI.Layout.Item(self.view)
             self.sheetInset = container.modalSheetInset
             self.sheetBackground = container.modalSheetBackground
-            self.sheetBackgroundItem = self.sheetBackground.flatMap({ UI.Layout.Item($0) })
+            self.sheetBackgroundItem = container.modalSheetBackground.flatMap({ UI.Layout.Item($0) })
         }
 
     }
     
 }
 
-extension UI.Container.Modal.Item : Hashable {
+extension UI.Container.ModalItem : Hashable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
@@ -44,9 +44,9 @@ extension UI.Container.Modal.Item : Hashable {
     
 }
 
-extension UI.Container.Modal.Item : Equatable {
+extension UI.Container.ModalItem : Equatable {
     
-    static func == (lhs: UI.Container.Modal.Item, rhs: UI.Container.Modal.Item) -> Bool {
+    static func == (lhs: UI.Container.ModalItem, rhs: UI.Container.ModalItem) -> Bool {
         return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
     }
     

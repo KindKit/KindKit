@@ -144,7 +144,7 @@ final class KKScrollView : UIScrollView {
     override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
         
-        self.scrollIndicatorInsets = self._scrollIndicatorInsets()
+        self.scrollIndicatorInsets = self._scrollIndicatorInset()
     }
     
 }
@@ -194,7 +194,7 @@ extension KKScrollView {
     
     func update(contentInset: InsetFloat) {
         self.contentInset = contentInset.uiEdgeInsets
-        self.scrollIndicatorInsets = self._scrollIndicatorInsets()
+        self.scrollIndicatorInsets = self._scrollIndicatorInset()
     }
     
     func update(contentSize: SizeFloat) {
@@ -264,7 +264,7 @@ private extension KKScrollView {
         self.kkDelegate?.triggeredRefresh(self)
     }
     
-    func _scrollIndicatorInsets() -> UIEdgeInsets {
+    func _scrollIndicatorInset() -> UIEdgeInsets {
         let contentInset = self.contentInset
         let safeArea = self.safeAreaInsets
         return UIEdgeInsets(

@@ -61,6 +61,24 @@ public extension Inset {
 public extension Inset {
     
     @inlinable
+    func lerp(_ to: Self, progress: Value) -> Self {
+        let top = self.top.lerp(to.top, progress: progress)
+        let left = self.left.lerp(to.left, progress: progress)
+        let right = self.right.lerp(to.right, progress: progress)
+        let bottom = self.bottom.lerp(to.bottom, progress: progress)
+        return .init(top: top, left: left, right: right, bottom: bottom)
+    }
+    
+    @inlinable
+    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
+        return self.lerp(to, progress: progress.value)
+    }
+    
+}
+
+public extension Inset {
+    
+    @inlinable
     static prefix func - (arg: Self) -> Self {
         return Inset(top: -arg.top, left: -arg.left, right: -arg.right, bottom: -arg.bottom)
     }

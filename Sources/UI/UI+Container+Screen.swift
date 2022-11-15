@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -55,7 +55,7 @@ public extension UI.Container {
         private var _virtualKeyboardHeight: Float = 0 {
             didSet {
                 guard self._virtualKeyboardHeight != oldValue else { return }
-                self.didChangeInsets()
+                self.refreshParentInset()
             }
         }
         private var _virtualKeyboardAnimation: IAnimationTask? {
@@ -78,30 +78,45 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            let inheritedInsets = self.inheritedInsets(interactive: interactive)
+        public func apply(contentInset: UI.Container.Inset) {
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
 #if os(macOS)
-            return inheritedInsets
+            return .zero
 #elseif os(iOS)
             return .init(
-                top: inheritedInsets.top,
-                left: inheritedInsets.left,
-                right: inheritedInsets.right,
-                bottom: max(self._virtualKeyboardHeight, inheritedInsets.bottom)
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: self._virtualKeyboardHeight
             )
 #endif
         }
         
-        public func didChangeInsets() {
-            let inheritedInsets = self.inheritedInsets(interactive: true)
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            let parentInset = self.parentInset()
+#if os(macOS)
+            return parentInset
+#elseif os(iOS)
+            return parentInset.bottom(
+                natural: max(self._virtualKeyboardHeight, parentInset.natural.bottom),
+                interactive: max(self._virtualKeyboardHeight, parentInset.interactive.bottom)
+            )
+#endif
+        }
+        
+        public func refreshParentInset() {
+            let parentInset = self.parentInset()
+            self.refreshContentInset()
             let overlayEdge = self.screen.overlayEdge
             self._layout.inset = .init(
-                top: overlayEdge.contains(.top) == false ? inheritedInsets.top : 0,
-                left: overlayEdge.contains(.left) == false ? inheritedInsets.left : 0,
-                right: overlayEdge.contains(.right) == false ? inheritedInsets.right : 0,
-                bottom: overlayEdge.contains(.bottom) == false ? inheritedInsets.bottom : 0
+                top: overlayEdge.contains(.top) == false ? parentInset.interactive.top : 0,
+                left: overlayEdge.contains(.left) == false ? parentInset.interactive.left : 0,
+                right: overlayEdge.contains(.right) == false ? parentInset.interactive.right : 0,
+                bottom: overlayEdge.contains(.bottom) == false ? parentInset.interactive.bottom : 0
             )
-            self.screen.didChangeInsets()
+            self.screen.apply(inset: parentInset)
         }
         
         public func activate() -> Bool {
@@ -188,7 +203,7 @@ private extension UI.Container.Screen {
                 guard let self = self else { return }
                 self._virtualKeyboardAnimation = nil
                 self._virtualKeyboardHeight = height
-                self.didChangeInsets()
+                self.refreshParentInset()
             }
         )
     }
@@ -328,6 +343,14 @@ extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScre
 }
 
 extension UI.Container.Screen : IUIPushContentContainer where Screen : IUIScreenPushable {
+    
+    public var pushPlacement: UI.Push.Placement {
+        return self.screen.pushPlacement
+    }
+    
+    public var pushOptions: UI.Push.Options {
+        return self.screen.pushOptions
+    }
     
     public var pushDuration: TimeInterval? {
         return self.screen.pushDuration

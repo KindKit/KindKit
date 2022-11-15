@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -48,6 +48,12 @@ public extension UI.Container {
         }
         
         private var _view: UI.View.Rect
+        private var _parentInset: UI.Container.Inset = .zero {
+            didSet {
+                guard self._parentInset != oldValue else { return }
+                self.refreshContentInset()
+            }
+        }
         
         public init(
             _ color: UI.Color = .clear
@@ -57,11 +63,19 @@ public extension UI.Container {
                 .fill(color)
         }
         
-        public func insets(of content: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
+        public func apply(contentInset: UI.Container.Inset) {
         }
         
-        public func didChangeInsets() {
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            return self.parentInset()
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            return .zero
+        }
+        
+        public func refreshParentInset() {
+            self._parentInset = self.parentInset()
         }
         
         public func activate() -> Bool {
@@ -167,8 +181,8 @@ extension UI.Container.None : IUIDialogContentContainer {
 
 extension UI.Container.None : IUIPushContentContainer {
     
-    public var pushDuration: TimeInterval? {
-        return 5
-    }
+    public var pushPlacement: UI.Push.Placement { .top }
+    public var pushOptions: UI.Push.Options { [] }
+    public var pushDuration: TimeInterval? { 5 }
     
 }

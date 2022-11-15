@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -52,14 +52,14 @@ public extension UI.Container {
                 if self.isPresented == true {
                     self._content.prepareHide(interactive: false)
                     self._content.finishHide(interactive: false)
-                    self._content.didChangeInsets()
+                    self._content.refreshParentInset()
                 }
                 self._content.parent = nil
                 self._content = newValue
                 self._content.parent = self
                 self._layout.content = UI.Layout.Item(self._content.view)
                 if self.isPresented == true {
-                    self._content.didChangeInsets()
+                    self._content.refreshParentInset()
                     self._content.prepareShow(interactive: false)
                     self._content.finishShow(interactive: false)
                 }
@@ -75,7 +75,7 @@ public extension UI.Container {
                         case .leading:
                             leading.prepareHide(interactive: false)
                             leading.finishHide(interactive: false)
-                            leading.didChangeInsets()
+                            leading.refreshParentInset()
                         default:
                             break
                         }
@@ -90,7 +90,7 @@ public extension UI.Container {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .leading:
-                            leading.didChangeInsets()
+                            leading.refreshParentInset()
                             leading.prepareShow(interactive: false)
                             leading.finishShow(interactive: false)
                         default:
@@ -116,7 +116,7 @@ public extension UI.Container {
                         case .trailing:
                             trailing.prepareHide(interactive: false)
                             trailing.finishHide(interactive: false)
-                            trailing.didChangeInsets()
+                            trailing.refreshParentInset()
                         default:
                             break
                         }
@@ -131,7 +131,7 @@ public extension UI.Container {
                     if self.isPresented == true {
                         switch self._layout.state {
                         case .trailing:
-                            trailing.didChangeInsets()
+                            trailing.refreshParentInset()
                             trailing.prepareShow(interactive: false)
                             trailing.finishShow(interactive: false)
                         default:
@@ -200,14 +200,40 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            return self.inheritedInsets(interactive: interactive)
+        public func apply(contentInset: UI.Container.Inset) {
+            self._content.apply(contentInset: contentInset)
+            if let container = self._leading {
+                container.apply(contentInset: contentInset)
+            }
+            if let container = self._trailing {
+                container.apply(contentInset: contentInset)
+            }
         }
         
-        public func didChangeInsets() {
-            self._leading?.didChangeInsets()
-            self._content.didChangeInsets()
-            self._trailing?.didChangeInsets()
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            return self.parentInset()
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            let contentInset = self._content.contentInset()
+            switch self._layout.state {
+            case .idle:
+                return contentInset
+            case .leading(let progress):
+                guard let leading = self._leading else { return contentInset }
+                let leadingInset = leading.contentInset()
+                return contentInset.lerp(leadingInset, progress: progress)
+            case .trailing(let progress):
+                guard let trailing = self._trailing else { return contentInset }
+                let trailingInset = trailing.contentInset()
+                return contentInset.lerp(trailingInset, progress: progress)
+            }
+        }
+        
+        public func refreshParentInset() {
+            self._leading?.refreshParentInset()
+            self._content.refreshParentInset()
+            self._trailing?.refreshParentInset()
         }
         
         public func activate() -> Bool {

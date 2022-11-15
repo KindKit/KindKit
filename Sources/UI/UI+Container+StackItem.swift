@@ -4,17 +4,15 @@
 
 import Foundation
 
-extension UI.Container.Stack {
+extension UI.Container {
     
-    final class Item {
+    final class StackItem {
         
         var container: IUIStackContentContainer
         var owner: AnyObject?
-        var view: IUIView {
-            return self.item.view
-        }
-        var item: UI.Layout.Item
-        var bar: UI.Layout.Item {
+        var view: IUIView
+        var viewItem: UI.Layout.Item
+        var barItem: UI.Layout.Item {
             set { self._layout.bar = newValue }
             get { self._layout.bar }
         }
@@ -33,26 +31,27 @@ extension UI.Container.Stack {
         private var _layout: Layout
         
         init(
-            container: IUIStackContentContainer,
-            owner: AnyObject? = nil,
-            insets: InsetFloat = .zero
+            _ container: IUIStackContentContainer,
+            _ owner: AnyObject? = nil,
+            inset: InsetFloat = .zero
         ) {
-            container.stackBar.safeArea(InsetFloat(top: 0, left: insets.left, right: insets.right, bottom: 0))
+            container.stackBar.safeArea(InsetFloat(top: 0, left: inset.left, right: inset.right, bottom: 0))
             self._layout = Layout(
                 bar: UI.Layout.Item(container.stackBar),
                 barVisibility: container.stackBarVisibility,
                 barHidden: container.stackBarHidden,
-                barOffset: insets.top,
+                barOffset: inset.top,
                 content: UI.Layout.Item(container.view)
             )
             self.container = container
             self.owner = owner
-            self.item = UI.Layout.Item(UI.View.Custom().content(self._layout))
+            self.view = UI.View.Custom().content(self._layout)
+            self.viewItem = UI.Layout.Item(self.view)
         }
         
-        func set(insets: InsetFloat) {
-            self.container.stackBar.safeArea(InsetFloat(top: 0, left: insets.left, right: insets.right, bottom: 0))
-            self._layout.barOffset = insets.top
+        func set(inset: InsetFloat) {
+            self.container.stackBar.safeArea(InsetFloat(top: 0, left: inset.left, right: inset.right, bottom: 0))
+            self._layout.barOffset = inset.top
         }
         
         func update() {
@@ -66,3 +65,20 @@ extension UI.Container.Stack {
     }
     
 }
+
+extension UI.Container.StackItem : Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
+    }
+    
+}
+
+extension UI.Container.StackItem : Equatable {
+    
+    static func == (lhs: UI.Container.StackItem, rhs: UI.Container.StackItem) -> Bool {
+        return ObjectIdentifier(lhs) == ObjectIdentifier(rhs)
+    }
+    
+}
+

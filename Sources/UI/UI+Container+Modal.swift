@@ -18,10 +18,10 @@ public extension UI.Container {
                 guard self.parent !== oldValue else { return }
                 if let parent = self.parent {
                     if parent.isPresented == true {
-                        self.didChangeInsets()
+                        self.refreshParentInset()
                     }
                 } else {
-                    self.didChangeInsets()
+                    self.refreshParentInset()
                 }
             }
         }
@@ -59,7 +59,7 @@ public extension UI.Container {
             return self._view
         }
         public var content: (IUIContainer & IUIContainerParentable)? {
-            didSet {
+            willSet {
                 if let content = self.content {
                     if self.isPresented == true {
                         content.prepareHide(interactive: false)
@@ -67,12 +67,14 @@ public extension UI.Container {
                     }
                     content.parent = nil
                 }
+            }
+            didSet {
                 self._layout.content = self.content.flatMap({ UI.Layout.Item($0.view) })
                 if let content = self.content {
                     content.parent = self
                     if self.isPresented == true {
-                        content.prepareHide(interactive: false)
-                        content.finishHide(interactive: false)
+                        content.prepareShow(interactive: false)
+                        content.finishShow(interactive: false)
                     }
                 }
             }
@@ -97,9 +99,9 @@ public extension UI.Container {
         private var _interactiveGesture = UI.Gesture.Pan().enabled(false)
         private var _interactiveBeginLocation: PointFloat?
 #endif
-        private var _items: [Item]
-        private var _previous: Item?
-        private var _current: Item? {
+        private var _items: [UI.Container.ModalItem]
+        private var _previous: UI.Container.ModalItem?
+        private var _current: UI.Container.ModalItem? {
             didSet {
 #if os(iOS)
                 self._interactiveGesture.isEnabled = self._current != nil
@@ -111,7 +113,7 @@ public extension UI.Container {
         }
         
         public init(
-            _ content: (IUIContainer & IUIContainerParentable)? = nil
+            content: (IUIContainer & IUIContainerParentable)? = nil
         ) {
             self.isPresented = false
             self.content = content
@@ -133,21 +135,61 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func insets(of container: IUIContainer, interactive: Bool) -> InsetFloat {
-            let inheritedInsets = self.inheritedInsets(interactive: interactive)
-            if let current = self._current?.container {
-                if current.modalSheetBackground != nil {
-                    return InsetFloat(top: 0, left: inheritedInsets.left, right: inheritedInsets.right, bottom: inheritedInsets.bottom)
-                }
+        public func apply(contentInset: UI.Container.Inset) {
+            for container in self.containers {
+                container.apply(contentInset: contentInset)
             }
-            return inheritedInsets
+            if let content = self.content {
+                content.apply(contentInset: contentInset)
+            }
         }
         
-        public func didChangeInsets() {
-            self._layout.inset = self.inheritedInsets(interactive: false)
-            self.content?.didChangeInsets()
+        public func parentInset(for container: IUIContainer) -> UI.Container.Inset {
+            let parentInset = self.parentInset()
+            if let current = self._current?.container {
+                if current.modalSheetBackground != nil {
+                    return .init(
+                        natural: .init(
+                            top: 0,
+                            left: parentInset.natural.left,
+                            right: parentInset.natural.right,
+                            bottom: parentInset.natural.bottom
+                        ),
+                        interactive: .init(
+                            top: 0,
+                            left: parentInset.interactive.left,
+                            right: parentInset.interactive.right,
+                            bottom: parentInset.interactive.bottom
+                        )
+                    )
+                }
+            }
+            return parentInset
+        }
+        
+        public func contentInset() -> UI.Container.Inset {
+            guard let content = self.content else { return .zero }
+            let contentInset = content.contentInset()
+            switch self._layout.state {
+            case .empty:
+                return contentInset
+            case .idle(let modal):
+                return modal.container.contentInset()
+            case .present(let modal, let progress):
+                let modalInset = modal.container.contentInset()
+                return contentInset.lerp(modalInset, progress: progress)
+            case .dismiss(let modal, let progress):
+                let modalInset = modal.container.contentInset()
+                return modalInset.lerp(contentInset, progress: progress)
+            }
+        }
+        
+        public func refreshParentInset() {
+            let parentInset = self.parentInset()
+            self._layout.inset = parentInset.natural
+            self.content?.refreshParentInset()
             for container in self.containers {
-                container.didChangeInsets()
+                container.refreshParentInset()
             }
         }
         
@@ -206,7 +248,7 @@ public extension UI.Container {
         
         public func present(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?) {
             container.parent = self
-            let item = Item(container: container)
+            let item = UI.Container.ModalItem(container)
             self._items.append(item)
             if self._current == nil {
                 self._present(modal: item, animated: animated, completion: completion)
@@ -217,7 +259,7 @@ public extension UI.Container {
         
         public func present< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer {
             wireframe.container.parent = self
-            let item = Item(owner: wireframe, container: wireframe.container)
+            let item = UI.Container.ModalItem(wireframe.container, wireframe)
             self._items.append(item)
             if self._current == nil {
                 self._present(modal: item, animated: animated, completion: completion)
@@ -260,26 +302,27 @@ extension UI.Container.Modal : IUIRootContentContainer {
 private extension UI.Container.Modal {
     
     func _setup() {
+        self._view.onHit(self, {
+            guard let current = $0._current else { return false }
+            guard current.container.shouldInteractive == true else { return false }
+            return current.container.view.isContains($1, from: $0._view)
+        })
 #if os(iOS)
         self._interactiveGesture
-            .onShouldRequireFailure(self, {
-                guard let view = $1.view else { return false }
-                if let container = $0._current?.container {
-                    return container.view.native.kk_isChild(of: view, recursive: true)
-                }
-                return false
-            })
-            .onShouldBeRequiredToFailBy(self, {
-                guard let view = $1.view else { return false }
-                if let container = $0.content {
-                    return container.view.native.kk_isChild(of: view, recursive: true)
-                }
-                return false
-            })
             .onShouldBegin(self, {
                 guard let current = $0._current else { return false }
                 guard current.container.shouldInteractive == true else { return false }
                 return $0._interactiveGesture.contains(in: current.container.view)
+            })
+            .onShouldRequireFailure(self, {
+                guard let view = $1.view else { return false }
+                guard let current = $0._current else { return false }
+                return current.container.view.native.kk_isChild(of: view, recursive: true)
+            })
+            .onShouldBeRequiredToFailBy(self, {
+                guard let view = $1.view else { return false }
+                guard let current = $0._current else { return false }
+                return current.container.view.native.kk_isChild(of: view, recursive: true)
             })
             .onBegin(self, { $0._beginInteractiveGesture() })
             .onChange(self, { $0._changeInteractiveGesture() })
@@ -293,7 +336,7 @@ private extension UI.Container.Modal {
         self._animation = nil
     }
     
-    func _present(current: Item?, next: Item, animated: Bool, completion: (() -> Void)?) {
+    func _present(current: UI.Container.ModalItem?, next: UI.Container.ModalItem, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
             self._dismiss(modal: current, animated: animated, completion: { [weak self] in
                 guard let self = self else { return }
@@ -304,39 +347,37 @@ private extension UI.Container.Modal {
         }
     }
     
-    func _present(modal: Item, animated: Bool, completion: (() -> Void)?) {
+    func _present(modal: UI.Container.ModalItem, animated: Bool, completion: (() -> Void)?) {
         self._current = modal
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
                 preparing: { [weak self] in
                     guard let self = self else { return }
                     self._layout.state = .present(modal: modal, progress: .zero)
-                    if self.isPresented == true {
-                        modal.container.didChangeInsets()
-                        modal.container.prepareShow(interactive: false)
-                    }
+                    modal.container.refreshParentInset()
+                    modal.container.prepareShow(interactive: false)
                 },
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._layout.state = .present(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .idle(modal: modal)
-                    if self.isPresented == true {
-                        modal.container.finishShow(interactive: false)
-                    }
+                    modal.container.finishShow(interactive: false)
+                    self.refreshContentInset()
                     completion?()
                 }
             )
         } else {
             self._layout.state = .idle(modal: modal)
+            self.refreshContentInset()
             if self.isPresented == true {
-                modal.container.didChangeInsets()
                 modal.container.prepareShow(interactive: false)
                 modal.container.finishShow(interactive: false)
             }
@@ -344,7 +385,7 @@ private extension UI.Container.Modal {
         }
     }
     
-    func _dismiss(current: Item, previous: Item?, animated: Bool, completion: (() -> Void)?) {
+    func _dismiss(current: UI.Container.ModalItem, previous: UI.Container.ModalItem?, animated: Bool, completion: (() -> Void)?) {
         self._dismiss(modal: current, animated: animated, completion: { [weak self] in
             guard let self = self else { return }
             self._current = previous
@@ -356,9 +397,9 @@ private extension UI.Container.Modal {
         })
     }
     
-    func _dismiss(modal: Item, animated: Bool, completion: (() -> Void)?) {
+    func _dismiss(modal: UI.Container.ModalItem, animated: Bool, completion: (() -> Void)?) {
         modal.container.prepareHide(interactive: false)
-        if animated == true {
+        if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 duration: TimeInterval(self._view.bounds.size.height / self.animationVelocity),
                 ease: Animation.Ease.QuadraticInOut(),
@@ -366,18 +407,23 @@ private extension UI.Container.Modal {
                     guard let self = self else { return }
                     self._layout.state = .dismiss(modal: modal, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._layout.state = .empty
                     modal.container.finishHide(interactive: false)
+                    self.refreshContentInset()
                     completion?()
                 }
             )
         } else {
-            modal.container.finishHide(interactive: false)
             self._layout.state = .empty
+            if self.isPresented == true {
+                modal.container.finishHide(interactive: false)
+            }
+            self.refreshContentInset()
             completion?()
         }
     }
@@ -395,7 +441,8 @@ private extension UI.Container.Modal {
     }
     
     func _changeInteractiveGesture() {
-        guard let beginLocation = self._interactiveBeginLocation, let current = self._current else { return }
+        guard let current = self._current else { return }
+        guard let beginLocation = self._interactiveBeginLocation else { return }
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation > 0 {
@@ -404,10 +451,12 @@ private extension UI.Container.Modal {
         } else {
             self._layout.state = .idle(modal: current)
         }
+        current.container.refreshParentInset()
     }
     
     func _endInteractiveGesture(_ canceled: Bool) {
-        guard let beginLocation = self._interactiveBeginLocation, let current = self._current else { return }
+        guard let current = self._current else { return }
+        guard let beginLocation = self._interactiveBeginLocation else { return }
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = currentLocation.y - beginLocation.y
         if deltaLocation > self.interactiveLimit {
@@ -419,6 +468,7 @@ private extension UI.Container.Modal {
                     guard let self = self else { return }
                     self._layout.state = .dismiss(modal: current, progress: progress)
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -434,6 +484,7 @@ private extension UI.Container.Modal {
                     guard let self = self else { return }
                     self._layout.state = .present(modal: current, progress: .one + (baseProgress - (baseProgress * progress)))
                     self._layout.updateIfNeeded()
+                    self.refreshContentInset()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -466,6 +517,7 @@ private extension UI.Container.Modal {
             self._current = nil
             self._layout.state = .empty
         }
+        self.refreshContentInset()
     }
     
     func _cancelInteractiveAnimation() {
@@ -477,6 +529,7 @@ private extension UI.Container.Modal {
         } else {
             self._layout.state = .empty
         }
+        self.refreshContentInset()
     }
     
 }

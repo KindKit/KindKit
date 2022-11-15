@@ -24,24 +24,24 @@ extension UI.Container.Stack {
         func layout(bounds: RectFloat) -> SizeFloat {
             switch self.state {
             case .idle(let current):
-                let currentSize = self._size(item: current, available: bounds.size)
-                current.frame = Rect(topLeft: bounds.topLeft, size: currentSize)
+                let currentSize = current.viewItem.size(available: bounds.size)
+                current.viewItem.frame = Rect(topLeft: bounds.topLeft, size: currentSize)
             case .push(let current, let forward, let progress):
-                let currentSize = self._size(item: current, available: bounds.size)
+                let currentSize = current.viewItem.size(available: bounds.size)
                 let currentRect = Rect(topLeft: bounds.topLeft, size: currentSize)
-                let forwardSize = self._size(item: forward, available: bounds.size)
+                let forwardSize = forward.viewItem.size(available: bounds.size)
                 let forwardRect = Rect(topLeft: currentRect.topRight, size: forwardSize)
                 let backwardRect = RectFloat(left: currentRect)
-                current.frame = currentRect.lerp(backwardRect, progress: progress)
-                forward.frame = forwardRect.lerp(currentRect, progress: progress)
+                current.viewItem.frame = currentRect.lerp(backwardRect, progress: progress)
+                forward.viewItem.frame = forwardRect.lerp(currentRect, progress: progress)
             case .pop(let backward, let current, let progress):
-                let currentSize = self._size(item: current, available: bounds.size)
+                let currentSize = current.viewItem.size(available: bounds.size)
                 let currentRect = Rect(topLeft: bounds.topLeft, size: currentSize)
-                let backwardSize = self._size(item: backward, available: bounds.size)
+                let backwardSize = backward.viewItem.size(available: bounds.size)
                 let backwardRect = Rect(topRight: currentRect.topLeft, size: backwardSize)
                 let forwardRect = RectFloat(right: currentRect)
-                current.frame = currentRect.lerp(forwardRect, progress: progress)
-                backward.frame = backwardRect.lerp(currentRect, progress: progress)
+                current.viewItem.frame = currentRect.lerp(forwardRect, progress: progress)
+                backward.viewItem.frame = backwardRect.lerp(currentRect, progress: progress)
             }
             return bounds.size
         }
@@ -49,35 +49,26 @@ extension UI.Container.Stack {
         func size(available: SizeFloat) -> SizeFloat {
             switch self.state {
             case .idle(let current):
-                return self._size(item: current, available: available)
+                return current.viewItem.size(available: available)
             case .push(let current, let forward, let progress):
-                let currentSize = self._size(item: current, available: available)
-                let forwardSize = self._size(item: forward, available: available)
+                let currentSize = current.viewItem.size(available: available)
+                let forwardSize = forward.viewItem.size(available: available)
                 return currentSize.lerp(forwardSize, progress: progress)
             case .pop(let backward, let current, let progress):
-                let backwardSize = self._size(item: backward, available: available)
-                let currentSize = self._size(item: current, available: available)
+                let backwardSize = backward.viewItem.size(available: available)
+                let currentSize = current.viewItem.size(available: available)
                 return currentSize.lerp(backwardSize, progress: progress)
             }
         }
         
         func items(bounds: RectFloat) -> [UI.Layout.Item] {
             switch self.state {
-            case .idle(let current): return [ current ]
-            case .push(let current, let forward, _): return [ current, forward ]
-            case .pop(let backward, let current, _): return [ backward, current ]
+            case .idle(let current): return [ current.viewItem ]
+            case .push(let current, let forward, _): return [ current.viewItem, forward.viewItem ]
+            case .pop(let backward, let current, _): return [ backward.viewItem, current.viewItem ]
             }
         }
         
-    }
-    
-}
-
-private extension UI.Container.Stack.Layout {
-    
-    @inline(__always)
-    func _size(item: UI.Layout.Item, available: SizeFloat) -> SizeFloat {
-        return item.size(available: available)
     }
     
 }

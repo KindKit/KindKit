@@ -23,20 +23,24 @@ public extension IUIContainerParentable where Self : IUIContainer {
     
 #endif
     
-    func inheritedInsets(interactive: Bool) -> InsetFloat {
+    func parentInset() -> UI.Container.Inset {
         guard let parent = self.parent else { return .zero }
         self.view.layoutIfNeeded()
-        return parent.insets(of: self, interactive: interactive)
+        return parent.parentInset(for: self)
+    }
+    
+    func refreshContentInset() {
+        self.parent?.refreshContentInset()
     }
     
 #if os(iOS)
     
-    func setNeedUpdateStatusBar() {
-        self.parent?.setNeedUpdateStatusBar()
+    func refreshStatusBar() {
+        self.parent?.refreshStatusBar()
     }
     
-    func setNeedUpdateOrientations() {
-        self.parent?.setNeedUpdateOrientations()
+    func refreshOrientations() {
+        self.parent?.refreshOrientations()
     }
     
 #endif

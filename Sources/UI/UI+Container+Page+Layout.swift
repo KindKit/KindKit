@@ -73,13 +73,13 @@ extension UI.Container.Page {
             case .empty:
                 break
             case .idle(let current):
-                current.frame = bounds
+                current.viewItem.frame = bounds
             case .forward(let current, let next, let progress):
-                current.frame = currentFrame.lerp(backwardFrame, progress: progress)
-                next.frame = forwardFrame.lerp(currentFrame, progress: progress)
+                current.viewItem.frame = currentFrame.lerp(backwardFrame, progress: progress)
+                next.viewItem.frame = forwardFrame.lerp(currentFrame, progress: progress)
             case .backward(let current, let next, let progress):
-                current.frame = currentFrame.lerp(forwardFrame, progress: progress)
-                next.frame = backwardFrame.lerp(currentFrame, progress: progress)
+                current.viewItem.frame = currentFrame.lerp(forwardFrame, progress: progress)
+                next.viewItem.frame = backwardFrame.lerp(currentFrame, progress: progress)
             }
             return bounds.size
         }
@@ -96,11 +96,11 @@ extension UI.Container.Page {
             switch self.state {
             case .empty: break
             case .idle(let current):
-                items.insert(current, at: 0)
+                items.insert(current.viewItem, at: 0)
             case .forward(let current, let next, _):
-                items.insert(contentsOf: [ current, next ], at: 0)
+                items.insert(contentsOf: [ current.viewItem, next.viewItem ], at: 0)
             case .backward(let current, let next, _):
-                items.insert(contentsOf: [ next, current ], at: 0)
+                items.insert(contentsOf: [ next.viewItem, current.viewItem ], at: 0)
             }
             return items
         }

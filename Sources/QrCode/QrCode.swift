@@ -21,7 +21,7 @@ public struct QrCode {
     public func generate(
         color: UI.Color,
         backgroundColor: UI.Color,
-        insets: InsetFloat,
+        inset: InsetFloat,
         size: SizeFloat
     ) -> UI.Image? {
         guard let qrFilter = CIFilter(name: "CIRCodeGenerator") else {
@@ -49,12 +49,12 @@ public struct QrCode {
         else {
             return nil
         }
-        guard let context = CGContext(data: nil, width: Int(size.width + insets.left + insets.right), height: Int(size.height + insets.top + insets.bottom), bitsPerComponent: qrCodeCgImage.bitsPerComponent, bytesPerRow: 0, space: qrCodeCgColorSpace, bitmapInfo: qrCodeCgImage.bitmapInfo.rawValue) else {
+        guard let context = CGContext(data: nil, width: Int(size.width + inset.left + inset.right), height: Int(size.height + inset.top + inset.bottom), bitsPerComponent: qrCodeCgImage.bitsPerComponent, bytesPerRow: 0, space: qrCodeCgColorSpace, bitmapInfo: qrCodeCgImage.bitmapInfo.rawValue) else {
             return nil
         }
         context.setFillColor(backgroundColor.cgColor)
         context.fill(CGRect(x: 0, y: 0, width: CGFloat(context.width), height: CGFloat(context.height)))
-        context.draw(qrCodeCgImage, in: CGRect(x: CGFloat(insets.left), y: CGFloat(insets.bottom), width: CGFloat(size.width), height: CGFloat(size.height)))
+        context.draw(qrCodeCgImage, in: CGRect(x: CGFloat(inset.left), y: CGFloat(inset.bottom), width: CGFloat(size.width), height: CGFloat(size.height)))
         guard let cgImage = context.makeImage() else {
             return nil
         }

@@ -37,12 +37,43 @@ public protocol IUIScreen : AnyObject {
 
 public extension IUIScreen {
     
+    var isPresented: Bool {
+        return self.container?.isPresented ?? false
+    }
+    
     var shouldInteractive: Bool {
         return true
     }
     
-    var isPresented: Bool {
-        return self.container?.isPresented ?? false
+#if os(iOS)
+    
+    var uiViewController: UIViewController? {
+        return self.container?.uiViewController
+    }
+    
+    var statusBar: UIStatusBarStyle {
+        return .default
+    }
+    
+    var statusBarAnimation: UIStatusBarAnimation {
+        return .fade
+    }
+    
+    var statusBarHidden: Bool {
+        return false
+    }
+    
+    var supportedOrientations: UIInterfaceOrientationMask {
+        return .all
+    }
+    
+#endif
+    
+    var inset: UI.Container.Inset {
+        guard let parentInset = self.container?.parentInset() else {
+            return .zero
+        }
+        return parentInset
     }
     
     func setup() {
@@ -75,43 +106,15 @@ public extension IUIScreen {
     
     func cancelHide(interactive: Bool) {
     }
-    
-}
-
-public extension IUIScreen {
-    
-    func inheritedInsets(interactive: Bool = false) -> InsetFloat {
-        return self.container?.inheritedInsets(interactive: interactive) ?? .zero
-    }
 
 #if os(iOS)
     
-    var uiViewController: UIViewController? {
-        return self.container?.uiViewController
+    func refreshStatusBar() {
+        self.container?.refreshStatusBar()
     }
     
-    var statusBar: UIStatusBarStyle {
-        return .default
-    }
-    
-    var statusBarAnimation: UIStatusBarAnimation {
-        return .fade
-    }
-    
-    var statusBarHidden: Bool {
-        return false
-    }
-    
-    var supportedOrientations: UIInterfaceOrientationMask {
-        return .all
-    }
-    
-    func setNeedUpdateStatusBar() {
-        self.container?.setNeedUpdateStatusBar()
-    }
-    
-    func setNeedUpdateOrientations() {
-        self.container?.setNeedUpdateOrientations()
+    func refreshOrientations() {
+        self.container?.refreshOrientations()
     }
     
     @discardableResult
