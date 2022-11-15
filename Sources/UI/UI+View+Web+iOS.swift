@@ -172,6 +172,10 @@ extension KKWebView : WKNavigationDelegate {
         }
     }
     
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        self.kkDelegate?.endLoading(self, error: error)
+    }
+    
 }
 
 extension KKWebView : WKUIDelegate {
