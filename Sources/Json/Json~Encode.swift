@@ -81,13 +81,13 @@ public extension Json {
             for item in value {
                 guard let key = try? keyEncoder.encode(item.key) else { continue }
                 guard let value = try? valueEncoder.encode(item.value) else { continue }
-                jsonValue.setObject(key, forKey: value as! NSCopying)
+                jsonValue.setObject(value, forKey: key as! NSCopying)
             }
         } else {
             for item in value {
                 let key = try keyEncoder.encode(item.key)
                 let value = try valueEncoder.encode(item.value)
-                jsonValue.setObject(key, forKey: value as! NSCopying)
+                jsonValue.setObject(value, forKey: key as! NSCopying)
             }
         }
         try self.set(value: jsonValue)
@@ -216,13 +216,13 @@ public extension Json {
             for item in value {
                 guard let key = try? keyEncoder.encode(item.key) else { continue }
                 guard let value = try? valueEncoder.encode(item.value) else { continue }
-                jsonValue.setObject(key, forKey: value as! NSCopying)
+                jsonValue.setObject(value, forKey: key as! NSCopying)
             }
         } else {
             for item in value {
                 let key = try keyEncoder.encode(item.key)
                 let value = try valueEncoder.encode(item.value)
-                jsonValue.setObject(key, forKey: value as! NSCopying)
+                jsonValue.setObject(value, forKey: key as! NSCopying)
             }
         }
         try self.set(value: jsonValue, path: path)

@@ -353,6 +353,13 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
+    func delaysContentTouches(_ value: Bool) -> Self {
+        self.delaysContentTouches = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
     func refreshColor(_ value: UI.Color?) -> Self {
         self.refreshColor = value
         return self

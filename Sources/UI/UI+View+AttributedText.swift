@@ -141,6 +141,52 @@ public extension UI.View.AttributedText {
     
 }
 
+public extension UI.View.AttributedText {
+    
+    @inlinable
+    @discardableResult
+    func onTap(_ closure: (() -> Void)?) -> Self {
+        self.onTap.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTap(_ closure: ((Self) -> Void)?) -> Self {
+        self.onTap.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTap(_ closure: (([NSAttributedString.Key: Any]?) -> Void)?) -> Self {
+        self.onTap.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTap(_ closure: ((Self, [NSAttributedString.Key: Any]?) -> Void)?) -> Self {
+        self.onTap.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTap< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onTap.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onTap< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, [NSAttributedString.Key: Any]?) -> Void)?) -> Self {
+        self.onTap.link(sender, closure)
+        return self
+    }
+    
+}
+
 extension UI.View.AttributedText : IUIView {
     
     public var native: NativeView {

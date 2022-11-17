@@ -83,6 +83,7 @@ public extension UI.View {
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         
         public init() {
+            self.layout.view = self
         }
         
         deinit {
