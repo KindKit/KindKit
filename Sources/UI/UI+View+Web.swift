@@ -130,6 +130,12 @@ public extension UI.View.Web {
         self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
     }
     
+    func reload() {
+        if self.isLoaded == true {
+            self._view.update(request: self.request)
+        }
+    }
+    
 }
 
 public extension UI.View.Web {
