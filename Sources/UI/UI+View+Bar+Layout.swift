@@ -73,8 +73,10 @@ extension UI.View.Bar {
                     height: contentHeight
                 )
                 self.background.frame = RectFloat(
-                    topLeft: bounds.topLeft,
-                    bottomRight: self.content.frame.bottomRight
+                    x: bounds.x,
+                    y: bounds.y,
+                    width: bounds.width,
+                    height: bounds.height - separatorHeight
                 )
                 return Size(
                     width: bounds.width,
@@ -111,8 +113,10 @@ extension UI.View.Bar {
                     height: contentHeight
                 )
                 self.background.frame = RectFloat(
-                    topLeft: self.content.frame.topLeft,
-                    bottomRight: bounds.bottomRight
+                    x: bounds.x,
+                    y: bounds.y + separatorHeight,
+                    width: bounds.width,
+                    height: bounds.height - separatorHeight
                 )
                 return Size(
                     width: bounds.width,

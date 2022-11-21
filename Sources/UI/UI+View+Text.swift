@@ -10,7 +10,7 @@ public extension UI.View {
         
         public private(set) weak var appearedLayout: IUILayout?
         public weak var appearedItem: UI.Layout.Item?
-        public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
+        public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
@@ -202,9 +202,27 @@ extension UI.View.Text : IUIView {
         }
         let size = self.size.apply(
             available: available,
-            sizeWithWidth: { self.text.kk_size(font: self.textFont, available: .init(width: $0, height: .infinity)) },
-            sizeWithHeight: { self.text.kk_size(font: self.textFont, available: .init(width: .infinity, height: $0)) },
-            size: { self.text.kk_size(font: self.textFont, available: available) }
+            sizeWithWidth: {
+                self.text.kk_size(
+                    font: self.textFont,
+                    numberOfLines: self.numberOfLines,
+                    available: .init(width: $0, height: .infinity)
+                )
+            },
+            sizeWithHeight: {
+                self.text.kk_size(
+                    font: self.textFont,
+                    numberOfLines: self.numberOfLines,
+                    available: .init(width: .infinity, height: $0)
+                )
+            },
+            size: {
+                self.text.kk_size(
+                    font: self.textFont,
+                    numberOfLines: self.numberOfLines,
+                    available: available
+                )
+            }
         )
         self._cacheAvailable = available
         self._cacheSize = size

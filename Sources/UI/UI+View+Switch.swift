@@ -16,7 +16,7 @@ public extension UI.View {
         
         public private(set) weak var appearedLayout: IUILayout?
         public weak var appearedItem: UI.Layout.Item?
-        public var size: UI.Size.Static = .init(width: .fixed(51), height: .fixed(31)) {
+        public var size: UI.Size.Static = .init(.fixed(51), .fixed(31)) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()

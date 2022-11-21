@@ -15,12 +15,12 @@ public final class Animation {
     public static let `default` = Animation()
     
     private var _tasks: [Task]
-    private var _displayLink: DisplayLink!
+    private var _displayLink: DisplayLink
     
     private init() {
         self._tasks = []
         self._displayLink = DisplayLink()
-        self._displayLink?.delegate = self
+        self._displayLink.delegate = self
     }
     
     deinit {

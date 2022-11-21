@@ -9,7 +9,7 @@ public extension UI.View {
     final class Button : IUIWidgetView {
         
         public private(set) var body: UI.View.Control
-        public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
+        public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()

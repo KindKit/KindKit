@@ -22,7 +22,7 @@ public extension UI.View.Input {
         
         public private(set) weak var appearedLayout: IUILayout?
         public weak var appearedItem: UI.Layout.Item?
-        public var size: UI.Size.Static = .init(width: .fill, height: .fixed(64)) {
+        public var size: UI.Size.Static = .init(.fill, .fixed(64)) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()

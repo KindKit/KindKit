@@ -37,7 +37,7 @@ public extension IUIViewDynamicSizeable {
     @inlinable
     @discardableResult
     func size(_ width: UI.Size.Dynamic.Dimension, _ height: UI.Size.Dynamic.Dimension) -> Self {
-        self.size = .init(width: width, height: height)
+        self.size = .init(width, height)
         return self
     }
     

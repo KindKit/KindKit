@@ -13,49 +13,68 @@ public extension Animation {
         weak var delegate: IAnimationQueueDelegate?
         
         var isRunning: Bool {
-            return CVDisplayLinkIsRunning(self._displayLink)
+            guard let instance = self._instance else { return false }
+            return CVDisplayLinkIsRunning(instance)
         }
         
-        fileprivate var _displayLink: CVDisplayLink!
-        fileprivate var _prevTime: CVTimeStamp!
-        
-        init?() {
-            guard CVDisplayLinkCreateWithActiveCGDisplays(&self._displayLink) == kCVReturnSuccess else {
-                return nil
-            }
-            guard CVDisplayLinkSetOutputCallback(self._displayLink!, AnimationDisplayLinkCallback, Unmanaged.passUnretained(self).toOpaque()) == kCVReturnSuccess else {
-                return nil
-            }
-            guard CVDisplayLinkSetCurrentCGDisplay(self._displayLink!, CGMainDisplayID()) == kCVReturnSuccess else {
-                return nil
-            }
-            guard CVDisplayLinkGetCurrentTime(self._displayLink!, &self._prevTime) == kCVReturnSuccess else {
-                return nil
-            }
-        }
+        fileprivate var _instance: CVDisplayLink?
         
         deinit {
             self.stop()
         }
         
         func start() {
-            CVDisplayLinkStart(self._displayLink)
+            if self._instance == nil {
+                self._instance = self._makeInstance()
+            }
+            if let instance = self._instance {
+                CVDisplayLinkStart(instance)
+            }
         }
         
         func stop() {
-            CVDisplayLinkStop(self._displayLink)
+            guard let instance = self._instance else { return }
+            CVDisplayLinkStop(instance)
         }
         
     }
     
 }
 
-fileprivate func AnimationDisplayLinkCallback(_ displayLink: CVDisplayLink, _ nowTime: UnsafePointer< CVTimeStamp >, _ outputTime: UnsafePointer< CVTimeStamp >, _ flagsIn: CVOptionFlags, _ flagsOut: UnsafeMutablePointer< CVOptionFlags >, _ context: UnsafeMutableRawPointer?) -> CVReturn {
+private extension Animation.DisplayLink {
+    
+    func _makeInstance() -> CVDisplayLink? {
+        var displayLink: CVDisplayLink!
+        guard CVDisplayLinkCreateWithActiveCGDisplays(&displayLink) == kCVReturnSuccess else {
+            return nil
+        }
+        guard CVDisplayLinkSetOutputCallback(displayLink!, AnimationDisplayLinkCallback, Unmanaged.passUnretained(self).toOpaque()) == kCVReturnSuccess else {
+            return nil
+        }
+        guard CVDisplayLinkSetCurrentCGDisplay(displayLink!, CGMainDisplayID()) == kCVReturnSuccess else {
+            return nil
+        }
+        return displayLink
+    }
+    
+}
+
+fileprivate func AnimationDisplayLinkCallback(
+    _ displayLink: CVDisplayLink,
+    _ nowTime: UnsafePointer< CVTimeStamp >,
+    _ outputTime: UnsafePointer< CVTimeStamp >,
+    _ flagsIn: CVOptionFlags,
+    _ flagsOut: UnsafeMutablePointer< CVOptionFlags >,
+    _ context: UnsafeMutableRawPointer?
+) -> CVReturn {
     guard let context = context else { return kCVReturnSuccess }
-    let displayLink = Unmanaged< Animation.DisplayLink >.fromOpaque(context).takeRetainedValue()
-    let delta = TimeInterval(outputTime.pointee.videoTime - displayLink._prevTime.videoTime) / TimeInterval(outputTime.pointee.videoTimeScale)
-    displayLink._prevTime = outputTime.pointee
-    displayLink.delegate?.update(delta)
+    let displayLink = Unmanaged< Animation.DisplayLink >.fromOpaque(context).takeUnretainedValue()
+    let timeScale = TimeInterval(outputTime.pointee.videoTimeScale)
+    let refreshPeriod = TimeInterval(outputTime.pointee.videoRefreshPeriod)
+    let delta = 1 / (timeScale / refreshPeriod)
+    DispatchQueue.main.async(execute: {
+        displayLink.delegate?.update(delta)
+    })
     return kCVReturnSuccess
 }
 

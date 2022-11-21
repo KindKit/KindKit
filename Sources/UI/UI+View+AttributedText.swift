@@ -17,7 +17,7 @@ public extension UI.View {
         
         public private(set) weak var appearedLayout: IUILayout?
         public weak var appearedItem: UI.Layout.Item?
-        public var size: UI.Size.Dynamic = .init(width: .fit, height: .fit) {
+        public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
                 self._cacheAvailable = nil
@@ -220,15 +220,24 @@ extension UI.View.AttributedText : IUIView {
             available: available,
             sizeWithWidth: {
                 guard let text = self.text else { return .init(width: $0, height: 0) }
-                return text.kk_size(available: .init(width: $0, height: .infinity))
+                return text.kk_size(
+                    numberOfLines: self.numberOfLines,
+                    available: .init(width: $0, height: .infinity)
+                )
             },
             sizeWithHeight: {
                 guard let text = self.text else { return .init(width: 0, height: $0) }
-                return text.kk_size(available: .init(width: .infinity, height: $0))
+                return text.kk_size(
+                    numberOfLines: self.numberOfLines,
+                    available: .init(width: .infinity, height: $0)
+                )
             },
             size: {
                 guard let text = self.text else { return .zero }
-                return text.kk_size(available: available)
+                return text.kk_size(
+                    numberOfLines: self.numberOfLines,
+                    available: available
+                )
             }
         )
         self._cacheAvailable = available

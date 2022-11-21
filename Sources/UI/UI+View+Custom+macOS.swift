@@ -39,6 +39,20 @@ final class KKCustomView : NSView {
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }
+    override var frame: CGRect {
+        set {
+            let oldValue = super.frame
+            if oldValue != newValue {
+                super.frame = newValue
+                if oldValue.size != newValue.size {
+                    if self.window != nil {
+                        self._layoutManager.invalidate()
+                    }
+                }
+            }
+        }
+        get { super.frame }
+    }
     override var isFlipped: Bool {
         return true
     }

@@ -80,10 +80,8 @@ final class KKScrollView : UIScrollView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        if #available(iOS 11.0, *) {
-            self.contentInsetAdjustmentBehavior = .never
-        }
+        
+        self.contentInsetAdjustmentBehavior = .never
         self.clipsToBounds = true
         self.delegate = self
         

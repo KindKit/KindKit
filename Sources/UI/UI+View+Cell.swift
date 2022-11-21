@@ -33,9 +33,7 @@ public extension UI.View {
             }
             get { self._isSelected }
         }
-#if os(iOS)
         public let pressedGesture = UI.Gesture.Tap()
-#endif
         public let onPressed: Signal.Empty< Void > = .init()
         
         private var _isSelected: Bool = false
@@ -45,9 +43,7 @@ public extension UI.View {
             self._layout = Layout()
             self.body = UI.View.Custom()
                 .content(self._layout)
-#if os(iOS)
                 .gestures([ self.pressedGesture ])
-#endif
                 .shouldHighlighting(true)
             self._setup()
         }
@@ -77,11 +73,9 @@ public extension UI.View.Cell {
 private extension UI.View.Cell {
     
     func _setup() {
-#if os(iOS)
         self.pressedGesture
             .onShouldBegin(self, { $0.shouldPressed })
             .onTriggered(self, { $0.onPressed.emit() })
-#endif
     }
     
 }

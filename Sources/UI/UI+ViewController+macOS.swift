@@ -127,12 +127,18 @@ public extension UI {
 }
 
 extension UI.ViewController : IRootContainerDelegate {
+    
+    public func updateContentInset() {
+        let contentInset = self.container.contentInset()
+        self.container.apply(contentInset: contentInset)
+    }
+    
 }
 
 extension UI.ViewController : IContainerBarControllerObserver {
     
     public func changed(_ barController: UI.Container.BarController) {
-        self.container.didChangeInset()
+        self.container.refreshParentInset()
     }
     
 }

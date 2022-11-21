@@ -63,7 +63,7 @@ extension UI.Layout.Composition.VFlow : IUICompositionLayoutEntity {
                 let newItems = items + [ item ]
                 let newItemsSize = self._size(newItems)
                 if newItemsSize.width >= bounds.width {
-                    let layoutSize = self._layout(items, itemsSize, itemRange, line)
+                    let layoutSize = self._layout(items, itemsSize, itemRange, bounds.y + line)
                     line += layoutSize.height + self.lineSpacing
                     itemsSize = item.size
                     items = [ item ]
@@ -74,7 +74,7 @@ extension UI.Layout.Composition.VFlow : IUICompositionLayoutEntity {
             }
         }
         if items.count > 0 {
-            let layoutSize = self._layout(items, itemsSize, itemRange, line)
+            let layoutSize = self._layout(items, itemsSize, itemRange, bounds.y + line)
             line += layoutSize.height + self.lineSpacing
         }
         if line > 0 {
@@ -165,7 +165,7 @@ private extension UI.Layout.Composition.VFlow {
                 offset += item.size.width + self.entitySpacing
             }
         case .center:
-            var offset = bounds.lowerBound
+            var offset: Float = 0
             let center = bounds.lowerBound + ((bounds.upperBound - bounds.lowerBound) / 2)
             let itemsCenter = itemsSize.width / 2
             for item in items {

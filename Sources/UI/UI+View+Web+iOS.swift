@@ -37,15 +37,24 @@ extension UI.View.Web {
 final class KKWebView : WKWebView {
         
     unowned var kkDelegate: KKWebViewDelegate?
-
+    override var safeAreaInsets: UIEdgeInsets {
+        return self._contentInset
+    }
+    
+    private var _contentInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self._contentInset != oldValue else { return }
+            self.safeAreaInsetsDidChange()
+        }
+    }
     private var _enablePinchGesture: Bool = true
+    private var _currentNavigation: WKNavigation?
     
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
-
-        if #available(iOS 11.0, *) {
-            self.scrollView.contentInsetAdjustmentBehavior = .never
-        }
+        
+        self.scrollView.contentInsetAdjustmentBehavior = .always
+        self.scrollView.backgroundColor = nil
         self.clipsToBounds = true
         self.navigationDelegate = self
         self.uiDelegate = self
@@ -94,8 +103,7 @@ extension KKWebView {
     }
     
     func update(contentInset: InsetFloat) {
-        self.scrollView.contentInset = contentInset.uiEdgeInsets
-        self.scrollView.scrollIndicatorInsets = contentInset.uiEdgeInsets
+        self._contentInset = contentInset.uiEdgeInsets
     }
     
     func update(enablePinchGesture: Bool) {
@@ -147,14 +155,6 @@ extension KKWebView : UIScrollViewDelegate {
 
 extension KKWebView : WKNavigationDelegate {
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.kkDelegate?.endLoading(self, error: nil)
-    }
-    
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        self.kkDelegate?.endLoading(self, error: error)
-    }
-    
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let kkDelegate = self.kkDelegate else {
             decisionHandler(.allow)
@@ -172,12 +172,29 @@ extension KKWebView : WKNavigationDelegate {
         }
     }
     
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        switch (error as NSError).code {
-        case NSURLErrorNotConnectedToInternet, NSURLErrorDataNotAllowed:
-            self.kkDelegate?.endLoading(self, error: error)
-        default: break
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self._currentNavigation = navigation
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard self._currentNavigation === navigation else {
+            return
         }
+        self.kkDelegate?.endLoading(self, error: nil)
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        guard self._currentNavigation === navigation else {
+            return
+        }
+        self.kkDelegate?.endLoading(self, error: error)
+    }
+    
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        guard self._currentNavigation === navigation else {
+            return
+        }
+        self.kkDelegate?.endLoading(self, error: error)
     }
     
 }

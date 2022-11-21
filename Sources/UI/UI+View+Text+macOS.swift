@@ -33,20 +33,35 @@ extension UI.View.Text {
     
 }
 
-final class KKTextView : NSTextField {
+final class KKTextView : NSTextView {
     
     weak var kkDelegate: KKControlViewDelegate?
+    override var alignmentRectInsets: NSEdgeInsets {
+        return .init()
+    }
     override var isFlipped: Bool {
         return true
     }
     
+    private let _textStorage: NSTextStorage
+    private let _textContainer: NSTextContainer
+    private let _layoutManager: NSLayoutManager
+    
     override init(frame: CGRect) {
-        super.init(frame: frame)
+        self._textStorage = NSTextStorage()
+        self._textContainer = NSTextContainer(containerSize: frame.size)
+        self._textContainer.lineFragmentPadding = 0
+        
+        self._layoutManager = NSLayoutManager()
+        self._layoutManager.addTextContainer(self._textContainer)
+        self._textStorage.addLayoutManager(self._layoutManager)
+        
+        super.init(frame: frame, textContainer: self._textContainer)
+        
+        self.textContainerInset = .zero
         
         self.translatesAutoresizingMaskIntoConstraints = false
         self.drawsBackground = true
-        self.isBordered = false
-        self.isBezeled = false
         self.isEditable = false
         self.isSelectable = false
     }
@@ -55,12 +70,13 @@ final class KKTextView : NSTextField {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        return nil
+    override func setFrameSize(_ newSize: NSSize) {
+        super.setFrameSize(newSize)
+        self._textContainer.containerSize = newSize
     }
     
-    override func alignmentRect(forFrame frame: NSRect) -> NSRect {
-        return frame
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return nil
     }
     
 }
@@ -79,7 +95,7 @@ extension KKTextView {
     }
     
     func update(text: String) {
-        self.stringValue = text
+        self.string = text
     }
     
     func update(textFont: UI.Font) {
@@ -95,15 +111,19 @@ extension KKTextView {
     }
     
     func update(lineBreak: UI.Text.LineBreak) {
-        self.lineBreakMode = lineBreak.nsLineBreakMode
+        self._textContainer.lineBreakMode = lineBreak.nsLineBreakMode
     }
     
     func update(numberOfLines: UInt) {
-        self.maximumNumberOfLines = Int(numberOfLines)
+        self._textContainer.maximumNumberOfLines = Int(numberOfLines)
     }
     
     func update(color: UI.Color?) {
-        self.backgroundColor = color?.native
+        if let color = color {
+            self.backgroundColor = color.native
+        } else {
+            self.backgroundColor = .clear
+        }
     }
     
     func update(alpha: Float) {

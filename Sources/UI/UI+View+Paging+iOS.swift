@@ -86,10 +86,8 @@ final class KKPagingView : UIScrollView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        if #available(iOS 11.0, *) {
-            self.contentInsetAdjustmentBehavior = .never
-        }
+        
+        self.contentInsetAdjustmentBehavior = .never
         self.showsHorizontalScrollIndicator = false
         self.showsVerticalScrollIndicator = false
         self.isPagingEnabled = true

@@ -13,28 +13,28 @@ public extension Animation {
         weak var delegate: IAnimationQueueDelegate?
         
         var isRunning: Bool {
-            return self._displayLink != nil
+            return self._instance != nil
         }
         
-        private var _displayLink: CADisplayLink?
+        private var _instance: CADisplayLink?
         private var _prevTime: CFTimeInterval!
         
         func start() {
-            if self._displayLink == nil {
-                let displayLink = CADisplayLink(target: self, selector: #selector(self._handle))
-                displayLink.add(to: .main, forMode: .common)
-                self._displayLink = displayLink
+            if self._instance == nil {
+                let instance = CADisplayLink(target: self, selector: #selector(self._handle))
+                instance.add(to: .main, forMode: .common)
+                self._instance = instance
                 self._prevTime = CACurrentMediaTime()
             }
         }
         
         func stop() {
-            if let displayLink = self._displayLink {
-                displayLink.remove(from: .main, forMode: .common)
-                displayLink.isPaused = true
-                displayLink.invalidate()
+            if let instance = self._instance {
+                instance.remove(from: .main, forMode: .common)
+                instance.isPaused = true
+                instance.invalidate()
             }
-            self._displayLink = nil
+            self._instance = nil
         }
         
     }

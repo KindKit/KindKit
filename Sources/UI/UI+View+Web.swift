@@ -25,7 +25,7 @@ public extension UI.View {
         
         public private(set) weak var appearedLayout: IUILayout?
         public weak var appearedItem: UI.Layout.Item?
-        public var size: UI.Size.Static = .init(width: .fill, height: .fill) {
+        public var size: UI.Size.Static = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
@@ -130,10 +130,12 @@ public extension UI.View.Web {
         self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
     }
     
-    func reload() {
+    @discardableResult
+    func reload() -> Self {
         if self.isLoaded == true {
             self._view.update(request: self.request)
         }
+        return self
     }
     
 }

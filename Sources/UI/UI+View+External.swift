@@ -17,7 +17,7 @@ public extension UI.View {
                 self.setNeedForceLayout()
             }
         }
-        public var size: UI.Size.Static = .init(width: .fill, height: .fill) {
+        public var size: UI.Size.Static = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()

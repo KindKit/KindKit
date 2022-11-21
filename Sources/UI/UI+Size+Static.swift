@@ -11,9 +11,18 @@ public extension UI.Size {
         public var width: Dimension?
         public var height: Dimension?
         
+        @available(*, deprecated, renamed: "UI.Size.Static.init(_:_:)")
         public init(
-            width: Dimension?,
-            height: Dimension?
+            width: Dimension,
+            height: Dimension
+        ) {
+            self.width = width
+            self.height = height
+        }
+        
+        public init(
+            _ width: Dimension?,
+            _ height: Dimension?
         ) {
             self.width = width
             self.height = height

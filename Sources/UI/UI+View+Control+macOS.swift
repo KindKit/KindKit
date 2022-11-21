@@ -39,6 +39,20 @@ final class KKControlView : NSControl {
     var contentSize: SizeFloat {
         return self._layoutManager.size
     }
+    override var frame: CGRect {
+        set {
+            let oldValue = super.frame
+            if oldValue != newValue {
+                super.frame = newValue
+                if oldValue.size != newValue.size {
+                    if self.window != nil {
+                        self._layoutManager.invalidate()
+                    }
+                }
+            }
+        }
+        get { super.frame }
+    }
     override var isFlipped: Bool {
         return true
     }
@@ -103,7 +117,7 @@ final class KKControlView : NSControl {
         super.mouseUp(with: event)
         
         if let kkDelegate = self.kkDelegate {
-            let location = self.convert(event.locationInWindow, to: self)
+            let location = self.convert(event.locationInWindow, from: nil)
             if kkDelegate.shouldPressing(self) == true && self.bounds.contains(location) == true {
                 kkDelegate.pressed(self)
             }

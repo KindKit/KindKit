@@ -37,7 +37,7 @@ public extension IUIViewStaticSizeable {
     @inlinable
     @discardableResult
     func size(_ width: UI.Size.Static.Dimension, _ height: UI.Size.Static.Dimension) -> Self {
-        self.size = .init(width: width, height: height)
+        self.size = .init(width, height)
         return self
     }
     

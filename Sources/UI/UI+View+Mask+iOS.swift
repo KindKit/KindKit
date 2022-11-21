@@ -40,11 +40,18 @@ final class KKMaskView : UIView {
     }
     override var frame: CGRect {
         set {
-            guard super.frame != newValue else { return }
-            super.frame = newValue
-            if let view = self._view {
-                self.update(cornerRadius: view.cornerRadius)
-                self.updateShadowPath()
+            let oldValue = super.frame
+            if oldValue != newValue {
+                super.frame = newValue
+                if let view = self._view {
+                    self.update(cornerRadius: view.cornerRadius)
+                    self.updateShadowPath()
+                }
+                if oldValue.size != newValue.size {
+                    if self.window != nil {
+                        self._layoutManager.invalidate()
+                    }
+                }
             }
         }
         get { super.frame }

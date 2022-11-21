@@ -162,9 +162,20 @@ public extension String {
     }
     
     @inlinable
-    func kk_size(font: UI.Font, available: SizeFloat) -> SizeFloat {
-        let attributed = NSAttributedString(string: self, attributes: [ .font : font.native ])
-        return attributed.kk_size(available: available)
+    func kk_attributed(font: UI.Font) -> NSAttributedString {
+        return NSAttributedString(
+            string: self,
+            attributes: [
+                .font : font.native,
+                .paragraphStyle : NSParagraphStyle.default
+            ]
+        )
+    }
+    
+    @inlinable
+    func kk_size(font: UI.Font, numberOfLines: UInt, available: SizeFloat) -> SizeFloat {
+        let attributed = self.kk_attributed(font: font)
+        return attributed.kk_size(numberOfLines: numberOfLines, available: available)
     }
 
 }
