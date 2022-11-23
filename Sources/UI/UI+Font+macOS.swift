@@ -10,7 +10,7 @@ public extension UI.Font {
     
     init(
         weight: Weight,
-        size: Float = UI.Font.systemSize
+        size: Double = UI.Font.systemSize
     ) {
         self.native = NSFont.systemFont(ofSize: CGFloat(size), weight: weight.nsFontWeight)
     }
@@ -25,8 +25,8 @@ public extension UI.Font {
 
 public extension UI.Font {
     
-    static var systemSize: Float {
-        return Float(NSFont.systemFontSize)
+    static var systemSize: Double {
+        return Double(NSFont.systemFontSize)
     }
     
 }

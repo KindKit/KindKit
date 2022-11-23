@@ -45,266 +45,109 @@ public extension UI.Size.Dynamic {
     
     @inlinable
     func apply(
-        available: SizeFloat,
-        sizeWithWidth: (_ width: Float) -> SizeFloat,
-        sizeWithHeight: (_ height: Float) -> SizeFloat,
-        size: () -> SizeFloat
-    ) -> SizeFloat {
-        let rw, rh: Float
+        available: Size,
+        contentSize: Size
+    ) -> Size {
+        return self.apply(
+            available: available,
+            sizeWithWidth: { _ in contentSize },
+            sizeWithHeight: { _ in contentSize },
+            size: { contentSize }
+        )
+    }
+    
+    @inlinable
+    func apply(
+        available: Size,
+        sizeWithWidth: (_ width: Double) -> Size,
+        sizeWithHeight: (_ height: Double) -> Size,
+        size: () -> Size
+    ) -> Size {
+        let rw, rh: Double
         switch (self.width, self.height) {
-        case (.fill, .fill):
+        case (.parent(let w), .parent(let h)):
             if available.width.isInfinite == false {
-                rw = max(0, available.width)
+                rw = max(0, available.width) * w.value
             } else {
                 rw = 0
             }
             if available.height.isInfinite == false {
-                rh = max(0, available.height)
+                rh = max(0, available.height) * h.value
             } else {
                 rh = 0
             }
-        case (.fixed(let w), .fill):
-            rw = max(0, w)
-            if available.height.isInfinite == false {
-                rh = max(0, available.height)
-            } else {
-                rh = 0
-            }
-        case (.percent(let w), .fill):
+        case (.parent(let w), .ratio(let h)):
             if available.width.isInfinite == false {
-                rw = max(0, available.width * w.value)
+                rw = max(0, available.width) * w.value
             } else {
                 rw = 0
             }
-            if available.height.isInfinite == false {
-                rh = max(0, available.height)
-            } else {
-                rh = 0
-            }
-        case (.morph(let w), .fill):
-            if available.height.isInfinite == false {
-                rh = max(0, available.height)
-            } else {
-                rh = 0
-            }
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = max(0, s.width * w.value)
-            } else {
-                rw = 0
-            }
-        case (.fit, .fill):
-            if available.height.isInfinite == false {
-                rh = max(0, available.height)
-            } else {
-                rh = 0
-            }
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = s.width
-            } else {
-                rw = 0
-            }
-        case (.fill, .fixed(let h)):
+            rh = rw * h.value
+        case (.parent(let w), .fixed(let h)):
             if available.width.isInfinite == false {
-                rw = max(0, available.width)
+                rw = max(0, available.width) * w.value
             } else {
                 rw = 0
             }
-            rh = max(0, h)
+            rh = h
+        case (.parent(let w), .content(let h)):
+            if available.width.isInfinite == false {
+                rw = max(0, available.width) * w.value
+            } else {
+                rw = 0
+            }
+            rh = sizeWithWidth(rw).height * h.value
+        case (.ratio(let w), .parent(let h)):
+            if available.height.isInfinite == false {
+                rh = max(0, available.height) * h.value
+            } else {
+                rh = 0
+            }
+            rw = rh * w.value
+        case (.ratio, .ratio):
+            rw = 0
+            rh = 0
+        case (.ratio(let w), .fixed(let h)):
+            rw = h * w.value
+            rh = h
+        case (.ratio(let w), .content(let h)):
+            rh = size().height * h.value
+            rw = rh * w.value
+        case (.fixed(let w), .parent(let h)):
+            rw = w
+            if available.height.isInfinite == false {
+                rh = max(0, available.height) * h.value
+            } else {
+                rh = 0
+            }
+        case (.fixed(let w), .ratio(let h)):
+            rw = w
+            rh = w * h.value
         case (.fixed(let w), .fixed(let h)):
-            rw = max(0, w)
-            rh = max(0, h)
-        case (.percent(let w), .fixed(let h)):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width * w.value)
-            } else {
-                rw = 0
-            }
-            rh = max(0, h)
-        case (.morph(let w), .fixed(let h)):
-            rh = max(0, h)
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = max(0, s.width * w.value)
-            } else {
-                rw = 0
-            }
-        case (.fit, .fixed(let h)):
-            rh = max(0, h)
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = s.width
-            } else {
-                rw = 0
-            }
-        case (.fill, .percent(let h)):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width)
-            } else {
-                rw = 0
-            }
+            rw = w
+            rh = h
+        case (.fixed(let w), .content(let h)):
+            rw = w
+            rh = size().height * h.value
+        case (.content(let w), .parent(let h)):
             if available.height.isInfinite == false {
-                rh = max(0, available.height * h.value)
+                rh = max(0, available.height) * h.value
             } else {
                 rh = 0
             }
-        case (.fixed(let w), .percent(let h)):
-            rw = max(0, w)
-            if available.height.isInfinite == false {
-                rh = max(0, available.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.percent(let w), .percent(let h)):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width * w.value)
-            } else {
-                rw = 0
-            }
-            if available.height.isInfinite == false {
-                rh = max(0, available.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.morph(let w), .percent(let h)):
-            if available.height.isInfinite == false {
-                rh = max(0, available.height * h.value)
-            } else {
-                rh = 0
-            }
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = max(0, s.width * w.value)
-            } else {
-                rw = 0
-            }
-        case (.fit, .percent(let h)):
-            if available.height.isInfinite == false {
-                rh = max(0, available.height * h.value)
-            } else {
-                rh = 0
-            }
-            let s = sizeWithHeight(rh)
-            if s.width.isInfinite == false {
-                rw = s.width
-            } else {
-                rw = 0
-            }
-        case (.fill, .morph(let h)):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width)
-            } else {
-                rw = 0
-            }
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = max(0, s.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.fixed(let w), .morph(let h)):
-            rw = max(0, w)
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = max(0, s.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.percent(let w), .morph(let h)):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width * w.value)
-            } else {
-                rw = 0
-            }
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = max(0, s.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.morph(let w), .morph(let h)):
+            rw = sizeWithHeight(rh).width * w.value
+        case (.content(let w), .ratio(let h)):
+            rw = size().width * w.value
+            rh = rw * h.value
+        case (.content(let w), .fixed(let h)):
+            rw = sizeWithHeight(h).width * w.value
+            rh = h
+        case (.content(let w), .content(let h)):
             let s = size()
-            if s.width.isInfinite == false {
-                rw = max(0, s.width * w.value)
-            } else {
-                rw = 0
-            }
-            if s.height.isInfinite == false {
-                rh = max(0, s.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.fit, .morph(let h)):
-            let s = size()
-            if s.width.isInfinite == false {
-                rw = s.width
-            } else {
-                rw = 0
-            }
-            if s.height.isInfinite == false {
-                rh = max(0, s.height * h.value)
-            } else {
-                rh = 0
-            }
-        case (.fill, .fit):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width)
-            } else {
-                rw = 0
-            }
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = s.height
-            } else {
-                rh = 0
-            }
-        case (.fixed(let w), .fit):
-            rw = max(0, w)
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = s.height
-            } else {
-                rh = 0
-            }
-        case (.percent(let w), .fit):
-            if available.width.isInfinite == false {
-                rw = max(0, available.width * w.value)
-            } else {
-                rw = 0
-            }
-            let s = sizeWithWidth(rw)
-            if s.height.isInfinite == false {
-                rh = s.height
-            } else {
-                rh = 0
-            }
-        case (.morph(let w), .fit):
-            let s = size()
-            if s.width.isInfinite == false {
-                rw = max(0, s.width * w.value)
-            } else {
-                rw = 0
-            }
-            if s.height.isInfinite == false {
-                rh = s.height
-            } else {
-                rh = 0
-            }
-        case (.fit, .fit):
-            let s = size()
-            if s.width.isInfinite == false {
-                rw = s.width
-            } else {
-                rw = 0
-            }
-            if s.height.isInfinite == false {
-                rh = s.height
-            } else {
-                rh = 0
-            }
+            rw = s.width * w.value
+            rh = s.height * h.value
         }
-        return Size(width: rw, height: rh)
+        return .init(width: rw, height: rh)
     }
     
 }

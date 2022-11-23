@@ -7,22 +7,24 @@ import Foundation
 public extension Intersection2 {
     
     enum LineToCircle : Equatable {
+        
         case none
-        case one(Point< Value >)
-        case two(Point< Value >, Point< Value >)
+        case one(Point)
+        case two(Point, Point)
+        
     }
     
 }
 
 public extension Intersection2 {
     
-    static func possibly(_ line: Line2< Value >, _ circle: Circle< Value >) -> Bool {
+    static func possibly(_ line: Line2, _ circle: Circle) -> Bool {
         let delta = circle.origin - line.origin
         let distance = Distance(squared: delta.dot(delta))
         return distance.real <= circle.radius
     }
     
-    static func find(_ line: Line2< Value >, _ circle: Circle< Value >) -> LineToCircle {
+    static func find(_ line: Line2, _ circle: Circle) -> LineToCircle {
         let delta = circle.origin - line.origin
         let a1 = delta.dot(delta) - circle.radius * circle.radius
         let a2 = line.direction.dot(delta)
@@ -49,12 +51,12 @@ public extension Intersection2 {
 public extension Line2 {
     
     @inlinable
-    func isIntersects(_ other: Circle< Value >) -> Bool {
+    func isIntersects(_ other: Circle) -> Bool {
         return Intersection2.possibly(self, other)
     }
     
     @inlinable
-    func intersection(_ other: Circle< Value >) -> Intersection2< Value >.LineToCircle {
+    func intersection(_ other: Circle) -> Intersection2.LineToCircle {
         return Intersection2.find(self, other)
     }
     
@@ -63,12 +65,12 @@ public extension Line2 {
 public extension Circle {
     
     @inlinable
-    func isIntersects(_ other: Line2< Value >) -> Bool {
+    func isIntersects(_ other: Line2) -> Bool {
         return Intersection2.possibly(other, self)
     }
     
     @inlinable
-    func intersection(_ other: Line2< Value >) -> Intersection2< Value >.LineToCircle {
+    func intersection(_ other: Line2) -> Intersection2.LineToCircle {
         return Intersection2.find(other, self)
     }
     

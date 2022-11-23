@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IHamburgerMenuContainer : IUIHamburgerContentContainer {
     
-    var hamburgerSize: Float { get }
-    var hamburgerLimit: Float { get }
+    var hamburgerSize: Double { get }
+    var hamburgerLimit: Double { get }
     
 }

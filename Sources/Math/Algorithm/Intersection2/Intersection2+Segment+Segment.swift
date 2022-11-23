@@ -7,9 +7,11 @@ import Foundation
 public extension Intersection2 {
     
     enum SegmentToSegment : Equatable {
+        
         case none
-        case one(Point< Value >)
-        case two(Point< Value >, Point< Value >)
+        case one(Point)
+        case two(Point, Point)
+        
     }
     
 }
@@ -17,7 +19,7 @@ public extension Intersection2 {
 public extension Intersection2.SegmentToSegment {
     
     @inlinable
-    var point1: Point< Value >? {
+    var point1: Point? {
         switch self {
         case .one(let point): return point
         case .two(let point, _): return point
@@ -26,7 +28,7 @@ public extension Intersection2.SegmentToSegment {
     }
     
     @inlinable
-    var point2: Point< Value >? {
+    var point2: Point? {
         switch self {
         case .two(_, let point): return point
         default: return nil
@@ -37,7 +39,7 @@ public extension Intersection2.SegmentToSegment {
 
 public extension Intersection2 {
     
-    static func possibly(_ segment1: Segment2< Value >, _ segment2: Segment2< Value >) -> Bool {
+    static func possibly(_ segment1: Segment2, _ segment2: Segment2) -> Bool {
         let cf1 = segment1.centeredForm
         let cf2 = segment2.centeredForm
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
@@ -64,7 +66,7 @@ public extension Intersection2 {
         }
     }
     
-    static func find(_ segment1: Segment2< Value >, _ segment2: Segment2< Value >) -> SegmentToSegment {
+    static func find(_ segment1: Segment2, _ segment2: Segment2) -> SegmentToSegment {
         let cf1 = segment1.centeredForm
         let cf2 = segment2.centeredForm
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
@@ -104,7 +106,7 @@ public extension Segment2 {
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Intersection2< Value >.SegmentToSegment {
+    func intersection(_ other: Self) -> Intersection2.SegmentToSegment {
         return Intersection2.find(self, other)
     }
     

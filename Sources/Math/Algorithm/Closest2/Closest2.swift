@@ -4,5 +4,5 @@
 
 import Foundation
 
-public struct Closest2< Value : IScalar & Hashable > {
+public struct Closest2 {
 }

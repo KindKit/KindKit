@@ -3,36 +3,31 @@
 //
 
 import Foundation
-#if canImport(CoreGraphics)
-import CoreGraphics
-#endif
 
 public protocol ICurve2 {
     
-    associatedtype Value : IScalar & Hashable
-    
     var isSimple: Bool { get }
 
-    var points: [Point< Value >] { get }
-    var start: Point< Value > { set get }
-    var end: Point< Value > { set get }
+    var points: [Point] { get }
+    var start: Point { set get }
+    var end: Point { set get }
     var inverse: Self { get }
-    var length: Distance< Value > { get }
-    var bbox: Box2< Value > { get }
+    var length: Distance { get }
+    var bbox: Box2 { get }
     
-    func point(at location: Percent< Value >) -> Point< Value >
-    func normal(at location: Percent< Value >) -> Point< Value >
-    func derivative(at location: Percent< Value >) -> Point< Value >
+    func point(at location: Percent) -> Point
+    func normal(at location: Percent) -> Point
+    func derivative(at location: Percent) -> Point
     
-    func split(at location: Percent< Value >) -> (left: Self, right: Self)
-    func cut(start: Percent< Value >, end: Percent< Value >) -> Self
+    func split(at location: Percent) -> (left: Self, right: Self)
+    func cut(start: Percent, end: Percent) -> Self
     
 }
 
 public extension ICurve2 {
     
     @inlinable
-    func offset(at: Percent< Value >, distance: Value) -> Point< Value > {
+    func offset(at: Percent, distance: Double) -> Point {
         let point = self.point(at: at)
         let normal = self.normal(at: at)
         return point + distance * normal

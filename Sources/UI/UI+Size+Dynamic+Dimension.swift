@@ -8,12 +8,33 @@ public extension UI.Size.Dynamic {
 
     enum Dimension : Equatable {
         
-        case fill
-        case percent(PercentFloat)
-        case fixed(Float)
-        case morph(PercentFloat)
-        case fit
+        case parent(Percent)
+        case ratio(Percent)
+        case fixed(Double)
+        case content(Percent)
         
+    }
+    
+}
+
+public extension UI.Size.Dynamic.Dimension {
+    
+    static var fill: Self {
+        return .parent(.one)
+    }
+    
+    static var fit: Self {
+        return .content(.one)
+    }
+    
+    @available(*, deprecated, renamed: "UI.Size.Dynamic.Dimension.parent")
+    static func percent(_ value: Percent) -> Self {
+        return .parent(value)
+    }
+    
+    @available(*, deprecated, renamed: "UI.Size.Dynamic.Dimension.content")
+    static func morph(_ value: Percent) -> Self {
+        return .content(value)
     }
     
 }
@@ -22,37 +43,8 @@ public extension UI.Size.Dynamic.Dimension {
     
     var isStatic: Bool {
         switch self {
-        case .fill, .percent, .fixed: return true
-        case .morph, .fit: return false
-        }
-    }
-    
-}
-
-public extension UI.Size.Dynamic.Dimension {
-    
-    @inlinable
-    func apply(
-        available: Float,
-        calculate: () -> Float
-    ) -> Float? {
-        switch self {
-        case .fill:
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available)
-        case .percent(let value):
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available * value.value)
-        case .fixed(let value):
-            return max(0, value)
-        case .morph(let percent):
-            let r = calculate()
-            guard r.isInfinite == false else { return nil }
-            return max(0, r * percent.value)
-        case .fit:
-            let r = calculate()
-            guard r.isInfinite == false else { return nil }
-            return max(0, r)
+        case .parent, .ratio, .fixed: return true
+        case .content: return false
         }
     }
     

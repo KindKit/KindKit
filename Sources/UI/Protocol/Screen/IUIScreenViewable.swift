@@ -11,7 +11,7 @@ public protocol IUIScreenViewable : AnyObject {
     var view: AssociatedView { get }
     var overlayEdge: UI.Edge { get }
     
-    func apply(inset: UI.Container.Inset)
+    func apply(inset: UI.Container.AccumulateInset)
     
 }
 
@@ -25,7 +25,7 @@ public extension IUIScreenViewable {
 
 public extension IUIScreenViewable where Self : IUIScreen, AssociatedView == UI.View.Scroll {
     
-    func apply(inset: UI.Container.Inset, in view: UI.View.Scroll) {
+    func apply(inset: UI.Container.AccumulateInset, in view: UI.View.Scroll) {
         let overlayEdge = self.overlayEdge
         view.contentInset = .init(
             top: overlayEdge.contains(.top) ? inset.natural.top : 0,

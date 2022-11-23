@@ -8,12 +8,12 @@ public extension RemoteImage.Filter {
 
     final class Thumbnail : IRemoteImageFilter {
 
-        public let size: SizeFloat
+        public let size: Size
         public var name: String {
             return "\(self.size.width)x\(self.size.height)"
         }
         
-        public init(_ size: SizeFloat) {
+        public init(_ size: Size) {
             self.size = size
         }
         

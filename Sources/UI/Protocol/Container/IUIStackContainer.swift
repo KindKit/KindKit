@@ -10,9 +10,9 @@ public protocol IUIStackContainer : IUIContainer, IUIContainerParentable {
     var containers: [IUIStackContentContainer] { get }
     var current: IUIStackContentContainer { get }
     var hidesGroupBarWhenPushed: Bool { set get }
-    var animationVelocity: Float { set get }
+    var animationVelocity: Double { set get }
 #if os(iOS)
-    var interactiveLimit: Float { set get }
+    var interactiveLimit: Double { set get }
 #endif
     
     func update(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?)

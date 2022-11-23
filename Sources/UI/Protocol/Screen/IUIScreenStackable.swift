@@ -7,14 +7,14 @@ import Foundation
 public protocol IUIScreenStackable : AnyObject {
     
     var stackBar: UI.View.StackBar { get }
-    var stackBarVisibility: Float { get }
+    var stackBarVisibility: Double { get }
     var stackBarHidden: Bool { get }
     
 }
 
 public extension IUIScreenStackable {
     
-    var stackBarVisibility: Float {
+    var stackBarVisibility: Double {
         return 1
     }
     

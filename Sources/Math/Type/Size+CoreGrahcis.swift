@@ -11,14 +11,14 @@ public extension Size {
     @inlinable
     var cgSize: CGSize {
         return CGSize(
-            width: self.width.cgFloat,
-            height: self.height.cgFloat
+            width: CGFloat(self.width),
+            height: CGFloat(self.height)
         )
     }
     
     init(_ cgSize: CGSize) {
-        self.width = Value(cgSize.width)
-        self.height = Value(cgSize.height)
+        self.width = Double(cgSize.width)
+        self.height = Double(cgSize.height)
     }
     
 }

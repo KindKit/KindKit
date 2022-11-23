@@ -12,7 +12,7 @@ public protocol IUIModalContentContainer : IUIContainer, IUIContainerParentable 
     
     var modalCornerRadius: UI.CornerRadius { get }
     
-    var modalSheetInset: InsetFloat? { get }
+    var modalSheetInset: Inset? { get }
     var modalSheetBackground: (IUIView & IUIViewAlphable)? { get }
     
 }

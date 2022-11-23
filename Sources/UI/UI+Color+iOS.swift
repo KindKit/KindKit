@@ -9,10 +9,10 @@ import UIKit
 public extension UI.Color {
     
     init(
-        r: Float,
-        g: Float,
-        b: Float,
-        a: Float = 1
+        r: Double,
+        g: Double,
+        b: Double,
+        a: Double = 1
     ) {
         self.native = UIColor(
             red: CGFloat(r),
@@ -90,6 +90,16 @@ public extension UI.Color {
 public extension UI.Color {
     
     @inlinable
+    var rgba: Rgba {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        self.native.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return .init(r: r, g: g, b: b, a: a)
+    }
+    
+    @inlinable
     var cgColor: CGColor {
         return self.native.cgColor
     }
@@ -103,7 +113,7 @@ public extension UI.Color {
 
 public extension UI.Color {
     
-    func with(alpha: Float) -> UI.Color {
+    func with(alpha: Double) -> UI.Color {
         return .init(self.native.withAlphaComponent(CGFloat(alpha)))
     }
     

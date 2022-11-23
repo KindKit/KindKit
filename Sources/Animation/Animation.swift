@@ -14,7 +14,7 @@ public final class Animation {
     
     public static let `default` = Animation()
     
-    private var _tasks: [Task]
+    private var _tasks: [IAnimationTask]
     private var _displayLink: DisplayLink
     
     private init() {
@@ -27,94 +27,35 @@ public final class Animation {
         self._displayLink.stop()
     }
     
-    @discardableResult
-    public func run(
-        delay: TimeInterval = 0,
-        duration: TimeInterval,
-        elapsed: TimeInterval = 0,
-        ease: IAnimationEase = Ease.Linear(),
-        preparing: (() -> Void)? = nil,
-        processing: @escaping (_ progress: PercentFloat) -> Void,
-        completion: @escaping () -> Void
-    ) -> IAnimationTask {
-        let task = Task(
-            delay: delay,
-            duration: duration,
-            elapsed: elapsed,
-            ease: ease,
-            preparing: preparing,
-            processing: processing,
-            completion: completion
-        )
+}
+
+public extension Animation {
+    
+    func append(task: IAnimationTask) {
+        guard self._tasks.contains(where: { $0 === task }) == false else {
+            return
+        }
         self._tasks.append(task)
         if self._displayLink.isRunning == false {
             self._displayLink.start()
         }
-        return task
     }
     
-}
-
-private extension Animation {
+    func remove(task: IAnimationTask) {
+        guard let index = self._tasks.firstIndex(where: { $0 === task }) else {
+            return
+        }
+        task.cancel()
+        self._tasks.remove(at: index)
+    }
     
-    final class Task : IAnimationTask {
-        
-        var delay: TimeInterval
-        var duration: TimeInterval
-        var elapsed: TimeInterval
-        var ease: IAnimationEase
-        var preparing: (() -> Void)?
-        var processing: (_ progress: PercentFloat) -> Void
-        var completion: () -> Void
-        
-        var isRunning: Bool
-        var isCompletion: Bool
-        var isCanceled: Bool
-        
-        @inlinable
-        init(
-            delay: TimeInterval,
-            duration: TimeInterval,
-            elapsed: TimeInterval,
-            ease: IAnimationEase,
-            preparing: (() -> Void)?,
-            processing: @escaping (_ progress: PercentFloat) -> Void,
-            completion: @escaping () -> Void
-        ) {
-            self.delay = delay
-            self.duration = duration
-            self.elapsed = elapsed
-            self.ease = ease
-            self.preparing = preparing
-            self.processing = processing
-            self.completion = completion
-            self.isRunning = false
-            self.isCompletion = false
-            self.isCanceled = false
-        }
-        
-        @inlinable
-        func update(_ delta: TimeInterval) {
-            guard self.isCanceled == false else { return }
-            self.elapsed += delta
-            if self.elapsed > self.delay {
-                if self.isRunning == false {
-                    self.isRunning = true
-                    self.preparing?()
-                }
-                let progress = Percent(Float((self.elapsed - self.delay) / self.duration)).normalized
-                self.processing(self.ease.perform(progress))
-                if self.elapsed >= self.duration && self.isCompletion == false {
-                    self.isCompletion = true
-                }
-            }
-        }
-        
-        func cancel() {
-            guard self.isCompletion == false else { return }
-            self.isCanceled = true
-        }
-
+    @inlinable
+    @discardableResult
+    func run(
+        _ task: IAnimationTask
+    ) -> ICancellable {
+        self.append(task: task)
+        return task
     }
     
 }
@@ -122,10 +63,9 @@ private extension Animation {
 extension Animation : IAnimationQueueDelegate {
     
     func update(_ delta: TimeInterval) {
-        var removingTask: [Task] = []
+        var removingTask: [IAnimationTask] = []
         for task in self._tasks {
-            task.update(delta)
-            if task.isCompletion == true || task.isCanceled == true {
+            if task.update(delta) == true {
                 removingTask.append(task)
             }
         }
@@ -134,9 +74,7 @@ extension Animation : IAnimationQueueDelegate {
                 return removingTask.contains(where: { return task === $0 })
             })
             for task in removingTask {
-                if task.isCompletion == true {
-                    task.completion()
-                }
+                task.complete()
             }
         }
         if self._tasks.count == 0 {

@@ -8,8 +8,8 @@ public extension UI.Size {
     
     struct Static : Equatable {
         
-        public var width: Dimension?
-        public var height: Dimension?
+        public var width: Dimension
+        public var height: Dimension
         
         @available(*, deprecated, renamed: "UI.Size.Static.init(_:_:)")
         public init(
@@ -21,8 +21,8 @@ public extension UI.Size {
         }
         
         public init(
-            _ width: Dimension?,
-            _ height: Dimension?
+            _ width: Dimension,
+            _ height: Dimension
         ) {
             self.width = width
             self.height = height
@@ -36,43 +36,63 @@ public extension UI.Size.Static {
     
     @inlinable
     func apply(
-        available: SizeFloat,
-        aspectRatio: Float?
-    ) -> SizeFloat {
-        if let aspectRatio = aspectRatio {
-            if let width = self.width {
-                let w = width.apply(available: available.width)
-                if w > .leastNonzeroMagnitude {
-                    return Size(width: w, height: w / aspectRatio)
-                }
-            } else if let height = self.height {
-                let h = height.apply(available: available.height)
-                if h > .leastNonzeroMagnitude {
-                    return Size(width: h * aspectRatio, height: h)
-                }
+        available: Size
+    ) -> Size {
+        let rw, rh: Double
+        switch (self.width, self.height) {
+        case (.parent(let w), .parent(let h)):
+            if available.width.isInfinite == false {
+                rw = max(0, available.width) * w.value
+            } else {
+                rw = 0
             }
-            return .zero
+            if available.height.isInfinite == false {
+                rh = max(0, available.height) * h.value
+            } else {
+                rh = 0
+            }
+        case (.parent(let w), .ratio(let h)):
+            if available.width.isInfinite == false {
+                rw = max(0, available.width) * w.value
+            } else {
+                rw = 0
+            }
+            rh = rw * h.value
+        case (.parent(let w), .fixed(let h)):
+            if available.width.isInfinite == false {
+                rw = max(0, available.width) * w.value
+            } else {
+                rw = 0
+            }
+            rh = h
+        case (.ratio(let w), .parent(let h)):
+            if available.height.isInfinite == false {
+                rh = max(0, available.height) * h.value
+            } else {
+                rh = 0
+            }
+            rw = rh * w.value
+        case (.ratio, .ratio):
+            rw = 0
+            rh = 0
+        case (.ratio(let w), .fixed(let h)):
+            rw = h * w.value
+            rh = h
+        case (.fixed(let w), .parent(let h)):
+            rw = w
+            if available.height.isInfinite == false {
+                rh = max(0, available.height) * h.value
+            } else {
+                rh = 0
+            }
+        case (.fixed(let w), .ratio(let h)):
+            rw = w
+            rh = w * h.value
+        case (.fixed(let w), .fixed(let h)):
+            rw = w
+            rh = h
         }
-        return self.apply(available: available)
-    }
-    
-    @inlinable
-    func apply(
-        available: SizeFloat
-    ) -> SizeFloat {
-        let w: Float
-        if let width = self.width {
-            w = width.apply(available: available.width)
-        } else {
-            w = 0
-        }
-        let h: Float
-        if let height = self.height {
-            h = height.apply(available: available.height)
-        } else {
-            h = 0
-        }
-        return Size(width: w, height: h)
+        return .init(width: rw, height: rh)
     }
     
 }

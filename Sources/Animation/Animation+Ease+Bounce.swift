@@ -14,7 +14,7 @@ public extension Animation.Ease {
             self._easeOut = BounceOut()
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             return 1 - self._easeOut.perform(1 - x)
         }
 
@@ -25,7 +25,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             if x < 4 / 11 {
                 return (121 * x * x) / 16
             } else if x < 8 / 11 {
@@ -54,7 +54,7 @@ public extension Animation.Ease {
             self._easeOut = BounceOut()
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             if x < 1 / 2 {
                 return 1 / 2 * self._easeIn.perform(x * 2)
             } else {
@@ -65,4 +65,31 @@ public extension Animation.Ease {
 
     }
 
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BounceIn {
+    
+    @inlinable
+    static func bounceIn() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BounceOut {
+    
+    @inlinable
+    static func bounceOut() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BounceInOut {
+    
+    @inlinable
+    static func bounceInOut() -> Self {
+        return .init()
+    }
+    
 }

@@ -5,23 +5,20 @@
 import Foundation
 import CoreGraphics
 
-public typealias Polyline2Float = Polyline2< Float >
-public typealias Polyline2Double = Polyline2< Double >
-
-public struct Polyline2< Value : IScalar & Hashable > : Hashable {
+public struct Polyline2 : Hashable {
     
-    public var corners: [Point< Value >] {
+    public var corners: [Point] {
         didSet {
             self.edges = Self._edges(self.corners.count)
             self.bbox = Self._bbox(self.corners)
         }
     }
     public private(set) var edges: [Edge]
-    public private(set) var bbox: Box2< Value >
+    public private(set) var bbox: Box2
     
     public init(
-        corners: [Point< Value >],
-        bbox: Box2< Value >? = nil
+        corners: [Point],
+        bbox: Box2? = nil
     ) {
         self.corners = corners
         self.edges = Self._edges(self.corners.count)
@@ -42,12 +39,12 @@ public extension Polyline2 {
 public extension Polyline2 {
     
     @inlinable
-    var polygon: Polygon2< Value > {
+    var polygon: Polygon2 {
         return Polygon2(countours: [ self ], bbox: self.bbox)
     }
     
     @inlinable
-    var segments: [Segment2< Value >] {
+    var segments: [Segment2] {
         return self.edges.map({ self[segment: $0] })
     }
     
@@ -70,14 +67,14 @@ public extension Polyline2 {
         return index.value >= self.edges.startIndex && index.value < self.edges.endIndex
     }
      
-    func update(index: CornerIndex, closure: (_ corner: Point< Value >) -> Point< Value >) -> Self {
+    func update(index: CornerIndex, closure: (_ corner: Point) -> Point) -> Self {
         guard self.isValid(index) == true else { return self }
         var cs = self.corners
         cs[index.value] = closure(cs[index.value])
         return Polyline2(corners: cs)
     }
     
-    func update(index: EdgeIndex, closure: (_ segment: Segment2< Value >) -> Segment2< Value >) -> Self {
+    func update(index: EdgeIndex, closure: (_ segment: Segment2) -> Segment2) -> Self {
         guard self.isValid(index) == true else { return self }
         var cs = self.corners
         let e = self[edge: index]
@@ -87,16 +84,16 @@ public extension Polyline2 {
         return Polyline2(corners: cs)
     }
     
-    func offset(distance: Point< Value >) -> Self {
+    func offset(distance: Point) -> Self {
         guard distance !~ .zero else { return self }
         return Polyline2(corners: self.corners.map({ $0 + distance }))
     }
     
-    func outline(distance: Value) -> Self {
+    func outline(distance: Double) -> Self {
         guard self.corners.count > 2 else { return self }
         guard distance !~ 0 else { return self }
         return Polyline2(
-            corners: Array< Point< Value > >(unsafeUninitializedCapacity: self.corners.count, initializingWith: { buffer, count in
+            corners: Array< Point >(unsafeUninitializedCapacity: self.corners.count, initializingWith: { buffer, count in
                 var pe = self.edges[self.edges.count - 1]
                 var ps = Segment2(start: self.corners[pe.start.value], end: self.corners[pe.end.value])
                 var pn = ps.normal(at: .half)
@@ -121,7 +118,7 @@ public extension Polyline2 {
 
 public extension Polyline2 {
     
-    func isContains(_ point: Point< Value >, rule: FillRule = .winding) -> Bool {
+    func isContains(_ point: Point, rule: FillRule = .winding) -> Bool {
         let count = self.edges.reduce(0, {
             $0 + self._windingCount(point, self[segment: $1])
         })
@@ -131,8 +128,8 @@ public extension Polyline2 {
         }
     }
 
-    func corner(_ point: Point< Value >, distance: Distance< Value >, condition: ((_ index: CornerIndex) -> Bool)? = nil) -> CornerIndex? {
-        var corners: [(CornerIndex, Distance< Value >)] = []
+    func corner(_ point: Point, distance: Distance, condition: ((_ index: CornerIndex) -> Bool)? = nil) -> CornerIndex? {
+        var corners: [(CornerIndex, Distance)] = []
         for index in self.corners.indices {
             let d = self.corners[index].distance(point).abs
             if d <= distance {
@@ -149,8 +146,8 @@ public extension Polyline2 {
         return sorted.first?.0
     }
     
-    func edge(_ point: Point< Value >, distance: Distance< Value >, condition: ((_ index: EdgeIndex) -> Bool)? = nil) -> EdgeIndex? {
-        var edges: [(EdgeIndex, Distance< Value >)] = []
+    func edge(_ point: Point, distance: Distance, condition: ((_ index: EdgeIndex) -> Bool)? = nil) -> EdgeIndex? {
+        var edges: [(EdgeIndex, Distance)] = []
         for index in self.edges.indices {
             let e = self.edges[index]
             let s = self[segment: e]
@@ -175,7 +172,7 @@ public extension Polyline2 {
 
 public extension Polyline2 {
     
-    subscript(corner key: CornerIndex) -> Point< Value > {
+    subscript(corner key: CornerIndex) -> Point {
         set { self.corners[key.value] = newValue }
         get { self.corners[key.value] }
     }
@@ -184,12 +181,12 @@ public extension Polyline2 {
         return self.edges[key.value]
     }
     
-    subscript(segment key: EdgeIndex) -> Segment2< Value > {
+    subscript(segment key: EdgeIndex) -> Segment2 {
         set { self[segment: self.edges[key.value]] = newValue }
         get { self[segment: self.edges[key.value]] }
     }
     
-    subscript(segment key: Edge) -> Segment2< Value > {
+    subscript(segment key: Edge) -> Segment2 {
         set {
             self.corners[key.start.value] = newValue.start
             self.corners[key.end.value] = newValue.end
@@ -221,7 +218,7 @@ public extension Polyline2 {
         )
     }
     
-    subscript(segments key: CornerIndex) -> (left: Segment2< Value >, right: Segment2< Value >)? {
+    subscript(segments key: CornerIndex) -> (left: Segment2, right: Segment2)? {
         guard let edges = self[edges: key] else { return nil }
         return (
             left: self[segment: edges.left],
@@ -229,7 +226,7 @@ public extension Polyline2 {
         )
     }
     
-    subscript(segments key: EdgeIndex) -> (left: Segment2< Value >, right: Segment2< Value >)? {
+    subscript(segments key: EdgeIndex) -> (left: Segment2, right: Segment2)? {
         guard let edges = self[edges: key] else { return nil }
         return (
             left: self[segment: edges.left],
@@ -253,11 +250,11 @@ private extension Polyline2 {
     }
     
     @inline(__always)
-    static func _bbox(_ corners: [Point< Value >]) -> Box2< Value > {
+    static func _bbox(_ corners: [Point]) -> Box2 {
         return corners.kk_reduce({
-            return Box2< Value >()
+            return Box2()
         }, {
-            return Box2< Value >(lower: $0, upper: $0)
+            return Box2(lower: $0, upper: $0)
         }, {
             return $0.union($1)
         })
@@ -268,7 +265,7 @@ private extension Polyline2 {
 private extension Polyline2 {
     
     @inline(__always)
-    func _windingCount(_ point: Point< Value >, _ segment: Segment2< Value >) -> Int {
+    func _windingCount(_ point: Point, _ segment: Segment2) -> Int {
         let bbox = segment.bbox
         if bbox.lower.x > point.x {
             return 0
@@ -288,7 +285,7 @@ private extension Polyline2 {
     }
     
     @inline(__always)
-    func _windingCountAdjustment(_ value: Value, _ lower: Value, _ upper: Value) -> Int {
+    func _windingCountAdjustment(_ value: Double, _ lower: Double, _ upper: Double) -> Int {
         if upper < value, value <= lower {
             return 1
         } else if lower < value, value <= upper {

@@ -7,15 +7,15 @@ import Foundation
 public protocol IUIPageContainer : IUIContainer, IUIContainerParentable {
     
     var bar: UI.View.PageBar { get }
-    var barVisibility: Float { get }
+    var barVisibility: Double { get }
     var barHidden: Bool { get }
     var containers: [IUIPageContentContainer] { get }
     var backward: IUIPageContentContainer? { get }
     var current: IUIPageContentContainer? { get }
     var forward: IUIPageContentContainer? { get }
-    var animationVelocity: Float { set get }
+    var animationVelocity: Double { set get }
 #if os(iOS)
-    var interactiveLimit: Float { set get }
+    var interactiveLimit: Double { set get }
 #endif
     
     func updateBar(animated: Bool, completion: (() -> Void)?)

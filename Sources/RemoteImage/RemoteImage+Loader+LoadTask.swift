@@ -61,7 +61,7 @@ private extension RemoteImage.Loader.LoadTask {
                     queue: self.workQueue,
                     download: { [weak self] progress in
                         guard let self = self else { return }
-                        self.progress(progress: Float(progress.fractionCompleted))
+                        self.progress(progress: Double(progress.fractionCompleted))
                     },
                     success: { [weak self] data, image in
                         guard let self = self else { return }

@@ -8,12 +8,12 @@ public extension Graphics {
 
     struct LineDash : Equatable {
         
-        public let phase: Float
-        public let lengths: [Float]
+        public let phase: Double
+        public let lengths: [Double]
         
         public init(
-            phase: Float,
-            lengths: [Float]
+            phase: Double,
+            lengths: [Double]
         ) {
             self.phase = phase
             self.lengths = lengths

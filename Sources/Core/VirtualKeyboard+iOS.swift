@@ -49,16 +49,16 @@ public extension VirtualKeyboard {
     
     struct Info {
 
-        public let beginFrame: RectFloat
-        public let endFrame: RectFloat
+        public let beginFrame: Rect
+        public let endFrame: Rect
         public let duration: TimeInterval
 
         init?(_ userInfo: [ AnyHashable : Any ]) {
             guard let beginFrameValue = userInfo[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else { return nil }
             guard let endFrameValue = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return nil }
             guard let durationValue = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else { return nil }
-            self.beginFrame = RectFloat(beginFrameValue.cgRectValue)
-            self.endFrame = RectFloat(endFrameValue.cgRectValue)
+            self.beginFrame = Rect(beginFrameValue.cgRectValue)
+            self.endFrame = Rect(endFrameValue.cgRectValue)
             self.duration = TimeInterval(durationValue.doubleValue)
         }
 

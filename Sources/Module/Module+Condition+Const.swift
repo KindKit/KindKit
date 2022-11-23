@@ -17,3 +17,14 @@ public extension Module.Condition {
     }
 
 }
+
+public extension IModuleCondition where Self == Module.Condition.Const {
+    
+    @inlinable
+    static func const(
+        _ state: Bool
+    ) -> Self {
+        return .init(state)
+    }
+    
+}

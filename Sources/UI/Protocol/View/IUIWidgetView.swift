@@ -20,12 +20,6 @@ public extension IUIWidgetView {
     }
     
     @inlinable
-    var appearedItem: UI.Layout.Item? {
-        set { self.body.appearedItem = newValue }
-        get { self.body.appearedItem }
-    }
-    
-    @inlinable
     var native: NativeView {
         return self.body.native
     }
@@ -36,8 +30,14 @@ public extension IUIWidgetView {
     }
     
     @inlinable
-    var bounds: RectFloat {
+    var bounds: Rect {
         return self.body.bounds
+    }
+    
+    @inlinable
+    var frame: Rect {
+        set { self.body.frame = newValue }
+        get { self.body.frame }
     }
     
     @inlinable
@@ -92,7 +92,7 @@ public extension IUIWidgetView {
     }
     
     @inlinable
-    func size(available: SizeFloat) -> SizeFloat {
+    func size(available: Size) -> Size {
         return self.body.size(available: available)
     }
     

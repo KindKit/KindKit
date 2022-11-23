@@ -6,13 +6,13 @@ import Foundation
 
 public extension Center2 {
     
-    static func find< Value : IScalar & Hashable >(
-        polyline: Polyline2< Value >
-    ) -> Point< Value > {
+    static func find(
+        polyline: Polyline2
+    ) -> Point {
         
         let points = polyline.corners
-        var x: Value = 0
-        var y: Value = 0
+        var x: Double = 0
+        var y: Double = 0
         var j = points.count - 1
         for i in 0..<points.count {
             let point1 = points[i]
@@ -23,7 +23,7 @@ public extension Center2 {
             j = i
         }
         
-        var area: Value = 0
+        var area: Double = 0
         j = points.count - 1
         for i in 0..<points.count {
             let point1 = points[i]
@@ -43,7 +43,7 @@ public extension Center2 {
 
 public extension Polyline2 {
     
-    func center() -> Point< Value > {
+    func center() -> Point {
         return Center2.find(polyline: self)
     }
     

@@ -6,20 +6,20 @@ import Foundation
 
 public protocol IUIViewPageable : AnyObject {
     
-    var currentPage: Float { set get }
+    var currentPage: Double { set get }
     
     var numberOfPages: UInt { set get }
     
     var linkedPageable: IUIViewPageable? { set get }
     
-    func animate(currentPage: Float, completion: (() -> Void)?)
+    func animate(currentPage: Double, completion: (() -> Void)?)
     
 }
 
 public extension IUIViewPageable where Self : IUIWidgetView, Body : IUIViewPageable {
     
     @inlinable
-    var currentPage: Float {
+    var currentPage: Double {
         set { self.body.currentPage = newValue }
         get { self.body.currentPage }
     }
@@ -54,7 +54,7 @@ public extension IUIViewPageable {
     
     @inlinable
     @discardableResult
-    func currentPage(_ value: Float) -> Self {
+    func currentPage(_ value: Double) -> Self {
         self.currentPage = value
         return self
     }

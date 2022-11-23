@@ -4,17 +4,14 @@
 
 import Foundation
 
-public typealias Segment2Float = Segment2< Float >
-public typealias Segment2Double = Segment2< Double >
-
-public struct Segment2< Value : IScalar & Hashable > : Hashable {
+public struct Segment2 : Hashable {
     
-    public var start: Point< Value >
-    public var end: Point< Value >
+    public var start: Point
+    public var end: Point
     
     public init(
-        start: Point< Value >,
-        end: Point< Value >
+        start: Point,
+        end: Point
     ) {
         self.start = start
         self.end = end
@@ -25,17 +22,17 @@ public struct Segment2< Value : IScalar & Hashable > : Hashable {
 public extension Segment2 {
     
     @inlinable
-    var center: Point< Value > {
+    var center: Point {
         return self.start + (self.delta / 2)
     }
     
     @inlinable
-    var delta: Point< Value > {
+    var delta: Point {
         return self.end - self.start
     }
     
     @inlinable
-    var centeredForm: (center: Point< Value >, direction: Point< Value >, extend: Value) {
+    var centeredForm: (center: Point, direction: Point, extend: Double) {
         set {
             self.start = newValue.center - newValue.extend * newValue.direction
             self.end = newValue.center + newValue.extend * newValue.direction
@@ -51,7 +48,7 @@ public extension Segment2 {
     }
     
     @inlinable
-    var line: Line2< Value > {
+    var line: Line2 { 
         let cf = self.centeredForm
         return Line2(origin: cf.center, direction: cf.direction)
     }
@@ -61,7 +58,7 @@ public extension Segment2 {
 public extension Segment2 {
     
     @inlinable
-    func direction(_ point: Point< Value >) -> Value {
+    func direction(_ point: Point) -> Double {
         let d = self.end - self.start
         let p = point - self.start
         let c = d.cross(p)
@@ -83,7 +80,7 @@ extension Segment2 : ICurve2 {
     }
     
     @inlinable
-    public var points: [Point< Value >] {
+    public var points: [Point] {
         return [ self.start, self.end ]
     }
     
@@ -93,38 +90,38 @@ extension Segment2 : ICurve2 {
     }
     
     @inlinable
-    public var length: Distance< Value > {
+    public var length: Distance {
         return self.end.distance(self.start)
     }
     
     @inlinable
-    public var bbox: Box2< Value > {
+    public var bbox: Box2 {
         return Box2(point1: self.start, point2: self.end)
     }
     
     @inlinable
-    public func point(at location: Percent< Value >) -> Point< Value > {
+    public func point(at location: Percent) -> Point {
         if location <= .zero {
             return self.start
         } else if location >= .one {
             return self.end
         }
-        return self.start.lerp(self.end, progress: location.value)
+        return self.start.lerp(self.end, progress: location)
     }
     
     @inlinable
-    public func normal(at location: Percent< Value >) -> Point< Value > {
+    public func normal(at location: Percent) -> Point {
         return self.delta.perpendicular.normalized.point
     }
     
     @inlinable
-    public func derivative(at location: Percent< Value >) -> Point< Value > {
+    public func derivative(at location: Percent) -> Point {
         return self.delta
     }
     
     @inlinable
-    public func split(at location: Percent< Value >) -> (left: Self, right: Self) {
-        let center = self.start.lerp(self.end, progress: location.value)
+    public func split(at location: Percent) -> (left: Self, right: Self) {
+        let center = self.start.lerp(self.end, progress: location)
         return (
             left: Segment2(start: self.start, end: center),
             right: Segment2(start: center, end: self.end)
@@ -132,7 +129,7 @@ extension Segment2 : ICurve2 {
     }
     
     @inlinable
-    public func cut(start: Percent< Value >, end: Percent< Value >) -> Self {
+    public func cut(start: Percent, end: Percent) -> Self {
         return Segment2(start: self.point(at: start), end: self.point(at: end))
     }
     
@@ -141,7 +138,7 @@ extension Segment2 : ICurve2 {
 public extension Segment2 {
     
     @inlinable
-    static func + (lhs: Self, rhs: Point< Value >) -> Self {
+    static func + (lhs: Self, rhs: Point) -> Self {
         return Segment2(
             start: lhs.start + rhs,
             end: lhs.end + rhs
@@ -149,12 +146,12 @@ public extension Segment2 {
     }
     
     @inlinable
-    static func += (lhs: inout Self, rhs: Point< Value >) {
+    static func += (lhs: inout Self, rhs: Point) {
         lhs = lhs + rhs
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Point< Value >) -> Self {
+    static func - (lhs: Self, rhs: Point) -> Self {
         return Segment2(
             start: lhs.start - rhs,
             end: lhs.end - rhs
@@ -162,12 +159,12 @@ public extension Segment2 {
     }
     
     @inlinable
-    static func -= (lhs: inout Self, rhs: Point< Value >) {
+    static func -= (lhs: inout Self, rhs: Point) {
         lhs = lhs - rhs
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Matrix3< Value >) -> Self {
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
         return Segment2(
             start: lhs.start * rhs,
             end: lhs.end * rhs
@@ -175,7 +172,7 @@ public extension Segment2 {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Matrix3< Value >) {
+    static func *= (lhs: inout Self, rhs: Matrix3) {
         lhs = lhs * rhs
     }
     

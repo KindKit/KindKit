@@ -8,9 +8,9 @@ public extension UI.Size.Static {
 
     enum Dimension : Equatable {
         
-        case fill
-        case percent(PercentFloat)
-        case fixed(Float)
+        case parent(Percent)
+        case ratio(Percent)
+        case fixed(Double)
         
     }
     
@@ -18,20 +18,13 @@ public extension UI.Size.Static {
 
 public extension UI.Size.Static.Dimension {
     
-    @inlinable
-    func apply(
-        available: Float
-    ) -> Float {
-        switch self {
-        case .fill:
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available)
-        case .fixed(let value):
-            return max(0, value)
-        case .percent(let value):
-            guard available.isInfinite == false else { return 0 }
-            return max(0, available * value.value)
-        }
+    static var fill: Self {
+        return .parent(.one)
+    }
+    
+    @available(*, deprecated, renamed: "UI.Size.Static.Dimension.parent")
+    static func percent(_ value: Percent) -> Self {
+        return .parent(value)
     }
     
 }

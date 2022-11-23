@@ -37,7 +37,7 @@ extension RemoteImage.Loader {
 
 extension RemoteImage.Loader.FilterTask : IRemoteImageTarget {
     
-    func remoteImage(progress: Float) {
+    func remoteImage(progress: Double) {
         self.progress(progress: progress)
     }
     

@@ -9,13 +9,13 @@ public extension Graphics.Guide {
     final class Lines : IGraphicsGuide {
         
         public var isEnabled: Bool
-        public var lines: [Line2Float]
-        public var snap: Float
+        public var lines: [Line2]
+        public var snap: Double
         
         public init(
             isEnabled: Bool = true,
-            lines: [Line2Float],
-            snap: Float
+            lines: [Line2],
+            snap: Double
         ) {
             self.isEnabled = isEnabled
             self.lines = lines
@@ -28,9 +28,9 @@ public extension Graphics.Guide {
 
 extension Graphics.Guide.Lines : IGraphicsCoordinateGuide {
     
-    public func guide(_ coordinate: PointFloat) -> PointFloat? {
+    public func guide(_ coordinate: Point) -> Point? {
         guard self.isEnabled == true else { return nil }
-        let snap = DistanceFloat(real: self.snap)
+        let snap = Distance(real: self.snap)
         let oi = self.lines.map({ (line: $0, distance: $0.distance(coordinate)) })
         let fi = oi.filter({ $0.distance.abs <= snap })
         let si = fi.sorted(by: { $0.distance < $1.distance })

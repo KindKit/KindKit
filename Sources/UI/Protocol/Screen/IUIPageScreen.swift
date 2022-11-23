@@ -7,7 +7,7 @@ import Foundation
 public protocol IUIPageScreen : IUIScreen {
     
     var pageBar: UI.View.PageBar { get }
-    var pageBarVisibility: Float { get }
+    var pageBarVisibility: Double { get }
     var pageBarHidden: Bool { get }
     
     func change(current: IUIPageContentContainer)
@@ -24,7 +24,7 @@ public protocol IUIPageScreen : IUIScreen {
 
 public extension IUIPageScreen {
     
-    var pageBarVisibility: Float {
+    var pageBarVisibility: Double {
         return 1
     }
     

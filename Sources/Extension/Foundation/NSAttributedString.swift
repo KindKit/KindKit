@@ -7,7 +7,7 @@ import Foundation
 public extension NSAttributedString {
     
     @inlinable
-    func kk_size(numberOfLines: UInt, available: SizeFloat) -> SizeFloat {
+    func kk_size(numberOfLines: UInt, available: Size) -> Size {
         let textStorage = NSTextStorage(attributedString: self)
 #if os(macOS)
         let textContainer = NSTextContainer(containerSize: available.cgSize)

@@ -36,7 +36,7 @@ public extension Graphics {
                 self.owner?.setNeedRedraw()
             }
         }
-        public var alpha: Float = 1 {
+        public var alpha: Double = 1 {
             didSet {
                 guard self.alpha != oldValue else { return }
                 self.needUpdateAbsoluteAlpha()
@@ -50,17 +50,17 @@ public extension Graphics {
             }
         }
         
-        private var _absoluteMatrix: Matrix3Float?
-        private var _absoluteInverseMatrix: Matrix3Float?
-        private var _relativeMatrix: Matrix3Float?
-        private var _relativeInverseMatrix: Matrix3Float?
-        private var _absoluteAlpha: Float?
+        private var _absoluteMatrix: Matrix3?
+        private var _absoluteInverseMatrix: Matrix3?
+        private var _relativeMatrix: Matrix3?
+        private var _relativeInverseMatrix: Matrix3?
+        private var _absoluteAlpha: Double?
         
         public init(
             owner: IGraphicsNodeOwner? = nil,
             content: IGraphicsNodeContent? = nil,
             transform: Graphics.Transform = Graphics.Transform(),
-            alpha: Float = 1,
+            alpha: Double = 1,
             hidden: Bool = false
         ) {
             self.owner = owner
@@ -94,7 +94,7 @@ public extension Graphics.Node {
 
 public extension Graphics.Node {
     
-    var absoluteMatrix: Matrix3Float {
+    var absoluteMatrix: Matrix3 {
         guard let parent = self.parent else {
             return self.relativeMatrix
         }
@@ -104,28 +104,28 @@ public extension Graphics.Node {
         return self._absoluteMatrix! * self.relativeMatrix
     }
     
-    var absoluteInverseMatrix: Matrix3Float {
+    var absoluteInverseMatrix: Matrix3 {
         if self._absoluteInverseMatrix == nil {
             self._absoluteInverseMatrix = self.absoluteMatrix.inverse
         }
         return self._absoluteInverseMatrix!
     }
     
-    var relativeMatrix: Matrix3Float {
+    var relativeMatrix: Matrix3 {
         if self._relativeMatrix == nil {
             self._relativeMatrix = self.transform.matrix
         }
         return self._relativeMatrix!
     }
     
-    var relativeInverseMatrix: Matrix3Float {
+    var relativeInverseMatrix: Matrix3 {
         if self._relativeInverseMatrix == nil {
             self._relativeInverseMatrix = self.relativeMatrix.inverse
         }
         return self._relativeInverseMatrix!
     }
     
-    var absoluteAlpha: Float {
+    var absoluteAlpha: Double {
         guard let parent = self.parent else {
             return self.alpha
         }
@@ -204,7 +204,7 @@ public extension Graphics.Node {
         parent.remove(node: self)
     }
     
-    func hitTest(at location: PointFloat) -> Graphics.Node? {
+    func hitTest(at location: Point) -> Graphics.Node? {
         guard self.hidden == false else { return nil }
         if self.content?.hitTest(self, global: location, local: location * self.absoluteInverseMatrix) == true {
             return self
@@ -217,7 +217,7 @@ public extension Graphics.Node {
         return nil
     }
     
-    func draw(_ context: Graphics.Context, _ bounds: RectFloat) {
+    func draw(_ context: Graphics.Context, _ bounds: Rect) {
         guard self.hidden == false else { return }
         context.apply(
             matrix: self.relativeMatrix,

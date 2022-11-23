@@ -11,7 +11,7 @@ public protocol IUIHamburgerContainer : IUIContainer, IUIContainerParentable {
     var isShowedLeading: Bool { get }
     var trailing: IHamburgerMenuContainer? { set get }
     var isShowedTrailing: Bool { get }
-    var animationVelocity: Float { set get }
+    var animationVelocity: Double { set get }
     
     func showLeading(animated: Bool, completion: (() -> Void)?)
     func hideLeading(animated: Bool, completion: (() -> Void)?)

@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIScreenDialogable : AnyObject {
     
-    var dialogInset: InsetFloat { get }
+    var dialogInset: Inset { get }
     var dialogWidth: DialogContentContainerSize { get }
     var dialogHeight: DialogContentContainerSize { get }
     var dialogAlignment: DialogContentContainerAlignment { get }
@@ -16,7 +16,7 @@ public protocol IUIScreenDialogable : AnyObject {
 
 public extension IUIScreenDialogable {
     
-    var dialogInset: InsetFloat {
+    var dialogInset: Inset {
         return .zero
     }
     

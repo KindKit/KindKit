@@ -6,19 +6,19 @@ import Foundation
 
 public extension Operation2.Simplify {
     
-    static func perform< Value : IScalar & Hashable >(
-        polyline: Polyline2< Value >,
-        distance: Value
-    ) -> Polyline2< Value > {
+    static func perform(
+        polyline: Polyline2,
+        distance: Double
+    ) -> Polyline2 {
         var corners = polyline.corners
-        if corners.count > 1 && distance > .epsilon {
-            let segs: [Segment2< Value >] = Array(unsafeUninitializedCapacity: corners.count, initializingWith: { buffer, count in
+        if corners.count > 1 && distance > .ulpOfOne {
+            let segs: [Segment2] = Array(unsafeUninitializedCapacity: corners.count, initializingWith: { buffer, count in
                 for i in 0..<corners.count {
                     buffer[i] = Segment2(start: corners[i], end: corners[(i + 1) % corners.count])
                 }
                 count = corners.count
             })
-            var cs: [Point< Value >] = []
+            var cs: [Point] = []
             for i in 0 ..< segs.count {
                 let s = segs[i]
                 let sd = s.length.real
@@ -36,7 +36,7 @@ public extension Operation2.Simplify {
             corners = cs
         }
         if corners.count > 1 {
-            let segs: [Segment2< Value >] = Array(unsafeUninitializedCapacity: corners.count, initializingWith: { buffer, count in
+            let segs: [Segment2] = Array(unsafeUninitializedCapacity: corners.count, initializingWith: { buffer, count in
                 for i in 0..<corners.count {
                     buffer[i] = Segment2(start: corners[i], end: corners[(i + 1) % corners.count])
                 }
@@ -83,7 +83,7 @@ public extension Operation2.Simplify {
 
 public extension Polyline2 {
     
-    func simplify(distance: Value) -> Self {
+    func simplify(distance: Double) -> Self {
         return Operation2.Simplify.perform(polyline: self, distance: distance)
     }
     

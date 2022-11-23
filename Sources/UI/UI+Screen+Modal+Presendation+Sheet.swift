@@ -8,7 +8,7 @@ public extension UI.Screen.Modal.Presentation {
     
     struct Sheet {
         
-        public let inset: InsetFloat
+        public let inset: Inset
         public let background: IUIView & IUIViewAlphable
         
         public init(
@@ -21,7 +21,7 @@ public extension UI.Screen.Modal.Presentation {
         }
         
         public init(
-            inset: InsetFloat,
+            inset: Inset,
             background: IUIView & IUIViewAlphable
         ) {
             self.inset = inset

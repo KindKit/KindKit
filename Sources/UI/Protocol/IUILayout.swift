@@ -16,19 +16,19 @@ public protocol IUILayoutDelegate : AnyObject {
 public protocol IUILayout : AnyObject {
     
     var delegate: IUILayoutDelegate? { set get }
-    var view: IUIView? { set get }
+    var appearedView: IUIView? { set get }
     
     func setNeedUpdate()
     func updateIfNeeded()
     
     func invalidate()
-    func invalidate(item: UI.Layout.Item)
+    func invalidate(_ view: IUIView)
 
-    func layout(bounds: RectFloat) -> SizeFloat
+    func layout(bounds: Rect) -> Size
     
-    func size(available: SizeFloat) -> SizeFloat
+    func size(available: Size) -> Size
     
-    func items(bounds: RectFloat) -> [UI.Layout.Item]
+    func views(bounds: Rect) -> [IUIView]
     
 }
 
@@ -37,13 +37,13 @@ public extension IUILayout {
     func invalidate() {
     }
     
-    func invalidate(item: UI.Layout.Item) {
+    func invalidate(_ view: IUIView) {
     }
     
     @inlinable
-    func setNeedForceUpdate(item: UI.Layout.Item? = nil) {
-        if let item = item {
-            self.invalidate(item: item)
+    func setNeedForceUpdate(_ view: IUIView? = nil) {
+        if let view = view {
+            self.invalidate(view)
         }
         let forceParent: Bool
         if let delegate = self.delegate {
@@ -57,12 +57,8 @@ public extension IUILayout {
             forceParent = true
         }
         if forceParent == true {
-            if let view = self.view, let item = view.appearedItem {
-                if let layout = view.appearedLayout {
-                    layout.setNeedForceUpdate(item: item)
-                } else {
-                    item.setNeedForceUpdate()
-                }
+            if let view = self.appearedView {
+                view.appearedLayout?.setNeedForceUpdate(view)
             }
         }
     }
@@ -84,15 +80,17 @@ public extension IUILayout {
     }
     
     @inlinable
-    func visible(items: [UI.Layout.Item], for bounds: RectFloat) -> [UI.Layout.Item] {
-        guard let firstIndex = items.firstIndex(where: { return bounds.isIntersects($0.frame) }) else { return [] }
-        var result: [UI.Layout.Item] = [ items[firstIndex] ]
-        let start = min(firstIndex + 1, items.count)
-        let end = items.count
+    func visible(views: [IUIView], for bounds: Rect) -> [IUIView] {
+        guard let firstIndex = views.firstIndex(where: { return bounds.isIntersects($0.frame) }) else {
+            return []
+        }
+        var result: [IUIView] = [ views[firstIndex] ]
+        let start = min(firstIndex + 1, views.count)
+        let end = views.count
         for index in start ..< end {
-            let item = items[index]
-            if bounds.isIntersects(item.frame) == true {
-                result.append(item)
+            let view = views[index]
+            if bounds.isIntersects(view.frame) == true {
+                result.append(view)
             } else {
                 break
             }

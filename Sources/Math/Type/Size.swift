@@ -4,17 +4,14 @@
 
 import Foundation
 
-public typealias SizeFloat = Size< Float >
-public typealias SizeDouble = Size< Double >
-
-public struct Size< Value : IScalar & Hashable > : Hashable {
+public struct Size : Hashable {
     
-    public var width: Value
-    public var height: Value
+    public var width: Double
+    public var height: Double
     
     public init(
-        width: Value,
-        height: Value
+        width: Double,
+        height: Double
     ) {
         self.width = width
         self.height = height
@@ -54,12 +51,12 @@ public extension Size {
     }
     
     @inlinable
-    var area: Value {
+    var area: Double {
         return self.width * self.height
     }
     
     @inlinable
-    var aspectRatio: Value {
+    var aspectRatio: Double {
         return self.width / self.height
     }
     
@@ -78,14 +75,14 @@ public extension Size {
     }
     
     @inlinable
-    func inset(horizontal: Value, vertical: Value) -> Self {
-        let width: Value
+    func inset(horizontal: Double, vertical: Double) -> Self {
+        let width: Double
         if self.width.isInfinite == false {
             width = self.width - horizontal
         } else {
             width = self.width
         }
-        let height: Value
+        let height: Double
         if self.height.isInfinite == false {
             height = self.height - vertical
         } else {
@@ -95,7 +92,7 @@ public extension Size {
     }
     
     @inlinable
-    func inset(_ value: Inset< Value >) -> Self {
+    func inset(_ value: Inset) -> Self {
         return self.inset(horizontal: value.horizontal, vertical: value.vertical)
     }
     
@@ -115,18 +112,6 @@ public extension Size {
         return Size(width: self.width * sc, height: self.height * sc)
     }
     
-    @inlinable
-    func lerp(_ to: Self, progress: Value) -> Self {
-        let width = self.width.lerp(to.width, progress: progress)
-        let height = self.height.lerp(to.height, progress: progress)
-        return Size(width: width, height: height)
-    }
-    
-    @inlinable
-    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
-        return self.lerp(to, progress: progress.value)
-    }
-    
 }
 
 public extension Size {
@@ -142,7 +127,7 @@ public extension Size {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: Value) -> Self {
+    static func + (lhs: Self, rhs: Double) -> Self {
         return Size(width: lhs.width + rhs, height: lhs.height + rhs)
     }
     
@@ -152,7 +137,7 @@ public extension Size {
     }
     
     @inlinable
-    static func += (lhs: inout Self, rhs: Value) {
+    static func += (lhs: inout Self, rhs: Double) {
         lhs = lhs + rhs
     }
     
@@ -162,7 +147,7 @@ public extension Size {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Value) -> Self {
+    static func - (lhs: Self, rhs: Double) -> Self {
         return Size(width: lhs.width - rhs, height: lhs.height - rhs)
     }
     
@@ -172,7 +157,7 @@ public extension Size {
     }
     
     @inlinable
-    static func -= (lhs: inout Self, rhs: Value) {
+    static func -= (lhs: inout Self, rhs: Double) {
         lhs = lhs - rhs
     }
     
@@ -182,7 +167,7 @@ public extension Size {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Value) -> Self {
+    static func * (lhs: Self, rhs: Double) -> Self {
         return Size(width: lhs.width * rhs, height: lhs.height * rhs)
     }
     
@@ -192,7 +177,7 @@ public extension Size {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Value) {
+    static func *= (lhs: inout Self, rhs: Double) {
         lhs = lhs * rhs
     }
     
@@ -202,7 +187,7 @@ public extension Size {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: Value) -> Self {
+    static func / (lhs: Self, rhs: Double) -> Self {
         return Size(width: lhs.width / rhs, height: lhs.height / rhs)
     }
     
@@ -212,8 +197,16 @@ public extension Size {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: Value) {
+    static func /= (lhs: inout Self, rhs: Double) {
         lhs = lhs / rhs
+    }
+    
+}
+
+extension Size : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.width < rhs.width && lhs.height < rhs.height
     }
     
 }
@@ -227,10 +220,13 @@ extension Size : INearEqutable {
     
 }
 
-extension Size : Comparable where Value : Comparable {
+extension Size : ILerpable {
     
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.width < rhs.width && lhs.height < rhs.height
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        let width = self.width.lerp(to.width, progress: progress)
+        let height = self.height.lerp(to.height, progress: progress)
+        return Size(width: width, height: height)
     }
     
 }

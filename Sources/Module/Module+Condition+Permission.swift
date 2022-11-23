@@ -23,3 +23,15 @@ public extension Module.Condition {
     }
 
 }
+
+public extension IModuleCondition where Self == Module.Condition.Permission {
+    
+    @inlinable
+    static func permission(
+        _ permission: IPermission,
+        states: [KindKit.Permission.Status]
+    ) -> Self {
+        return .init(permission, states: states)
+    }
+    
+}

@@ -11,14 +11,14 @@ public extension Point {
     @inlinable
     var cgPoint: CGPoint {
         return CGPoint(
-            x: self.x.cgFloat,
-            y: self.y.cgFloat
+            x: CGFloat(self.x),
+            y: CGFloat(self.y)
         )
     }
     
     init(_ cgPoint: CGPoint) {
-        self.x = Value(cgPoint.x)
-        self.y = Value(cgPoint.y)
+        self.x = Double(cgPoint.x)
+        self.y = Double(cgPoint.y)
     }
     
 }

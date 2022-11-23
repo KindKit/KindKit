@@ -32,7 +32,7 @@ public extension UI.Image {
     ) {
         guard let image = NSImage(data: data) else { return nil }
         self.native = image
-        self.size = SizeFloat(image.size)
+        self.size = Size(image.size)
         self.scale = 1
     }
     
@@ -41,7 +41,7 @@ public extension UI.Image {
     ) {
         guard let image = NSImage(contentsOf: url) else { return nil }
         self.native = image
-        self.size = SizeFloat(image.size)
+        self.size = Size(image.size)
         self.scale = 1
     }
     
@@ -49,7 +49,7 @@ public extension UI.Image {
         _ native: NSImage
     ) {
         self.native = native
-        self.size = SizeFloat(native.size)
+        self.size = Size(native.size)
         self.scale = 1
     }
     
@@ -57,7 +57,7 @@ public extension UI.Image {
         _ cgImage: CGImage
     ) {
         self.native = NSImage(cgImage: cgImage, size: .zero)
-        self.size = SizeFloat(self.native.size)
+        self.size = Size(self.native.size)
         self.scale = 1
     }
     
@@ -94,7 +94,7 @@ public extension UI.Image {
         return representation.representation(using: .png, properties: [:])
     }
     
-    func scaleTo(size: SizeFloat) -> UI.Image? {
+    func scaleTo(size: Size) -> UI.Image? {
         let targetSize = self.size.aspectFit(size).cgSize
         let rect = NSRect(origin: .zero, size: targetSize)
         guard let representation = self.native.bestRepresentation(for: rect, context: nil, hints: nil) else {

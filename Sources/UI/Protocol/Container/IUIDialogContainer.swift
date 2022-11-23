@@ -10,9 +10,9 @@ public protocol IUIDialogContainer : IUIContainer, IUIContainerParentable {
     var containers: [IUIDialogContentContainer] { get }
     var previous: IUIDialogContentContainer? { get }
     var current: IUIDialogContentContainer? { get }
-    var animationVelocity: Float { set get }
+    var animationVelocity: Double { set get }
 #if os(iOS)
-    var interactiveLimit: Float { set get }
+    var interactiveLimit: Double { set get }
 #endif
     
     func present(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?)

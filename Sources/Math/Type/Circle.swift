@@ -4,25 +4,22 @@
 
 import Foundation
 
-public typealias CircleFloat = Circle< Float >
-public typealias CircleDouble = Circle< Double >
-
-public struct Circle< Value : IScalar & Hashable > : Hashable {
+public struct Circle : Hashable {
     
-    public var origin: Point< Value >
-    public var radius: Value
+    public var origin: Point
+    public var radius: Double
     
     public init(
-        origin: Point< Value >,
-        radius: Value
+        origin: Point,
+        radius: Double
     ) {
         self.origin = origin
         self.radius = radius
     }
     
     public init(
-        origin: Point< Value >,
-        radius: Distance< Value >
+        origin: Point,
+        radius: Distance
     ) {
         self.origin = origin
         self.radius = radius.real
@@ -33,7 +30,7 @@ public struct Circle< Value : IScalar & Hashable > : Hashable {
 public extension Circle {
     
     @inlinable
-    func isContains(_ point: Point< Value >) -> Bool {
+    func isContains(_ point: Point) -> Bool {
         let distance = self.origin.distance(point)
         return distance.real.abs <= self.radius
     }

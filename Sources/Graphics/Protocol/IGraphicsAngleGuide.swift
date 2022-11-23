@@ -6,6 +6,6 @@ import Foundation
 
 public protocol IGraphicsAngleGuide : IGraphicsGuide {
     
-    func guide(_ value: AngleFloat) -> AngleFloat?
+    func guide(_ value: Angle) -> Angle?
 
 }

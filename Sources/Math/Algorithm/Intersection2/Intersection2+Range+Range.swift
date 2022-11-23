@@ -7,9 +7,11 @@ import Foundation
 public extension Intersection2 {
     
     enum RangeToRange : Equatable {
+        
         case none
-        case one(Value)
-        case two(Value, Value)
+        case one(Double)
+        case two(Double, Double)
+        
     }
     
 }
@@ -17,7 +19,7 @@ public extension Intersection2 {
 public extension Intersection2.RangeToRange {
     
     @inlinable
-    var value1: Value? {
+    var value1: Double? {
         switch self {
         case .one(let value): return value
         case .two(let value, _): return value
@@ -26,7 +28,7 @@ public extension Intersection2.RangeToRange {
     }
     
     @inlinable
-    var value2: Value? {
+    var value2: Double? {
         switch self {
         case .two(_, let value): return value
         default: return nil

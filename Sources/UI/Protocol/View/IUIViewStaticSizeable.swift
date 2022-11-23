@@ -23,13 +23,13 @@ public extension IUIViewStaticSizeable where Self : IUIWidgetView, Body : IUIVie
 public extension IUIViewStaticSizeable {
     
     @inlinable
-    var width: UI.Size.Static.Dimension? {
+    var width: UI.Size.Static.Dimension {
         set { self.size.width = newValue }
         get { self.size.width }
     }
     
     @inlinable
-    var height: UI.Size.Static.Dimension? {
+    var height: UI.Size.Static.Dimension {
         set { self.size.height = newValue }
         get { self.size.height }
     }

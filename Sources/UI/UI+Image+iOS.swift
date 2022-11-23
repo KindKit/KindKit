@@ -24,8 +24,8 @@ public extension UI.Image {
         } else {
             self.native = image
         }
-        self.size = SizeFloat(image.size)
-        self.scale = Float(image.scale)
+        self.size = Size(image.size)
+        self.scale = Double(image.scale)
     }
     
     init(
@@ -43,8 +43,8 @@ public extension UI.Image {
         } else {
             self.native = image
         }
-        self.size = SizeFloat(image.size)
-        self.scale = Float(image.scale)
+        self.size = Size(image.size)
+        self.scale = Double(image.scale)
     }
     
     init?(
@@ -53,8 +53,8 @@ public extension UI.Image {
     ) {
         guard let image = Self._create(data: data, renderingMode: renderingMode) else { return nil }
         self.native = image
-        self.size = SizeFloat(image.size)
-        self.scale = Float(image.scale)
+        self.size = Size(image.size)
+        self.scale = Double(image.scale)
     }
     
     init?(
@@ -64,16 +64,16 @@ public extension UI.Image {
         guard let data = try? Data(contentsOf: url) else { return nil }
         guard let image = Self._create(data: data, renderingMode: renderingMode) else { return nil }
         self.native = image
-        self.size = SizeFloat(image.size)
-        self.scale = Float(image.scale)
+        self.size = Size(image.size)
+        self.scale = Double(image.scale)
     }
     
     init(
         _ uiImage: UIImage
     ) {
         self.native = uiImage
-        self.size = SizeFloat(uiImage.size)
-        self.scale = Float(uiImage.scale)
+        self.size = Size(uiImage.size)
+        self.scale = Double(uiImage.scale)
     }
     
     init(
@@ -89,20 +89,20 @@ public extension UI.Image {
         } else {
             self.native = image
         }
-        self.size = SizeFloat(image.size)
-        self.scale = Float(image.scale)
+        self.size = Size(image.size)
+        self.scale = Double(image.scale)
     }
     
     init(
         _ cgImage: CGImage
     ) {
         self.native = UIImage(cgImage: cgImage)
-        self.size = SizeFloat(self.native.size)
-        self.scale = Float(self.native.scale)
+        self.size = Size(self.native.size)
+        self.scale = Double(self.native.scale)
     }
     
-    init?(size: SizeFloat, scale: Float? = nil, color: UI.Color) {
-        let realScale = scale ?? Float(UIScreen.main.scale)
+    init?(size: Size, scale: Double? = nil, color: UI.Color) {
+        let realScale = scale ?? Double(UIScreen.main.scale)
         UIGraphicsBeginImageContextWithOptions(size.cgSize, false, CGFloat(realScale))
         defer {
             UIGraphicsEndImageContext()
@@ -116,7 +116,7 @@ public extension UI.Image {
             return nil
         }
         self.native = UIImage(cgImage: image)
-        self.size = SizeFloat(width: Float(image.width), height: Float(image.height))
+        self.size = Size(width: Double(image.width), height: Double(image.height))
         self.scale = realScale
     }
     
@@ -152,7 +152,7 @@ public extension UI.Image {
         return .init(self.native.withRenderingMode(renderingMode))
     }
     
-    func unrotate(maxResolution: Float) -> UI.Image {
+    func unrotate(maxResolution: Double) -> UI.Image {
         guard let imgRef = self.native.cgImage else {
             return self
         }
@@ -229,7 +229,7 @@ public extension UI.Image {
     }
     
     func round(
-        auto percent: PercentFloat,
+        auto percent: Percent,
         edges: UI.CornerRadius.Edge = .all
     ) -> UI.Image? {
         return self.round(
@@ -239,11 +239,11 @@ public extension UI.Image {
     }
     
     func round(
-        radius: Float,
+        radius: Double,
         edges: UI.CornerRadius.Edge = .all
     ) -> UI.Image? {
-        let radius = radius.cgFloat
-        let scale = self.scale.cgFloat
+        let radius = CGFloat(radius)
+        let scale = CGFloat(self.scale)
         let rect = CGRect(origin: .zero, size: self.size.cgSize)
         UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
         defer {
@@ -269,7 +269,7 @@ public extension UI.Image {
     }
     
     func scaleTo(
-        size: SizeFloat
+        size: Size
     ) -> UI.Image? {
         guard let cgImage = self.native.cgImage else {
             return nil

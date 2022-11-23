@@ -11,18 +11,18 @@ public extension Inset {
     @inlinable
     var nsEdgeInsets: NSEdgeInsets {
         return NSEdgeInsets(
-            top: self.top.cgFloat,
-            left: self.left.cgFloat,
-            bottom: self.bottom.cgFloat,
-            right: self.right.cgFloat
+            top: CGFloat(self.top),
+            left: CGFloat(self.left),
+            bottom: CGFloat(self.bottom),
+            right: CGFloat(self.right)
         )
     }
     
     init(_ nsEdgeInsets: NSEdgeInsets) {
-        self.top = Value(nsEdgeInsets.top)
-        self.left = Value(nsEdgeInsets.left)
-        self.right = Value(nsEdgeInsets.right)
-        self.bottom = Value(nsEdgeInsets.bottom)
+        self.top = Double(nsEdgeInsets.top)
+        self.left = Double(nsEdgeInsets.left)
+        self.right = Double(nsEdgeInsets.right)
+        self.bottom = Double(nsEdgeInsets.bottom)
     }
     
 }

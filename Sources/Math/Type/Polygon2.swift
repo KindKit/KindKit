@@ -5,21 +5,18 @@
 import Foundation
 import CoreGraphics
 
-public typealias Polygon2Float = Polygon2< Float >
-public typealias Polygon2Double = Polygon2< Double >
-
-public struct Polygon2< Value : IScalar & Hashable > : Hashable {
+public struct Polygon2 : Hashable {
     
-    public var countours: [Polyline2< Value >] {
+    public var countours: [Polyline2] {
         didSet {
             self.bbox = Self._bbox(self.countours)
         }
     }
-    public private(set) var bbox: Box2< Value >
+    public private(set) var bbox: Box2
     
     public init(
-        countours: [Polyline2< Value >],
-        bbox: Box2< Value >? = nil
+        countours: [Polyline2],
+        bbox: Box2? = nil
     ) {
         self.countours = countours
         self.bbox = bbox ?? Self._bbox(countours)
@@ -30,7 +27,7 @@ public struct Polygon2< Value : IScalar & Hashable > : Hashable {
 public extension Polygon2 {
     
     @inlinable
-    var segments: [Segment2< Value >] {
+    var segments: [Segment2] {
         return self.countours.kk_reduce({
             return []
         }, {
@@ -56,9 +53,9 @@ public extension Polygon2 {
 private extension Polygon2 {
     
     @inline(__always)
-    static func _bbox(_ countours: [Polyline2< Value >]) -> Box2< Value > {
+    static func _bbox(_ countours: [Polyline2]) -> Box2 {
         return countours.kk_reduce({
-            return Box2< Value >()
+            return Box2()
         }, {
             return $0.bbox
         }, {

@@ -11,7 +11,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             return 1 - sqrt(1 - (x * x))
         }
 
@@ -22,7 +22,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             return sqrt((2 - x) * x)
         }
 
@@ -33,7 +33,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             if x < 1 / 2 {
                 let h = 1 - sqrt(1 - 4 * (x * x))
                 return 1 / 2 * h
@@ -46,4 +46,31 @@ public extension Animation.Ease {
 
     }
 
+}
+
+public extension IAnimationEase where Self == Animation.Ease.CircularIn {
+    
+    @inlinable
+    static func circularIn() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.CircularOut {
+    
+    @inlinable
+    static func circularOut() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.CircularInOut {
+    
+    @inlinable
+    static func circularInOut() -> Self {
+        return .init()
+    }
+    
 }

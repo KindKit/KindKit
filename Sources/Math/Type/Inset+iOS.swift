@@ -11,18 +11,18 @@ public extension Inset {
     @inlinable
     var uiEdgeInsets: UIEdgeInsets {
         return UIEdgeInsets(
-            top: self.top.cgFloat,
-            left: self.left.cgFloat,
-            bottom: self.bottom.cgFloat,
-            right: self.right.cgFloat
+            top: CGFloat(self.top),
+            left: CGFloat(self.left),
+            bottom: CGFloat(self.bottom),
+            right: CGFloat(self.right)
         )
     }
     
     init(_ uiEdgeInsets: UIEdgeInsets) {
-        self.top = Value(uiEdgeInsets.top)
-        self.left = Value(uiEdgeInsets.left)
-        self.right = Value(uiEdgeInsets.right)
-        self.bottom = Value(uiEdgeInsets.bottom)
+        self.top = Double(uiEdgeInsets.top)
+        self.left = Double(uiEdgeInsets.left)
+        self.right = Double(uiEdgeInsets.right)
+        self.bottom = Double(uiEdgeInsets.bottom)
     }
     
 }

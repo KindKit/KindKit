@@ -6,18 +6,18 @@ import Foundation
 
 public protocol IUIScreenHamburgerable : AnyObject {
     
-    var hamburgerSize: Float { get }
-    var hamburgerLimit: Float { get }
+    var hamburgerSize: Double { get }
+    var hamburgerLimit: Double { get }
     
 }
 
 public extension IUIScreenHamburgerable {
     
-    var hamburgerSize: Float {
+    var hamburgerSize: Double {
         return 240
     }
     
-    var hamburgerLimit: Float {
+    var hamburgerLimit: Double {
         return 120
     }
     

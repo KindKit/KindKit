@@ -9,13 +9,13 @@ public extension Graphics.Guide {
     final class Grid : IGraphicsGuide {
         
         public var isEnabled: Bool
-        public var gridSize: PointFloat
-        public var snapSize: PointFloat
+        public var gridSize: KindKit.Point
+        public var snapSize: KindKit.Point
         
         public init(
             isEnabled: Bool = true,
-            gridSize: PointFloat,
-            snapSize: PointFloat
+            gridSize: KindKit.Point,
+            snapSize: KindKit.Point
         ) {
             self.isEnabled = isEnabled
             self.gridSize = gridSize
@@ -28,7 +28,7 @@ public extension Graphics.Guide {
 
 extension Graphics.Guide.Grid : IGraphicsCoordinateGuide {
     
-    public func guide(_ coordinate: PointFloat) -> PointFloat? {
+    public func guide(_ coordinate: KindKit.Point) -> KindKit.Point? {
         guard self.isEnabled == true else { return nil }
         let nx = coordinate.x.abs
         let ny = coordinate.y.abs
@@ -41,7 +41,7 @@ extension Graphics.Guide.Grid : IGraphicsCoordinateGuide {
         if x == nil && y == nil {
             return nil
         }
-        return PointFloat(
+        return .init(
             x: x ?? coordinate.x,
             y: y ?? coordinate.y
         )
@@ -51,7 +51,7 @@ extension Graphics.Guide.Grid : IGraphicsCoordinateGuide {
 
 private extension Graphics.Guide.Grid {
     
-    static func _guide(_ isNegative: Bool, _ value: Float, _ grid: Float, _ snap: Float) -> Float? {
+    static func _guide(_ isNegative: Bool, _ value: Double, _ grid: Double, _ snap: Double) -> Double? {
         if value >= grid - snap && value <= grid + snap {
             if isNegative == true {
                 return -grid

@@ -69,7 +69,7 @@ public extension IUIScreen {
     
 #endif
     
-    var inset: UI.Container.Inset {
+    var inset: UI.Container.AccumulateInset {
         guard let parentInset = self.container?.parentInset() else {
             return .zero
         }

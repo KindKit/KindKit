@@ -6,12 +6,12 @@
 
 import AppKit
 
-#warning("Need impl kk_diagonalInInches: Float")
-#warning("Need impl kk_animationVelocity: Float")
-#warning("Need impl kk_pixelPerInch: Float")
+#warning("Need impl kk_diagonalInInches: Double")
+#warning("Need impl kk_animationVelocity: Double")
+#warning("Need impl kk_pixelPerInch: Double")
 public extension NSScreen {
     
-    static let kk_animationVelocity: Float = {
+    static let kk_animationVelocity: Double = {
         return 2000
     }()
     

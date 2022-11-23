@@ -8,16 +8,16 @@ import UIKit
 
 public extension UIScreen {
     
-    static let kk_diagonalInInches: Float = {
+    static let kk_diagonalInInches: Double = {
         let bounds = UIScreen.main.nativeBounds
-        let diagonal = Float(sqrt((bounds.width * bounds.width) + (bounds.height * bounds.height)))
-        let ppi = Float(UIScreen.kk_pixelPerInch)
+        let diagonal = Double(sqrt((bounds.width * bounds.width) + (bounds.height * bounds.height)))
+        let ppi = Double(UIScreen.kk_pixelPerInch)
         return diagonal / ppi
     }()
     
-    static let kk_animationVelocity: Float = {
+    static let kk_animationVelocity: Double = {
         let bounds = UIScreen.main.bounds
-        let size = Float(max(bounds.width, bounds.height))
+        let size = Double(max(bounds.width, bounds.height))
         switch UIDevice.current.userInterfaceIdiom {
         case .phone: return size * 2.2
         case .pad: return size * 2.5
@@ -25,7 +25,7 @@ public extension UIScreen {
         }
     }()
     
-    static let kk_pixelPerInch: Float = {
+    static let kk_pixelPerInch: Double = {
         let device = UIDevice.current
         let screen = UIScreen.main
         switch device.userInterfaceIdiom {
@@ -43,7 +43,7 @@ public extension UIScreen {
             }
             return 326
         default:
-            return 160 * Float(screen.scale)
+            return 160 * Double(screen.scale)
         }
     }()
     
@@ -51,7 +51,7 @@ public extension UIScreen {
 
 fileprivate extension UIScreen {
     
-    static func _iPhonePpi(machine: String) -> Float? {
+    static func _iPhonePpi(machine: String) -> Double? {
         switch machine {
         case "iPhone14,4": fallthrough // iPhone 13 mini
         case "iPhone13,1":             // iPhone 12 mini
@@ -101,7 +101,7 @@ fileprivate extension UIScreen {
         }
     }
     
-    static func _iPadPpi(machine: String) -> Float? {
+    static func _iPadPpi(machine: String) -> Double? {
         switch machine {
         case "iPad14,1", "iPad14,2": fallthrough // iPad mini (6th generation)
         case "iPad11,1", "iPad11,2": fallthrough // iPad mini (5th generation)

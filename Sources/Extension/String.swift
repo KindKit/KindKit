@@ -173,7 +173,7 @@ public extension String {
     }
     
     @inlinable
-    func kk_size(font: UI.Font, numberOfLines: UInt, available: SizeFloat) -> SizeFloat {
+    func kk_size(font: UI.Font, numberOfLines: UInt, available: Size) -> Size {
         let attributed = self.kk_attributed(font: font)
         return attributed.kk_size(numberOfLines: numberOfLines, available: available)
     }

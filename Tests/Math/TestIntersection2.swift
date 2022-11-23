@@ -28,8 +28,8 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testPossiblyLineToLine() {
-        let l1 = Line2Float(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
-        let l2 = Line2Float(origin: Point(x: 2, y: 0), direction: Point(x: 0, y: 1))
+        let l1 = Line2(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
+        let l2 = Line2(origin: Point(x: 2, y: 0), direction: Point(x: 0, y: 1))
         
         let result = Intersection2.possibly(l1, l2)
         if result == false {
@@ -38,13 +38,13 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindLineToLine() {
-        let l1 = Line2Float(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
-        let l2 = Line2Float(origin: Point(x: 2, y: 0), direction: Point(x: 0, y: 1))
+        let l1 = Line2(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
+        let l2 = Line2(origin: Point(x: 2, y: 0), direction: Point(x: 0, y: 1))
         
         let result = Intersection2.find(l1, l2)
         switch result {
         case .point(let data):
-            if data.point != PointFloat(x: 2, y: 2) {
+            if data.point != Point(x: 2, y: 2) {
                 XCTFail()
             }
         default:
@@ -53,7 +53,7 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testPossiblyLineToBox() {
-        let l = Line2Float(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
+        let l = Line2(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
         let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
         
         let result = Intersection2.possibly(l, b)
@@ -63,7 +63,7 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindLineToBox() {
-        let l = Line2Float(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
+        let l = Line2(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
         let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
         
         let result = Intersection2.find(l, b)
@@ -73,8 +73,8 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testPossiblyLineToSegment() {
-        let l = Line2Float(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
-        let s = Segment2Float(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
+        let l = Line2(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
+        let s = Segment2(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
         
         let result = Intersection2.possibly(l, s)
         if result == false {
@@ -83,13 +83,13 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindLineToSegment() {
-        let l = Line2Float(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
-        let s = Segment2Float(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
+        let l = Line2(origin: Point(x: 0, y: 2), direction: Point(x: 1, y: 0))
+        let s = Segment2(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
         
         let result = Intersection2.find(l, s)
         switch result {
         case .one(let point):
-            if point != PointFloat(x: 2, y: 2) {
+            if point != Point(x: 2, y: 2) {
                 XCTFail()
             }
         default:
@@ -98,8 +98,8 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testPossiblySegmentToSegment() {
-        let s1 = Segment2Float(start: Point(x: 0, y: 2), end: Point(x: 4, y: 2))
-        let s2 = Segment2Float(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
+        let s1 = Segment2(start: Point(x: 0, y: 2), end: Point(x: 4, y: 2))
+        let s2 = Segment2(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
         
         let result = Intersection2.possibly(s1, s2)
         if result == false {
@@ -108,11 +108,11 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindSegmentToSegment() {
-        let s1 = Segment2Float(start: Point(x: 0, y: 2), end: Point(x: 4, y: 2))
-        let s2 = Segment2Float(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
+        let s1 = Segment2(start: Point(x: 0, y: 2), end: Point(x: 4, y: 2))
+        let s2 = Segment2(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
         
         let result = Intersection2.find(s1, s2)
-        if result != .one(PointFloat(x: 2, y: 2)) {
+        if result != .one(Point(x: 2, y: 2)) {
             XCTFail()
         }
     }

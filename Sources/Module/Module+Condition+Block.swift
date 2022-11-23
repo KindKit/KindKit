@@ -21,3 +21,14 @@ public extension Module.Condition {
     }
 
 }
+
+public extension IModuleCondition where Self == Module.Condition.Block {
+    
+    @inlinable
+    static func block(
+        _ block: @escaping () -> Bool
+    ) -> Self {
+        return .init(block)
+    }
+    
+}

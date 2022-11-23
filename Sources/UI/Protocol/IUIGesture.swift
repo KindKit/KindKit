@@ -65,8 +65,8 @@ public extension IUIGesture {
         return view.bounds.isContains(location)
     }
 
-    func location(in view: IUIView) -> PointFloat {
-        return PointFloat(self.native.location(in: view.native))
+    func location(in view: IUIView) -> Point {
+        return Point(self.native.location(in: view.native))
     }
 
 }

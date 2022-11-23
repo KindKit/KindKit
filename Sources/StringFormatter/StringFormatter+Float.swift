@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct Float< InputType : BinaryFloatingPoint > : IStringFormatter {
+    struct Double< InputType : BinaryFloatingPoint > : IStringFormatter {
         
         public let formatter: NumberFormatter
         
@@ -99,7 +99,7 @@ public extension StringFormatter {
         }
         
         public func format(_ input: InputType) -> String {
-            if let value = Swift.Float(exactly: input) {
+            if let value = Swift.Double(exactly: input) {
                 if let string = self.formatter.string(from: NSNumber(value: value)) {
                     return string
                 }

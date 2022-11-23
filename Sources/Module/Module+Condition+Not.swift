@@ -21,3 +21,14 @@ public extension Module.Condition {
     }
 
 }
+
+public extension IModuleCondition where Self == Module.Condition.Not {
+    
+    @inlinable
+    static func not(
+        _ condition: IModuleCondition
+    ) -> Self {
+        return .init(condition)
+    }
+    
+}

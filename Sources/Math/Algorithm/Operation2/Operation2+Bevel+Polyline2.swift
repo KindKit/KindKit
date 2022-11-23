@@ -6,11 +6,11 @@ import Foundation
 
 public extension Operation2.Bevel {
     
-    static func perform< Value : IScalar & Hashable >(
-        polyline: Polyline2< Value >,
+    static func perform(
+        polyline: Polyline2,
         index: CornerIndex,
-        distance: Value
-    ) -> Polyline2< Value > {
+        distance: Double
+    ) -> Polyline2 {
         guard polyline.isValid(index) == true else { return polyline }
         guard polyline.corners.count > 2 else { return polyline }
         guard let es = polyline[edges: index] else { return polyline }
@@ -46,7 +46,7 @@ public extension Operation2.Bevel {
 
 public extension Polyline2 {
     
-    func bevel(index: CornerIndex, distance: Value) -> Self {
+    func bevel(index: CornerIndex, distance: Double) -> Self {
         return Operation2.Bevel.perform(polyline: self, index: index, distance: distance)
     }
     

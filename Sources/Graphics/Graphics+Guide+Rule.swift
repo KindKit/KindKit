@@ -9,13 +9,13 @@ public extension Graphics.Guide {
     final class Rule : IGraphicsGuide {
         
         public var isEnabled: Bool
-        public var size: Float
-        public var snap: Float
+        public var size: Double
+        public var snap: Double
         
         public init(
             isEnabled: Bool = true,
-            size: Float,
-            snap: Float
+            size: Double,
+            snap: Double
         ) {
             self.isEnabled = isEnabled
             self.size = size
@@ -28,7 +28,7 @@ public extension Graphics.Guide {
 
 extension Graphics.Guide.Rule : IGraphicsRuleGuide {
     
-    public func guide(_ value: Float) -> Float? {
+    public func guide(_ value: Double) -> Double? {
         guard self.isEnabled == true else { return nil }
         let n = value.abs
         let b = (n / self.size).roundNearest

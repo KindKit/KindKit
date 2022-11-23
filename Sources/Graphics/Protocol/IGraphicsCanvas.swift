@@ -8,42 +8,42 @@ import Foundation
 
 public protocol IGraphicsCanvas : AnyObject {
     
-    var view: UI.View.Canvas? { get }
+    var appearedView: UI.View.Canvas? { get }
     
     func attach(view: UI.View.Canvas)
     func detach()
     
-    func resize(_ size: SizeFloat)
+    func resize(_ size: Size)
     
-    func draw(_ context: Graphics.Context, bounds: RectFloat)
+    func draw(_ context: Graphics.Context, bounds: Rect)
     
     func shouldTapGesture(_ gesture: Graphics.Gesture) -> Bool
-    func tapGesture(_ gesture: Graphics.Gesture, location: PointFloat)
+    func tapGesture(_ gesture: Graphics.Gesture, location: Point)
     
     func shouldLongTapGesture(_ gesture: Graphics.Gesture) -> Bool
-    func longTapGesture(_ gesture: Graphics.Gesture, location: PointFloat)
+    func longTapGesture(_ gesture: Graphics.Gesture, location: Point)
     
     func shouldPanGesture(_ gesture: Graphics.Gesture) -> Bool
-    func beginPanGesture(_ gesture: Graphics.Gesture, location: PointFloat)
-    func changePanGesture(_ gesture: Graphics.Gesture, location: PointFloat)
-    func endPanGesture(_ gesture: Graphics.Gesture, location: PointFloat)
+    func beginPanGesture(_ gesture: Graphics.Gesture, location: Point)
+    func changePanGesture(_ gesture: Graphics.Gesture, location: Point)
+    func endPanGesture(_ gesture: Graphics.Gesture, location: Point)
     
     func shouldPinchGesture() -> Bool
-    func beginPinchGesture(location: PointFloat, scale: Float)
-    func changePinchGesture(location: PointFloat, scale: Float)
-    func endPinchGesture(location: PointFloat, scale: Float)
+    func beginPinchGesture(location: Point, scale: Double)
+    func changePinchGesture(location: Point, scale: Double)
+    func endPinchGesture(location: Point, scale: Double)
     
     func shouldRotationGesture() -> Bool
-    func beginRotationGesture(location: PointFloat, angle: AngleFloat)
-    func changeRotationGesture(location: PointFloat, angle: AngleFloat)
-    func endRotationGesture(location: PointFloat, angle: AngleFloat)
+    func beginRotationGesture(location: Point, angle: Angle)
+    func changeRotationGesture(location: Point, angle: Angle)
+    func endRotationGesture(location: Point, angle: Angle)
     
 }
 
 public extension IGraphicsCanvas {
     
     func setNeedRedraw() {
-        self.view?.setNeedRedraw()
+        self.appearedView?.setNeedRedraw()
     }
     
 }

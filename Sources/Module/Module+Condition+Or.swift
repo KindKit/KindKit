@@ -26,3 +26,14 @@ public extension Module.Condition {
     }
 
 }
+
+public extension IModuleCondition where Self == Module.Condition.Or {
+    
+    @inlinable
+    static func or(
+        _ conditions: [IModuleCondition]
+    ) -> Self {
+        return .init(conditions)
+    }
+    
+}

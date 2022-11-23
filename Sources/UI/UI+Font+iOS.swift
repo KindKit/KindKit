@@ -10,7 +10,7 @@ public extension UI.Font {
     
     init(
         weight: Weight,
-        size: Float = UI.Font.systemSize
+        size: Double = UI.Font.systemSize
     ) {
         self.native = UIFont.systemFont(
             ofSize: CGFloat(size),
@@ -20,11 +20,11 @@ public extension UI.Font {
     
     init(
         weight: Weight,
-        scaled: Float = UI.Font.systemSize,
-        lower: Float? = nil,
-        upper: Float? = nil
+        scaled: Double = UI.Font.systemSize,
+        lower: Double? = nil,
+        upper: Double? = nil
     ) {
-        var size = Float(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
+        var size = Double(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
         if let lower = lower {
             size = max(lower, size)
         }
@@ -39,7 +39,7 @@ public extension UI.Font {
     
     init(
         name: String,
-        size: Float = UI.Font.systemSize
+        size: Double = UI.Font.systemSize
     ) {
         self.native = UIFont(
             name: name,
@@ -49,11 +49,11 @@ public extension UI.Font {
     
     init(
         name: String,
-        scaled: Float = UI.Font.systemSize,
-        lower: Float? = nil,
-        upper: Float? = nil
+        scaled: Double = UI.Font.systemSize,
+        lower: Double? = nil,
+        upper: Double? = nil
     ) {
-        var size = Float(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
+        var size = Double(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
         if let lower = lower {
             size = max(lower, size)
         }
@@ -76,8 +76,8 @@ public extension UI.Font {
 
 public extension UI.Font {
     
-    static var systemSize: Float {
-        return Float(UIFont.systemFontSize)
+    static var systemSize: Double {
+        return Double(UIFont.systemFontSize)
     }
     
 }
@@ -85,12 +85,12 @@ public extension UI.Font {
 public extension UI.Font {
     
     @inlinable
-    var lineHeight: Float {
-        return Float(self.native.lineHeight)
+    var lineHeight: Double {
+        return Double(self.native.lineHeight)
     }
     
     @inlinable
-    func withSize(_ size: Float) -> UI.Font {
+    func withSize(_ size: Double) -> UI.Font {
         return UI.Font(self.native.withSize(CGFloat(size)))
     }
     

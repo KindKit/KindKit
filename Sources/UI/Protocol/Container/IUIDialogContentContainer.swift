@@ -6,8 +6,8 @@ import Foundation
 
 public enum DialogContentContainerSize : Equatable {
     
-    case fill(before: Float, after: Float)
-    case fixed(value: Float)
+    case fill(before: Double, after: Double)
+    case fixed(value: Double)
     case fit
     
 }
@@ -30,7 +30,7 @@ public protocol IUIDialogContentContainer : IUIContainer, IUIContainerParentable
     
     var dialogContainer: IUIDialogContainer? { get }
     
-    var dialogInset: InsetFloat { get }
+    var dialogInset: Inset { get }
     var dialogWidth: DialogContentContainerSize { get }
     var dialogHeight: DialogContentContainerSize { get }
     var dialogAlignment: DialogContentContainerAlignment { get }

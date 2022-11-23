@@ -54,34 +54,22 @@ public extension Keychain {
     
     @discardableResult
     func set(_ value: Data?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
         return self._processSet(value, key: key, access: access)
     }
 
     @discardableResult
     func set(_ value: String?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
         return self._processSet(value, key: key, access: access)
     }
 
     @discardableResult
     func set(_ value: Bool?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
         return self._processSet(value, key: key, access: access)
     }
     
     @discardableResult
     func set< Value : BinaryInteger >(_ value: Value?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
-        return self._processSet(String(value), key: key, access: access)
+        return self._processSet(value.flatMap({ String($0) }), key: key, access: access)
     }
 
     func get(_ key: String) -> Data? {
@@ -139,7 +127,10 @@ public extension Keychain {
 
 private extension Keychain {
 
-    func _processSet(_ value: Data, key: String, access: AccessOptions) -> Bool {
+    func _processSet(_ value: Data?, key: String, access: AccessOptions) -> Bool {
+        guard let value = value else {
+            return self._processDelete(key)
+        }
         self._processDelete(key)
         let query = self._process(
             query: [
@@ -154,12 +145,20 @@ private extension Keychain {
         return code == noErr
     }
 
-    func _processSet(_ value: String, key: String, access: AccessOptions) -> Bool {
-        guard let data = value.data(using: String.Encoding.utf8) else { return false }
+    func _processSet(_ value: String?, key: String, access: AccessOptions) -> Bool {
+        guard let value = value else {
+            return self._processDelete(key)
+        }
+        guard let data = value.data(using: String.Encoding.utf8) else {
+            return false
+        }
         return self._processSet(data, key: key, access: access)
     }
 
-    func _processSet(_ value: Bool, key: String, access: AccessOptions) -> Bool {
+    func _processSet(_ value: Bool?, key: String, access: AccessOptions) -> Bool {
+        guard let value = value else {
+            return self._processDelete(key)
+        }
         let bytes: [UInt8] = (value == true) ? [1] : [0]
         return self._processSet(Data(bytes), key: key, access: access)
     }

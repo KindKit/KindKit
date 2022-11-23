@@ -9,8 +9,8 @@ public extension UI {
     enum CornerRadius : Equatable {
         
         case none
-        case auto(percent: PercentFloat, edges: Edge)
-        case manual(radius: Float, edges: Edge)
+        case auto(percent: Percent, edges: Edge)
+        case manual(radius: Double, edges: Edge)
         
     }
     
@@ -26,7 +26,7 @@ public extension UI.CornerRadius {
 
 public extension UI.CornerRadius {
     
-    static func manual(radius: Float) -> Self {
+    static func manual(radius: Double) -> Self {
         return .manual(radius: radius, edges: .all)
     }
     

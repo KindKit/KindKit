@@ -4,24 +4,21 @@
 
 import Foundation
 
-public typealias InsetFloat = Inset< Float >
-public typealias InsetDouble = Inset< Double >
-
-public struct Inset< Value : IScalar & Hashable > : Hashable {
+public struct Inset : Hashable {
     
-    public var top: Value
-    public var left: Value
-    public var right: Value
-    public var bottom: Value
+    public var top: Double
+    public var left: Double
+    public var right: Double
+    public var bottom: Double
     
-    public init(top: Value, left: Value, right: Value, bottom: Value) {
+    public init(top: Double, left: Double, right: Double, bottom: Double) {
         self.top = top
         self.left = left
         self.right = right
         self.bottom = bottom
     }
     
-    public init(horizontal: Value, vertical: Value) {
+    public init(horizontal: Double, vertical: Double) {
         self.top = vertical
         self.left = horizontal
         self.right = horizontal
@@ -47,31 +44,13 @@ public extension Inset {
     }
     
     @inlinable
-    var horizontal: Value {
+    var horizontal: Double {
         return self.left + self.right
     }
     
     @inlinable
-    var vertical: Value {
+    var vertical: Double {
         return self.top + self.bottom
-    }
-    
-}
-
-public extension Inset {
-    
-    @inlinable
-    func lerp(_ to: Self, progress: Value) -> Self {
-        let top = self.top.lerp(to.top, progress: progress)
-        let left = self.left.lerp(to.left, progress: progress)
-        let right = self.right.lerp(to.right, progress: progress)
-        let bottom = self.bottom.lerp(to.bottom, progress: progress)
-        return .init(top: top, left: left, right: right, bottom: bottom)
-    }
-    
-    @inlinable
-    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
-        return self.lerp(to, progress: progress.value)
     }
     
 }
@@ -125,6 +104,14 @@ public extension Inset {
     
 }
 
+extension Inset : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.top < rhs.top && lhs.left < rhs.left && lhs.right < rhs.right && lhs.bottom < rhs.bottom
+    }
+    
+}
+
 extension Inset : INearEqutable {
     
     @inlinable
@@ -134,10 +121,15 @@ extension Inset : INearEqutable {
     
 }
 
-extension Inset : Comparable where Value : Comparable {
+extension Inset : ILerpable {
     
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.top < rhs.top && lhs.left < rhs.left && lhs.right < rhs.right && lhs.bottom < rhs.bottom
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        let top = self.top.lerp(to.top, progress: progress)
+        let left = self.left.lerp(to.left, progress: progress)
+        let right = self.right.lerp(to.right, progress: progress)
+        let bottom = self.bottom.lerp(to.bottom, progress: progress)
+        return .init(top: top, left: left, right: right, bottom: bottom)
     }
     
 }

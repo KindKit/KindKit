@@ -18,7 +18,7 @@ public extension UI.Reuse {
         public init(
             owner: Reusable.Owner,
             unloadBehaviour: UI.Reuse.UnloadBehaviour = .whenDisappear,
-            cache: UI.Reuse.Cache = UI.Reuse.Cache.shared,
+            cache: UI.Reuse.Cache? = UI.Reuse.Cache.shared,
             name: String? = nil
         ) {
             self.owner = owner

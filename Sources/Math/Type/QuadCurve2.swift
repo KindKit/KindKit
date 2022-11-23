@@ -4,26 +4,23 @@
 
 import Foundation
 
-public typealias QuadCurve2Float = QuadCurve2< Float >
-public typealias QuadCurve2Double = QuadCurve2< Double >
-
-public struct QuadCurve2< Value : IScalar & Hashable > : Hashable {
+public struct QuadCurve2 : Hashable {
     
-    public var start: Point< Value >
-    public var control: Point< Value >
-    public var end: Point< Value >
+    public var start: Point
+    public var control: Point
+    public var end: Point
     
     public init(
-        start: Point< Value >,
-        control: Point< Value >,
-        end: Point< Value >
+        start: Point,
+        control: Point,
+        end: Point
     ) {
         self.start = start
         self.control = control
         self.end = end
     }
     
-    public init(_ line: Segment2< Value >) {
+    public init(_ line: Segment2) {
         self.start = line.start
         self.control = 0.5 * (line.start + line.end)
         self.end = line.end
@@ -33,7 +30,7 @@ public struct QuadCurve2< Value : IScalar & Hashable > : Hashable {
 
 public extension QuadCurve2 {
     
-    var segment: ConvertCurve2< Segment2< Value > > {
+    var segment: ConvertCurve2< Segment2 > {
         let line = Segment2(start: self.start, end: self.end)
         return ConvertCurve2(
             curve: line,
@@ -51,11 +48,11 @@ extension QuadCurve2 : ICurve2 {
         let n2 = self.normal(at: .one)
         let s = n1.dot(n2).clamp(-1.0, 1.0)
         let a = s.acos.abs
-        return a < (Value.pi / 3)
+        return a < (Double.pi / 3)
     }
     
     @inlinable
-    public var points: [Point< Value >] {
+    public var points: [Point] {
         return [ self.start, self.control, self.end ]
     }
     
@@ -64,14 +61,14 @@ extension QuadCurve2 : ICurve2 {
         return QuadCurve2(start: self.end, control: self.control, end: self.start)
     }
     
-    public var length: Distance< Value > {
-        return Distance(squared: Value(Bezier.length({
-            let d = self.derivative(at: Percent(Value($0)))
-            return d.length.squared.double
-        })))
+    public var length: Distance {
+        return Distance(squared: Bezier.length({
+            let d = self.derivative(at: Percent($0))
+            return d.length.squared
+        }))
     }
     
-    public var bbox: Box2< Value > {
+    public var bbox: Box2 {
         var lower = self.start.min(self.end)
         var upper = self.start.max(self.end)
         let ds = self.control - self.start
@@ -97,7 +94,7 @@ extension QuadCurve2 : ICurve2 {
         return Box2(lower: lower, upper: upper)
     }
     
-    public func point(at location: Percent< Value >) -> Point< Value > {
+    public func point(at location: Percent) -> Point {
         if location <= .zero {
             return self.start
         } else if location >= .one {
@@ -111,7 +108,7 @@ extension QuadCurve2 : ICurve2 {
         return (a * self.start) + (b * self.control) + (c * self.end)
     }
     
-    public func normal(at location: Percent< Value >) -> Point< Value > {
+    public func normal(at location: Percent) -> Point {
         var d = self.derivative(at: location)
         if d ~~ .zero && (location <= .zero || location >= .one) {
             if location ~~ .zero {
@@ -123,7 +120,7 @@ extension QuadCurve2 : ICurve2 {
         return d.perpendicular.normalized.point
     }
     
-    public func derivative(at location: Percent< Value >) -> Point< Value > {
+    public func derivative(at location: Percent) -> Point {
         let a = 1 - location.value
         let b = location.value
         let s = 2 * (self.control - self.start)
@@ -131,20 +128,20 @@ extension QuadCurve2 : ICurve2 {
         return (a * s) + (b * e)
     }
     
-    public func split(at location: Percent< Value >) -> (left: Self, right: Self) {
+    public func split(at location: Percent) -> (left: Self, right: Self) {
         let ss = self.start
         let sc = self.control
         let se = self.end
-        let es = ss.lerp(sc, progress: location.value)
-        let ec = sc.lerp(se, progress: location.value)
-        let ee = es.lerp(ec, progress: location.value)
+        let es = ss.lerp(sc, progress: location)
+        let ec = sc.lerp(se, progress: location)
+        let ee = es.lerp(ec, progress: location)
         return (
             left: QuadCurve2(start: ss, control: es, end: ee),
             right: QuadCurve2(start: ee, control: ec, end: se)
         )
     }
     
-    public func cut(start: Percent< Value >, end: Percent< Value >) -> Self {
+    public func cut(start: Percent, end: Percent) -> Self {
         guard start > .zero || end < .one else { return self }
         let k = (end.value - start.value) / 2
         let s = self.point(at: start)
@@ -158,7 +155,7 @@ extension QuadCurve2 : ICurve2 {
 public extension QuadCurve2 {
     
     @inlinable
-    static func + (lhs: Self, rhs: Point< Value >) -> Self {
+    static func + (lhs: Self, rhs: Point) -> Self {
         return QuadCurve2(
             start: lhs.start + rhs,
             control: lhs.control + rhs,
@@ -167,7 +164,7 @@ public extension QuadCurve2 {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Point< Value >) -> Self {
+    static func - (lhs: Self, rhs: Point) -> Self {
         return QuadCurve2(
             start: lhs.start - rhs,
             control: lhs.control - rhs,
@@ -176,7 +173,7 @@ public extension QuadCurve2 {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Matrix3< Value >) -> Self {
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
         return QuadCurve2(
             start: lhs.start * rhs,
             control: lhs.control * rhs,

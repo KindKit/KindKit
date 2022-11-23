@@ -4,136 +4,133 @@
 
 import Foundation
 
-public typealias RectFloat = Rect< Float >
-public typealias RectDouble = Rect< Double >
-
-public struct Rect< Value : IScalar & Hashable > : Hashable {
+public struct Rect : Hashable {
     
-    public var origin: Point< Value >
-    public var size: Size< Value >
+    public var origin: Point
+    public var size: Size
     
-    public init(origin: Point< Value >, size: Size< Value >) {
+    public init(origin: Point, size: Size) {
         self.origin = origin
         self.size = size
     }
     
-    public init(x: Value, y: Value, width: Value, height: Value) {
+    public init(x: Double, y: Double, width: Double, height: Double) {
         self.origin = Point(x: x, y: y)
         self.size = Size(width: width, height: height)
     }
     
-    public init(x: Value, y: Value, size: Size< Value >) {
+    public init(x: Double, y: Double, size: Size) {
         self.origin = Point(x: x, y: y)
         self.size = size
     }
     
-    public init(topLeft: Point< Value >, bottomRight: Point< Value >) {
+    public init(topLeft: Point, bottomRight: Point) {
         self.origin = topLeft
         self.size = Size(width: bottomRight.x - topLeft.x, height: bottomRight.y - topLeft.y)
     }
     
-    public init(top: Rect< Value >) {
+    public init(top: Rect) {
         self.init(bottomLeft: top.topLeft, size: top.size)
     }
     
-    public init(left: Rect< Value >) {
+    public init(left: Rect) {
         self.init(topRight: left.topLeft, size: left.size)
     }
     
-    public init(right: Rect< Value >) {
+    public init(right: Rect) {
         self.init(topLeft: right.topRight, size: right.size)
     }
     
-    public init(bottom: Rect< Value >) {
+    public init(bottom: Rect) {
         self.init(topLeft: bottom.bottomLeft, size: bottom.size)
     }
     
-    public init(topLeft: Point< Value >, size: Size< Value >) {
+    public init(topLeft: Point, size: Size) {
         self.origin = topLeft
         self.size = size
     }
     
-    public init(topLeft: Point< Value >, width: Value, height: Value) {
+    public init(topLeft: Point, width: Double, height: Double) {
         self.origin = topLeft
         self.size = Size(width: width, height: height)
     }
     
-    public init(top: Point< Value >, size: Size< Value >) {
+    public init(top: Point, size: Size) {
         self.origin = Point(x: top.x - size.width / 2, y: top.y)
         self.size = size
     }
     
-    public init(top: Point< Value >, width: Value, height: Value) {
-        self.origin = Point< Value >(x: top.x - width / 2, y: top.y)
+    public init(top: Point, width: Double, height: Double) {
+        self.origin = Point(x: top.x - width / 2, y: top.y)
         self.size = Size(width: width, height: height)
     }
     
-    public init(topRight: Point< Value >, size: Size< Value >) {
+    public init(topRight: Point, size: Size) {
         self.origin = Point(x: topRight.x - size.width, y: topRight.y)
         self.size = size
     }
     
-    public init(topRight: Point< Value >, width: Value, height: Value) {
+    public init(topRight: Point, width: Double, height: Double) {
         self.origin = Point(x: topRight.x - width, y: topRight.y)
         self.size = Size(width: width, height: height)
     }
     
-    public init(left: Point< Value >, size: Size< Value >) {
+    public init(left: Point, size: Size) {
         self.origin = Point(x: left.x, y: left.y - size.height / 2)
         self.size = size
     }
     
-    public init(left: Point< Value >, width: Value, height: Value) {
+    public init(left: Point, width: Double, height: Double) {
         self.origin = Point(x: left.x, y: left.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    public init(center: Point< Value >, size: Size< Value >) {
+    public init(center: Point, size: Size) {
         self.origin = Point(x: center.x - size.width / 2, y: center.y - size.height / 2)
         self.size = size
     }
     
-    public init(center: Point< Value >, width: Value, height: Value) {
+    public init(center: Point, width: Double, height: Double) {
         self.origin = Point(x: center.x - width / 2, y: center.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    public init(right: Point< Value >, size: Size< Value >) {
+    public init(right: Point, size: Size) {
         self.origin = Point(x: right.x - size.width, y: right.y - size.height / 2)
         self.size = size
     }
     
-    public init(right: Point< Value >, width: Value, height: Value) {
+    public init(right: Point, width: Double, height: Double) {
         self.origin = Point(x: right.x - width, y: right.y - height / 2)
         self.size = Size(width: width, height: height)
     }
     
-    public init(bottomLeft: Point< Value >, size: Size< Value >) {
+    public init(bottomLeft: Point, size: Size) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - size.height)
         self.size = size
     }
     
-    public init(bottomLeft: Point< Value >, width: Value, height: Value) {
+    public init(bottomLeft: Point, width: Double, height: Double) {
         self.origin = Point(x: bottomLeft.x, y: bottomLeft.y - height)
         self.size = Size(width: width, height: height)
     }
     
-    public init(bottom: Point< Value >, size: Size< Value >) {
+    public init(bottom: Point, size: Size) {
         self.origin = Point(x: bottom.x - size.width / 2, y: bottom.y - size.height)
         self.size = size
     }
     
-    public init(bottom: Point< Value >, width: Value, height: Value) {
-        self.origin = Point< Value >(x: bottom.x - width / 2, y: bottom.y - height)
+    public init(bottom: Point, width: Double, height: Double) {
+        self.origin = Point(x: bottom.x - width / 2, y: bottom.y - height)
         self.size = Size(width: width, height: height)
     }
     
-    public init(bottomRight: Point< Value >, size: Size< Value >) {
+    public init(bottomRight: Point, size: Size) {
         self.origin = Point(x: bottomRight.x - size.width, y: bottomRight.y - size.height)
         self.size = size
     }
     
-    public init(bottomRight: Point< Value >, width: Value, height: Value) {
+    public init(bottomRight: Point, width: Double, height: Double) {
         self.origin = Point(x: bottomRight.x - width, y: bottomRight.y - height)
         self.size = Size(width: width, height: height)
     }
@@ -157,67 +154,67 @@ public extension Rect {
     }
     
     @inlinable
-    var x: Value {
+    var x: Double {
         return self.origin.x
     }
     
     @inlinable
-    var y: Value {
+    var y: Double {
         return self.origin.y
     }
     
     @inlinable
-    var width: Value {
+    var width: Double {
         return self.size.width
     }
 
     @inlinable
-    var height: Value {
+    var height: Double {
         return self.size.height
     }
 
     @inlinable
-    var topLeft: Point< Value > {
+    var topLeft: Point {
         return Point(x: self.x, y: self.y)
     }
     
     @inlinable
-    var top: Point< Value > {
+    var top: Point {
         return Point(x: self.x + self.width / 2, y: self.y)
     }
     
     @inlinable
-    var topRight: Point< Value > {
+    var topRight: Point {
         return Point(x: self.x + self.width, y: self.y)
     }
     
     @inlinable
-    var left: Point< Value > {
+    var left: Point {
         return Point(x: self.x, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var center: Point< Value > {
+    var center: Point {
         return Point(x: self.x + self.width / 2, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var right: Point< Value > {
+    var right: Point {
         return Point(x: self.x + self.width, y: self.y + self.height / 2)
     }
     
     @inlinable
-    var bottomLeft: Point< Value > {
+    var bottomLeft: Point {
         return Point(x: self.x, y: self.y + self.height)
     }
     
     @inlinable
-    var bottom: Point< Value > {
+    var bottom: Point {
         return Point(x: self.x + self.width / 2, y: self.y + self.height)
     }
     
     @inlinable
-    var bottomRight: Point< Value > {
+    var bottomRight: Point {
         return Point(x: self.x + self.width, y: self.y + self.height)
     }
     
@@ -231,40 +228,40 @@ public extension Rect {
 public extension Rect {
     
     @inlinable
-    func isContains(_ point: Point< Value >) -> Bool {
-        guard self.x <= point.x && self.x + self.width >= point.x else { return false }
-        guard self.y <= point.y && self.y + self.height >= point.y else { return false }
+    func isContains(_ point: Point) -> Bool {
+        guard self.x <~ point.x && self.x + self.width >~ point.x else { return false }
+        guard self.y <~ point.y && self.y + self.height >~ point.y else { return false }
         return true
     }
 
     @inlinable
     func isContains(_ rect: Self) -> Bool {
-        guard self.x <= rect.x && self.x + self.width >= rect.x + rect.width else { return false }
-        guard self.y <= rect.y && self.y + self.height >= rect.y + rect.height else { return false }
+        guard self.x <~ rect.x && self.x + self.width >= rect.x + rect.width else { return false }
+        guard self.y <~ rect.y && self.y + self.height >= rect.y + rect.height else { return false }
         return true
     }
 
     @inlinable
     func isIntersects(_ rect: Self) -> Bool {
-        guard self.x <= rect.x + rect.width && self.x + self.width >= rect.x else { return false }
-        guard self.y <= rect.y + rect.height && self.y + self.height >= rect.y else { return false }
+        guard self.x <~ rect.x + rect.width && self.x + self.width >~ rect.x else { return false }
+        guard self.y <~ rect.y + rect.height && self.y + self.height >~ rect.y else { return false }
         return true
     }
     
     @inlinable
     func isHorizontalIntersects(_ rect: Self) -> Bool {
-        guard self.x <= rect.x + rect.width && self.x + self.width >= rect.x else { return false }
+        guard self.x <~ rect.x + rect.width && self.x + self.width >~ rect.x else { return false }
         return true
     }
     
     @inlinable
     func isVerticalIntersects(_ rect: Self) -> Bool {
-        guard self.y <= rect.y + rect.height && self.y + self.height >= rect.y else { return false }
+        guard self.y <~ rect.y + rect.height && self.y + self.height >~ rect.y else { return false }
         return true
     }
 
     @inlinable
-    func offset(_ point: Point< Value >) -> Self {
+    func offset(_ point: Point) -> Self {
         return Rect(topLeft: self.origin - point, size: self.size)
     }
 
@@ -278,7 +275,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(left: Value) -> (left: Self, right: Self) {
+    func split(left: Double) -> (left: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: left, height: self.height),
             right: Rect(x: self.x + left, y: self.y, width: self.width - left, height: self.height)
@@ -286,7 +283,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(right: Value) -> (left: Self, right: Self) {
+    func split(right: Double) -> (left: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: self.width - right, height: self.height),
             right: Rect(x: (self.x + self.width) - right, y: self.y, width: right, height: self.height)
@@ -294,7 +291,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(left: Value, right: Value) -> (left: Self, middle: Self, right: Self) {
+    func split(left: Double, right: Double) -> (left: Self, middle: Self, right: Self) {
         return (
             left: Rect(x: self.x, y: self.y, width: left, height: self.height),
             middle: Rect(x: self.x + left, y: self.y, width: self.width - (left + right), height: self.height),
@@ -303,7 +300,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(top: Value) -> (top: Self, bottom: Self) {
+    func split(top: Double) -> (top: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: top),
             bottom: Rect(x: self.x, y: self.y + top, width: self.width, height: self.height - top)
@@ -311,7 +308,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(bottom: Value) -> (top: Self, bottom: Self) {
+    func split(bottom: Double) -> (top: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: self.height - bottom),
             bottom: Rect(x: self.x, y: (self.y + self.height) - bottom, width: self.width, height: bottom)
@@ -319,7 +316,7 @@ public extension Rect {
     }
     
     @inlinable
-    func split(top: Value, bottom: Value) -> (top: Self, middle: Self, bottom: Self) {
+    func split(top: Double, bottom: Double) -> (top: Self, middle: Self, bottom: Self) {
         return (
             top: Rect(x: self.x, y: self.y, width: self.width, height: top),
             middle: Rect(x: self.x, y: self.y + top, width: self.width, height: self.height - (top + bottom)),
@@ -328,18 +325,18 @@ public extension Rect {
     }
     
     @inlinable
-    func inset(_ inset: Inset< Value >) -> Self {
+    func inset(_ inset: Inset) -> Self {
         return Rect(x: self.x + inset.left, y: self.y + inset.top, size: self.size.inset(inset))
     }
     
     @inlinable
-    func grid(rows: UInt, columns: UInt, spacing: Point< Value >) -> [Self] {
-        var result: [Rect< Value >] = []
+    func grid(rows: UInt, columns: UInt, spacing: Point) -> [Self] {
+        var result: [Rect] = []
         if rows > 0 && columns > 0 {
             var origin = self.origin
             let itemSize = Size(
-                width: rows > 1 ? self.width / Value(rows - 1) : self.width,
-                height: columns > 1 ? self.height / Value(columns - 1) : self.height
+                width: rows > 1 ? self.width / Double(rows - 1) : self.width,
+                height: columns > 1 ? self.height / Double(columns - 1) : self.height
             )
             for _ in 0 ..< rows {
                 origin.x = self.x
@@ -354,25 +351,13 @@ public extension Rect {
     }
     
     @inlinable
-    func aspectFit(_ size: Size< Value >) -> Self {
+    func aspectFit(_ size: Size) -> Self {
         return Rect(center: self.center, size: self.size.aspectFit(size))
     }
     
     @inlinable
-    func aspectFill(_ size: Size< Value >) -> Self {
+    func aspectFill(_ size: Size) -> Self {
         return Rect(center: self.center, size: self.size.aspectFill(size))
-    }
-    
-    @inlinable
-    func lerp(_ to: Self, progress: Value) -> Self {
-        let origin = self.origin.lerp(to.origin, progress: progress)
-        let size = self.size.lerp(to.size, progress: progress)
-        return Rect(origin: origin, size: size)
-    }
-    
-    @inlinable
-    func lerp(_ to: Self, progress: Percent< Value >) -> Self {
-        return self.lerp(to, progress: progress.value)
     }
     
 }
@@ -426,6 +411,14 @@ public extension Rect {
     
 }
 
+extension Rect : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.origin < rhs.origin && lhs.size < rhs.size
+    }
+    
+}
+
 extension Rect : INearEqutable {
     
     @inlinable
@@ -435,10 +428,13 @@ extension Rect : INearEqutable {
     
 }
 
-extension Rect : Comparable where Value : Comparable {
+extension Rect : ILerpable {
     
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.origin < rhs.origin && lhs.size < rhs.size
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        let origin = self.origin.lerp(to.origin, progress: progress)
+        let size = self.size.lerp(to.size, progress: progress)
+        return Rect(origin: origin, size: size)
     }
     
 }

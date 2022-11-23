@@ -84,7 +84,7 @@ extension RemoteImage.Loader.Task {
         })
     }
     
-    func progress(progress: Float) {
+    func progress(progress: Double) {
         let targets = self.targets
         self.syncQueue.async(execute: {
             for target in targets {

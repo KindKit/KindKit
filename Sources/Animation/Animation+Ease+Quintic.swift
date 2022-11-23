@@ -11,7 +11,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             return x * x * x * x * x
         }
 
@@ -22,7 +22,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             let f = (x - 1)
             return f * f * f * f * f + 1
         }
@@ -34,7 +34,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             if x < 1 / 2 {
                 return 16 * x * x * x * x * x
             } else {
@@ -45,4 +45,31 @@ public extension Animation.Ease {
 
     }
 
+}
+
+public extension IAnimationEase where Self == Animation.Ease.QuinticIn {
+    
+    @inlinable
+    static func quinticIn() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.QuinticOut {
+    
+    @inlinable
+    static func quinticOut() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.QuinticInOut {
+    
+    @inlinable
+    static func quinticInOut() -> Self {
+        return .init()
+    }
+    
 }

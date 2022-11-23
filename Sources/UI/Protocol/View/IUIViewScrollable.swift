@@ -6,11 +6,11 @@ import Foundation
 
 public protocol IUIViewScrollable : AnyObject {
     
-    var visibleInset: InsetFloat { set get }
+    var visibleInset: Inset { set get }
     
-    var contentInset: InsetFloat { set get }
+    var contentInset: Inset { set get }
     
-    var contentSize: SizeFloat { get }
+    var contentSize: Size { get }
     
     var isDragging: Bool { get }
     
@@ -31,19 +31,19 @@ public protocol IUIViewScrollable : AnyObject {
 public extension IUIViewScrollable where Self : IUIWidgetView, Body : IUIViewScrollable {
     
     @inlinable
-    var visibleInset: InsetFloat {
+    var visibleInset: Inset {
         set { self.body.visibleInset = newValue }
         get { self.body.visibleInset }
     }
     
     @inlinable
-    var contentInset: InsetFloat {
+    var contentInset: Inset {
         set { self.body.contentInset = newValue }
         get { self.body.contentInset }
     }
     
     @inlinable
-    var contentSize: SizeFloat {
+    var contentSize: Size {
         self.body.contentSize
     }
     
@@ -88,14 +88,14 @@ public extension IUIViewScrollable {
     
     @inlinable
     @discardableResult
-    func visibleInset(_ value: InsetFloat) -> Self {
+    func visibleInset(_ value: Inset) -> Self {
         self.visibleInset = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func contentInset(_ value: InsetFloat) -> Self {
+    func contentInset(_ value: Inset) -> Self {
         self.contentInset = value
         return self
     }

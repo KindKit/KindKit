@@ -152,7 +152,7 @@ extension LogUI {
             self.target.remove(observer: self)
         }
         
-        func apply(inset: UI.Container.Inset) {
+        func apply(inset: UI.Container.AccumulateInset) {
             self.view.contentInset = inset.natural
             self._scrollToBottom()
         }
@@ -273,7 +273,7 @@ extension LogUI.Screen : ILogUITargetObserver {
         self._entities.append(entity)
         if self._filter(entity.item) == true {
             self.layout.insert(
-                index: self.layout.items.count - 1,
+                index: self.layout.views.count - 1,
                 views: [ entity.cell ]
             )
             self.view.layoutIfNeeded()

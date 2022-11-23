@@ -9,13 +9,13 @@ public extension Graphics.Guide {
     final class Angle : IGraphicsGuide {
         
         public var isEnabled: Bool
-        public var value: AngleFloat
-        public var snap: AngleFloat
+        public var value: KindKit.Angle
+        public var snap: KindKit.Angle
         
         public init(
             isEnabled: Bool = true,
-            value: AngleFloat,
-            snap: AngleFloat
+            value: KindKit.Angle,
+            snap: KindKit.Angle
         ) {
             self.isEnabled = isEnabled
             self.value = value
@@ -28,7 +28,7 @@ public extension Graphics.Guide {
 
 extension Graphics.Guide.Angle : IGraphicsAngleGuide {
     
-    public func guide(_ angle: AngleFloat) -> AngleFloat? {
+    public func guide(_ angle: KindKit.Angle) -> KindKit.Angle? {
         guard self.isEnabled == true else { return nil }
         let s = angle.radians / self.value.radians
         let p = self.value.radians * s.roundDown
@@ -38,9 +38,9 @@ extension Graphics.Guide.Angle : IGraphicsAngleGuide {
         let md = min(pd, nd)
         if md < self.snap.radians {
             if pd < nd {
-                return AngleFloat(radians: p)
+                return .init(radians: p)
             } else if nd < pd {
-                return AngleFloat(radians: n)
+                return .init(radians: n)
             }
         }
         return nil

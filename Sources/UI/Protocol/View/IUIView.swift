@@ -7,9 +7,9 @@ import Foundation
 public protocol IUIView : IUIAnyView {
     
     var appearedLayout: IUILayout? { get }
-    var appearedItem: UI.Layout.Item? { set get }
-    var isVisible: Bool { get }
+    var frame: Rect { set get }
     var isHidden: Bool { set get }
+    var isVisible: Bool { get }
     var onVisible: Signal.Empty< Void > { get }
     var onVisibility: Signal.Empty< Void > { get }
     var onInvisible: Signal.Empty< Void > { get }
@@ -44,6 +44,13 @@ public extension IUIView {
 }
 
 public extension IUIView {
+    
+    @inlinable
+    @discardableResult
+    func frame(_ frame: Rect) -> Self {
+        self.frame = frame
+        return self
+    }
     
     @inlinable
     @discardableResult
@@ -123,22 +130,14 @@ public extension IUIView {
     }
     
     @inlinable
-    func isContains(_ point: PointFloat, from: IUIView) -> Bool {
+    func isContains(_ point: Point, from: IUIView) -> Bool {
         let localPoint = self.native.convert(point.cgPoint, from: from.native)
         return self.native.bounds.contains(localPoint)
     }
     
     @inlinable
     func setNeedForceLayout() {
-        if let layout = self.appearedLayout {
-            if let item = self.appearedItem {
-                layout.setNeedForceUpdate(item: item)
-            } else {
-                layout.setNeedForceUpdate()
-            }
-        } else if let item = self.appearedItem {
-            item.setNeedForceUpdate()
-        }
+        self.appearedLayout?.setNeedForceUpdate(self)
     }
     
     @inlinable
@@ -157,7 +156,7 @@ public extension IUIView {
     
     func parent< View >(of type: View.Type) -> View? {
         guard let layout = self.appearedLayout else { return nil }
-        guard let view = layout.view else { return nil }
+        guard let view = layout.appearedView else { return nil }
         if let view = view as? View {
             return view
         }

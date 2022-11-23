@@ -45,9 +45,9 @@ public extension Graphics.Context {
 
 public extension Graphics.Context {
     
-    func apply< Value : IScalar >(
-        matrix: Matrix3< Value >? = nil,
-        alpha: Value? = nil,
+    func apply(
+        matrix: Matrix3? = nil,
+        alpha: Double? = nil,
         fill: Graphics.Fill? = nil,
         stroke: Graphics.Stroke? = nil,
         block: () -> Void
@@ -85,24 +85,24 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        circle: Circle< Value >,
+    func draw(
+        circle: Circle,
         mode: Graphics.DrawMode
     ) {
         self._instance.saveGState()
         self._instance.beginPath()
         self._instance.addEllipse(in: CGRect(
-            x: (circle.origin.x - circle.radius).cgFloat,
-            y: (circle.origin.y - circle.radius).cgFloat,
-            width: (circle.radius * 2).cgFloat,
-            height: (circle.radius * 2).cgFloat
+            x: CGFloat(circle.origin.x - circle.radius),
+            y: CGFloat(circle.origin.y - circle.radius),
+            width: CGFloat(circle.radius * 2),
+            height: CGFloat(circle.radius * 2)
         ))
         self._draw(mode: mode)
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        circles: [Circle< Value >],
+    func draw(
+        circles: [Circle],
         mode: Graphics.DrawMode
     ) {
         guard circles.isEmpty == false else { return }
@@ -111,10 +111,10 @@ public extension Graphics.Context {
         for index in circles.indices {
             let circle = circles[index]
             self._instance.addEllipse(in: CGRect(
-                x: (circle.origin.x - circle.radius).cgFloat,
-                y: (circle.origin.y - circle.radius).cgFloat,
-                width: (circle.radius * 2).cgFloat,
-                height: (circle.radius * 2).cgFloat
+                x: CGFloat(circle.origin.x - circle.radius),
+                y: CGFloat(circle.origin.y - circle.radius),
+                width: CGFloat(circle.radius * 2),
+                height: CGFloat(circle.radius * 2)
             ))
         }
         if self._instance.isPathEmpty == false {
@@ -123,8 +123,8 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        segment: Segment2< Value >
+    func draw(
+        segment: Segment2
     ) {
         self._instance.saveGState()
         self._instance.beginPath()
@@ -134,8 +134,8 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        segments: [Segment2< Value >]
+    func draw(
+        segments: [Segment2]
     ) {
         guard segments.isEmpty == false else { return }
         self._instance.saveGState()
@@ -148,8 +148,8 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        polyline: Polyline2< Value >,
+    func draw(
+        polyline: Polyline2,
         mode: Graphics.DrawMode
     ) {
         guard polyline.corners.isEmpty == false else { return }
@@ -166,8 +166,8 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        polygon: Polygon2< Value >,
+    func draw(
+        polygon: Polygon2,
         mode: Graphics.DrawMode
     ) {
         guard polygon.countours.isEmpty == false else { return }
@@ -187,8 +187,8 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
-        path: Path2< Value >,
+    func draw(
+        path: Path2,
         mode: Graphics.DrawMode
     ) {
         guard path.elements.isEmpty == false else { return }
@@ -214,8 +214,8 @@ public extension Graphics.Context {
         positioning: Graphics.Context.Positioning
     ) {
         guard let cgImage = image.cgImage else { return }
-        let w = image.size.width.cgFloat
-        let h = image.size.height.cgFloat
+        let w = CGFloat(image.size.width)
+        let h = CGFloat(image.size.height)
         let rect: CGRect
         switch positioning {
         case .topLeft:rect = CGRect(x: 0, y: 0, width: w, height: h)
@@ -234,17 +234,17 @@ public extension Graphics.Context {
         self._instance.restoreGState()
     }
     
-    func draw< Value : IScalar >(
+    func draw(
         text: NSAttributedString,
-        rect: Rect< Value >
+        rect: Rect
     ) {
         self._instance.saveGState()
         text.draw(with: rect.cgRect, options: [ .usesLineFragmentOrigin, .usesFontLeading ], context: nil)
         self._instance.restoreGState()
     }
 
-    func clear< Value : IScalar >(
-        rect: Rect< Value >
+    func clear(
+        rect: Rect
     ) {
         self._instance.clear(rect.cgRect)
     }
@@ -254,17 +254,17 @@ public extension Graphics.Context {
 private extension Graphics.Context {
     
     @inline(__always)
-    func _apply< Value : IScalar >(
-        matrix: Matrix3< Value >
+    func _apply(
+        matrix: Matrix3
     ) {
         self._instance.concatenate(matrix.cgAffineTransform)
     }
     
     @inline(__always)
-    func _apply< Value : IScalar >(
-        alpha: Value
+    func _apply(
+        alpha: Double
     ) {
-        self._instance.setAlpha(alpha.cgFloat)
+        self._instance.setAlpha(CGFloat(alpha))
     }
     
     @inline(__always)
@@ -289,13 +289,13 @@ private extension Graphics.Context {
     func _apply(
         stroke: Graphics.Stroke
     ) {
-        self._instance.setLineWidth(stroke.width.cgFloat)
+        self._instance.setLineWidth(CGFloat(stroke.width))
         self._instance.setLineJoin(stroke.join.cgLineJoin)
         self._instance.setLineCap(stroke.cap.cgLineCap)
         if let dash = stroke.dash {
             self._instance.setLineDash(
-                phase: dash.phase.cgFloat,
-                lengths: dash.lengths.map({ $0.cgFloat })
+                phase: CGFloat(dash.phase),
+                lengths: dash.lengths.map({ CGFloat($0) })
             )
         } else {
             self._instance.setLineDash(phase: 0, lengths: [])

@@ -22,10 +22,23 @@ public extension Module.Condition {
         
         private var _conditions: [IModuleCondition]
         
-        public init(_ conditions: [IModuleCondition]) {
+        public init(
+            _ conditions: [IModuleCondition]
+        ) {
             self._conditions = conditions
         }
         
     }
 
+}
+
+public extension IModuleCondition where Self == Module.Condition.And {
+    
+    @inlinable
+    static func and(
+        _ conditions: [IModuleCondition]
+    ) -> Self {
+        return .init(conditions)
+    }
+    
 }

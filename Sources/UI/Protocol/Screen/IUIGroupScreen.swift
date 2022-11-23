@@ -7,7 +7,7 @@ import Foundation
 public protocol IUIGroupScreen : IUIScreen {
     
     var groupBar: UI.View.GroupBar { get }
-    var groupBarVisibility: Float { get }
+    var groupBarVisibility: Double { get }
     var groupBarHidden: Bool { get }
     
     func change(current: IUIGroupContentContainer)
@@ -16,7 +16,7 @@ public protocol IUIGroupScreen : IUIScreen {
 
 public extension IUIGroupScreen {
     
-    var groupBarVisibility: Float {
+    var groupBarVisibility: Double {
         return 1
     }
     

@@ -11,7 +11,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             return x * x * x - x * sin(x * .pi)
         }
 
@@ -22,7 +22,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             let f = (1 - x)
             return 1 - (f * f * f - f * sin(f * .pi))
         }
@@ -34,7 +34,7 @@ public extension Animation.Ease {
         public init() {
         }
 
-        public func perform(_ x: Float) -> Float {
+        public func perform(_ x: Double) -> Double {
             if x < 1 / 2 {
                 let f = 2 * x
                 return 1 / 2 * (f * f * f - f * sin(f * .pi))
@@ -46,6 +46,33 @@ public extension Animation.Ease {
             }
         }
 
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BackIn {
+    
+    @inlinable
+    static func backIn() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BackOut {
+    
+    @inlinable
+    static func backOut() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IAnimationEase where Self == Animation.Ease.BackInOut {
+    
+    @inlinable
+    static func backInOut() -> Self {
+        return .init()
     }
     
 }

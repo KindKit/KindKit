@@ -8,11 +8,11 @@ public protocol IUIAnyView : AnyObject {
     
     var native: NativeView { get }
     var isLoaded: Bool { get }
-    var bounds: RectFloat { get }
+    var bounds: Rect { get }
     var onAppear: Signal.Empty< Void > { get }
     var onDisappear: Signal.Empty< Void > { get }
     
-    func size(available: SizeFloat) -> SizeFloat
+    func size(available: Size) -> Size
     
     func disappear()
     

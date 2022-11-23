@@ -10,4 +10,7 @@ public protocol IAnimationTask : ICancellable {
     var isCompletion: Bool { get }
     var isCanceled: Bool { get }
     
+    func update(_ delta: TimeInterval) -> Bool
+    func complete()
+    
 }
