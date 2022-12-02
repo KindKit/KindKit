@@ -33,14 +33,9 @@ class TestApiFlow : XCTestCase {
                 },
                 response: { _ in
                     Query.Response()
-                },
-                transform: { _, response -> Result< Data, Query.ResponseError > in
-                    switch response {
-                    case .success(let value): return .success(value.0)
-                    case .failure(let error): return .failure(error)
-                    }
                 }
             )
+            .mapValue({ $0.0 })
             .pipeline()
         let subscription = pipeline.subscribe(
             onReceiveValue: {
