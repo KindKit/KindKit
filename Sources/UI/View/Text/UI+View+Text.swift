@@ -219,25 +219,11 @@ extension UI.View.Text : IUIView {
         }
         let size = self.size.apply(
             available: available,
-            sizeWithWidth: {
-                self.text.kk_size(
-                    font: self.textFont,
-                    numberOfLines: self.numberOfLines,
-                    available: .init(width: $0, height: .infinity)
-                )
-            },
-            sizeWithHeight: {
-                self.text.kk_size(
-                    font: self.textFont,
-                    numberOfLines: self.numberOfLines,
-                    available: .init(width: .infinity, height: $0)
-                )
-            },
             size: {
                 self.text.kk_size(
                     font: self.textFont,
                     numberOfLines: self.numberOfLines,
-                    available: available
+                    available: $0
                 )
             }
         )

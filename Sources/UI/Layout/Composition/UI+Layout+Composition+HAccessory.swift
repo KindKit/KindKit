@@ -8,13 +8,66 @@ public extension UI.Layout.Composition {
     
     struct HAccessory {
         
-        public var leading: IUICompositionLayoutEntity?
-        public var leadingSpacing: Double
+        public var leading: Info?
         public var center: IUICompositionLayoutEntity
-        public var trailing: IUICompositionLayoutEntity?
-        public var trailingSpacing: Double
+        public var trailing: Info?
         public var filling: Bool
         
+        public init(
+            leading: Info? = nil,
+            center: IUICompositionLayoutEntity,
+            trailing: Info? = nil,
+            filling: Bool = true
+        ) {
+            self.leading = leading
+            self.center = center
+            self.trailing = trailing
+            self.filling = filling
+        }
+        
+        public init(
+            leading: Info? = nil,
+            center: IUICompositionLayoutEntity,
+            trailing: IUICompositionLayoutEntity,
+            filling: Bool = true
+        ) {
+            self.init(
+                leading: leading,
+                center: center,
+                trailing: .init(entity: trailing, spacing: 0),
+                filling: filling
+            )
+        }
+        
+        public init(
+            leading: IUICompositionLayoutEntity,
+            center: IUICompositionLayoutEntity,
+            trailing: Info? = nil,
+            filling: Bool = true
+        ) {
+            self.init(
+                leading: .init(entity: leading, spacing: 0),
+                center: center,
+                trailing: trailing,
+                filling: filling
+            )
+        }
+        
+        public init(
+            leading: IUICompositionLayoutEntity? = nil,
+            center: IUICompositionLayoutEntity,
+            trailing: IUICompositionLayoutEntity? = nil,
+            filling: Bool = true
+        ) {
+            self.init(
+                leading: leading.flatMap({ .init(entity: $0, spacing: 0) }),
+                center: center,
+                trailing: trailing.flatMap({ .init(entity: $0, spacing: 0) }),
+                filling: filling
+            )
+        }
+        
+        @available(*, deprecated, renamed: "UI.Layout.Composition.HAccessory.init(leading:center:trailing:filling:)")
         public init(
             leading: IUICompositionLayoutEntity? = nil,
             leadingSpacing: Double = 0,
@@ -23,12 +76,22 @@ public extension UI.Layout.Composition {
             trailingSpacing: Double = 0,
             filling: Bool = true
         ) {
-            self.leading = leading
-            self.leadingSpacing = leadingSpacing
-            self.center = center
-            self.trailing = trailing
-            self.trailingSpacing = trailingSpacing
-            self.filling = filling
+            self.init(
+                leading: leading.flatMap({
+                    return .init(
+                        entity: $0,
+                        spacing: leadingSpacing
+                    )
+                }),
+                center: center,
+                trailing: trailing.flatMap({
+                    return .init(
+                        entity: $0,
+                        spacing: trailingSpacing
+                    )
+                }),
+                filling: filling
+            )
         }
         
     }
@@ -38,67 +101,51 @@ public extension UI.Layout.Composition {
 extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
     
     public func invalidate() {
-        self.leading?.invalidate()
+        self.leading?.entity.invalidate()
         self.center.invalidate()
-        self.trailing?.invalidate()
+        self.trailing?.entity.invalidate()
     }
     
     public func invalidate(_ view: IUIView) {
-        self.leading?.invalidate(view)
+        self.leading?.entity.invalidate(view)
         self.center.invalidate(view)
-        self.trailing?.invalidate(view)
+        self.trailing?.entity.invalidate(view)
     }
     
     @discardableResult
     public func layout(bounds: Rect) -> Size {
-        let leadingSize: Size
-        if let leading = self.leading {
-            leadingSize = leading.size(available: bounds.size)
-        } else {
-            leadingSize = .zero
-        }
-        let trailingSize: Size
-        if let trailing = self.trailing {
-            trailingSize = trailing.size(available: bounds.size)
-        } else {
-            trailingSize = .zero
-        }
-        let accessorySize = (leadingSize.width + self.leadingSpacing) + (trailingSize.width + self.trailingSpacing)
-        let centerSize = self.center.size(available: Size(
-            width: bounds.width - accessorySize,
-            height: max(leadingSize.height, bounds.height, trailingSize.height)
-        ))
+        let sizes = self._size(available: bounds.size)
         let base = Rect(
             x: bounds.x,
             y: bounds.y,
             width: bounds.width,
-            height: max(leadingSize.height, centerSize.height, trailingSize.height)
+            height: max(sizes.leadingSize.height, sizes.centerSize.height, sizes.trailingSize.height)
         )
         if let leading = self.leading {
-            leading.layout(bounds: Rect(
+            leading.entity.layout(bounds: Rect(
                 topLeft: base.topLeft,
-                width: leadingSize.width,
+                width: sizes.leadingSize.width,
                 height: base.height
             ))
         }
         if let trailing = self.trailing {
-            trailing.layout(bounds: Rect(
+            trailing.entity.layout(bounds: Rect(
                 topRight: base.topRight,
-                width: trailingSize.width,
+                width: sizes.trailingSize.width,
                 height: base.height
             ))
         }
         if self.filling == true {
             self.center.layout(bounds: Rect(
-                x: base.x + (leadingSize.width + self.leadingSpacing),
+                x: base.x + (sizes.leadingSize.width + sizes.leadingSpacing),
                 y: base.y,
-                width: base.width - accessorySize,
+                width: base.width - ((sizes.leadingSize.width + sizes.leadingSpacing) + (sizes.trailingSize.width + sizes.trailingSpacing)),
                 height: base.height
             ))
         } else {
             self.center.layout(bounds: Rect(
                 center: base.center,
-                width: bounds.width - (max(leadingSize.width + self.leadingSpacing, trailingSize.width + self.trailingSpacing) * 2),
+                width: bounds.width - (max(sizes.leadingSize.width + sizes.leadingSpacing, sizes.trailingSize.width + sizes.trailingSpacing) * 2),
                 height: base.height
             ))
         }
@@ -106,36 +153,20 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
     }
     
     public func size(available: Size) -> Size {
-        let leadingSize: Size
-        if let leading = self.leading {
-            leadingSize = leading.size(available: available)
-        } else {
-            leadingSize = .zero
-        }
-        let trailingSize: Size
-        if let trailing = self.trailing {
-            trailingSize = trailing.size(available: available)
-        } else {
-            trailingSize = .zero
-        }
-        let accessorySize = (leadingSize.width + self.leadingSpacing) + (trailingSize.width + self.trailingSpacing)
-        let centerSize = self.center.size(available: Size(
-            width: available.width - accessorySize,
-            height: max(leadingSize.height, available.height, trailingSize.height)
-        ))
+        let sizes = self._size(available: available)
         return Size(
             width: available.width,
-            height: max(leadingSize.height, centerSize.height, trailingSize.height)
+            height: max(sizes.leadingSize.height, sizes.centerSize.height, sizes.trailingSize.height)
         )
     }
     
     public func views(bounds: Rect) -> [IUIView] {
         var views: [IUIView] = []
         if let leading = self.leading {
-            views.append(contentsOf: leading.views(bounds: bounds))
+            views.append(contentsOf: leading.entity.views(bounds: bounds))
         }
         if let trailing = self.trailing {
-            views.append(contentsOf: trailing.views(bounds: bounds))
+            views.append(contentsOf: trailing.entity.views(bounds: bounds))
         }
         views.append(contentsOf: self.center.views(bounds: bounds))
         return views
@@ -143,9 +174,124 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
     
 }
 
+private extension UI.Layout.Composition.HAccessory {
+    
+    func _size(available: Size) -> (leadingSize: Size, leadingSpacing: Double, centerSize: Size, trailingSize: Size, trailingSpacing: Double) {
+        let leadingSize: Size
+        let leadingSpacing: Double
+        let trailingSize: Size
+        let trailingSpacing: Double
+        if let leading = self.leading, let trailing = self.trailing {
+            leadingSpacing = leading.spacing
+            trailingSpacing = trailing.spacing
+            if leading.priority >= trailing.priority {
+                leadingSize = leading.entity.size(available: available)
+                trailingSize = trailing.entity.size(available: Size(
+                    width: available.width - leadingSize.width,
+                    height: max(leadingSize.height, available.height)
+                ))
+            } else {
+                trailingSize = trailing.entity.size(available: available)
+                leadingSize = leading.entity.size(available: Size(
+                    width: available.width - trailingSize.width,
+                    height: max(trailingSize.height, available.height)
+                ))
+            }
+        } else if let leading = self.leading {
+            leadingSize = leading.entity.size(available: available)
+            leadingSpacing = leading.spacing
+            trailingSize = .zero
+            trailingSpacing = 0
+        } else if let trailing = self.trailing {
+            leadingSize = .zero
+            leadingSpacing = 0
+            trailingSize = trailing.entity.size(available: available)
+            trailingSpacing = trailing.spacing
+        } else {
+            leadingSize = .zero
+            leadingSpacing = 0
+            trailingSize = .zero
+            trailingSpacing = 0
+        }
+        let centerSize = self.center.size(available: Size(
+            width: available.width - (leadingSize.width + leadingSpacing) + (trailingSize.width + trailingSpacing),
+            height: max(leadingSize.height, available.height, trailingSize.height)
+        ))
+        return (
+            leadingSize: leadingSize,
+            leadingSpacing: leadingSpacing,
+            centerSize: centerSize,
+            trailingSize: trailingSize,
+            trailingSpacing: trailingSpacing
+        )
+    }
+    
+}
+
 public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.HAccessory {
     
     @inlinable
+    static func hAccessory(
+        leading: UI.Layout.Composition.HAccessory.Info? = nil,
+        center: IUICompositionLayoutEntity,
+        trailing: UI.Layout.Composition.HAccessory.Info? = nil,
+        filling: Bool = true
+    ) -> UI.Layout.Composition.HAccessory {
+        return .init(
+            leading: leading,
+            center: center,
+            trailing: trailing,
+            filling: filling
+        )
+    }
+    
+    @inlinable
+    static func hAccessory(
+        leading: UI.Layout.Composition.HAccessory.Info? = nil,
+        center: IUICompositionLayoutEntity,
+        trailing: IUICompositionLayoutEntity,
+        filling: Bool = true
+    ) -> UI.Layout.Composition.HAccessory {
+        return .init(
+            leading: leading,
+            center: center,
+            trailing: trailing,
+            filling: filling
+        )
+    }
+    
+    @inlinable
+    static func hAccessory(
+        leading: IUICompositionLayoutEntity,
+        center: IUICompositionLayoutEntity,
+        trailing: UI.Layout.Composition.HAccessory.Info? = nil,
+        filling: Bool = true
+    ) -> UI.Layout.Composition.HAccessory {
+        return .init(
+            leading: leading,
+            center: center,
+            trailing: trailing,
+            filling: filling
+        )
+    }
+    
+    @inlinable
+    static func hAccessory(
+        leading: IUICompositionLayoutEntity? = nil,
+        center: IUICompositionLayoutEntity,
+        trailing: IUICompositionLayoutEntity? = nil,
+        filling: Bool = true
+    ) -> UI.Layout.Composition.HAccessory {
+        return .init(
+            leading: leading,
+            center: center,
+            trailing: trailing,
+            filling: filling
+        )
+    }
+    
+    @inlinable
+    @available(*, deprecated, renamed: "hAccessory(leading:center:trailing:filling:)")
     static func hAccessory(
         leading: IUICompositionLayoutEntity? = nil,
         leadingSpacing: Double = 0,

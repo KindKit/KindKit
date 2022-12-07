@@ -235,25 +235,11 @@ extension UI.View.AttributedText : IUIView {
         }
         let size = self.size.apply(
             available: available,
-            sizeWithWidth: {
-                guard let text = self.text else { return .init(width: $0, height: 0) }
-                return text.kk_size(
-                    numberOfLines: self.numberOfLines,
-                    available: .init(width: $0, height: .infinity)
-                )
-            },
-            sizeWithHeight: {
-                guard let text = self.text else { return .init(width: 0, height: $0) }
-                return text.kk_size(
-                    numberOfLines: self.numberOfLines,
-                    available: .init(width: .infinity, height: $0)
-                )
-            },
             size: {
                 guard let text = self.text else { return .zero }
                 return text.kk_size(
                     numberOfLines: self.numberOfLines,
-                    available: available
+                    available: $0
                 )
             }
         )

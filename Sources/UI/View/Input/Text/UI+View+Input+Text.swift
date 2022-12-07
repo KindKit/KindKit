@@ -264,25 +264,11 @@ extension UI.View.Input.Text : IUIView {
         guard self.isHidden == false else { return .zero }
         return self.size.apply(
             available: available,
-            sizeWithWidth: {
-                self.text.kk_size(
-                    font: self.textFont,
-                    numberOfLines: 0,
-                    available: .init(width: $0, height: .infinity)
-                )
-            },
-            sizeWithHeight: {
-                self.text.kk_size(
-                    font: self.textFont,
-                    numberOfLines: 0,
-                    available: .init(width: .infinity, height: $0)
-                )
-            },
             size: {
                 self.text.kk_size(
                     font: self.textFont,
                     numberOfLines: 0,
-                    available: available
+                    available: $0
                 )
             }
         )

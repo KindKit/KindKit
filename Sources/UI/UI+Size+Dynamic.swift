@@ -50,18 +50,14 @@ public extension UI.Size.Dynamic {
     ) -> Size {
         return self.apply(
             available: available,
-            sizeWithWidth: { _ in contentSize },
-            sizeWithHeight: { _ in contentSize },
-            size: { contentSize }
+            size: { _ in contentSize }
         )
     }
     
     @inlinable
     func apply(
         available: Size,
-        sizeWithWidth: (_ width: Double) -> Size,
-        sizeWithHeight: (_ height: Double) -> Size,
-        size: () -> Size
+        size: (Size) -> Size
     ) -> Size {
         let rw, rh: Double
         switch (self.width, self.height) {
@@ -96,7 +92,8 @@ public extension UI.Size.Dynamic {
             } else {
                 rw = 0
             }
-            rh = sizeWithWidth(rw).height * h.value
+            let cs = size(.init(width: rw, height: available.height))
+            rh = cs.height * h.value
         case (.ratio(let w), .parent(let h)):
             if available.height.isInfinite == false {
                 rh = max(0, available.height) * h.value
@@ -111,7 +108,8 @@ public extension UI.Size.Dynamic {
             rw = h * w.value
             rh = h
         case (.ratio(let w), .content(let h)):
-            rh = size().height * h.value
+            let cs = size(available)
+            rh = cs.height * h.value
             rw = rh * w.value
         case (.fixed(let w), .parent(let h)):
             rw = w
@@ -128,22 +126,25 @@ public extension UI.Size.Dynamic {
             rh = h
         case (.fixed(let w), .content(let h)):
             rw = w
-            rh = size().height * h.value
+            let cs = size(.init(width: rw, height: available.height))
+            rh = cs.height * h.value
         case (.content(let w), .parent(let h)):
             if available.height.isInfinite == false {
                 rh = max(0, available.height) * h.value
             } else {
                 rh = 0
             }
-            rw = sizeWithHeight(rh).width * w.value
+            let cs = size(.init(width: available.height, height: rh))
+            rw = cs.width * w.value
         case (.content(let w), .ratio(let h)):
-            rw = size().width * w.value
+            rw = size(available).width * w.value
             rh = rw * h.value
         case (.content(let w), .fixed(let h)):
-            rw = sizeWithHeight(h).width * w.value
+            let cs = size(.init(width: available.width, height: h))
+            rw = cs.width * w.value
             rh = h
         case (.content(let w), .content(let h)):
-            let s = size()
+            let s = size(available)
             rw = s.width * w.value
             rh = s.height * h.value
         }

@@ -79,9 +79,7 @@ public extension UI.View {
             guard self.isHidden == false else { return .zero }
             return self.size.apply(
                 available: available,
-                sizeWithWidth: { self.body.size(available: .init(width: $0, height: available.height)) },
-                sizeWithHeight: { self.body.size(available: .init(width: available.width, height: $0)) },
-                size: { self.body.size(available: available) }
+                size: { self.body.size(available: $0) }
             )
         }
         

@@ -171,17 +171,9 @@ extension UI.View.Control : IUIView {
         guard self.isHidden == false else { return .zero }
         return self.size.apply(
             available: available,
-            sizeWithWidth: {
-                guard let content = self.content else { return .init(width: $0, height: 0) }
-                return content.size(available: .init(width: $0, height: available.height))
-            },
-            sizeWithHeight: {
-                guard let content = self.content else { return .init(width: 0, height: $0) }
-                return content.size(available: .init(width: available.width, height: $0))
-            },
             size: {
                 guard let content = self.content else { return .zero }
-                return content.size(available: available)
+                return content.size(available: $0)
             }
         )
     }
