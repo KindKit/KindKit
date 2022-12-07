@@ -62,9 +62,13 @@ public extension RemoteImage.Loader {
     }()
     
     func download(target: IRemoteImageTarget, query: IRemoteImageQuery) {
-        self.lockQueue.sync(flags: .barrier, execute: {
+        self.lockQueue.async(execute: {
             if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
                 loadTask.add(target: target)
+            } else if let image = self.cache.image(query: query) {
+                self.syncQueue.async(execute: {
+                    target.remoteImage(image: image)
+                })
             } else {
                 let loadTask = LoadTask(
                     delegate: self,
@@ -81,7 +85,7 @@ public extension RemoteImage.Loader {
     }
     
     func download(target: IRemoteImageTarget, query: IRemoteImageQuery, filter: IRemoteImageFilter) {
-        self.lockQueue.sync(flags: .barrier, execute: {
+        self.lockQueue.async(execute: {
             if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
                 if let filterTask = self._filterTasks.first(where: { $0.query.key == query.key && $0.filter.name == filter.name }) {
                     filterTask.add(target: target)
@@ -98,6 +102,10 @@ public extension RemoteImage.Loader {
                     loadTask.add(target: filterTask)
                     self._filterTasks.append(filterTask)
                 }
+            } else if let image = self.cache.image(query: query, filter: filter) {
+                self.syncQueue.async(execute: {
+                    target.remoteImage(image: image)
+                })
             } else {
                 let loadTask = LoadTask(
                     delegate: self,

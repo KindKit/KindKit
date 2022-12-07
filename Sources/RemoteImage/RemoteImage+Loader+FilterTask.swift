@@ -43,19 +43,23 @@ extension RemoteImage.Loader.FilterTask : IRemoteImageTarget {
     
     func remoteImage(image: UI.Image) {
         self.task = DispatchWorkItem.kk_async(block: {
-            do {
-                if let image = self.filter.apply(image) {
-                    if let data = image.pngData() {
-                        try self.cache.set(data: data, image: image, query: self.query, filter: self.filter)
-                        self.finish(image: image)
+            if let image = self.cache.image(query: self.query, filter: self.filter) {
+                self.finish(image: image)
+            } else {
+                do {
+                    if let image = self.filter.apply(image) {
+                        if let data = image.pngData() {
+                            try self.cache.set(data: data, image: image, query: self.query, filter: self.filter)
+                            self.finish(image: image)
+                        } else {
+                            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
+                        }
                     } else {
                         throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
                     }
-                } else {
-                    throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
+                } catch let error {
+                    self.finish(error: error)
                 }
-            } catch let error {
-                self.finish(error: error)
             }
         }, queue: self.workQueue)
     }
