@@ -35,9 +35,9 @@ extension UI.View.Input.Text {
 
 final class KKInputTextView : UIView {
     
-    override var bounds: CGRect {
+    override var frame: CGRect {
         didSet {
-            guard super.bounds != oldValue else { return }
+            guard super.frame != oldValue else { return }
             self._updateInputTextHeight()
         }
     }

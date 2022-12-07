@@ -182,6 +182,10 @@ public extension UI.Layout.List {
         }
     }
     
+    func insert(index: Int, view: IUIView) {
+        self.insert(index: index, views: [ view ])
+    }
+    
     func delete(range: Range< Int >) {
         self._firstVisible = nil
         if self._animations.isEmpty == false {
@@ -215,6 +219,10 @@ public extension UI.Layout.List {
                 self.setNeedForceUpdate()
             }
         }
+    }
+    
+    func delete(view: IUIView) {
+        self.delete(views: [ view ])
     }
     
 }

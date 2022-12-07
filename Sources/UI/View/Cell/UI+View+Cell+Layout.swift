@@ -16,20 +16,26 @@ extension UI.View.Cell {
         var content: IUIView? {
             didSet { self.setNeedForceUpdate() }
         }
+        var contentInset: Inset = .zero {
+            didSet { self.setNeedForceUpdate() }
+        }
         
         init() {
         }
         
         func layout(bounds: Rect) -> Size {
             self.background?.frame = bounds
-            self.content?.frame = bounds
+            self.content?.frame = bounds.inset(self.contentInset)
             return bounds.size
         }
         
         func size(available: Size) -> Size {
             guard let content = self.content else { return .zero }
-            let contentSize = content.size(available: available)
-            return Size(width: available.width, height: contentSize.height)
+            let contentSize = content.size(available: available.inset(self.contentInset))
+            return Size(
+                width: available.width + self.contentInset.horizontal,
+                height: contentSize.height + self.contentInset.vertical
+            )
         }
         
         func views(bounds: Rect) -> [IUIView] {

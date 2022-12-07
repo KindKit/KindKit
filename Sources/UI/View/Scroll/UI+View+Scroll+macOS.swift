@@ -48,10 +48,10 @@ final class KKScrollView : NSScrollView {
         set { self._documentView.frame = NSRect(origin: .zero, size: newValue) }
         get { super.contentSize }
     }
-    override var bounds: CGRect {
+    override var frame: CGRect {
         didSet {
-            guard self.bounds != oldValue else { return }
-            if self.bounds.size != oldValue.size {
+            guard self.frame != oldValue else { return }
+            if self.frame.size != oldValue.size {
                 if self.window != nil {
                     self._layoutManager.invalidate()
                 }

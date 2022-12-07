@@ -24,6 +24,10 @@ public extension UI.View {
                 self._layout.content = self.content
             }
         }
+        public var contentInset: Inset {
+            set { self._layout.contentInset = newValue }
+            get { self._layout.contentInset }
+        }
         public var shouldPressed: Bool = true
         public var isSelected: Bool {
             set {
@@ -65,6 +69,13 @@ public extension UI.View.Cell {
     @discardableResult
     func content(_ value: IUIView) -> Self {
         self.content = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: Inset) -> Self {
+        self.contentInset = value
         return self
     }
     

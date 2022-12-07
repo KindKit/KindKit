@@ -62,7 +62,7 @@ public extension UI.Layout {
         public init(
             direction: Direction,
             alignment: Alignment,
-            inset: Inset,
+            inset: Inset = .zero,
             columns: Int,
             spacing: Point = .zero,
             views: [IUIView] = []
@@ -101,7 +101,7 @@ public extension UI.Layout {
                 alignment: self.alignment,
                 spacing: self.spacing
             )
-            return pass.bounding
+            return pass.bounding.inset(-self.inset)
         }
         
         public func size(available: Size) -> Size {
@@ -109,7 +109,7 @@ public extension UI.Layout {
             if pass.available !~ available {
                 pass = self._makePass(available)
             }
-            return pass.bounding
+            return pass.bounding.inset(-self.inset)
         }
         
         public func views(bounds: Rect) -> [IUIView] {
@@ -161,6 +161,10 @@ public extension UI.Layout.Grid {
         self.setNeedForceUpdate()
     }
     
+    func insert(index: Int, view: IUIView) {
+        self.insert(index: index, views: [ view ])
+    }
+    
     func delete(range: Range< Int >) {
         self._views.removeSubrange(range)
         self._cache.removeSubrange(range)
@@ -177,6 +181,11 @@ public extension UI.Layout.Grid {
             }
             self.setNeedForceUpdate()
         }
+    }
+    
+    @inlinable
+    func delete(view: IUIView) {
+        self.delete(views: [ view ])
     }
     
 }

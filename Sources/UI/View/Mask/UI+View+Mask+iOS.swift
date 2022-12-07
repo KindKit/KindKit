@@ -38,10 +38,10 @@ final class KKMaskView : UIView {
     var contentSize: Size {
         return self._layoutManager.size
     }
-    override var bounds: CGRect {
+    override var frame: CGRect {
         didSet {
-            guard self.bounds != oldValue else { return }
-            if self.bounds.size != oldValue.size {
+            guard self.frame != oldValue else { return }
+            if self.frame.size != oldValue.size {
                 if let view = self._view {
                     self.update(cornerRadius: view.cornerRadius)
                     self.updateShadowPath()

@@ -43,13 +43,13 @@ final class KKPagingView : UIScrollView {
             }
         }
     }
-    override var bounds: CGRect {
+    override var frame: CGRect {
         set {
-            let oldValue = super.bounds
+            let oldValue = super.frame
             if oldValue != newValue {
                 let oldContentOffset = self.contentOffset
                 let oldContentSize = self.contentSize
-                super.bounds = newValue
+                super.frame = newValue
                 if oldValue.size != newValue.size {
                     if self._revalidatePage == nil {
                         self._revalidatePage = Self._currentPage(
@@ -62,7 +62,7 @@ final class KKPagingView : UIScrollView {
                 }
             }
         }
-        get { super.bounds }
+        get { super.frame }
     }
     override var contentSize: CGSize {
         set {
