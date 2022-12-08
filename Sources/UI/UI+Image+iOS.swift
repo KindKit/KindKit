@@ -152,6 +152,10 @@ public extension UI.Image {
         return .init(self.native.withRenderingMode(renderingMode))
     }
     
+    func unrotate() -> UI.Image {
+        return self.unrotate(maxResolution: max(self.size.width, self.size.height))
+    }
+    
     func unrotate(maxResolution: Double) -> UI.Image {
         guard let imgRef = self.native.cgImage else {
             return self

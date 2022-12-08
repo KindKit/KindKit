@@ -35,6 +35,12 @@ extension UI.View.Input.Text {
 
 final class KKInputTextView : UIView {
     
+    override var canBecomeFirstResponder: Bool {
+        return self._input.canBecomeFirstResponder
+    }
+    override var canResignFirstResponder: Bool {
+        return self._input.canResignFirstResponder
+    }
     override var frame: CGRect {
         didSet {
             guard super.frame != oldValue else { return }
@@ -54,6 +60,7 @@ final class KKInputTextView : UIView {
     private var _inputInset: UIEdgeInsets = .zero {
         didSet {
             guard self._inputInset != oldValue else { return }
+            self._input.textContainerInset = self._inputInset
             self.setNeedsLayout()
         }
     }
@@ -71,6 +78,7 @@ final class KKInputTextView : UIView {
         self._placeholder.isHidden = true
 
         self._input = UITextView()
+        self._input.textContainerInset = .zero
         self._input.backgroundColor = .clear
         self._input.textContainer.lineFragmentPadding = 0
         self._input.layoutManager.usesFontLeading = true
@@ -87,6 +95,14 @@ final class KKInputTextView : UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func becomeFirstResponder() -> Bool {
+        return self._input.becomeFirstResponder()
+    }
+    
+    override func resignFirstResponder() -> Bool {
+        return self._input.resignFirstResponder()
     }
     
     override func layoutSubviews() {

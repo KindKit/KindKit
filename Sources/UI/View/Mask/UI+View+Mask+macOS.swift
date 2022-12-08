@@ -46,7 +46,7 @@ final class KKMaskView : NSView {
                     origin: .zero,
                     size: frame.size
                 )
-                self._updateShadowPath()
+                self._updatePath()
                 if self.window != nil {
                     self._layoutManager.invalidate()
                 }
@@ -60,22 +60,13 @@ final class KKMaskView : NSView {
     fileprivate var _border: UI.Border = .none {
         didSet {
             guard self._border != oldValue else { return }
-            if let layer = self.layer {
-                switch self._border {
-                case .none:
-                    layer.borderWidth = 0
-                    layer.borderColor = nil
-                case .manual(let width, let color):
-                    layer.borderWidth = CGFloat(width)
-                    layer.borderColor = color.cgColor
-                }
-            }
+            self._clipView._border = self._border
         }
     }
     fileprivate var _cornerRadius: UI.CornerRadius = .none {
         didSet {
             guard self._cornerRadius != oldValue else { return }
-            self._updateShadowPath()
+            self._updatePath()
             self._clipView._cornerRadius = self._cornerRadius
         }
     }
@@ -84,6 +75,7 @@ final class KKMaskView : NSView {
             guard self._shadow != oldValue else { return }
             if let layer = self.layer {
                 if let shadow = self._shadow {
+                    layer.masksToBounds = false
                     layer.shadowColor = shadow.color.cgColor
                     layer.shadowOpacity = Float(shadow.opacity)
                     layer.shadowRadius = CGFloat(shadow.radius)
@@ -92,13 +84,14 @@ final class KKMaskView : NSView {
                         height: CGFloat(shadow.offset.y)
                     )
                 } else {
+                    layer.masksToBounds = true
                     layer.shadowColor = nil
                     layer.shadowOpacity = 0
                     layer.shadowRadius = 0
                     layer.shadowOffset = .zero
                 }
             }
-            self._updateShadowPath()
+            self._updatePath()
         }
     }
     fileprivate var _layoutManager: UI.Layout.Manager!
@@ -116,7 +109,7 @@ final class KKMaskView : NSView {
         self.wantsLayer = true
         self.addSubview(self._clipView)
         
-        self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self._layoutManager = UI.Layout.Manager(contentView: self._clipView, delegate: self)
     }
         
     required init?(coder: NSCoder) {
@@ -158,7 +151,7 @@ extension KKMaskView {
             didSet {
                 guard self.frame != oldValue else { return }
                 if self.frame.size != oldValue.size {
-                    self._updateCornerRadius()
+                    self._updatePath()
                 }
             }
         }
@@ -166,21 +159,41 @@ extension KKMaskView {
             return true
         }
         
+        fileprivate var _border: UI.Border = .none {
+            didSet {
+                guard self._border != oldValue else { return }
+                switch self._border {
+                case .none:
+                    self._borderLayer.lineWidth = 0
+                    self._borderLayer.strokeColor = nil
+                case .manual(let width, let color):
+                    self._borderLayer.lineWidth = CGFloat(width)
+                    self._borderLayer.strokeColor = color.cgColor
+                }
+                self._updatePath()
+            }
+        }
         fileprivate var _cornerRadius: UI.CornerRadius = .none {
             didSet {
                 guard self._cornerRadius != oldValue else { return }
-                self._updateCornerRadius()
+                self._updatePath()
             }
         }
+        fileprivate var _borderLayer: CAShapeLayer
         fileprivate var _maskLayer: CAShapeLayer
         
         override init(frame: CGRect) {
+            self._borderLayer = .init()
+            self._borderLayer.fillColor = nil
+            self._borderLayer.zPosition = 1
+            
             self._maskLayer = CAShapeLayer()
             
             super.init(frame: frame)
             
             self.wantsLayer = true
             self.layer?.mask = self._maskLayer
+            self.layer?.addSublayer(self._borderLayer)
         }
         
         required init?(coder: NSCoder) {
@@ -249,23 +262,24 @@ extension KKMaskView {
 
 private extension KKMaskView {
     
-    func _updateShadowPath() {
+    func _updatePath() {
         guard let layer = self.layer else { return }
-        if self._shadow != nil {
-            layer.shadowPath = CGPath.kk_roundRect(
-                rect: Rect(self.bounds),
-                corner: self._cornerRadius
-            )
-        } else {
-            layer.shadowPath = nil
-        }
+        layer.shadowPath = CGPath.kk_roundRect(
+            rect: Rect(self.bounds),
+            corner: self._cornerRadius
+        )
     }
     
 }
 
 private extension KKMaskView.ClipView {
     
-    func _updateCornerRadius() {
+    func _updatePath() {
+        self._borderLayer.path = CGPath.kk_roundRect(
+            rect: Rect(self.bounds),
+            border: self._borderLayer.lineWidth,
+            corner: self._cornerRadius
+        )
         self._maskLayer.path = CGPath.kk_roundRect(
             rect: Rect(self.bounds),
             corner: self._cornerRadius

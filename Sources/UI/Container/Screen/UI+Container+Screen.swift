@@ -107,7 +107,15 @@ public extension UI.Container {
         }
         
         public func refreshParentInset() {
+#if os(macOS)
             let parentInset = self.parentInset()
+#elseif os(iOS)
+            let baseParentInset = self.parentInset()
+            let parentInset = baseParentInset.bottom(
+                natural: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom),
+                interactive: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
+            )
+#endif
             self.refreshContentInset()
             let overlayEdge = self.screen.overlayEdge
             self._layout.inset = .init(

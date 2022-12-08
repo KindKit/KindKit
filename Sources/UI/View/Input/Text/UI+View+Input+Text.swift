@@ -265,10 +265,10 @@ extension UI.View.Input.Text : IUIView {
         return self.size.apply(
             available: available,
             size: {
-                self.text.kk_size(
+                return self._text.kk_size(
                     font: self.textFont,
                     numberOfLines: 0,
-                    available: $0
+                    available: $0.inset(self.textInset)
                 )
             }
         )

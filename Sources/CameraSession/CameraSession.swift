@@ -71,7 +71,7 @@ public final class CameraSession {
     private var _captureSessionStopObserver: NSObjectProtocol?
     
     public init(
-        permission: IPermission
+        _ permission: IPermission
     ) {
         self.permission = permission
         self._setup()
@@ -454,10 +454,22 @@ extension CameraSession : IPermissionObserver {
     }
     
     public func didRequest(_ permission: IPermission, source: Any?) {
-        if self.permission === permission && self.isStarting == true {
-            if let state = self._startState {
-                self._startState = nil
-                self._configure(state: state)
+        if self.permission === permission {
+            switch self.permission.status {
+            case .authorized:
+                if self.isStarting == true {
+                    if let state = self._startState {
+                        self._startState = nil
+                        self._configure(state: state)
+                    }
+                }
+            default:
+                if self.isStarting == true {
+                    self._activeState = nil
+                    self.isStarting = false
+                } else if self.isStarted == true {
+                    self.stop()
+                }
             }
         }
     }

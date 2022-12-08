@@ -48,6 +48,7 @@ public extension IUIScreenStackable where Self : IUIScreen {
     @discardableResult
     func stackPop(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
         guard let container = self.stackContainer else { return false }
+        guard container.containers.isEmpty == false else { return false }
         container.pop(animated: animated, completion: completion)
         return true
     }

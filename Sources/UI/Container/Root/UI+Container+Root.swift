@@ -83,6 +83,10 @@ public extension UI.Container {
                 if self.isPresented == true {
                     self.content.prepareShow(interactive: false)
                     self.content.finishShow(interactive: false)
+#if os(iOS)
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
+#endif
                 }
             }
         }

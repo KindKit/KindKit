@@ -16,8 +16,7 @@ public extension Permission {
             if #available(macOS 11.0, iOS 14.5, *) {
                 switch ATTrackingManager.trackingAuthorizationStatus {
                 case .notDetermined: return .notDetermined
-                case .restricted: return .denied
-                case .denied: return .denied
+                case .restricted, .denied: return .denied
                 case .authorized: return .authorized
                 @unknown default: return .denied
                 }

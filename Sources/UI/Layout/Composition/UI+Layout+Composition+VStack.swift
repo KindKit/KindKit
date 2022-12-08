@@ -9,15 +9,18 @@ public extension UI.Layout.Composition {
     struct VStack {
         
         public var alignment: Alignment
+        public var behaviour: Behaviour
         public var spacing: Double
         public var entities: [IUICompositionLayoutEntity]
         
         public init(
             alignment: Alignment,
+            behaviour: Behaviour = [],
             spacing: Double = 0,
             entities: [IUICompositionLayoutEntity]
         ) {
             self.alignment = alignment
+            self.behaviour = behaviour
             self.spacing = spacing
             self.entities = entities
         }
@@ -53,10 +56,7 @@ extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
     
     @discardableResult
     public func layout(bounds: Rect) -> Size {
-        let pass = self._sizePass(available: Size(
-            width: bounds.width,
-            height: .infinity
-        ))
+        let pass = self._sizePass(available: bounds.size)
         switch self.alignment {
         case .left: self._layoutLeft(bounds: bounds, pass: pass)
         case .center: self._layoutCenter(bounds: bounds, pass: pass)
@@ -67,10 +67,7 @@ extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
     }
     
     public func size(available: Size) -> Size {
-        let pass = self._sizePass(available: Size(
-            width: available.width,
-            height: .infinity
-        ))
+        let pass = self._sizePass(available: available)
         return pass.bounding
     }
     
@@ -88,16 +85,47 @@ private extension UI.Layout.Composition.VStack {
     
     @inline(__always)
     func _sizePass(available: Size) -> Pass {
-        var pass = Pass(
-            sizes: [],
-            bounding: .zero
-        )
-        for entity in self.entities {
-            let size = entity.size(available: available)
-            pass.sizes.append(size)
-            if size.height > 0 {
-                pass.bounding.width = max(pass.bounding.width, size.width)
-                pass.bounding.height += size.height + self.spacing
+        var pass: Pass
+        if self.behaviour.contains(.fit) == true {
+            let width: Double
+            if available.width.isInfinite == true {
+                width = 0
+            } else {
+                width = available.width
+            }
+            pass = Pass(
+                sizes: [],
+                bounding: .init(
+                    width: width,
+                    height: 0
+                )
+            )
+            for entity in self.entities {
+                let size = entity.size(available: .init(
+                    width: available.width,
+                    height: available.height - pass.bounding.height
+                ))
+                pass.sizes.append(size)
+                if size.height > 0 {
+                    pass.bounding.width = max(pass.bounding.width, size.width)
+                    pass.bounding.height += size.height + self.spacing
+                }
+            }
+        } else {
+            pass = Pass(
+                sizes: [],
+                bounding: .zero
+            )
+            for entity in self.entities {
+                let size = entity.size(available: .init(
+                    width: available.width,
+                    height: .infinity
+                ))
+                pass.sizes.append(size)
+                if size.height > 0 {
+                    pass.bounding.width = max(pass.bounding.width, size.width)
+                    pass.bounding.height += size.height + self.spacing
+                }
             }
         }
         if pass.bounding.height > 0 {
@@ -157,11 +185,13 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func vStack(
         alignment: UI.Layout.Composition.VStack.Alignment,
+        behaviour: UI.Layout.Composition.VStack.Behaviour = [],
         spacing: Double = 0,
         entities: [IUICompositionLayoutEntity]
     ) -> UI.Layout.Composition.VStack {
         return .init(
             alignment: alignment,
+            behaviour: behaviour,
             spacing: spacing,
             entities: entities
         )

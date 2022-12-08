@@ -3,17 +3,18 @@
 //
 
 import Foundation
-import AVFoundation
+import PhotosUI
 
 public extension Permission {
     
-    final class Camera : IPermission {
+    final class PhotoLibrary : IPermission {
         
+        public let access: Access
         public var status: Permission.Status {
             switch self._rawStatus() {
             case .notDetermined: return .notDetermined
             case .denied, .restricted: return .denied
-            case .authorized: return .authorized
+            case .authorized, .limited: return .authorized
             default: return .denied
             }
         }
@@ -26,7 +27,11 @@ public extension Permission {
         private var _resignActiveObserver: NSObjectProtocol?
 #endif
         
-        public init() {
+        public init(
+            _ access: Access
+        ) {
+            self.access = access
+            
             self._observer = Observer()
             
 #if os(iOS)
@@ -68,11 +73,19 @@ public extension Permission {
             switch self._rawStatus() {
             case .notDetermined:
                 self._willRequest(source: source)
-                AVCaptureDevice.requestAccess(for: .video, completionHandler: { [weak self] granted in
-                    DispatchQueue.main.async(execute: {
-                        self?._didRequest(source: source)
+                if #available(iOS 14, *) {
+                    PHPhotoLibrary.requestAuthorization(for: self.access.level, handler: { [weak self] _ in
+                        DispatchQueue.main.async(execute: {
+                            self?._didRequest(source: source)
+                        })
                     })
-                })
+                } else {
+                    PHPhotoLibrary.requestAuthorization({ [weak self] _ in
+                        DispatchQueue.main.async(execute: {
+                            self?._didRequest(source: source)
+                        })
+                    })
+                }
             case .denied:
 #if os(iOS)
                 guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -93,7 +106,7 @@ public extension Permission {
 
 #if os(iOS)
 
-private extension Permission.Camera {
+private extension Permission.PhotoLibrary {
     
     func _didBecomeActive(_ notification: Notification) {
         guard let resignState = self._resignState else { return }
@@ -116,10 +129,14 @@ private extension Permission.Camera {
 
 #endif
 
-private extension Permission.Camera {
+private extension Permission.PhotoLibrary {
     
-    func _rawStatus() -> AVAuthorizationStatus {
-        return AVCaptureDevice.authorizationStatus(for: .video)
+    func _rawStatus() -> PHAuthorizationStatus {
+        if #available(iOS 14, *) {
+            return PHPhotoLibrary.authorizationStatus(for: self.access.level)
+        } else {
+            return PHPhotoLibrary.authorizationStatus()
+        }
     }
     
     func _didRedirectToSettings(source: Any) {

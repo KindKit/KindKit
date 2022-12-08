@@ -77,6 +77,12 @@ public extension UI.Container {
                         content.finishShow(interactive: false)
                     }
                 }
+                if self.isPresented == true {
+#if os(iOS)
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
+#endif
+                }
             }
         }
         public var containers: [IUIModalContentContainer] {
@@ -372,6 +378,10 @@ private extension UI.Container.Modal {
                         self._layout.state = .idle(modal: modal)
                         modal.container.finishShow(interactive: false)
                         self.refreshContentInset()
+#if os(iOS)
+                        self.refreshOrientations()
+                        self.refreshStatusBar()
+#endif
                         completion?()
                     }
                 )
@@ -380,17 +390,22 @@ private extension UI.Container.Modal {
             self._layout.state = .idle(modal: modal)
             self.refreshContentInset()
             if self.isPresented == true {
+                modal.container.refreshParentInset()
                 modal.container.prepareShow(interactive: false)
                 modal.container.finishShow(interactive: false)
+#if os(iOS)
+                self.refreshOrientations()
+                self.refreshStatusBar()
+#endif
             }
             completion?()
         }
     }
     
     func _dismiss(current: UI.Container.ModalItem, previous: UI.Container.ModalItem?, animated: Bool, completion: (() -> Void)?) {
+        self._current = previous
         self._dismiss(modal: current, animated: animated, completion: { [weak self] in
             guard let self = self else { return }
-            self._current = previous
             if let previous = previous {
                 self._present(modal: previous, animated: animated, completion: completion)
             } else {
@@ -418,6 +433,10 @@ private extension UI.Container.Modal {
                         self._layout.state = .empty
                         modal.container.finishHide(interactive: false)
                         self.refreshContentInset()
+#if os(iOS)
+                        self.refreshOrientations()
+                        self.refreshStatusBar()
+#endif
                         completion?()
                     }
                 )
@@ -426,6 +445,10 @@ private extension UI.Container.Modal {
             self._layout.state = .empty
             if self.isPresented == true {
                 modal.container.finishHide(interactive: false)
+#if os(iOS)
+                self.refreshOrientations()
+                self.refreshStatusBar()
+#endif
             }
             self.refreshContentInset()
             completion?()
@@ -524,6 +547,12 @@ private extension UI.Container.Modal {
         } else {
             self._current = nil
             self._layout.state = .empty
+            if self.isPresented == true {
+#if os(iOS)
+                self.refreshOrientations()
+                self.refreshStatusBar()
+#endif
+            }
         }
         self.refreshContentInset()
     }

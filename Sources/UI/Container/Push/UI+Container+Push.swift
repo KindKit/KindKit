@@ -91,6 +91,12 @@ public extension UI.Container {
                         content.finishShow(interactive: false)
                     }
                 }
+                if self.isPresented == true {
+#if os(iOS)
+                    self.refreshOrientations()
+                    self.refreshStatusBar()
+#endif
+                }
             }
         }
         public var containers: [IUIPushContentContainer] {

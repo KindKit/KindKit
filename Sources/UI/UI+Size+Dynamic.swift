@@ -134,7 +134,7 @@ public extension UI.Size.Dynamic {
             } else {
                 rh = 0
             }
-            let cs = size(.init(width: available.height, height: rh))
+            let cs = size(.init(width: available.width, height: rh))
             rw = cs.width * w.value
         case (.content(let w), .ratio(let h)):
             rw = size(available).width * w.value

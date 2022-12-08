@@ -149,6 +149,7 @@ final class KKScrollContentView : NSClipView {
         super.init(frame: CGRect.zero)
         
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.wantsLayer = true
     }
     
     required init?(coder: NSCoder) {
@@ -177,6 +178,7 @@ final class KKScrollDocumentView : NSView {
         super.init(frame: CGRect.zero)
         
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.wantsLayer = true
     }
     
     required init?(coder: NSCoder) {

@@ -68,6 +68,22 @@ public extension UI.View {
             }
             get { self._selected }
         }
+        public var preset: Preset? {
+            didSet {
+                guard self.preset != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(preset: self.preset)
+                }
+            }
+        }
+        public var selectedPreset: Preset? {
+            didSet {
+                guard self.selectedPreset != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(selectedPreset: self.selectedPreset)
+                }
+            }
+        }
         public var color: UI.Color? {
             didSet {
                 guard self.color != oldValue else { return }
@@ -125,6 +141,16 @@ public extension UI.View {
 public extension UI.View.Segmented {
     
     @inlinable
+    var selectedIndex: Int? {
+        guard let selected = self.selected else { return nil }
+        return self.items.firstIndex(of: selected)
+    }
+    
+}
+
+public extension UI.View.Segmented {
+    
+    @inlinable
     @discardableResult
     func items(_ value: [Item]) -> Self {
         self.items = value
@@ -135,6 +161,20 @@ public extension UI.View.Segmented {
     @discardableResult
     func selected(_ value: Item?) -> Self {
         self.selected = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func preset(_ value: Preset?) -> Self {
+        self.preset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selectedPreset(_ value: Preset?) -> Self {
+        self.selectedPreset = value
         return self
     }
     
