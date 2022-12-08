@@ -60,7 +60,6 @@ public extension UI.View {
                 guard self.cornerRadius != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(cornerRadius: self.cornerRadius)
-                    self._view.updateShadowPath()
                 }
             }
         }
@@ -69,7 +68,6 @@ public extension UI.View {
                 guard self.shadow != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(shadow: self.shadow)
-                    self._view.updateShadowPath()
                 }
             }
         }
