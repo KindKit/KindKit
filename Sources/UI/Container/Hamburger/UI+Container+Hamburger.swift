@@ -403,6 +403,10 @@ private extension UI.Container.Hamburger {
                     .custom(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .leading(progress: progress)
@@ -411,6 +415,7 @@ private extension UI.Container.Hamburger {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .leading(progress: .one)
                             leading.finishShow(interactive: interactive)
                             completion?()
@@ -446,6 +451,10 @@ private extension UI.Container.Hamburger {
                     .custom(
                         duration: TimeInterval(self._layout.leadingSize / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .leading(progress: progress.invert)
@@ -454,6 +463,7 @@ private extension UI.Container.Hamburger {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .idle
                             leading.finishHide(interactive: interactive)
                             completion?()
@@ -484,6 +494,10 @@ private extension UI.Container.Hamburger {
                     .custom(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress)
@@ -492,6 +506,7 @@ private extension UI.Container.Hamburger {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .trailing(progress: .one)
                             trailing.finishShow(interactive: interactive)
                             completion?()
@@ -527,6 +542,10 @@ private extension UI.Container.Hamburger {
                     .custom(
                         duration: TimeInterval(self._layout.trailingSize / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .trailing(progress: progress.invert)
@@ -535,6 +554,7 @@ private extension UI.Container.Hamburger {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .idle
                             trailing.finishHide(interactive: interactive)
                             completion?()

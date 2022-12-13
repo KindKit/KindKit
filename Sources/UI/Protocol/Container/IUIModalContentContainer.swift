@@ -7,13 +7,8 @@ import Foundation
 public protocol IUIModalContentContainer : IUIContainer, IUIContainerParentable {
         
     var modalContainer: IUIModalContainer? { get }
-    
     var modalColor: UI.Color { get }
-    
-    var modalCornerRadius: UI.CornerRadius { get }
-    
-    var modalSheetInset: Inset? { get }
-    var modalSheetBackground: (IUIView & IUIViewAlphable)? { get }
+    var modalSheet: UI.Modal.Presentation.Sheet? { get }
     
 }
 

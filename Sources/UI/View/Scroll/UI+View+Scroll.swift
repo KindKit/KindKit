@@ -91,6 +91,9 @@ public extension UI.View {
                 if self.isLoaded == true {
                     self._view.update(contentInset: self.contentInset)
                 }
+                if self.size.isStatic == false {
+                    self.setNeedForceLayout()
+                }
             }
         }
         public var contentOffset: Point {
@@ -458,7 +461,7 @@ extension UI.View.Scroll : IUIView {
             available: available,
             size: {
                 guard let content = self.content else { return .zero }
-                return content.size(available: $0)
+                return content.size(available: $0).inset(-self.contentInset)
             }
         )
     }

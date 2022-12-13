@@ -287,6 +287,12 @@ private extension KKCameraPreviewView {
 extension KKCameraPreviewView : UIGestureRecognizerDelegate {
     
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let cameraSession = self._cameraSession else {
+            return false
+        }
+        guard cameraSession.isStarted == true else {
+            return false
+        }
         guard let videoDevice = self._videoDevice else {
             return false
         }

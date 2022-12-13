@@ -380,6 +380,7 @@ private extension UI.Container.Book {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._layout.state = .forward(current: current, next: forward, progress: .zero)
                         forward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
@@ -394,6 +395,7 @@ private extension UI.Container.Book {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .idle(current: forward)
                         current.container.finishHide(interactive: false)
                         forward.container.finishShow(interactive: false)
@@ -443,6 +445,7 @@ private extension UI.Container.Book {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._layout.state = .backward(current: current, next: backward, progress: .zero)
                         backward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
@@ -457,6 +460,7 @@ private extension UI.Container.Book {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .idle(current: backward)
                         current.container.finishHide(interactive: false)
                         backward.container.finishShow(interactive: false)

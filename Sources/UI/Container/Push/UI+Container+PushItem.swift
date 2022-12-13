@@ -8,9 +8,8 @@ extension UI.Container {
     
     final class PushItem {
         
-        var container: IUIPushContentContainer
-        var view: IUIView
-        var viewSize: Size
+        let container: IUIPushContentContainer
+        private(set) var viewSize: Size
         
         init(
             _ container: IUIPushContentContainer,
@@ -19,7 +18,6 @@ extension UI.Container {
             _ contentInset: Inset
         ) {
             self.container = container
-            self.view = container.view
             if container.pushOptions.contains(.useContentInset) == true {
                 self.viewSize = container.view.size(available: available.inset(contentInset))
             } else {
@@ -39,6 +37,15 @@ extension UI.Container {
             }
         }
         
+    }
+    
+}
+
+extension UI.Container.PushItem {
+    
+    @inlinable
+    var view: IUIView {
+        return container.view
     }
     
 }

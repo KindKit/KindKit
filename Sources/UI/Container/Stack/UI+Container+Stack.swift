@@ -141,10 +141,7 @@ public extension UI.Container {
             }
             if let item = item {
                 if item.barHidden == false && UI.Container.BarController.shared.hidden(.stack) == false {
-                    return parentInset.top(
-                        natural: item.barSize,
-                        interactive: item.barSize * item.barVisibility
-                    )
+                    return parentInset + .init(top: item.barSize, visibility: item.barVisibility)
                 }
             }
             return parentInset
@@ -154,10 +151,7 @@ public extension UI.Container {
             func _inset_(item: UI.Container.StackItem) -> UI.Container.AccumulateInset {
                 let contentInset = item.container.contentInset()
                 if item.barHidden == false && UI.Container.BarController.shared.hidden(.stack) == false {
-                    return contentInset.top(
-                        natural: item.barSize,
-                        interactive: item.barSize * item.barVisibility
-                    )
+                    return contentInset + .init(top: item.barSize, visibility: item.barVisibility)
                 }
                 return contentInset
             }
@@ -452,21 +446,10 @@ extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreen
         return self.screen.modalColor
     }
     
-    public var modalCornerRadius: UI.CornerRadius {
-        return self.screen.modalCornerRadius
-    }
-    
-    public var modalSheetInset: Inset? {
+    public var modalSheet: UI.Modal.Presentation.Sheet? {
         switch self.screen.modalPresentation {
         case .simple: return nil
-        case .sheet(let info): return info.inset
-        }
-    }
-    
-    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
-        switch self.screen.modalPresentation {
-        case .simple: return nil
-        case .sheet(let info): return info.background
+        case .sheet(let info): return info
         }
     }
     
@@ -540,6 +523,7 @@ private extension UI.Container.Stack {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._layout.state = .push(current: current, forward: forward, progress: .zero)
                         forward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
@@ -558,6 +542,7 @@ private extension UI.Container.Stack {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .idle(current: forward)
                         current.container.finishHide(interactive: false)
                         forward.container.finishShow(interactive: false)
@@ -617,6 +602,7 @@ private extension UI.Container.Stack {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._layout.state = .pop(backward: backward, current: current, progress: .zero)
                         backward.container.refreshParentInset()
                         current.container.prepareHide(interactive: false)
@@ -635,6 +621,7 @@ private extension UI.Container.Stack {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .idle(current: backward)
                         current.container.finishHide(interactive: false)
                         backward.container.finishShow(interactive: false)

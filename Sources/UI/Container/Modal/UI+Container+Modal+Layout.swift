@@ -13,15 +13,10 @@ extension UI.Container.Modal {
         var state: State = .empty {
             didSet {
                 guard self.state != oldValue else { return }
-                switch oldValue {
-                case .empty:
-                    break
-                case .idle(let modal):
-                    self._cache[ObjectIdentifier(modal.view)] = nil
-                case .present(let modal, _):
-                    self._cache[ObjectIdentifier(modal.view)] = nil
-                case .dismiss(let modal, _):
-                    self._cache[ObjectIdentifier(modal.view)] = nil
+                if let oldModal = oldValue.modal {
+                    if self.state.modal != oldModal {
+                        oldModal.reset()
+                    }
                 }
                 self.setNeedUpdate()
             }
@@ -29,6 +24,7 @@ extension UI.Container.Modal {
         var inset: Inset = .zero {
             didSet {
                 guard self.inset != oldValue else { return }
+                self.state.modal?.reset()
                 self.setNeedUpdate()
             }
         }
@@ -38,7 +34,6 @@ extension UI.Container.Modal {
                 self.setNeedUpdate()
             }
         }
-        private var _cache: [ObjectIdentifier : Size] = [:]
 
         init(
             _ content: IUIView?
@@ -47,11 +42,15 @@ extension UI.Container.Modal {
         }
         
         public func invalidate() {
-            self._cache.removeAll(keepingCapacity: true)
+            self.state.modal?.reset()
         }
         
         public func invalidate(_ view: IUIView) {
-            self._cache[ObjectIdentifier(view)] = nil
+            if let modal = self.state.modal {
+                if modal.view === view {
+                    modal.reset()
+                }
+            }
         }
         
         func layout(bounds: Rect) -> Size {
@@ -61,46 +60,74 @@ extension UI.Container.Modal {
             switch self.state {
             case .empty:
                 break
-            case .idle(let modal):
+            case .idle(let modal, let detent):
                 let modalInset: Inset
-                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground {
-                    modalInset = Inset(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
-                    sheet.frame = bounds
-                    sheet.alpha = 1
+                if let sheet = modal.sheet {
+                    modalInset = Inset(
+                        top: self.inset.top + sheet.inset.top,
+                        left: sheet.inset.left,
+                        right: sheet.inset.right,
+                        bottom: sheet.inset.bottom
+                    )
+                    sheet.background.frame = bounds
+                    sheet.background.alpha = 1
                 } else {
                     modalInset = .zero
                 }
                 let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(view: modal.view, available: modalBounds.size)
+                let modalSize = modal.size(of: detent, available: modalBounds.size)
                 modal.view.frame = Rect(bottom: modalBounds.bottom, size: modalSize)
-            case .present(let modal, let progress):
+            case .transition(let modal, let from, let to, var progress):
                 let modalInset: Inset
-                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground {
-                    modalInset = Inset(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
-                    sheet.frame = bounds
-                    sheet.alpha = progress.value
+                if let sheet = modal.sheet {
+                    modalInset = Inset(
+                        top: self.inset.top + sheet.inset.top,
+                        left: sheet.inset.left,
+                        right: sheet.inset.right,
+                        bottom: sheet.inset.bottom
+                    )
+                    sheet.background.frame = bounds
+                    if from == nil {
+                        sheet.background.alpha = progress.value
+                    } else if to == nil {
+                        sheet.background.alpha = progress.invert.value
+                    } else {
+                        sheet.background.alpha = 1
+                    }
                 } else {
                     modalInset = .zero
                 }
                 let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(view: modal.view, available: modalBounds.size)
-                let beginRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
-                let endRect = Rect(bottom: modalBounds.bottom, size: modalSize)
-                modal.view.frame = beginRect.lerp(endRect, progress: progress)
-            case .dismiss(let modal, let progress):
-                let modalInset: Inset
-                if let sheetInset = modal.sheetInset, let sheet = modal.sheetBackground {
-                    modalInset = Inset(top: self.inset.top + sheetInset.top, left: sheetInset.left, right: sheetInset.right, bottom: sheetInset.bottom)
-                    sheet.frame = bounds
-                    sheet.alpha = progress.invert.value
+                let fromRect: Rect
+                let toRect: Rect
+                if let from = from, let to = to {
+                    let fromSize = modal.size(of: from, available: modalBounds.size)
+                    let toSize = modal.size(of: to, available: modalBounds.size)
+                    fromRect = Rect(bottom: bounds.bottom, size: fromSize)
+                    toRect = Rect(bottom: bounds.bottom, size: toSize)
+                } else if let from = from {
+                    let fromSize = modal.size(of: from, available: modalBounds.size)
+                    let toSize = modal.minSize(available: modalBounds.size)
+                    fromRect = Rect(bottom: modalBounds.bottom, size: fromSize)
+                    toRect = Rect(top: bounds.bottom, size: toSize)
+                } else if let to = to {
+                    if progress > .one {
+                        progress -= .one
+                        let fromSize = modal.size(of: to, available: modalBounds.size)
+                        let toSize = Size(width: fromSize.width, height: fromSize.height * 2)
+                        fromRect = Rect(bottom: modalBounds.bottom, size: fromSize)
+                        toRect = Rect(bottom: modalBounds.bottom, size: toSize)
+                    } else {
+                        let fromSize = modal.minSize(available: modalBounds.size)
+                        let toSize = modal.size(of: to, available: modalBounds.size)
+                        fromRect = Rect(top: bounds.bottom, size: fromSize)
+                        toRect = Rect(bottom: modalBounds.bottom, size: toSize)
+                    }
                 } else {
-                    modalInset = .zero
+                    fromRect = .zero
+                    toRect = .zero
                 }
-                let modalBounds = bounds.inset(modalInset)
-                let modalSize = self._size(view: modal.view, available: modalBounds.size)
-                let beginRect = Rect(bottom: modalBounds.bottom, size: modalSize)
-                let endRect = Rect(topLeft: bounds.bottomLeft, size: bounds.size)
-                modal.view.frame = beginRect.lerp(endRect, progress: progress)
+                modal.view.frame = fromRect.lerp(toRect, progress: progress)
             }
             return bounds.size
         }
@@ -114,20 +141,8 @@ extension UI.Container.Modal {
             if let content = self.content {
                 views.append(content)
             }
-            switch self.state {
-            case .empty: break
-            case .idle(let modal):
-                if let view = modal.sheetBackground {
-                    views.append(view)
-                }
-                views.append(modal.view)
-            case .present(let modal, _):
-                if let view = modal.sheetBackground {
-                    views.append(view)
-                }
-                views.append(modal.view)
-            case .dismiss(let modal, _):
-                if let view = modal.sheetBackground {
+            if let modal = self.state.modal {
+                if let view = modal.sheet?.background {
                     views.append(view)
                 }
                 views.append(modal.view)
@@ -139,16 +154,141 @@ extension UI.Container.Modal {
     
 }
 
-private extension UI.Container.Modal.Layout {
+extension UI.Container.Modal.Layout {
+}
+
+extension UI.Container.Modal.Layout {
     
-    @inline(__always)
-    func _size(view: IUIView, available: Size) -> Size {
-        if let cacheSize = self._cache[ObjectIdentifier(view)] {
-            return cacheSize
+    func beginInteractive(
+        modal: UI.Container.ModalItem
+    ) {
+    }
+    
+    func changeInteractive(
+        modal: UI.Container.ModalItem,
+        delta: Double
+    ) {
+        if modal.isSheet == true {
+            if let transition = modal.sheetTransition(delta: delta) {
+                self.state = .transition(
+                    modal: modal,
+                    from: transition.from,
+                    to: transition.to,
+                    progress: transition.progress
+                )
+            } else {
+                self.state = .idle(modal: modal)
+            }
+        } else if let view = self.appearedView {
+            if delta > 0 {
+                let progress = Percent(delta / view.bounds.size.height)
+                self.state = .dismiss(modal: modal, progress: progress)
+            } else {
+                self.state = .idle(modal: modal)
+            }
         }
-        let itemSize = view.size(available: available)
-        self._cache[ObjectIdentifier(view)] = itemSize
-        return itemSize
+    }
+    
+    func endInteractive(
+        modal: UI.Container.ModalItem,
+        velocity: Double,
+        delta: Double,
+        animation: @escaping (Percent) -> Void,
+        finish: @escaping () -> Void,
+        cancel: @escaping () -> Void
+    ) -> ICancellable? {
+        let transition: (
+            from: UI.Size.Dynamic.Dimension?,
+            to: UI.Size.Dynamic.Dimension?,
+            size: Double,
+            progress: Percent
+        )?
+        if modal.isSheet == true {
+            transition = modal.sheetTransition(delta: delta)
+        } else if let view = self.appearedView {
+            if delta > 0 {
+                let size = view.bounds.size.height
+                let progress = Percent(delta / size)
+                transition = (
+                    from: modal.currentDetent,
+                    to: nil,
+                    size: size,
+                    progress: progress
+                )
+            } else {
+                transition = nil
+            }
+        } else {
+            transition = nil
+        }
+        guard let transition = transition else {
+            self.state = .idle(modal: modal)
+            cancel()
+            return nil
+        }
+        let baseProgress = transition.progress
+        let estimateProgress = .one - baseProgress
+        if baseProgress >= Percent(0.25) {
+            let duration = (transition.size * estimateProgress.value) / velocity
+            return Animation.default.run(
+                .custom(
+                    duration: duration,
+                    processing: { [weak self] animationProgress in
+                        guard let self = self else { return }
+                        let progress = baseProgress + (estimateProgress * animationProgress)
+                        self.state = .transition(
+                            modal: modal,
+                            from: transition.from,
+                            to: transition.to,
+                            progress: progress
+                        )
+                        self.updateIfNeeded()
+                        animation(progress)
+                    },
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        if let detent = transition.to {
+                            self.state = .idle(modal: modal, detent: detent)
+                            modal.currentDetent = detent
+                            cancel()
+                        } else {
+                            self.state = .empty
+                            finish()
+                        }
+                    }
+                )
+            )
+        } else {
+            let duration = (transition.size * baseProgress.value) / velocity
+            return Animation.default.run(
+                .custom(
+                    duration: duration,
+                    processing: { [weak self] animationProgress in
+                        guard let self = self else { return }
+                        let progress = estimateProgress + (baseProgress * animationProgress)
+                        self.state = .transition(
+                            modal: modal,
+                            from: transition.to,
+                            to: transition.from,
+                            progress: progress
+                        )
+                        self.updateIfNeeded()
+                        animation(progress)
+                    },
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        if let detent = transition.from {
+                            self.state = .idle(modal: modal, detent: detent)
+                            modal.currentDetent = detent
+                            cancel()
+                        } else {
+                            self.state = .idle(modal: modal)
+                            cancel()
+                        }
+                    }
+                )
+            )
+        }
     }
     
 }

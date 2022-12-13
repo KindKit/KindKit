@@ -19,6 +19,10 @@ public extension UI.Size.Dynamic {
 
 public extension UI.Size.Dynamic.Dimension {
     
+    static var none: Self {
+        return .fixed(0)
+    }
+    
     static var fill: Self {
         return .parent(.one)
     }

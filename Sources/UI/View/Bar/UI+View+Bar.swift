@@ -10,8 +10,7 @@ public extension UI.View {
         
         public let body: UI.View.Custom
         public var placement: Placement {
-            set { self._layout.placement = newValue }
-            get { self._layout.placement }
+            self._layout.placement
         }
         public var size: Double? {
             set { self._layout.size = newValue }
@@ -50,13 +49,6 @@ public extension UI.View {
 }
 
 public extension UI.View.Bar {
-    
-    @inlinable
-    @discardableResult
-    func placement(_ value: Placement) -> Self {
-        self.placement = value
-        return self
-    }
     
     @inlinable
     @discardableResult

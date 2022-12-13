@@ -163,9 +163,7 @@ extension UI.Container.None : IHamburgerMenuContainer {
 extension UI.Container.None : IUIModalContentContainer {
     
     public var modalColor: UI.Color { .white }
-    public var modalCornerRadius: UI.CornerRadius { .none }
-    public var modalSheetInset: Inset? { nil }
-    public var modalSheetBackground: (IUIView & IUIViewAlphable)? { nil }
+    public var modalSheet: UI.Modal.Presentation.Sheet? { nil }
     
 }
 

@@ -28,7 +28,7 @@ public extension CameraSession.Recorder {
             return self._delegate != nil && self._context != nil
         }
         
-        @available(iOS 11.0, macOS 13.0, *)
+        @available(macOS 13.0, *)
         public var flash: Flash? {
             set { self._settings.flashMode = newValue?.raw ?? .auto }
             get { .init(self._settings.flashMode) }

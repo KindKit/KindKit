@@ -8,19 +8,29 @@ extension UI.Container {
     
     final class DialogItem {
         
-        var container: IUIDialogContentContainer
-        var view: IUIView
-        var background: (IUIView & IUIViewAlphable)?
+        let container: IUIDialogContentContainer
         
         init(
             _ container: IUIDialogContentContainer,
             _ available: Size
         ) {
             self.container = container
-            self.view = container.view
-            self.background = container.dialogBackground
         }
         
+    }
+    
+}
+
+extension UI.Container.DialogItem {
+    
+    @inlinable
+    var view: IUIView {
+        return container.view
+    }
+    
+    @inlinable
+    var background: (IUIView & IUIViewAlphable)? {
+        return container.dialogBackground
     }
     
 }

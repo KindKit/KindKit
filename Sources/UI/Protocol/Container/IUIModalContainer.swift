@@ -11,9 +11,6 @@ public protocol IUIModalContainer : IUIContainer, IUIContainerParentable {
     var previous: IUIModalContentContainer? { get }
     var current: IUIModalContentContainer? { get }
     var animationVelocity: Double { set get }
-#if os(iOS)
-    var interactiveLimit: Double { set get }
-#endif
     
     func present(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?)
     

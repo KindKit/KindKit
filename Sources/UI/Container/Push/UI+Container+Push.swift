@@ -271,7 +271,7 @@ public extension UI.Container {
                 self.inset + self._layout.contentInset
             )
             self._items.append(item)
-            if self._current == nil {
+            if self._current == nil && self._animation == nil {
                 self._present(push: item, animated: animated, completion: completion)
             } else {
                 completion?()
@@ -372,6 +372,7 @@ private extension UI.Container.Push {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._layout.state = .present(push: push, progress: .zero)
                         if self.isPresented == true {
                             push.container.refreshParentInset()
@@ -386,6 +387,7 @@ private extension UI.Container.Push {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .idle(push: push)
                         self._didPresent(push: push)
                         if self.isPresented == true {
@@ -430,6 +432,8 @@ private extension UI.Container.Push {
             self._current = previous
             if let previous = previous {
                 self._present(push: previous, animated: animated, completion: completion)
+            } else if self._current == nil && self._items.isEmpty == false {
+                self._present(push: self._items[0], animated: animated, completion: completion)
             } else {
                 completion?()
             }
@@ -443,6 +447,10 @@ private extension UI.Container.Push {
                 .custom(
                     duration: self._layout.duration(item: push, velocity: self.animationVelocity),
                     ease: Animation.Ease.QuadraticInOut(),
+                    preparing: { [weak self] in
+                        guard let self = self else { return }
+                        self._view.locked = true
+                    },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
                         self._layout.state = .dismiss(push: push, progress: progress)
@@ -451,6 +459,7 @@ private extension UI.Container.Push {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
+                        self._view.locked = false
                         self._layout.state = .empty
                         push.container.finishHide(interactive: false)
 #if os(iOS)

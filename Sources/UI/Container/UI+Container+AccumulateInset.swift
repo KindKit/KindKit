@@ -44,89 +44,51 @@ public extension UI.Container {
             self.interactive = interactive
         }
         
+        public init(
+            top: Double,
+            visibility: Double
+        ) {
+            self.natural = .init(top: top, left: 0, right: 0, bottom: 0)
+            self.interactive = .init(top: top * visibility, left: 0, right: 0, bottom: 0)
+        }
+        
+        public init(
+            left: Double,
+            visibility: Double
+        ) {
+            self.natural = .init(top: 0, left: left, right: 0, bottom: 0)
+            self.interactive = .init(top: 0, left: left * visibility, right: 0, bottom: 0)
+        }
+        
+        public init(
+            right: Double,
+            visibility: Double
+        ) {
+            self.natural = .init(top: 0, left: 0, right: right, bottom: 0)
+            self.interactive = .init(top: 0, left: 0, right: right * visibility, bottom: 0)
+        }
+        
+        public init(
+            bottom: Double,
+            visibility: Double
+        ) {
+            self.natural = .init(top: 0, left: 0, right: 0, bottom: bottom)
+            self.interactive = .init(top: 0, left: 0, right: 0, bottom: bottom * visibility)
+        }
+        
     }
 
 }
 
 public extension UI.Container.AccumulateInset {
     
-    static let zero: Self = .init(natural: .zero, interactive: .zero)
+    static var zero: Self {
+        return .init(natural: .zero, interactive: .zero)
+    }
     
 }
 
 public extension UI.Container.AccumulateInset {
-    
-    @inlinable
-    func top(natural: Double, interactive: Double) -> Self {
-        return .init(
-            natural: .init(
-                top: self.natural.top + natural,
-                left: self.natural.left,
-                right: self.natural.right,
-                bottom: self.natural.bottom
-            ),
-            interactive: .init(
-                top: self.interactive.top + interactive,
-                left: self.interactive.left,
-                right: self.interactive.right,
-                bottom: self.interactive.bottom
-            )
-        )
-    }
-    
-    @inlinable
-    func left(natural: Double, interactive: Double) -> Self {
-        return .init(
-            natural: .init(
-                top: self.natural.top,
-                left: self.natural.left + natural,
-                right: self.natural.right,
-                bottom: self.natural.bottom
-            ),
-            interactive: .init(
-                top: self.interactive.top,
-                left: self.interactive.left + interactive,
-                right: self.interactive.right,
-                bottom: self.interactive.bottom
-            )
-        )
-    }
-    
-    @inlinable
-    func right(natural: Double, interactive: Double) -> Self {
-        return .init(
-            natural: .init(
-                top: self.natural.top,
-                left: self.natural.left,
-                right: self.natural.right + natural,
-                bottom: self.natural.bottom
-            ),
-            interactive: .init(
-                top: self.interactive.top,
-                left: self.interactive.left,
-                right: self.interactive.right + interactive,
-                bottom: self.interactive.bottom
-            )
-        )
-    }
-    
-    @inlinable
-    func bottom(natural: Double, interactive: Double) -> Self {
-        return .init(
-            natural: .init(
-                top: self.natural.top,
-                left: self.natural.left,
-                right: self.natural.right,
-                bottom: self.natural.bottom + natural
-            ),
-            interactive: .init(
-                top: self.interactive.top,
-                left: self.interactive.left,
-                right: self.interactive.right,
-                bottom: self.interactive.bottom + interactive
-            )
-        )
-    }
     
     @inlinable
     func min(_ other: Self) -> Self {

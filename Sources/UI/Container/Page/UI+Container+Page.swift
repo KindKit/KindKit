@@ -157,10 +157,7 @@ public extension UI.Container {
             let parentInset = self.parentInset()
             if self._items.contains(where: { $0.container === container }) == true {
                 if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
-                    return parentInset.top(
-                        natural: self.barSize,
-                        interactive: self.barSize * self.barVisibility
-                    )
+                    return parentInset + .init(top: self.barSize, visibility: self.barVisibility)
                 }
             }
             return parentInset
@@ -183,10 +180,7 @@ public extension UI.Container {
                 contentInset = currentInset.lerp(nextInset, progress: progress)
             }
             if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
-                return contentInset.top(
-                    natural: self.barSize,
-                    interactive: self.barSize * self.barVisibility
-                )
+                return contentInset + .init(top: self.barSize, visibility: self.barVisibility)
             }
             return contentInset
         }
@@ -489,6 +483,7 @@ private extension UI.Container.Page {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._bar.beginTransition()
                         self._layout.state = .forward(current: current, next: forward, progress: .zero)
                         if self.isPresented == true {
@@ -508,6 +503,7 @@ private extension UI.Container.Page {
                         guard let self = self else { return }
                         self._animation = nil
                         self._bar.finishTransition(to: forward.bar)
+                        self._view.locked = false
                         self._layout.state = .idle(current: forward)
                         current.container.finishHide(interactive: false)
                         forward.container.finishShow(interactive: false)
@@ -554,6 +550,7 @@ private extension UI.Container.Page {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
+                        self._view.locked = true
                         self._bar.beginTransition()
                         self._layout.state = .backward(current: current, next: backward, progress: .zero)
                         if self.isPresented == true {
@@ -573,6 +570,7 @@ private extension UI.Container.Page {
                         guard let self = self else { return }
                         self._animation = nil
                         self._bar.finishTransition(to: backward.bar)
+                        self._view.locked = false
                         self._layout.state = .idle(current: backward)
                         current.container.finishHide(interactive: false)
                         backward.container.finishShow(interactive: false)

@@ -204,69 +204,73 @@ private extension CameraSession {
         didConfigure: (() -> Void)? = nil,
         didStart: (() -> Void)? = nil
     ) {
-        willConfigure?()
-        self.session.beginConfiguration()
-        if old?.videoPreset != new.videoPreset {
-            let raw = new.videoPreset.raw
-            if self.session.canSetSessionPreset(raw) == true {
-                self.session.sessionPreset = raw
+        self._queue.async(execute: { [weak self] in
+            guard let self = self else { return }
+            if let willConfigure = willConfigure {
+                DispatchQueue.main.sync(execute: willConfigure)
+            }
+            self.session.beginConfiguration()
+            if old?.videoPreset != new.videoPreset {
+                let raw = new.videoPreset.raw
+                if self.session.canSetSessionPreset(raw) == true {
+                    self.session.sessionPreset = raw
+                } else {
+                    self.session.sessionPreset = .high
+                }
+            }
+            if old?.videoDevice !== new.videoDevice {
+                if let videoDevice = old?.videoDevice {
+                    self.session.removeInput(videoDevice.input)
+                }
+                if self.session.canAddInput(new.videoDevice.input) == true {
+                    self.session.addInput(new.videoDevice.input)
+                }
+            }
+            if old?.audioDevice !== new.audioDevice {
+                if let audioDevice = old?.audioDevice {
+                    self.session.removeInput(audioDevice.input)
+                }
+                if let audioDevice = new.audioDevice {
+                    if self.session.canAddInput(audioDevice.input) == true {
+                        self.session.addInput(audioDevice.input)
+                    }
+                }
+            }
+            if let oldRecorders = old?.recorders {
+                do {
+                    let recorders = oldRecorders.filter({ recorder in
+                        return new.recorders.contains(where: { $0 === recorder }) == false
+                    })
+                    for recorder in recorders {
+                        self.session.removeOutput(recorder.output)
+                    }
+                }
+                do {
+                    let recorders = new.recorders.filter({ recorder in
+                        return oldRecorders.contains(where: { $0 === recorder }) == false
+                    })
+                    for recorder in recorders {
+                        if self.session.canAddOutput(recorder.output) == true {
+                            self.session.addOutput(recorder.output)
+                        }
+                    }
+                }
             } else {
-                self.session.sessionPreset = .high
-            }
-        }
-        if old?.videoDevice !== new.videoDevice {
-            if let videoDevice = old?.videoDevice {
-                self.session.removeInput(videoDevice.input)
-            }
-            if self.session.canAddInput(new.videoDevice.input) == true {
-                self.session.addInput(new.videoDevice.input)
-            }
-        }
-        if old?.audioDevice !== new.audioDevice {
-            if let audioDevice = old?.audioDevice {
-                self.session.removeInput(audioDevice.input)
-            }
-            if let audioDevice = new.audioDevice {
-                if self.session.canAddInput(audioDevice.input) == true {
-                    self.session.addInput(audioDevice.input)
-                }
-            }
-        }
-        if let oldRecorders = old?.recorders {
-            do {
-                let recorders = oldRecorders.filter({ recorder in
-                    return new.recorders.contains(where: { $0 === recorder }) == false
-                })
-                for recorder in recorders {
-                    self.session.removeOutput(recorder.output)
-                }
-            }
-            do {
-                let recorders = new.recorders.filter({ recorder in
-                    return oldRecorders.contains(where: { $0 === recorder }) == false
-                })
-                for recorder in recorders {
+                for recorder in new.recorders {
                     if self.session.canAddOutput(recorder.output) == true {
                         self.session.addOutput(recorder.output)
                     }
                 }
             }
-        } else {
-            for recorder in new.recorders {
-                if self.session.canAddOutput(recorder.output) == true {
-                    self.session.addOutput(recorder.output)
-                }
+            self.session.commitConfiguration()
+            if let didConfigure = didConfigure {
+                DispatchQueue.main.sync(execute: didConfigure)
             }
-        }
-        self.session.commitConfiguration()
-        didConfigure?()
-        self._activeState = new
-        self._queue.async(execute: { [weak self] in
-            guard let self = self else { return }
             self.session.startRunning()
-            if let didStart = didStart {
-                DispatchQueue.main.sync(execute: didStart)
-            }
+            DispatchQueue.main.sync(execute: {
+                self._activeState = new
+                didStart?()
+            })
         })
     }
     
@@ -390,7 +394,10 @@ public extension CameraSession {
     
     func stop() {
         if self.isStarted == true {
-            self.session.stopRunning()
+            self._queue.async(execute: { [weak self] in
+                guard let self = self else { return }
+                self.session.stopRunning()
+            })
             self._activeState = nil
         }
         self.isStarting = false

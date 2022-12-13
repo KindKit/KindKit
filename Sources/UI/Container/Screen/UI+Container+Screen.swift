@@ -48,8 +48,8 @@ public extension UI.Container {
         }
         public let screen: Screen
         
-        private let _layout: Layout
-        private let _view: UI.View.Custom
+        private let _layout = Layout()
+        private let _view = UI.View.Custom()
 #if os(iOS)
         private var _virtualKeyboard = VirtualKeyboard()
         private var _virtualKeyboardHeight: Double = 0 {
@@ -68,9 +68,6 @@ public extension UI.Container {
         ) {
             self.isPresented = false
             self.screen = screen
-            self._layout = Layout()
-            self._view = UI.View.Custom()
-                .content(self._layout)
             self._setup()
         }
         
@@ -82,49 +79,15 @@ public extension UI.Container {
         }
         
         public func contentInset() -> UI.Container.AccumulateInset {
-#if os(macOS)
-            return .zero
-#elseif os(iOS)
-            return .init(
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: self._virtualKeyboardHeight
-            )
-#endif
+            return self._contentInset()
         }
         
         public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
-            let parentInset = self.parentInset()
-#if os(macOS)
-            return parentInset
-#elseif os(iOS)
-            return parentInset.bottom(
-                natural: max(self._virtualKeyboardHeight, parentInset.natural.bottom),
-                interactive: max(self._virtualKeyboardHeight, parentInset.interactive.bottom)
-            )
-#endif
+            return self._parentInset(for: container)
         }
         
         public func refreshParentInset() {
-#if os(macOS)
-            let parentInset = self.parentInset()
-#elseif os(iOS)
-            let baseParentInset = self.parentInset()
-            let parentInset = baseParentInset.bottom(
-                natural: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom),
-                interactive: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
-            )
-#endif
-            self.refreshContentInset()
-            let overlayEdge = self.screen.overlayEdge
-            self._layout.inset = .init(
-                top: overlayEdge.contains(.top) == false ? parentInset.interactive.top : 0,
-                left: overlayEdge.contains(.left) == false ? parentInset.interactive.left : 0,
-                right: overlayEdge.contains(.right) == false ? parentInset.interactive.right : 0,
-                bottom: overlayEdge.contains(.bottom) == false ? parentInset.interactive.bottom : 0
-            )
-            self.screen.apply(inset: parentInset)
+            return self._refreshParentInset()
         }
         
         public func activate() -> Bool {
@@ -172,11 +135,12 @@ private extension UI.Container.Screen {
 #if os(iOS)
         self._subscribeVirtualKeyboard()
 #endif
-        
         self.screen.container = self
         self.screen.setup()
         
         self._layout.content = self.screen.view
+        self._layout.bar = self.screen.bar
+        self._view.content = self._layout
     }
     
     func _destroy() {
@@ -185,6 +149,195 @@ private extension UI.Container.Screen {
 #endif
         self.screen.container = nil
         self.screen.destroy()
+    }
+    
+    func _contentInset() -> UI.Container.AccumulateInset {
+#if os(macOS)
+        let contentInset = UI.Container.AccumulateInset(
+            self.screen.additionalContentInset
+        )
+#elseif os(iOS)
+        let contentInset = UI.Container.AccumulateInset(
+            top: self.screen.additionalContentInset.top,
+            left: self.screen.additionalContentInset.left,
+            right: self.screen.additionalContentInset.right,
+            bottom: self.screen.additionalContentInset.bottom + self._virtualKeyboardHeight
+        )
+#endif
+        if let bar = self.screen.bar {
+            switch bar.placement {
+            case .top:
+                let barSize = self._layout.barSize ?? .zero
+                return .init(
+                    natural: .init(
+                        top: contentInset.natural.top + barSize.height,
+                        left: contentInset.natural.left,
+                        right: contentInset.natural.right,
+                        bottom: contentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: contentInset.interactive.top + barSize.height,
+                        left: contentInset.interactive.left,
+                        right: contentInset.interactive.right,
+                        bottom: contentInset.interactive.bottom
+                    )
+                )
+            case .bottom:
+                let barSize = self._layout.barSize ?? .zero
+                return .init(
+                    natural: .init(
+                        top: contentInset.natural.top,
+                        left: contentInset.natural.left,
+                        right: contentInset.natural.right,
+                        bottom: contentInset.natural.bottom + barSize.height
+                    ),
+                    interactive: .init(
+                        top: contentInset.interactive.top,
+                        left: contentInset.interactive.left,
+                        right: contentInset.interactive.right,
+                        bottom: contentInset.interactive.bottom + barSize.height
+                    )
+                )
+            }
+        } else {
+            return contentInset
+        }
+    }
+    
+    func _parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+#if os(iOS)
+        let baseParentInset = self.parentInset()
+        let parentInset = UI.Container.AccumulateInset(
+            natural: .init(
+                top: baseParentInset.natural.top,
+                left: baseParentInset.natural.left,
+                right: baseParentInset.natural.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom)
+            ),
+            interactive: .init(
+                top: baseParentInset.interactive.top,
+                left: baseParentInset.interactive.left,
+                right: baseParentInset.interactive.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
+            )
+        )
+#else
+        let parentInset = self.parentInset()
+#endif
+        if let bar = self.screen.bar {
+            let barSize = self._layout.barSize ?? .zero
+            switch bar.placement {
+            case .top:
+                return .init(
+                    natural: .init(
+                        top: barSize.height,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: parentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: barSize.height,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: parentInset.interactive.bottom
+                    )
+                )
+            case .bottom:
+                return .init(
+                    natural: .init(
+                        top: parentInset.natural.top,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: barSize.height
+                    ),
+                    interactive: .init(
+                        top: parentInset.interactive.top,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: barSize.height
+                    )
+                )
+            }
+        } else {
+            return parentInset
+        }
+    }
+    
+    func _refreshParentInset() {
+#if os(iOS)
+        let baseParentInset = self.parentInset()
+        let parentInset = UI.Container.AccumulateInset(
+            natural: .init(
+                top: baseParentInset.natural.top,
+                left: baseParentInset.natural.left,
+                right: baseParentInset.natural.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom)
+            ),
+            interactive: .init(
+                top: baseParentInset.interactive.top,
+                left: baseParentInset.interactive.left,
+                right: baseParentInset.interactive.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
+            )
+        )
+#else
+        let parentInset = self.parentInset()
+#endif
+        self.refreshContentInset()
+        if let bar = self.screen.bar {
+            switch bar.placement {
+            case .top:
+                bar.safeArea = .init(
+                    top: parentInset.natural.top,
+                    left: parentInset.natural.left,
+                    right: parentInset.natural.right,
+                    bottom: 0
+                )
+            case .bottom:
+                bar.safeArea = .init(
+                    top: 0,
+                    left: parentInset.natural.left,
+                    right: parentInset.natural.right,
+                    bottom: parentInset.natural.bottom
+                )
+            }
+            self._layout.updateIfNeeded()
+            let barSize = self._layout.barSize ?? .zero
+            switch bar.placement {
+            case .top:
+                self.screen.apply(inset: .init(
+                    natural: .init(
+                        top: barSize.height,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: parentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: barSize.height,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: parentInset.interactive.bottom
+                    )
+                ))
+            case .bottom:
+                self.screen.apply(inset: .init(
+                    natural: .init(
+                        top: parentInset.natural.top,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: barSize.height
+                    ),
+                    interactive: .init(
+                        top: parentInset.interactive.top,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: barSize.height
+                    )
+                ))
+            }
+        } else {
+            self.screen.apply(inset: parentInset)
+        }
     }
     
 #if os(iOS)
@@ -308,21 +461,10 @@ extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScree
         return self.screen.modalColor
     }
     
-    public var modalCornerRadius: UI.CornerRadius {
-        return self.screen.modalCornerRadius
-    }
-    
-    public var modalSheetInset: Inset? {
+    public var modalSheet: UI.Modal.Presentation.Sheet? {
         switch self.screen.modalPresentation {
         case .simple: return nil
-        case .sheet(let info): return info.inset
-        }
-    }
-    
-    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
-        switch self.screen.modalPresentation {
-        case .simple: return nil
-        case .sheet(let info): return info.background
+        case .sheet(let info): return info
         }
     }
     

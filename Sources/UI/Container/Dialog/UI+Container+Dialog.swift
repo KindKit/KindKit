@@ -233,7 +233,7 @@ public extension UI.Container {
             container.parent = self
             let item = UI.Container.DialogItem(container, self._view.bounds.size)
             self._items.append(item)
-            if self._current == nil {
+            if self._current == nil && self._animation == nil {
                 self._present(dialog: item, animated: animated, completion: completion)
             } else {
                 completion?()
@@ -326,6 +326,10 @@ extension UI.Container.Dialog {
                     .custom(
                         duration: TimeInterval(size / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .present(progress: progress)
@@ -335,6 +339,7 @@ extension UI.Container.Dialog {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .idle
                             dialog.container.finishShow(interactive: false)
                             self.refreshContentInset()
@@ -374,6 +379,8 @@ extension UI.Container.Dialog {
             self._current = previous
             if let previous = previous {
                 self._present(dialog: previous, animated: animated, completion: completion)
+            } else  if self._current == nil && self._items.isEmpty == false {
+                self._present(dialog: self._items[0], animated: animated, completion: completion)
             } else {
                 completion?()
             }
@@ -394,6 +401,10 @@ extension UI.Container.Dialog {
                     .custom(
                         duration: TimeInterval(size / self.animationVelocity),
                         ease: Animation.Ease.QuadraticInOut(),
+                        preparing: { [weak self] in
+                            guard let self = self else { return }
+                            self._view.locked = true
+                        },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
                             self._layout.state = .dismiss(progress: progress)
@@ -403,6 +414,7 @@ extension UI.Container.Dialog {
                         completion: { [weak self] in
                             guard let self = self else { return }
                             self._animation = nil
+                            self._view.locked = false
                             self._layout.state = .idle
                             self._layout.dialogItem = nil
                             dialog.container.finishHide(interactive: false)

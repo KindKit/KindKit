@@ -11,41 +11,55 @@ extension UI.Container.Screen {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         
-        var inset: Inset = .zero {
-            didSet {
-                guard self.inset != oldValue else { return }
-                self.setNeedUpdate()
-            }
-        }
         var content: IUIView? {
             didSet {
                 guard self.content !== oldValue else { return }
                 self.setNeedUpdate()
             }
         }
+        var bar: UI.View.Bar? {
+            didSet {
+                guard self.bar !== oldValue else { return }
+                self.setNeedUpdate()
+            }
+        }
+        var barSize: Size?
         
         init() {
         }
         
         func layout(bounds: Rect) -> Size {
-            guard let content = self.content else {
-                return .zero
+            if let content = self.content {
+                content.frame = bounds
             }
-            content.frame = bounds.inset(self.inset)
+            if let bar = self.bar {
+                let barSize = bar.size(available: bounds.size)
+                switch bar.placement {
+                case .top: bar.frame = .init(top: bounds.top, size: barSize)
+                case .bottom: bar.frame = .init(bottom: bounds.bottom, size: barSize)
+                }
+                self.barSize = barSize
+            }
             return bounds.size
         }
         
         func size(available: Size) -> Size {
-            guard let content = self.content else {
-                return .zero
+            if let content = self.content {
+                let itemSize = content.size(available: available)
+                return itemSize
             }
-            let itemSize = content.size(available: available.inset(self.inset))
-            return itemSize.inset(-self.inset)
+            return .zero
         }
         
         func views(bounds: Rect) -> [IUIView] {
-            guard let content = self.content else { return [] }
-            return [ content ]
+            if let content = self.content, let bar = self.bar {
+                return [ content, bar ]
+            } else if let content = self.content {
+                return [ content ]
+            } else if let bar = self.bar {
+                return [ bar ]
+            }
+            return []
         }
         
     }

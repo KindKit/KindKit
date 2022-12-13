@@ -345,7 +345,7 @@ extension UI.View.Input.Text : IUIViewInputable {
     
     @discardableResult
     public func startEditing() -> Self {
-        self._view.becomeFirstResponder()
+        _ = self._view.becomeFirstResponder()
         return self
     }
     

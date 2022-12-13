@@ -8,8 +8,7 @@ public extension IUIWidgetView where Body == UI.View.Bar {
     
     @inlinable
     var placement: UI.View.Bar.Placement {
-        set { self.body.placement = newValue }
-        get { self.body.placement }
+        self.body.placement
     }
     
     @inlinable
@@ -28,13 +27,6 @@ public extension IUIWidgetView where Body == UI.View.Bar {
     var separator: IUIView? {
         set { self.body.separator = newValue }
         get { self.body.separator }
-    }
-    
-    @inlinable
-    @discardableResult
-    func placement(_ value: UI.View.Bar.Placement) -> Self {
-        self.body.placement = value
-        return self
     }
     
     @inlinable

@@ -143,10 +143,7 @@ public extension UI.Container {
             let parentInset = self.parentInset()
             if self._items.contains(where: { $0.container === container }) == true {
                 if self.barHidden == false && UI.Container.BarController.shared.hidden(.group) == false {
-                    return parentInset.bottom(
-                        natural: self.barSize,
-                        interactive: self.barSize * self.barVisibility
-                    )
+                    return parentInset + .init(bottom: self.barSize, visibility: self.barVisibility)
                 }
             }
             return parentInset
@@ -169,10 +166,7 @@ public extension UI.Container {
                 contentInset = currentInset.lerp(nextInset, progress: progress)
             }
             if self.barHidden == false && UI.Container.BarController.shared.hidden(.group) == false {
-                return contentInset.bottom(
-                    natural: self.barSize,
-                    interactive: self.barSize * self.barVisibility
-                )
+                return contentInset + .init(bottom: self.barSize, visibility: self.barVisibility)
             }
             return contentInset
         }

@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Size.Static {
 
-    enum Dimension : Equatable {
+    enum Dimension : Comparable {
         
         case parent(Percent)
         case ratio(Percent)

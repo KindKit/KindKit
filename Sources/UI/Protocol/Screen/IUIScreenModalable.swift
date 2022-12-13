@@ -15,9 +15,7 @@ public protocol IUIScreenModalable : AnyObject {
 public extension IUIScreenModalable {
     
     var modalColor: UI.Color { .white }
-    
     var modalCornerRadius: UI.CornerRadius { .none }
-    
     var modalPresentation: UI.Screen.Modal.Presentation { .simple }
     
 }

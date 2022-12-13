@@ -124,10 +124,7 @@ public extension UI.Container {
             let parentInset = self.parentInset()
             if self._content === container, let stickySize = self._layout.stickySize {
                 if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
-                    return parentInset.bottom(
-                        natural: stickySize.height,
-                        interactive: stickySize.height * self.stickyVisibility
-                    )
+                    return parentInset + .init(bottom: stickySize.height, visibility: self.stickyVisibility)
                 }
             }
             return parentInset
@@ -139,10 +136,7 @@ public extension UI.Container {
                 return contentInset
             }
             if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
-                return contentInset.bottom(
-                    natural: stickySize.height,
-                    interactive: stickySize.height * self.stickyVisibility
-                )
+                return contentInset + .init(bottom: stickySize.height, visibility: self.stickyVisibility)
             }
             return contentInset
         }
@@ -300,16 +294,8 @@ extension UI.Container.Sticky : IUIModalContentContainer where ContentContainer 
         return self.content.modalColor
     }
     
-    public var modalCornerRadius: UI.CornerRadius {
-        return self.content.modalCornerRadius
-    }
-    
-    public var modalSheetInset: Inset? {
-        return self.content.modalSheetInset
-    }
-    
-    public var modalSheetBackground: (IUIView & IUIViewAlphable)? {
-        return self.content.modalSheetBackground
+    public var modalSheet: UI.Modal.Presentation.Sheet? {
+        return self.content.modalSheet
     }
     
 }
