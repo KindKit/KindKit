@@ -239,120 +239,112 @@ private extension UI.View.Button.Layout {
         primaryInset: Inset,
         primarySize: Size
     ) -> (secondary: Rect, primary: Rect) {
-        let secondary: Rect
-        let primary: Rect
-        switch secondaryPosition {
-        case .top:
-            let offset = secondaryInset.top + secondarySize.height + primaryInset.top
-            let baseline = max(secondarySize.width, primarySize.width) / 2
-            secondary = Rect(
-                x: baseline - (secondarySize.width / 2),
-                y: 0,
-                width: secondarySize.width,
-                height: secondarySize.height
+        switch alignment {
+        case .fill:
+            let secondary: Rect
+            let primary: Rect
+            switch secondaryPosition {
+            case .top:
+                let splited = bounds.split(
+                    bottom: primarySize.height + primaryInset.vertical
+                )
+                primary = splited.bottom.inset(primaryInset)
+                secondary = splited.top.inset(secondaryInset)
+            case .left:
+                let splited = bounds.split(
+                    right: primarySize.width + primaryInset.horizontal
+                )
+                primary = splited.right.inset(primaryInset)
+                secondary = splited.left.inset(secondaryInset)
+            case .right:
+                let splited = bounds.split(
+                    left: primarySize.width + primaryInset.horizontal
+                )
+                primary = splited.left.inset(primaryInset)
+                secondary = splited.right.inset(secondaryInset)
+            case .bottom:
+                let splited = bounds.split(
+                    top: primarySize.height + primaryInset.vertical
+                )
+                primary = splited.top.inset(primaryInset)
+                secondary = splited.bottom.inset(secondaryInset)
+            }
+            return (
+                secondary: Rect(center: secondary.center, size: secondarySize),
+                primary: Rect(center: primary.center, size: primarySize)
             )
-            switch alignment {
-            case .fill:
+        case .center:
+            let secondary: Rect
+            let primary: Rect
+            switch secondaryPosition {
+            case .top:
+                let baseline = max(secondarySize.width, primarySize.width) / 2
+                secondary = Rect(
+                    x: baseline - (secondarySize.width / 2),
+                    y: 0,
+                    width: secondarySize.width,
+                    height: secondarySize.height
+                )
                 primary = Rect(
                     x: baseline - (primarySize.width / 2),
-                    y: offset,
-                    width: primarySize.width,
-                    height: bounds.height - offset
-                )
-            case .center:
-                primary = Rect(
-                    x: baseline - (primarySize.width / 2),
-                    y: offset,
+                    y: secondaryInset.top + secondarySize.height + secondaryInset.bottom + primaryInset.top,
                     width: primarySize.width,
                     height: primarySize.height
                 )
-            }
-        case .left:
-            let offset = secondaryInset.right + secondarySize.width + primaryInset.left
-            let baseline = max(secondarySize.height, primarySize.height) / 2
-            secondary = Rect(
-                x: 0,
-                y: baseline - (secondarySize.height / 2),
-                width: secondarySize.width,
-                height: secondarySize.height
-            )
-            switch alignment {
-            case .fill:
-                primary = Rect(
-                    x: offset,
-                    y: baseline - (primarySize.height / 2),
-                    width: bounds.width - offset,
-                    height: primarySize.height
-                )
-            case .center:
-                primary = Rect(
-                    x: offset,
-                    y: baseline - (primarySize.height / 2),
-                    width: primarySize.width,
-                    height: primarySize.height
-                )
-            }
-        case .right:
-            let offset = secondaryInset.left + primarySize.width + primaryInset.right
-            let baseline = max(secondarySize.height, primarySize.height) / 2
-            secondary = Rect(
-                x: offset,
-                y: baseline - (secondarySize.height / 2),
-                width: secondarySize.width,
-                height: secondarySize.height
-            )
-            switch alignment {
-            case .fill:
-                primary = Rect(
+            case .left:
+                let baseline = max(secondarySize.height, primarySize.height) / 2
+                secondary = Rect(
                     x: 0,
+                    y: baseline - (secondarySize.height / 2),
+                    width: secondarySize.width,
+                    height: secondarySize.height
+                )
+                primary = Rect(
+                    x: secondaryInset.left + secondarySize.width + secondaryInset.right + primaryInset.left,
                     y: baseline - (primarySize.height / 2),
-                    width: bounds.width - offset,
+                    width: primarySize.width,
                     height: primarySize.height
                 )
-            case .center:
+            case .right:
+                let baseline = max(secondarySize.height, primarySize.height) / 2
                 primary = Rect(
                     x: 0,
                     y: baseline - (primarySize.height / 2),
                     width: primarySize.width,
                     height: primarySize.height
                 )
-            }
-        case .bottom:
-            let offset = secondaryInset.top + primarySize.height + primaryInset.bottom
-            let baseline = max(secondarySize.width, primarySize.width) / 2
-            secondary = Rect(
-                x: baseline - (secondarySize.width / 2),
-                y: offset,
-                width: secondarySize.width,
-                height: secondarySize.height
-            )
-            switch alignment {
-            case .fill:
-                primary = Rect(
-                    x: baseline - (primarySize.width / 2),
-                    y: 0,
-                    width: primarySize.width,
-                    height: bounds.height - offset
+                secondary = Rect(
+                    x: primaryInset.left + primarySize.width + primaryInset.right + secondaryInset.left,
+                    y: baseline - (secondarySize.height / 2),
+                    width: secondarySize.width,
+                    height: secondarySize.height
                 )
-            case .center:
+            case .bottom:
+                let baseline = max(secondarySize.width, primarySize.width) / 2
                 primary = Rect(
                     x: baseline - (primarySize.width / 2),
                     y: 0,
                     width: primarySize.width,
                     height: primarySize.height
                 )
+                secondary = Rect(
+                    x: baseline - (secondarySize.width / 2),
+                    y: primaryInset.top + primarySize.height + primaryInset.bottom + secondaryInset.top,
+                    width: secondarySize.width,
+                    height: secondarySize.height
+                )
             }
+            let union = secondary.union(primary)
+            let center = bounds.center
+            let offset = Point(
+                x: center.x - (union.width / 2),
+                y: center.y - (union.height / 2)
+            )
+            return (
+                secondary: Rect(center: secondary.center + offset, size: secondary.size),
+                primary: Rect(center: primary.center + offset, size: primary.size)
+            )
         }
-        let union = secondary.union(primary)
-        let center = bounds.center
-        let offset = Point(
-            x: center.x - (union.width / 2),
-            y: center.y - (union.height / 2)
-        )
-        return (
-            secondary: Rect(center: secondary.center + offset, size: secondary.size),
-            primary: Rect(center: primary.center + offset, size: primary.size)
-        )
     }
     
 }
