@@ -125,59 +125,43 @@ extension UI.View.Button {
         func size(available: Size) -> Size {
             var size = Size(width: 0, height: 0)
             let spinnerSize = self.spinner.flatMap({ return $0.size(available: available) })
-            let primarySize = self.primary.flatMap({ return $0.size(available: available) })
-            let secondarySize = self.secondary.flatMap({ return $0.size(available: available) })
+            let primarySize = self.primary.flatMap({ return $0.size(available: available).inset(-self.primaryInset) })
+            let secondarySize = self.secondary.flatMap({ return $0.size(available: available).inset(-self.secondaryInset) })
             if self.spinnerAnimating == true, let spinnerSize = spinnerSize {
                 switch self.spinnerPosition {
                 case .fill:
-                    size.width = self.inset.left + spinnerSize.width + self.inset.right
-                    size.height = self.inset.top + spinnerSize.height + self.inset.bottom
+                    size = spinnerSize
                 case .secondary:
                     if let primarySize = primarySize {
                         if secondarySize != nil {
                             switch self.secondaryPosition {
-                            case .top:
-                                size.width = self.inset.left + max(spinnerSize.width, primarySize.width) + self.inset.right
-                                size.height = self.inset.top + spinnerSize.height + self.secondaryInset.bottom + self.primaryInset.top + primarySize.height + self.inset.bottom
-                            case .left:
-                                size.width += self.inset.left + spinnerSize.width + self.secondaryInset.right + self.primaryInset.left + primarySize.width + self.inset.right
-                                size.height = self.inset.top + max(spinnerSize.height, primarySize.height) + self.inset.bottom
-                            case .right:
-                                size.width = self.inset.left + primarySize.width + self.primaryInset.right + self.secondaryInset.left + spinnerSize.width + self.inset.right
-                                size.height = self.inset.top + max(spinnerSize.height, primarySize.height) + self.inset.bottom
-                            case .bottom:
-                                size.width = self.inset.left + max(spinnerSize.width, primarySize.width) + self.inset.right
-                                size.height = self.inset.top + primarySize.height + self.primaryInset.bottom + self.secondaryInset.top + spinnerSize.height + self.inset.bottom
+                            case .top, .bottom:
+                                size.width = max(primarySize.width, spinnerSize.width)
+                                size.height = primarySize.height + spinnerSize.height
+                            case .left, .right:
+                                size.width += primarySize.width + spinnerSize.width
+                                size.height = max(primarySize.height, spinnerSize.height)
                             }
                         } else {
-                            size.width = self.inset.left + spinnerSize.width + self.inset.right
-                            size.height = self.inset.top + spinnerSize.height + self.inset.bottom
+                            size = spinnerSize
                         }
                     } else {
-                        size.width = self.inset.left + spinnerSize.width + self.inset.right
-                        size.height = self.inset.top + spinnerSize.height + self.inset.bottom
+                        size = spinnerSize
                     }
                 }
             } else if let primarySize = primarySize, let secondarySize = secondarySize {
                 switch self.secondaryPosition {
-                case .top:
-                    size.width = self.inset.left + max(secondarySize.width, primarySize.width) + self.inset.right
-                    size.height = self.inset.top + secondarySize.height + self.secondaryInset.bottom + self.primaryInset.top + primarySize.height + self.inset.bottom
-                case .left:
-                    size.width = self.inset.left + secondarySize.width + self.secondaryInset.right + self.primaryInset.left + primarySize.width + self.inset.right
-                    size.height = self.inset.top + max(secondarySize.height, primarySize.height) + self.inset.bottom
-                case .right:
-                    size.width = self.inset.left + primarySize.width + self.primaryInset.right + self.secondaryInset.left + secondarySize.width + self.inset.right
-                    size.height = self.inset.top + max(secondarySize.height, primarySize.height) + self.inset.bottom
-                case .bottom:
-                    size.width = self.inset.left + max(secondarySize.width, primarySize.width) + self.inset.right
-                    size.height = self.inset.top + primarySize.height + self.primaryInset.bottom + self.secondaryInset.top + secondarySize.height + self.inset.bottom
+                case .top, .bottom:
+                    size.width = max(primarySize.width, secondarySize.width)
+                    size.height = primarySize.height + secondarySize.height
+                case .left, .right:
+                    size.width = primarySize.width + secondarySize.width
+                    size.height = max(primarySize.height, secondarySize.height)
                 }
             } else if let primarySize = primarySize {
-                size.width = self.inset.left + primarySize.width + self.inset.right
-                size.height = self.inset.top + primarySize.height + self.inset.bottom
+                size = primarySize
             }
-            return size
+            return size.inset(-self.inset)
         }
         
         func views(bounds: Rect) -> [IUIView] {
@@ -241,95 +225,137 @@ private extension UI.View.Button.Layout {
     ) -> (secondary: Rect, primary: Rect) {
         switch alignment {
         case .fill:
-            let secondary: Rect
-            let primary: Rect
             switch secondaryPosition {
             case .top:
                 let splited = bounds.split(
                     bottom: primarySize.height + primaryInset.vertical
                 )
-                primary = splited.bottom.inset(primaryInset)
-                secondary = splited.top.inset(secondaryInset)
+                let primary = splited.bottom.inset(primaryInset)
+                let secondary = splited.top.inset(secondaryInset)
+                return (
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondarySize.width,
+                        height: secondary.height
+                    ),
+                    primary: Rect(
+                        center: primary.center,
+                        width: primarySize.width,
+                        height: primary.height
+                    )
+                )
             case .left:
                 let splited = bounds.split(
                     right: primarySize.width + primaryInset.horizontal
                 )
-                primary = splited.right.inset(primaryInset)
-                secondary = splited.left.inset(secondaryInset)
+                let primary = splited.right.inset(primaryInset)
+                let secondary = splited.left.inset(secondaryInset)
+                return (
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondary.width,
+                        height: secondarySize.height
+                    ),
+                    primary: Rect(
+                        center: primary.center,
+                        width: primary.width,
+                        height: primarySize.height
+                    )
+                )
             case .right:
                 let splited = bounds.split(
                     left: primarySize.width + primaryInset.horizontal
                 )
-                primary = splited.left.inset(primaryInset)
-                secondary = splited.right.inset(secondaryInset)
+                let primary = splited.left.inset(primaryInset)
+                let secondary = splited.right.inset(secondaryInset)
+                return (
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondary.width,
+                        height: secondarySize.height
+                    ),
+                    primary: Rect(
+                        center: primary.center,
+                        width: primary.width,
+                        height: primarySize.height
+                    )
+                )
             case .bottom:
                 let splited = bounds.split(
                     top: primarySize.height + primaryInset.vertical
                 )
-                primary = splited.top.inset(primaryInset)
-                secondary = splited.bottom.inset(secondaryInset)
+                let primary = splited.top.inset(primaryInset)
+                let secondary = splited.bottom.inset(secondaryInset)
+                return (
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondarySize.width,
+                        height: secondary.height
+                    ),
+                    primary: Rect(
+                        center: primary.center,
+                        width: primarySize.width,
+                        height: primary.height
+                    )
+                )
             }
-            return (
-                secondary: Rect(center: secondary.center, size: secondarySize),
-                primary: Rect(center: primary.center, size: primarySize)
-            )
         case .center:
-            let secondary: Rect
             let primary: Rect
+            let secondary: Rect
+            let baseline = Point(
+                x: max(primarySize.width, secondarySize.width) / 2,
+                y: max(primarySize.height, secondarySize.height) / 2
+            )
             switch secondaryPosition {
             case .top:
-                let baseline = max(secondarySize.width, primarySize.width) / 2
                 secondary = Rect(
-                    x: baseline - (secondarySize.width / 2),
-                    y: 0,
+                    x: (baseline.x - (secondarySize.width / 2)),
+                    y: secondaryInset.top,
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
                 primary = Rect(
-                    x: baseline - (primarySize.width / 2),
-                    y: secondaryInset.top + secondarySize.height + secondaryInset.bottom + primaryInset.top,
+                    x: (baseline.x - (primarySize.width / 2)),
+                    y: primaryInset.top + secondarySize.height + secondaryInset.vertical,
                     width: primarySize.width,
                     height: primarySize.height
                 )
             case .left:
-                let baseline = max(secondarySize.height, primarySize.height) / 2
                 secondary = Rect(
-                    x: 0,
-                    y: baseline - (secondarySize.height / 2),
+                    x: secondaryInset.left,
+                    y: (baseline.y - (secondarySize.height / 2)),
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
                 primary = Rect(
-                    x: secondaryInset.left + secondarySize.width + secondaryInset.right + primaryInset.left,
-                    y: baseline - (primarySize.height / 2),
+                    x: primaryInset.left + secondarySize.width + secondaryInset.horizontal,
+                    y: (baseline.y - (primarySize.height / 2)),
                     width: primarySize.width,
                     height: primarySize.height
                 )
             case .right:
-                let baseline = max(secondarySize.height, primarySize.height) / 2
                 primary = Rect(
-                    x: 0,
-                    y: baseline - (primarySize.height / 2),
+                    x: primaryInset.left,
+                    y: (baseline.y - (primarySize.height / 2)),
                     width: primarySize.width,
                     height: primarySize.height
                 )
                 secondary = Rect(
-                    x: primaryInset.left + primarySize.width + primaryInset.right + secondaryInset.left,
-                    y: baseline - (secondarySize.height / 2),
+                    x: secondaryInset.left + primarySize.width + primaryInset.horizontal,
+                    y: (baseline.y - (secondarySize.height / 2)),
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
             case .bottom:
-                let baseline = max(secondarySize.width, primarySize.width) / 2
                 primary = Rect(
-                    x: baseline - (primarySize.width / 2),
-                    y: 0,
+                    x: (baseline.x - (primarySize.width / 2)),
+                    y: primaryInset.top,
                     width: primarySize.width,
                     height: primarySize.height
                 )
                 secondary = Rect(
-                    x: baseline - (secondarySize.width / 2),
-                    y: primaryInset.top + primarySize.height + primaryInset.bottom + secondaryInset.top,
+                    x: (baseline.x - (secondarySize.width / 2)),
+                    y: secondaryInset.top + primarySize.height + primaryInset.vertical,
                     width: secondarySize.width,
                     height: secondarySize.height
                 )

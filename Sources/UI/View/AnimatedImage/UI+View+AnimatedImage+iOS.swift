@@ -115,6 +115,8 @@ extension KKAnimatedImageView {
     
     func cleanup() {
         self.stopAnimating()
+        self.animationImages = []
+        self.image = nil
     }
     
 }

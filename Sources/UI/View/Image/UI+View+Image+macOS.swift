@@ -100,6 +100,7 @@ extension KKImageView {
     }
     
     func cleanup() {
+        self.image = nil
     }
     
 }

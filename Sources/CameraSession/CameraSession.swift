@@ -110,9 +110,15 @@ private extension CameraSession {
             queue: OperationQueue.main,
             using: { [weak self] _ in self?._didStop() }
         )
+#if os(iOS)
+        self._subscribeDeviceOrientaion()
+#endif
     }
 
     func _unsubscribeSession() {
+#if os(iOS)
+        self._unsubscribeDeviceOrientaion()
+#endif
         if let observer = self._captureSessionStopObserver {
             NotificationCenter.default.removeObserver(observer)
             self._captureSessionStopObserver = nil
@@ -263,29 +269,25 @@ private extension CameraSession {
                 }
             }
             self.session.commitConfiguration()
+            DispatchQueue.main.sync(execute: {
+                self._activeState = new
+            })
             if let didConfigure = didConfigure {
                 DispatchQueue.main.sync(execute: didConfigure)
             }
             self.session.startRunning()
             DispatchQueue.main.sync(execute: {
-                self._activeState = new
                 didStart?()
             })
         })
     }
     
     func _didStart() {
-#if os(iOS)
-        self._subscribeDeviceOrientaion()
-#endif
         self.isStarted = true
         self._observer.notify({ $0.started(self) })
     }
 
     func _didStop() {
-#if os(iOS)
-        self._unsubscribeDeviceOrientaion()
-#endif
         self.isStarted = false
         self._observer.notify({ $0.stopped(self) })
     }

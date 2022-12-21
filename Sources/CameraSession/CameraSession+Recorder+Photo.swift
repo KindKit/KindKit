@@ -11,9 +11,9 @@ public extension CameraSession.Recorder {
         
         public var deviceOrientation: CameraSession.Orientation? {
             didSet {
-                guard self.interfaceOrientation != oldValue else { return }
+                guard self.deviceOrientation != oldValue else { return }
                 guard let connection = self._output.connection(with: .video) else { return }
-                if let videoOrientation = self.interfaceOrientation?.avOrientation {
+                if let videoOrientation = self.deviceOrientation?.avOrientation {
                     connection.videoOrientation = videoOrientation
                 } else {
                     connection.videoOrientation = .portrait
@@ -102,17 +102,19 @@ extension CameraSession.Recorder.Photo {
             return
         }
 #if os(macOS)
-        guard let image = NSImage(data: data) else {
+        guard let nsImage = NSImage(data: data) else {
             context.onFailure(.imageRepresentation)
             return
         }
-        context.onSuccess(UI.Image(image))
+        let image = UI.Image(nsImage)
+        context.onSuccess(UI.Image(nsImage))
 #elseif os(iOS)
         guard let uiImage = UIImage(data: data) else {
             context.onFailure(.imageRepresentation)
             return
         }
-        context.onSuccess(UI.Image(uiImage).unrotate())
+        let image = UI.Image(uiImage)
+        context.onSuccess(image)
 #else
         context.onFailure(.imageRepresentation)
 #endif
