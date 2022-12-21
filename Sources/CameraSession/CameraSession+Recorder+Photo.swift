@@ -114,7 +114,7 @@ extension CameraSession.Recorder.Photo {
             return
         }
         let image = UI.Image(uiImage)
-        context.onSuccess(image)
+        context.onSuccess(image.unrotate())
 #else
         context.onFailure(.imageRepresentation)
 #endif

@@ -149,7 +149,8 @@ public extension UI.Container {
         
         public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
             let parentInset = self.parentInset()
-            if let current = self._current?.container {
+            if self._current?.container === container {
+                let current = self._current!.container
                 if current.modalSheet != nil {
                     return .init(
                         natural: .init(
