@@ -46,6 +46,7 @@ final class KKGradientView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.isUserInteractionEnabled = false
         self.clipsToBounds = true
     }
     
