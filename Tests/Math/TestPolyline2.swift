@@ -8,7 +8,7 @@ import KindKit
 class TestPolyline2 : XCTestCase {
     
     func testExtrude1() {
-        let op = Polyline2Float(corners: [
+        let op = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
@@ -28,7 +28,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testExtrude2() {
-        let op = Polyline2Float(corners: [
+        let op = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
@@ -48,7 +48,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testExtrude3() {
-        let op = Polyline2Float(corners: [
+        let op = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
@@ -74,7 +74,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testBevel1() {
-        let op = Polyline2Float(corners: [
+        let op = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 20, y: 0),
             Point(x: 20, y: 10),
@@ -90,7 +90,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testBevel2() {
-        let op = Polyline2Float(corners: [
+        let op = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 20, y: 0),
             Point(x: 20, y: 10),
@@ -106,7 +106,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testCenter2() {
-        let p = Polyline2Float(corners: [
+        let p = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 20, y: 0),
             Point(x: 20, y: 10),
@@ -119,7 +119,7 @@ class TestPolyline2 : XCTestCase {
     }
     
     func testPolylabel2() {
-        let p = Polyline2Float(corners: [
+        let p = Polyline2(corners: [
             Point(x: 0, y: 0),
             Point(x: 20, y: 0),
             Point(x: 20, y: 10),

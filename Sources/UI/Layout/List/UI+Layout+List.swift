@@ -236,41 +236,43 @@ private extension UI.Layout.List {
     @inline(__always)
     func _visibleIndex(bounds: Rect) -> Int? {
         if let firstVisible = self._firstVisible {
-            var newFirstIndex = firstVisible
-            let firstItem = self._views[firstVisible]
-            let isFirstVisible = bounds.isIntersects(firstItem.frame)
-            let isBefore: Bool
-            let isAfter: Bool
-            switch self.direction {
-            case .horizontal:
-                isBefore = firstItem.frame.origin.x > bounds.origin.x
-                isAfter = firstItem.frame.origin.x < bounds.origin.x
-            case .vertical:
-                isBefore = firstItem.frame.origin.y > bounds.origin.y
-                isAfter = firstItem.frame.origin.y < bounds.origin.y
-            }
-            if isBefore == true {
-                var isFounded = isFirstVisible
-                for index in (0 ..< firstVisible + 1).reversed() {
-                    let view = self._views[index]
-                    if bounds.isIntersects(view.frame) == true {
-                        newFirstIndex = index
-                        isFounded = true
-                    } else if isFounded == true {
-                        break
+            if firstVisible >= self._views.startIndex && firstVisible < self._views.endIndex {
+                var newFirstIndex = firstVisible
+                let firstItem = self._views[firstVisible]
+                let isFirstVisible = bounds.isIntersects(firstItem.frame)
+                let isBefore: Bool
+                let isAfter: Bool
+                switch self.direction {
+                case .horizontal:
+                    isBefore = firstItem.frame.origin.x > bounds.origin.x
+                    isAfter = firstItem.frame.origin.x < bounds.origin.x
+                case .vertical:
+                    isBefore = firstItem.frame.origin.y > bounds.origin.y
+                    isAfter = firstItem.frame.origin.y < bounds.origin.y
+                }
+                if isBefore == true {
+                    var isFounded = isFirstVisible
+                    for index in (0 ..< firstVisible + 1).reversed() {
+                        let view = self._views[index]
+                        if bounds.isIntersects(view.frame) == true {
+                            newFirstIndex = index
+                            isFounded = true
+                        } else if isFounded == true {
+                            break
+                        }
+                    }
+                } else if isAfter == true {
+                    for index in firstVisible ..< self._views.count {
+                        let view = self._views[index]
+                        if bounds.isIntersects(view.frame) == true {
+                            newFirstIndex = index
+                            break
+                        }
                     }
                 }
-            } else if isAfter == true {
-                for index in firstVisible ..< self._views.count {
-                    let view = self._views[index]
-                    if bounds.isIntersects(view.frame) == true {
-                        newFirstIndex = index
-                        break
-                    }
-                }
+                self._firstVisible = newFirstIndex
+                return newFirstIndex
             }
-            self._firstVisible = newFirstIndex
-            return newFirstIndex
         }
         for index in 0 ..< self._views.count {
             let view = self._views[index]

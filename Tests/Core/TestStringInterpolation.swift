@@ -45,7 +45,7 @@ class TestStringInterpolation : XCTestCase {
     }
     
     func testFloat() {
-        let str = "Float = \(1024.8, formatter: StringFormatter.Float(minFractionDigits: 0, maxFractionDigits: 8, decimalSeparator: "•", usesGroupingSeparator: true, groupingSeparator: "_", groupingSize: 3))"
+        let str = "Float = \(1024.8, formatter: StringFormatter.Double(minFractionDigits: 0, maxFractionDigits: 8, decimalSeparator: "•", usesGroupingSeparator: true, groupingSeparator: "_", groupingSize: 3))"
         if str != "Float = 1_024•8" {
             XCTFail()
         }

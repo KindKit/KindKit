@@ -8,8 +8,8 @@ import KindKit
 class TestIntersection2 : XCTestCase {
     
     func testPossiblyCircleToCircle() {
-        let c1 = CircleFloat(origin: Point(x: -1, y: 0), radius: 1)
-        let c2 = CircleFloat(origin: Point(x: 1, y: 0), radius: 2)
+        let c1 = Circle(origin: Point(x: -1, y: 0), radius: 1)
+        let c2 = Circle(origin: Point(x: 1, y: 0), radius: 2)
         
         let result = Intersection2.possibly(c1, c2)
         if result == false {
@@ -18,8 +18,8 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindCircleToCircle() {
-        let c1 = CircleFloat(origin: Point(x: -1, y: 0), radius: 2)
-        let c2 = CircleFloat(origin: Point(x: 1, y: 0), radius: 2)
+        let c1 = Circle(origin: Point(x: -1, y: 0), radius: 2)
+        let c2 = Circle(origin: Point(x: 1, y: 0), radius: 2)
         
         let result = Intersection2.find(c1, c2)
         if result != .two(Point(x: 0, y: 1.73205078), Point(x: 0, y: -1.73205078)) {
@@ -54,7 +54,7 @@ class TestIntersection2 : XCTestCase {
     
     func testPossiblyLineToBox() {
         let l = Line2(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
-        let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
+        let b = Box2(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
         
         let result = Intersection2.possibly(l, b)
         if result == false {
@@ -64,7 +64,7 @@ class TestIntersection2 : XCTestCase {
     
     func testFindLineToBox() {
         let l = Line2(origin: Point(x: 1, y: 1), direction: Point(x: 1, y: 0))
-        let b = Box2Float(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
+        let b = Box2(lower: Point(x: 0, y: 0), upper: Point(x: 2, y: 2))
         
         let result = Intersection2.find(l, b)
         if result != .two(Point(x: 0, y: 1), Point(x: 2, y: 1)) {

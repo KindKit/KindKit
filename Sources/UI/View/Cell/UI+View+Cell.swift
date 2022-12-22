@@ -104,6 +104,12 @@ extension UI.View.Cell : IUIViewTransformable {
 extension UI.View.Cell : IUIViewDynamicSizeable {
 }
 
+extension UI.View.Cell : IUIViewDragDestinationtable {
+}
+
+extension UI.View.Cell : IUIViewDragSourceable {
+}
+
 extension UI.View.Cell : IUIViewHighlightable {
 }
 
@@ -114,6 +120,12 @@ extension UI.View.Cell : IUIViewLockable {
 }
 
 extension UI.View.Cell : IUIViewPressable {
+}
+
+extension UI.View.Cell : IUIViewColorable {
+}
+
+extension UI.View.Cell : IUIViewAlphable {
 }
 
 public extension IUIView where Self == UI.View.Cell {

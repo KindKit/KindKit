@@ -69,6 +69,22 @@ public extension UI.View {
             }
             get { self._gestures }
         }
+        public var dragDestination: IUIDragAndDropDestination? {
+            didSet {
+                guard self.dragDestination !== oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(dragDestination: self.dragDestination)
+                }
+            }
+        }
+        public var dragSource: IUIDragAndDropSource? {
+            didSet {
+                guard self.dragSource !== oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(dragSource: self.dragSource)
+                }
+            }
+        }
         public var color: UI.Color? {
             didSet {
                 guard self.color != oldValue else { return }
@@ -269,10 +285,10 @@ extension UI.View.Custom : IUIViewTransformable {
 extension UI.View.Custom : IUIViewDynamicSizeable {
 }
 
-extension UI.View.Custom : IUIViewColorable {
+extension UI.View.Custom : IUIViewDragDestinationtable {
 }
 
-extension UI.View.Custom : IUIViewAlphable {
+extension UI.View.Custom : IUIViewDragSourceable {
 }
 
 extension UI.View.Custom : IUIViewHighlightable {
@@ -282,6 +298,12 @@ extension UI.View.Custom : IUIViewLockable {
 }
 
 extension UI.View.Custom : IUIViewHitable {
+}
+
+extension UI.View.Custom : IUIViewColorable {
+}
+
+extension UI.View.Custom : IUIViewAlphable {
 }
 
 extension UI.View.Custom : KKCustomViewDelegate {

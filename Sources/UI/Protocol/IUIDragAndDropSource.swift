@@ -1,0 +1,181 @@
+//
+//  KindKit
+//
+
+import Foundation
+
+public protocol IUIDragAndDropSource : AnyObject {
+    
+    var onItems: Signal.Empty< [NSItemProvider]? > { get }
+    
+    var onAllow: Signal.Args< Bool?, UI.DragAndDrop.Operation > { get }
+    
+    var onBegin: Signal.Empty< Void > { get }
+    
+    var onEnd: Signal.Args< Void, UI.DragAndDrop.Operation > { get }
+    
+    var onPreview: Signal.Args< NativeView?, NSItemProvider > { get }
+    
+    var onBeginPreview: Signal.Args< Void, NSItemProvider > { get }
+    
+    var onEndPreview: Signal.Args< Void, NSItemProvider > { get }
+    
+}
+
+public extension IUIDragAndDropSource {
+    
+    @inlinable
+    @discardableResult
+    func onItems(_ closure: (() -> [NSItemProvider]?)?) -> Self {
+        self.onItems.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onItems(_ closure: ((Self) -> [NSItemProvider]?)?) -> Self {
+        self.onItems.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onItems< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> [NSItemProvider]?)?) -> Self {
+        self.onItems.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAllow(_ closure: ((UI.DragAndDrop.Operation) -> Bool?)?) -> Self {
+        self.onAllow.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAllow(_ closure: ((Self, UI.DragAndDrop.Operation) -> Bool?)?) -> Self {
+        self.onAllow.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onAllow< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.DragAndDrop.Operation) -> Bool?)?) -> Self {
+        self.onAllow.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBegin(_ closure: (() -> Void)?) -> Self {
+        self.onBegin.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBegin(_ closure: ((Self) -> Void)?) -> Self {
+        self.onBegin.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onBegin.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd(_ closure: ((UI.DragAndDrop.Operation) -> Void)?) -> Self {
+        self.onEnd.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd(_ closure: ((Self, UI.DragAndDrop.Operation) -> Void)?) -> Self {
+        self.onEnd.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onEnd.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.DragAndDrop.Operation) -> Void)?) -> Self {
+        self.onEnd.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPreview(_ closure: ((NSItemProvider) -> NativeView?)?) -> Self {
+        self.onPreview.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPreview(_ closure: ((Self, NSItemProvider) -> NativeView?)?) -> Self {
+        self.onPreview.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> NativeView?)?) -> Self {
+        self.onPreview.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginPreview(_ closure: ((NSItemProvider) -> Void)?) -> Self {
+        self.onBeginPreview.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginPreview(_ closure: ((Self, NSItemProvider) -> Void)?) -> Self {
+        self.onBeginPreview.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> Void)?) -> Self {
+        self.onBeginPreview.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndPreview(_ closure: ((NSItemProvider) -> Void)?) -> Self {
+        self.onEndPreview.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndPreview(_ closure: ((Self, NSItemProvider) -> Void)?) -> Self {
+        self.onEndPreview.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> Void)?) -> Self {
+        self.onEndPreview.link(sender, closure)
+        return self
+    }
+    
+}
