@@ -24,7 +24,7 @@ extension Slot.Args {
             self.cancel()
         }
         
-        override func perform(_ argument: Argument) -> Result {
+        override func perform(_ argument: Argument) throws -> Result {
             return self.closure(argument)
         }
         

@@ -27,8 +27,9 @@ extension Slot.Args {
             self.cancel()
         }
         
-        override func perform(_ argument: Argument) -> Result {
-            return self.closure(self.sender, argument)
+        override func perform(_ argument: Argument) throws -> Result {
+            guard let sender = self.sender else { throw Slot.Error.notHaveSender }
+            return self.closure(sender, argument)
         }
         
         override func cancel() {
