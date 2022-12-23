@@ -77,7 +77,7 @@ extension KKAttributedTextView {
     }
     
     func update(frame: Rect) {
-        self.frame = frame.cgRect
+        self.frame = frame.integral.cgRect
     }
     
     func update(transform: UI.Transform) {

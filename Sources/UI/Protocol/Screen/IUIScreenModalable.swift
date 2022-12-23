@@ -10,6 +10,8 @@ public protocol IUIScreenModalable : AnyObject {
     var modalCornerRadius: UI.CornerRadius { get }
     var modalPresentation: UI.Screen.Modal.Presentation { get }
     
+    func modalPressedOutside()
+    
 }
 
 public extension IUIScreenModalable {
@@ -37,6 +39,10 @@ public extension IUIScreenModalable where Self : IUIScreen {
     func modalDismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
         guard let container = self.modalContentContainer else { return false }
         return container.dismiss(animated: animated, completion: completion)
+    }
+    
+    func modalPressedOutside() {
+        self.modalDismiss()
     }
     
 }

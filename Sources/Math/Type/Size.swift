@@ -46,6 +46,11 @@ public extension Size {
     }
     
     @inlinable
+    var integral: Self {
+        return Size(width: self.width.roundUp, height: self.height.roundUp)
+    }
+    
+    @inlinable
     var wrap: Self {
         return Size(width: self.height, height: self.height)
     }

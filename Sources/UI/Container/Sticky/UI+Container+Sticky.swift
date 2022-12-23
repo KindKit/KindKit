@@ -298,6 +298,10 @@ extension UI.Container.Sticky : IUIModalContentContainer where ContentContainer 
         return self.content.modalSheet
     }
     
+    public func modalPressedOutside() {
+        self.content.modalPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Sticky : IUIHamburgerContentContainer where ContentContainer : IUIHamburgerContentContainer {

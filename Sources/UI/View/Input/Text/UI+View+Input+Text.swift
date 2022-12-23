@@ -12,6 +12,8 @@ protocol KKInputTextViewDelegate : AnyObject {
     
     func change(_ view: KKInputTextView, textHeight: Double)
     
+    func shouldReplace(_ view: KKInputTextView, info: UI.View.Input.Text.ShouldReplace) -> Bool
+    
     func beginEditing(_ view: KKInputTextView)
     func editing(_ view: KKInputTextView, text: String)
     func endEditing(_ view: KKInputTextView)
@@ -143,6 +145,7 @@ public extension UI.View.Input {
         public let onVisible: Signal.Empty< Void > = .init()
         public let onVisibility: Signal.Empty< Void > = .init()
         public let onInvisible: Signal.Empty< Void > = .init()
+        public let onShouldReplace: Signal.Args< Bool?, ShouldReplace > = .init()
         public let onBeginEditing: Signal.Empty< Void > = .init()
         public let onEditing: Signal.Empty< Void > = .init()
         public let onEndEditing: Signal.Empty< Void > = .init()
@@ -238,6 +241,31 @@ public extension UI.View.Input.Text {
     }
     
 #endif
+    
+}
+
+public extension UI.View.Input.Text {
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace(_ closure: ((ShouldReplace) -> Bool?)?) -> Self {
+        self.onShouldReplace.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace(_ closure: ((Self, ShouldReplace) -> Bool?)?) -> Self {
+        self.onShouldReplace.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, ShouldReplace) -> Bool?)?) -> Self {
+        self.onShouldReplace.link(sender, closure)
+        return self
+    }
     
 }
 
@@ -366,6 +394,10 @@ extension UI.View.Input.Text : KKInputTextViewDelegate {
                 self.setNeedForceLayout()
             }
         }
+    }
+    
+    func shouldReplace(_ view: KKInputTextView, info: ShouldReplace) -> Bool {
+        return self.onShouldReplace.emit(info, default: true)
     }
     
     func beginEditing(_ view: KKInputTextView) {

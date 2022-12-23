@@ -310,17 +310,32 @@ private extension UI.Container.Modal {
     
     func _setup() {
         self._view.onHit(self, {
-            guard let current = $0._current else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            return current.container.view.isContains($1, from: $0._view)
+            return $0._view.bounds.isContains($1)
         })
+        self._tapGesture
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard current.isSheet == true else { return false }
+                guard $0._tapGesture.contains(in: $0.view) == true else { return false }
+                return $0._tapGesture.contains(in: current.container.view) == false
+            })
+            .onTriggered(self, {
+                guard let current = $0._current else { return }
+                current.container.modalPressedOutside()
+            })
         self._view.add(gesture: self._tapGesture)
 #if os(iOS)
-        self._view.add(gesture: self._interactiveGesture)
         self._interactiveGesture
             .onShouldBegin(self, {
                 guard let current = $0._current else { return false }
                 guard current.container.shouldInteractive == true else { return false }
+                if let sheet = current.sheet {
+                    if let grabber = sheet.grabber {
+                        if $0._interactiveGesture.contains(in: grabber) == true {
+                            return true
+                        }
+                    }
+                }
                 return $0._interactiveGesture.contains(in: current.container.view)
             })
             .onShouldRequireFailure(self, {
@@ -337,6 +352,7 @@ private extension UI.Container.Modal {
             .onChange(self, { $0._changeInteractiveGesture() })
             .onCancel(self, { $0._endInteractiveGesture(true) })
             .onEnd(self, { $0._endInteractiveGesture(false) })
+        self._view.add(gesture: self._interactiveGesture)
 #endif
         self.content?.parent = self
     }

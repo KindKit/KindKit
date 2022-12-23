@@ -105,7 +105,7 @@ extension KKTextView {
     }
     
     func update(frame: Rect) {
-        self.frame = frame.cgRect
+        self.frame = frame.integral.cgRect
     }
     
     func update(text: String) {

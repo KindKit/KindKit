@@ -10,6 +10,8 @@ public protocol IUIModalContentContainer : IUIContainer, IUIContainerParentable 
     var modalColor: UI.Color { get }
     var modalSheet: UI.Modal.Presentation.Sheet? { get }
     
+    func modalPressedOutside()
+    
 }
 
 public extension IUIModalContentContainer {

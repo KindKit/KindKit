@@ -165,6 +165,9 @@ extension UI.Container.None : IUIModalContentContainer {
     public var modalColor: UI.Color { .white }
     public var modalSheet: UI.Modal.Presentation.Sheet? { nil }
     
+    public func modalPressedOutside() {
+    }
+    
 }
 
 extension UI.Container.None : IUIDialogContentContainer {

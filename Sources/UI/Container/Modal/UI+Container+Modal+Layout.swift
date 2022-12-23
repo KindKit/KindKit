@@ -76,7 +76,16 @@ extension UI.Container.Modal {
                 }
                 let modalBounds = bounds.inset(modalInset)
                 let modalSize = modal.size(of: detent, available: modalBounds.size)
-                modal.view.frame = Rect(bottom: modalBounds.bottom, size: modalSize)
+                let frame = Rect(bottom: modalBounds.bottom, size: modalSize)
+                modal.view.frame = frame
+                if let grabber = modal.sheet?.grabber {
+                    grabber.frame = Rect(
+                        top: frame.top,
+                        size: grabber.size(
+                            available: frame.size
+                        )
+                    )
+                }
             case .transition(let modal, let from, let to, var progress):
                 let modalInset: Inset
                 if let sheet = modal.sheet {
@@ -127,7 +136,16 @@ extension UI.Container.Modal {
                     fromRect = .zero
                     toRect = .zero
                 }
-                modal.view.frame = fromRect.lerp(toRect, progress: progress)
+                let frame = fromRect.lerp(toRect, progress: progress)
+                modal.view.frame = frame
+                if let grabber = modal.sheet?.grabber {
+                    grabber.frame = Rect(
+                        top: frame.top,
+                        size: grabber.size(
+                            available: frame.size
+                        )
+                    )
+                }
             }
             return bounds.size
         }
@@ -142,10 +160,14 @@ extension UI.Container.Modal {
                 views.append(content)
             }
             if let modal = self.state.modal {
-                if let view = modal.sheet?.background {
-                    views.append(view)
+                if let sheet = modal.sheet {
+                    views.append(contentsOf: [ sheet.background, modal.view ])
+                    if let view = sheet.grabber {
+                        views.append(view)
+                    }
+                } else {
+                    views.append(modal.view)
                 }
-                views.append(modal.view)
             }
             return views
         }

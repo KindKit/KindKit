@@ -13,13 +13,15 @@ public extension UI.Modal.Presentation {
         public let detents: [UI.Size.Dynamic.Dimension]
         public let preferredDetent: UI.Size.Dynamic.Dimension
         public let background: IUIView & IUIViewAlphable
-        
+        public let grabber: IUIView?
+
         public init(
             inset: Inset,
             cornerRadius: UI.CornerRadius,
             detents: [UI.Size.Dynamic.Dimension],
-            preferredDetent: UI.Size.Dynamic.Dimension?,
-            background: IUIView & IUIViewAlphable
+            preferredDetent: UI.Size.Dynamic.Dimension? = nil,
+            background: IUIView & IUIViewAlphable,
+            grabber: IUIView? = nil
         ) {
             self.inset = inset
             self.cornerRadius = cornerRadius
@@ -34,6 +36,7 @@ public extension UI.Modal.Presentation {
                 self.preferredDetent = self.detents[0]
             }
             self.background = background
+            self.grabber = grabber
         }
         
     }

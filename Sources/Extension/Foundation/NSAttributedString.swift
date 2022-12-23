@@ -25,7 +25,7 @@ public extension NSAttributedString {
             return .zero
         }
         let bounding = layoutManager.usedRect(for: textContainer)
-        return .init(bounding.integral.size)
+        return .init(bounding.size)
     }
     
 }

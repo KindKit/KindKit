@@ -468,6 +468,10 @@ extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScree
         }
     }
     
+    public func modalPressedOutside() {
+        self.screen.modalPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScreenDialogable {

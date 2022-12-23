@@ -199,14 +199,6 @@ extension KKMaskView {
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
-        override func hitTest(_ point: NSPoint) -> NSView? {
-            let hitView = super.hitTest(point)
-            if hitView === self {
-                return nil
-            }
-            return hitView
-        }
 
     }
     

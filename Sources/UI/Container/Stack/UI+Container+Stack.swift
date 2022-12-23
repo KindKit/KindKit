@@ -453,6 +453,10 @@ extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreen
         }
     }
     
+    public func modalPressedOutside() {
+        self.screen.modalPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Stack : IContainerBarControllerObserver {

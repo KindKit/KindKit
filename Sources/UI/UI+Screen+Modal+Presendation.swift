@@ -22,14 +22,16 @@ public extension UI.Screen.Modal.Presentation {
         cornerRadius: UI.CornerRadius = .none,
         detents: [UI.Size.Dynamic.Dimension] = [ .fit ],
         preferredDetent: UI.Size.Dynamic.Dimension? = nil,
-        background: IUIView & IUIViewAlphable
+        background: IUIView & IUIViewAlphable,
+        grabber: IUIView? = nil
     ) -> Self {
         return .sheet(UI.Modal.Presentation.Sheet(
             inset: inset,
             cornerRadius: cornerRadius,
             detents: detents,
             preferredDetent: preferredDetent,
-            background: background
+            background: background,
+            grabber: grabber
         ))
     }
     

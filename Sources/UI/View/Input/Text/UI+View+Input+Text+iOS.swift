@@ -226,10 +226,24 @@ extension KKInputTextView : UITextViewDelegate {
         self._delegate?.beginEditing(self)
     }
     
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        let sourceText = (textView.text ?? "") as NSString
-        let newText = sourceText.replacingCharacters(in: range, with: text)
-        self._delegate?.editing(self, text: newText)
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText replacement: String) -> Bool {
+        guard let delegate = self._delegate else {
+            return false
+        }
+        let source = textView.text ?? ""
+        guard let range = Range< String.Index >(range, in: source) else {
+            return false
+        }
+        let info = UI.View.Input.Text.ShouldReplace(
+            text: source,
+            range: range,
+            replacement: replacement
+        )
+        guard delegate.shouldReplace(self, info: info) == true else {
+            return false
+        }
+        let text = info.text.replacingCharacters(in: info.range, with: info.replacement)
+        self._delegate?.editing(self, text: text)
         return true
     }
     

@@ -89,13 +89,13 @@ extension UI.View.Button {
                                 primaryInset: self.primaryInset,
                                 primarySize: primarySize
                             )
-                            spinner.frame = frames.secondary.integral
-                            primary.frame = frames.primary.integral
+                            spinner.frame = frames.secondary
+                            primary.frame = frames.primary
                         } else {
-                            spinner.frame = Rect(center: availableBounds.center, size: spinnerSize).integral
+                            spinner.frame = Rect(center: availableBounds.center, size: spinnerSize)
                         }
                     } else {
-                        spinner.frame = Rect(center: availableBounds.center, size: spinnerSize).integral
+                        spinner.frame = Rect(center: availableBounds.center, size: spinnerSize)
                     }
                 }
             } else if let primary = self.primary, let secondary = self.secondary {
@@ -110,13 +110,13 @@ extension UI.View.Button {
                     primaryInset: self.primaryInset,
                     primarySize: primarySize
                 )
-                secondary.frame = frames.secondary.integral
-                primary.frame = frames.primary.integral
+                secondary.frame = frames.secondary
+                primary.frame = frames.primary
             } else if let primary = self.primary {
                 let primarySize = self._primarySize(availableBounds.size, view: primary)
                 switch self.alignment {
                 case .fill: primary.frame = availableBounds
-                case .center: primary.frame = Rect(center: availableBounds.center, size: primarySize).integral
+                case .center: primary.frame = Rect(center: availableBounds.center, size: primarySize)
                 }
             }
             return bounds.size
