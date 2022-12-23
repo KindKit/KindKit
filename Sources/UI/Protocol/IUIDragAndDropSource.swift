@@ -16,6 +16,12 @@ public protocol IUIDragAndDropSource : AnyObject {
     
     var onPreview: Signal.Args< NativeView?, NSItemProvider > { get }
     
+#if os(iOS)
+    
+    var onPreviewParameters: Signal.Args< UIDragPreviewParameters?, NSItemProvider > { get }
+    
+#endif
+    
     var onBeginPreview: Signal.Args< Void, NSItemProvider > { get }
     
     var onEndPreview: Signal.Args< Void, NSItemProvider > { get }
@@ -135,6 +141,31 @@ public extension IUIDragAndDropSource {
         self.onPreview.link(sender, closure)
         return self
     }
+    
+#if os(iOS)
+    
+    @inlinable
+    @discardableResult
+    func onPreviewParameters(_ closure: ((NSItemProvider) -> UIDragPreviewParameters?)?) -> Self {
+        self.onPreviewParameters.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPreviewParameters(_ closure: ((Self, NSItemProvider) -> UIDragPreviewParameters?)?) -> Self {
+        self.onPreviewParameters.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onPreviewParameters< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> UIDragPreviewParameters?)?) -> Self {
+        self.onPreviewParameters.link(sender, closure)
+        return self
+    }
+    
+#endif
     
     @inlinable
     @discardableResult

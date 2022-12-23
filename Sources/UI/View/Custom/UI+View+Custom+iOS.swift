@@ -284,11 +284,11 @@ extension KKCustomView : UIDragInteractionDelegate {
             return view
         })
         item.localObject = view
-        let parameters = UIDragPreviewParameters()
-        parameters.backgroundColor = .clear
-        if #available(iOS 14.0, *) {
-            parameters.shadowPath = nil
-        }
+        let parameters = dragSource.onPreviewParameters.emit(item.itemProvider, default: {
+            let parameters = UIDragPreviewParameters()
+            parameters.backgroundColor = .clear
+            return parameters
+        })
         return UITargetedDragPreview(view: view, parameters: parameters)
     }
     
