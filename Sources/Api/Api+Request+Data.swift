@@ -10,6 +10,7 @@ public extension Api.Request {
         
         case file(URL)
         case json(Json)
+        case text(String, String.Encoding)
         case raw(Foundation.Data)
         
     }
@@ -20,6 +21,10 @@ public extension Api.Request.Data {
     
     static func json(_ block: (_ json: Json) throws -> Void) rethrows -> Api.Request.Data {
         return .json(try Json().build(block))
+    }
+    
+    static func text(_ string: String) -> Api.Request.Data {
+        return .text(string, .utf8)
     }
     
 }
@@ -37,6 +42,14 @@ public extension Api.Request.Data {
             return (
                 raw: try json.saveAsData(),
                 mimetype: "application/json"
+            )
+        case .text(let string, let encoding):
+            guard let data = string.data(using: encoding) else {
+                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
+            }
+            return (
+                raw: data,
+                mimetype: "text/plain"
             )
         case .raw(let data):
             return (
