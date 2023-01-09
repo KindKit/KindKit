@@ -281,7 +281,7 @@ extension LogUI.Screen : ILogUITargetObserver {
         self._entities.append(entity)
         if self._filter(entity.item) == true {
             self.layout.insert(
-                index: self.layout.views.count - 1,
+                index: self.layout.views.count,
                 views: [ entity.cell ]
             )
             self.view.layoutIfNeeded()
