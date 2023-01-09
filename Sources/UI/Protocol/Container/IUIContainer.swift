@@ -34,6 +34,9 @@ public protocol IUIContainer : AnyObject {
 #endif
 
     func activate() -> Bool
+#if os(iOS)
+    func snake() -> Bool
+#endif
     
     func didChangeAppearance()
     

@@ -4,44 +4,26 @@
 
 import Foundation
 
-#if DEBUG
-
 extension URLResponse : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<\(String(describing: self.classForCoder))\n")
-
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<URLResponse")
         if let url = self.url {
-            let debug = url.debugString(0, nextIndent, indent)
-            DebugString("URL: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "URL", value: url)
         }
         if let mimeType = self.mimeType {
-            let debug = mimeType.debugString(0, nextIndent, indent)
-            DebugString("MimeType: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "MimeType", value: mimeType)
         }
         if let textEncoding = self.textEncodingName {
-            let debug = textEncoding.debugString(0, nextIndent, indent)
-            DebugString("TextEncoding: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "TextEncoding", value: textEncoding)
         }
         if let http = self as? HTTPURLResponse {
-            DebugString("StatusCode: \(http.statusCode)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "StatusCode", value: http.statusCode)
             if http.allHeaderFields.isEmpty == false {
-                let debug = http.allHeaderFields.debugString(0, nextIndent, indent)
-                DebugString("Headers: \(debug)\n", &buffer, indent, nextIndent, indent)
+                buff.append(inter: indent, key: "Headers", value: http.allHeaderFields)
             }
         }
-
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+        buff.append(footer: indent, data: ">")
     }
     
 }
-
-#endif

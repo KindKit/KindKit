@@ -180,21 +180,19 @@ private extension Api.Query.Task {
     }
 
     func _complete(_ result: Response.Result) {
-#if DEBUG
         switch self.provider.logging {
         case .never:
             break
-        case .whenError:
+        case .errorOnly(let category):
             switch result {
             case .failure:
-                print(self.debugString())
+                Log.shared.log(level: .error, category: category, message: self.dump())
             default:
                 break
             }
-        case .always:
-            print(self.debugString())
+        case .always(let category):
+            Log.shared.log(level: .error, category: category, message: self.dump())
         }
-#endif
         self.queue.sync(flags: .barrier, execute: {
             guard self._canceled == false else { return }
             self.onCompleted(result)
@@ -203,68 +201,73 @@ private extension Api.Query.Task {
 
 }
 
-#if DEBUG
-
 extension Api.Query.Task : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Api.Query.Task : IDebug {
-
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<Api.Query.Task\n")
-
-        DebugString("CreateAt: \(self.createAt)\n", &buffer, indent, nextIndent, indent)
-        DebugString("Duration: \(-self.createAt.timeIntervalSinceNow) s\n", &buffer, indent, nextIndent, indent)
+    
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Api.Query.Task")
+        buff.append(
+            inter: indent,
+            key: "CreateAt",
+            value: self.createAt
+        )
+        buff.append(
+            inter: indent,
+            key: "Duration",
+            value: -self.createAt.timeIntervalSinceNow,
+            valueFormatter: StringFormatter.DateComponents(
+                unitsStyle: .abbreviated,
+                allowedUnits: [ .second, .nanosecond ]
+            )
+        )
         if let request = self.task.originalRequest {
-            let debug = request.debugString(0, nextIndent, indent)
-            DebugString("OriginalRequest: \(debug)\n", &buffer, indent, nextIndent, indent)
-        }
-        if self.task.originalRequest != self.task.currentRequest {
-            if let request = task.currentRequest {
-                let debug = request.debugString(0, nextIndent, indent)
-                DebugString("CurrentRequest: \(debug)\n", &buffer, indent, nextIndent, indent)
-            }
+            buff.append(inter: indent, key: "Request", value: request)
         }
         if let response = self.task.response {
-            let debug = response.debugString(0, nextIndent, indent)
-            DebugString("Response: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "Response", value: response)
         }
         if let error = self.task.error as? NSError {
-            let debug = error.debugString(0, nextIndent, indent)
-            DebugString("Error: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "Error", value: error)
         }
         if let data = self._receivedData {
-            var debug = String()
-            if let json = try? JSONSerialization.jsonObject(with: data) {
-                if let array = json as? NSArray {
-                    array.debugString(&debug, 0, nextIndent, indent)
-                } else if let dictionay = json as? NSDictionary {
-                    dictionay.debugString(&debug, 0, nextIndent, indent)
+            if data.isEmpty == false {
+                if let json = try? JSONSerialization.jsonObject(with: data) {
+                    if let root = json as? NSArray {
+                        buff.append(
+                            inter: indent,
+                            key: "Body",
+                            value: root
+                        )
+                    } else if let root = json as? NSDictionary {
+                        buff.append(
+                            inter: indent,
+                            key: "Body",
+                            value: root
+                        )
+                    }
+                } else if let string = String(data: data, encoding: .utf8) {
+                    buff.append(
+                        inter: indent,
+                        key: "Body",
+                        value: string.kk_escape([ .tab, .return, .newline ])
+                    )
+                } else {
+                    buff.append(
+                        inter: indent,
+                        key: "Body",
+                        value: data
+                    )
                 }
-            } else if let string = String(data: data, encoding: .utf8) {
-                string.debugString(&debug, 0, nextIndent, indent)
-            } else {
-                data.debugString(&debug, 0, nextIndent, indent)
             }
-            DebugString("Received: \(debug)\n", &buffer, indent, nextIndent, indent)
         }
-
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+        buff.append(footer: indent, data: ">")
     }
     
 }
-
-#endif

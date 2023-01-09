@@ -49,19 +49,23 @@ extension LogUI {
         private(set) lazy var _searchBorder = UI.View.Rect()
             .border(.manual(width: 1, color: .platinum))
             .cornerRadius(.manual(radius: 4))
-            .fill(.red)
+            .fill(.white)
         
         private(set) lazy var _searchInput = UI.View.Input.String()
             .height(.fixed(44))
             .textFont(.init(weight: .regular, size: 16))
             .textColor(.black)
             .textInset(.init(horizontal: 12, vertical: 4))
+            .editingColor(.black)
             .placeholder(.init(
                 text: "Enter filter",
                 font: .init(weight: .regular, size: 16),
                 color: .platinum
             ))
-            .editingColor(.black)
+            .keyboard(.init(
+                returnKey: .search,
+                enablesReturnKeyAutomatically: false
+            ))
         
 #endif
         
@@ -152,6 +156,10 @@ extension LogUI {
             self.target.remove(observer: self)
         }
         
+        func snake() -> Bool {
+            return true
+        }
+        
         func apply(inset: UI.Container.AccumulateInset) {
             self.view.contentInset = inset.natural
             self._scrollToBottom()
@@ -239,7 +247,7 @@ private extension LogUI.Screen {
                                             UI.View.Text()
                                                 .color(.white)
                                                 .text(item.category)
-                                                .textFont(.init(weight: .regular, size: 16))
+                                                .textFont(.init(weight: .semibold, size: 16))
                                         ),
                                         .view(
                                             UI.View.Text()

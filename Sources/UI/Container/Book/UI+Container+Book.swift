@@ -154,6 +154,17 @@ public extension UI.Container {
             return false
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            if let item = self._current {
+                return item.container.snake()
+            }
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             if let item = self._backward {
                 item.container.didChangeAppearance()

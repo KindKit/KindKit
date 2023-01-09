@@ -6,21 +6,23 @@ import Foundation
 
 public extension Log.Target {
     
-    final class Default : ILogTarget {
+    final class Default {
         
-        public var enabled: Bool
-        
-        public init(
-            enabled: Bool = true
-        ) {
-            self.enabled = enabled
+        public init() {
         }
         
-        public func log(level: Log.Level, category: String, message: String) {
-            guard self.enabled == true else { return }
-            print("[\(category)]: \(message)")
-        }
-        
+    }
+    
+}
+
+extension Log.Target.Default : ILogTarget {
+    
+    public var files: [URL] {
+        return []
+    }
+    
+    public func log(level: Log.Level, category: String, message: String) {
+        print("[\(category)]: \(message)")
     }
     
 }

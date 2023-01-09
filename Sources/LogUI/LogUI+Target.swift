@@ -13,55 +13,30 @@ protocol ILogUITargetObserver : AnyObject {
 
 public extension LogUI {
 
-    final class Target : ILogTarget {
-            
-        public var enabled: Bool
+    final class Target {
+        
         public let limit: Int
-        
-        public private(set) var items: [Item]
-        
-        private var _lastIndex: Int
+        var items: [Item] {
+            return self._queue.sync(flags: .barrier, execute: {
+                return self._items
+            })
+        }
+
+        private var _items: [Item]
+        private let _queue: DispatchQueue
         private let _observer: Observer< ILogUITargetObserver >
         
         public init(
-            enabled: Bool = true,
             limit: Int = 512
         ) {
-            self.enabled = enabled
             self.limit = limit
-            self.items = []
-            self._lastIndex = 0
+            self._items = []
+            self._queue = .init(label: "KindKit.LogUI.Target")
             self._observer = Observer()
         }
-        
-        public func log(level: Log.Level, category: String, message: String) {
-            guard self.enabled == true else { return }
-            let appendItem = Item(index: self._lastIndex, date: Date(), level: level, category: category, message: message)
-            self.items.append(appendItem)
-            self._lastIndex += 1
-            self._observer.notify({ $0.append(self, item: appendItem) })
-            if self.items.count > self.limit {
-                let removeItem = self.items.removeFirst()
-                self._observer.notify({ $0.remove(self, item: removeItem) })
-            }
-        }
 
     }
 
-}
-
-public extension LogUI.Target {
-    
-    struct Item : Equatable {
-        
-        public let index: Int
-        public let date: Date
-        public let level: Log.Level
-        public let category: String
-        public let message: String
-        
-    }
-    
 }
 
 extension LogUI.Target {
@@ -72,6 +47,48 @@ extension LogUI.Target {
     
     func remove(observer: ILogUITargetObserver) {
         self._observer.remove(observer)
+    }
+    
+}
+
+extension LogUI.Target : ILogTarget {
+    
+    public var files: [URL] {
+        return []
+    }
+    
+    public func log(level: Log.Level, category: String, message: String) {
+        let item = Item(date: Date(), level: level, category: category, message: message)
+        self._queue.async(execute: { [weak self] in
+            guard let self = self else { return }
+            self._log(item: item)
+        })
+        
+    }
+    
+}
+
+private extension LogUI.Target {
+    
+    func _log(item: Item) {
+        self._items.append(item)
+        let removeItem: Item?
+        if self._items.count > self.limit {
+            removeItem = self._items.removeFirst()
+        } else {
+            removeItem = nil
+        }
+        DispatchQueue.main.async(execute: {[weak self] in
+            guard let self = self else { return }
+            self._didLog(append: item, remove: removeItem)
+        })
+    }
+    
+    func _didLog(append: Item, remove: Item?) {
+        self._observer.notify({ $0.append(self, item: append) })
+        if let remove = remove {
+            self._observer.notify({ $0.remove(self, item: remove) })
+        }
     }
     
 }

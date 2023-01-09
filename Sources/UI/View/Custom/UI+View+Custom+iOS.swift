@@ -94,7 +94,9 @@ final class KKCustomView : UIView {
         didSet {
             guard self._dragSource !== oldValue else { return }
             if self._dragSource != nil {
-                self._dragSourceInteraction = UIDragInteraction(delegate: self)
+                let interaction = UIDragInteraction(delegate: self)
+                self._dragSourceInteraction = interaction
+                interaction.isEnabled = true
             } else {
                 self._dragSourceInteraction = nil
             }

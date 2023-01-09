@@ -95,6 +95,15 @@ public extension UI.Container {
             return self.screen.activate()
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            guard self.isPresented == true else { return false }
+            return self.screen.snake()
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self.screen.didChangeAppearance()
         }

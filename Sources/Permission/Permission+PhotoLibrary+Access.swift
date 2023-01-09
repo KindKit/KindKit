@@ -18,7 +18,7 @@ public extension Permission.PhotoLibrary {
 
 extension Permission.PhotoLibrary.Access {
     
-    @available(iOS 14, *)
+    @available(macOS 11, iOS 14, *)
     var level: PHAccessLevel {
         switch self {
         case .addOnly: return .addOnly

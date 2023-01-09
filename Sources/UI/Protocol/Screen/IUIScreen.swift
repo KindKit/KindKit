@@ -22,6 +22,9 @@ public protocol IUIScreen : AnyObject {
     func destroy()
     
     func activate() -> Bool
+#if os(iOS)
+    func snake() -> Bool
+#endif
     
     func didChangeAppearance()
 
@@ -85,6 +88,14 @@ public extension IUIScreen {
     func activate() -> Bool {
         return false
     }
+    
+#if os(iOS)
+    
+    func snake() -> Bool {
+        return false
+    }
+    
+#endif
     
     func didChangeAppearance() {
     }

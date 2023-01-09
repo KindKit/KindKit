@@ -265,6 +265,30 @@ public extension UI.Container {
             }
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            switch self._layout.state {
+            case .idle:
+                return self._content.snake()
+            case .leading:
+                if let container = self._leading {
+                    if container.snake() == true {
+                        return true
+                    }
+                }
+            case .trailing:
+                if let container = self._trailing {
+                    if container.snake() == true {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self._content.didChangeAppearance()
             if let container = self._leading {

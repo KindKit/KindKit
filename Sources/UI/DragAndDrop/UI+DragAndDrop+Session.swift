@@ -9,7 +9,11 @@ public extension UI.DragAndDrop {
     struct Session {
         
         public let location: Point
+#if os(macOS)
+        public let items: [NSPasteboardItem]
+#elseif os(iOS)
         public let items: [NSItemProvider]
+#endif
         
 #if os(iOS)
         
@@ -27,6 +31,9 @@ public extension UI.DragAndDrop {
     
 }
 
+#if os(macOS)
+#elseif os(iOS)
+
 public extension UI.DragAndDrop.Session {
     
     func canLoad(ofClass aClass: NSItemProviderReading.Type) -> Bool {
@@ -34,3 +41,5 @@ public extension UI.DragAndDrop.Session {
     }
     
 }
+
+#endif

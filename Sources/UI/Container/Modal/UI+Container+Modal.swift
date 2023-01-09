@@ -212,6 +212,22 @@ public extension UI.Container {
             return false
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            if let current = self._current?.container {
+                if current.snake() == true {
+                    return true
+                }
+            }
+            if let content = self.content {
+                return content.snake()
+            }
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             for container in self.containers {
                 container.didChangeAppearance()

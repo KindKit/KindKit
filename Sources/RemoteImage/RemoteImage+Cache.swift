@@ -161,20 +161,9 @@ public extension RemoteImage.Cache {
 
     func cleanup(before: TimeInterval) {
         self.cleanupMemory()
-        let now = Date()
-        if let urls = try? self._fileManager.contentsOfDirectory(at: self.url, includingPropertiesForKeys: nil, options: [ .skipsHiddenFiles ]) {
-            for url in urls {
-                guard
-                    let attributes = try? self._fileManager.attributesOfItem(atPath: url.path),
-                    let modificationDate = attributes[FileAttributeKey.modificationDate] as? Date
-                else {
-                    continue
-                }
-                let delta = now.timeIntervalSince1970 - modificationDate.timeIntervalSince1970
-                if delta > before {
-                    try? self._fileManager.removeItem(at: url)
-                }
-            }
+        let urls = self._fileManager.kk_contents(at: self.url, olderThan: before)
+        for url in urls {
+            try? self._fileManager.removeItem(at: url)
         }
     }
 

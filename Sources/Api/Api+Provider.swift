@@ -18,9 +18,7 @@ public extension Api {
             set { self._sessionDelegate.localCertificateUrls = newValue }
             get { self._sessionDelegate.localCertificateUrls }
         }
-#if DEBUG
-        public var logging: Api.Logging = .never
-#endif
+        public var logging: Api.Logging
 
         private var _session: URLSession!
         private let _sessionDelegate: SessionDelegate
@@ -30,10 +28,12 @@ public extension Api {
             headers: [Api.Request.Header] = [],
             authenticationChallenge: AuthenticationChallenge = [],
             localCertificateUrls: [URL] = [],
-            configuration: URLSessionConfiguration = URLSessionConfiguration.default
+            configuration: URLSessionConfiguration = URLSessionConfiguration.default,
+            logging: Api.Logging = .never
         ) {
             self.url = url
             self.headers = headers
+            self.logging = logging
             self._sessionDelegate = .init(
                 authenticationChallenge: authenticationChallenge,
                 localCertificateUrls: localCertificateUrls

@@ -128,8 +128,8 @@ extension UI.Container.Push.Layout {
         return self._layout.delta(item: item, begin: begin, current: current)
     }
     
-    func progress(item: UI.Container.PushItem, delta: Double) -> Percent {
-        return self._layout.progress(item: item, delta: delta)
+    func state(item: UI.Container.PushItem, delta: Double) -> UI.Container.Push.State {
+        return self._layout.state(item: item, delta: delta)
     }
     
 }

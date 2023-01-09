@@ -20,37 +20,21 @@ public extension Xml {
     
 }
 
-
-#if DEBUG
-
 extension Xml.Attribute : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Xml.Attribute : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-        
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<XmlAttribute\n")
-        
-        DebugString("Name: \(self.name)\n", &buffer, indent, nextIndent, indent)
-        let valueDebug = self.value.debugString(0, nextIndent, indent)
-        DebugString("Value: \(valueDebug)\n", &buffer, indent, nextIndent, indent)
-        
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Xml.Attribute")
+            .append(inter: indent, key: "Name", value: self.name)
+            .append(inter: indent, key: "Value", value: self.value)
+            .append(footer: indent, data: ">")
     }
     
 }
-
-#endif

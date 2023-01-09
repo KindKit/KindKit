@@ -6,7 +6,13 @@ import Foundation
 
 public protocol IUIDragAndDropSource : AnyObject {
     
+#if os(macOS)
+    var pasteboardTypes: [NSPasteboard.PasteboardType] { get }
+    
+    var onItems: Signal.Empty< [NSPasteboardItem]? > { get }
+#elseif os(iOS)
     var onItems: Signal.Empty< [NSItemProvider]? > { get }
+#endif
     
     var onAllow: Signal.Args< Bool?, UI.DragAndDrop.Operation > { get }
     
@@ -30,6 +36,31 @@ public protocol IUIDragAndDropSource : AnyObject {
 
 public extension IUIDragAndDropSource {
     
+#if os(macOS)
+    
+    @inlinable
+    @discardableResult
+    func onItems(_ closure: (() -> [NSPasteboardItem]?)?) -> Self {
+        self.onItems.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onItems(_ closure: ((Self) -> [NSPasteboardItem]?)?) -> Self {
+        self.onItems.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onItems< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> [NSPasteboardItem]?)?) -> Self {
+        self.onItems.link(sender, closure)
+        return self
+    }
+    
+#elseif os(iOS)
+    
     @inlinable
     @discardableResult
     func onItems(_ closure: (() -> [NSItemProvider]?)?) -> Self {
@@ -50,6 +81,8 @@ public extension IUIDragAndDropSource {
         self.onItems.link(sender, closure)
         return self
     }
+    
+#endif
     
     @inlinable
     @discardableResult

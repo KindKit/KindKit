@@ -55,6 +55,19 @@ final class KKCustomView : NSView {
     
     private var _layoutManager: UI.Layout.Manager!
     private var _gestures: [IUIGesture] = []
+    private var _dragDestination: IUIDragAndDropDestination?
+    private var _dragSource: IUIDragAndDropSource? {
+        willSet {
+            guard self._dragSource !== newValue else { return }
+            self.unregisterDraggedTypes()
+        }
+        didSet {
+            guard self._dragSource !== oldValue else { return }
+            if let dragSource = self._dragSource {
+                self.registerForDraggedTypes(dragSource.pasteboardTypes)
+            }
+        }
+    }
     private var _isLocked: Bool = false
     
     override init(frame: CGRect) {
@@ -99,6 +112,20 @@ final class KKCustomView : NSView {
         return hitView
     }
     
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)
+        
+        if let dragSource = self._dragSource {
+            self.beginDraggingSession(
+                with: dragSource.onItems.emit(default: []).compactMap({
+                    return NSDraggingItem(pasteboardWriter: $0)
+                }),
+                event: event,
+                source: self
+            )
+        }
+    }
+    
 }
 
 extension KKCustomView {
@@ -107,6 +134,8 @@ extension KKCustomView {
         self.update(frame: view.frame)
         self.update(gestures: view.gestures)
         self.update(content: view.content)
+        self.update(dragDestination: view.dragDestination)
+        self.update(dragSource: view.dragSource)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
         self.update(locked: view.isLocked)
@@ -130,6 +159,14 @@ extension KKCustomView {
     func update(content: IUILayout?) {
         self._layoutManager.layout = content
         self.needsLayout = true
+    }
+    
+    func update(dragDestination: IUIDragAndDropDestination?) {
+        self._dragDestination = dragDestination
+    }
+    
+    func update(dragSource: IUIDragAndDropSource?) {
+        self._dragSource = dragSource
     }
     
     func update(color: UI.Color?) {
@@ -168,6 +205,29 @@ extension KKCustomView {
         self.removeGestureRecognizer(gesture.native)
     }
     
+}
+
+extension KKCustomView : NSDraggingSource {
+    
+    func draggingSession(_ session: NSDraggingSession, sourceOperationMaskFor context: NSDraggingContext) -> NSDragOperation {
+        return .generic
+    }
+    
+}
+
+extension KKCustomView {
+    
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        guard self._dragDestination != nil else { return false }
+        return true
+    }
+    
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        return .generic
+    }
+
+    override func draggingExited(_ sender: NSDraggingInfo?) {
+    }
 }
 
 extension KKCustomView : IUILayoutDelegate {

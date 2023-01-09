@@ -123,14 +123,6 @@ final class KKScrollView : UIScrollView {
                 }
                 self._layoutManager.layout(bounds: layoutBounds)
                 let size = self._layoutManager.size
-                if self.isDragging == false && self.isDecelerating == false && self._refreshView.isRefreshing == false {
-                    let contentOffset = self.contentOffset
-                    let contentInset = self.contentInset
-                    self.contentOffset = .init(
-                        x: contentOffset.x > 0 ? contentOffset.x : -contentInset.left,
-                        y: contentOffset.y > 0 ? contentOffset.y : -contentInset.top
-                    )
-                }
                 self.contentSize = size.cgSize
                 self.kkDelegate?.update(self, contentSize: size)
             }
@@ -268,6 +260,10 @@ extension KKScrollView {
     func cleanup() {
         self._layoutManager.layout = nil
         self.kkDelegate = nil
+        self.scrollIndicatorInsets = .zero
+        self.contentInset = .zero
+        self.contentOffset = .zero
+        self.contentSize = .zero
     }
     
 }

@@ -4,33 +4,24 @@
 
 import Foundation
 
-#if DEBUG
-
 extension Json : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Json : IDebug {
-
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        if self.isArray == true {
-            let array = try! self.array()
-            array.debugString(&buffer, headerIndent, indent, footerIndent)
-        } else if self.isDictionary == true {
-            let dictionary = try! self.dictionary()
-            dictionary.debugString(&buffer, headerIndent, indent, footerIndent)
-        } else {
-            if headerIndent > 0 {
-                buffer.append(String(repeating: "\t", count: headerIndent))
-            }
-            buffer.append("<Json>")
+    
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Json")
+        if let root = self.root as? NSArray {
+            buff.append(inter: indent, data: root)
+        } else if let root = self.root as? NSDictionary {
+            buff.append(inter: indent, data: root)
         }
+        buff.append(footer: indent, data: ">")
     }
 
 }
-
-#endif

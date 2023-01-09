@@ -125,6 +125,15 @@ public extension UI.Container {
             return content.activate()
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            guard let content = self.content else { return false }
+            return content.snake()
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self.content?.didChangeAppearance()
         }

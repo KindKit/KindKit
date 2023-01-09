@@ -4,72 +4,69 @@
 
 import Foundation
 
-#if DEBUG
-
 extension URLRequest : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<\(String(describing: self))\n")
-
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<URLRequest")
         if let url = self.url {
-            let debug = url.debugString(0, nextIndent, indent)
-            DebugString("URL: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "URL", value: url)
         }
-        if let method = self.httpMethod {
-            let debug = method.debugString(0, nextIndent, indent)
-            DebugString("Method: \(debug)\n", &buffer, indent, nextIndent, indent)
+        if let httpMethod = self.httpMethod {
+            buff.append(inter: indent, key: "Method", value: httpMethod)
         }
         if let headers = self.allHTTPHeaderFields {
             if headers.isEmpty == false {
-                let debug = headers.debugString(0, nextIndent, indent)
-                DebugString("Headers: \(debug)\n", &buffer, indent, nextIndent, indent)
+                buff.append(inter: indent, key: "Headers", value: headers)
             }
         }
         switch self.cachePolicy {
         case .useProtocolCachePolicy:
-            DebugString("CachePolicy: UseProtocolCachePolicy\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "UseProtocolCachePolicy")
         case .reloadIgnoringLocalCacheData:
-            DebugString("CachePolicy: ReloadIgnoringLocalCacheData\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "ReloadIgnoringLocalCacheData")
         case .reloadIgnoringLocalAndRemoteCacheData:
-            DebugString("CachePolicy: ReloadIgnoringLocalAndRemoteCacheData\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "ReloadIgnoringLocalAndRemoteCacheData")
         case .returnCacheDataElseLoad:
-            DebugString("CachePolicy: ReturnCacheDataElseLoad\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "ReturnCacheDataElseLoad")
         case .returnCacheDataDontLoad:
-            DebugString("CachePolicy: ReturnCacheDataDontLoad\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "ReturnCacheDataDontLoad")
         case .reloadRevalidatingCacheData:
-            DebugString("CachePolicy: ReloadRevalidatingCacheData\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "CachePolicy", value: "ReloadRevalidatingCacheData")
         @unknown default:
             break
         }
         if let body = self.httpBody {
             if body.isEmpty == false {
-                var debug = String()
                 if let json = try? JSONSerialization.jsonObject(with: body) {
-                    if let array = json as? NSArray {
-                        array.debugString(&debug, 0, nextIndent, indent)
-                    } else if let dictionay = json as? NSDictionary {
-                        dictionay.debugString(&debug, 0, nextIndent, indent)
+                    if let root = json as? NSArray {
+                        buff.append(
+                            inter: indent,
+                            key: "Body",
+                            value: root
+                        )
+                    } else if let root = json as? NSDictionary {
+                        buff.append(
+                            inter: indent,
+                            key: "Body",
+                            value: root
+                        )
                     }
                 } else if let string = String(data: body, encoding: .utf8) {
-                    string.debugString(&debug, 0, nextIndent, indent)
+                    buff.append(
+                        inter: indent,
+                        key: "Body",
+                        value: string.kk_escape([ .tab, .return, .newline ])
+                    )
                 } else {
-                    body.debugString(&debug, 0, nextIndent, indent)
+                    buff.append(
+                        inter: indent,
+                        key: "Body",
+                        value: body
+                    )
                 }
-                DebugString("Body: \(debug)\n", &buffer, indent, nextIndent, indent)
             }
         }
-
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+        buff.append(footer: indent, data: ">")
     }
     
 }
-
-#endif

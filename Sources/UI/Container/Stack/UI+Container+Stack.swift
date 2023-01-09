@@ -194,6 +194,17 @@ public extension UI.Container {
             return self._root.container.activate()
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            if self.screen.snake() == true {
+                return true
+            }
+            return self._root.container.snake()
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self.screen.didChangeAppearance()
             for item in self._items.reversed() {

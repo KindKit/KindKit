@@ -24,6 +24,14 @@ public extension Log {
         ]
     )
     
+    var files: [URL] {
+        var files: [URL] = []
+        for target in self._targets {
+            files.append(contentsOf: target.files)
+        }
+        return files
+    }
+    
 }
 
 public extension Log {
@@ -33,14 +41,18 @@ public extension Log {
         self._targets.append(target)
     }
     
+    func find< TargetType: ILogTarget >(_ type: TargetType.Type) -> TargetType? {
+        for target in self._targets {
+            guard let target = target as? TargetType else { continue }
+            return target
+        }
+        return nil
+    }
+    
     func remove(target: ILogTarget) {
         guard let index = self._targets.firstIndex(where: { $0 === target }) else { return }
         self._targets.remove(at: index)
     }
-    
-}
-
-public extension Log {
     
     func log(level: Log.Level, category: String, message: String) {
         for target in self._targets {
@@ -49,12 +61,12 @@ public extension Log {
     }
     
     @inlinable
-    func log< Sender : AnyObject >(level: Log.Level, module object: Sender, message: String) {
+    func log< Sender : AnyObject >(level: Log.Level, object: Sender.Type, message: String) {
         self.log(level: level, category: String(describing: object), message: message)
     }
     
     @inlinable
-    func log< Sender : AnyObject >(level: Log.Level, class object: Sender, message: String) {
+    func log< Sender : AnyObject >(level: Log.Level, object: Sender, message: String) {
         self.log(level: level, category: String(describing: type(of: object)), message: message)
     }
     

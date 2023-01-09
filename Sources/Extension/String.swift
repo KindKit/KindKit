@@ -5,9 +5,31 @@
 import Foundation
 
 public extension String {
-
+    
+    @inlinable
     func kk_remove(_ characterSet: CharacterSet) -> String {
         return self.components(separatedBy: characterSet).joined()
+    }
+    
+    @inlinable
+    func kk_escape(_ mode: StringEscape) -> String {
+        var result = self
+        if mode.contains(.tab) == true {
+            result = result.replacingOccurrences(of: "\t", with: "\\t")
+        }
+        if mode.contains(.newline) == true {
+            result = result.replacingOccurrences(of: "\n", with: "\\n")
+        }
+        if mode.contains(.return) == true {
+            result = result.replacingOccurrences(of: "\r", with: "\\r")
+        }
+        if mode.contains(.singleQuote) == true {
+            result = result.replacingOccurrences(of: "'", with: "\\'")
+        }
+        if mode.contains(.doubleQuote) == true {
+            result = result.replacingOccurrences(of: "\"", with: "\\\"")
+        }
+        return result
     }
 
     func kk_replace(keys: [String : String]) -> String {
@@ -82,28 +104,32 @@ public extension String {
         }
         return nil
     }
-
+    
+    @inlinable
     var kk_sha1: String? {
         if let data = self.data(using: .utf8) {
             return data.kk_sha1.kk_hexString
         }
         return nil
     }
-
+    
+    @inlinable
     var kk_sha224: String? {
         if let data = self.data(using: .utf8) {
             return data.kk_sha224.kk_hexString
         }
         return nil
     }
-
+    
+    @inlinable
     var kk_sha256: String? {
         if let data = self.data(using: .utf8) {
             return data.kk_sha256.kk_hexString
         }
         return nil
     }
-
+    
+    @inlinable
     var kk_sha384: String? {
         if let data = self.data(using: .utf8) {
             return data.kk_sha384.kk_hexString
@@ -111,6 +137,7 @@ public extension String {
         return nil
     }
     
+    @inlinable
     var kk_sha512: String? {
         if let data = self.data(using: .utf8) {
             return data.kk_sha512.kk_hexString
@@ -143,11 +170,13 @@ public extension String {
         }
         return components
     }
-
+    
+    @inlinable
     func kk_range(from nsRange: NSRange) -> Range< Index >? {
         return Range< Index >(nsRange, in: self)
     }
-
+    
+    @inlinable
     func kk_nsRange(from range: Range< Index >) -> NSRange {
         guard
             let from = range.lowerBound.samePosition(in: utf16),

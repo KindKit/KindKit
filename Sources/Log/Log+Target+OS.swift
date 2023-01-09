@@ -6,21 +6,23 @@ import Foundation
 
 public extension Log.Target {
     
-    final class OS : ILogTarget {
+    final class OS {
         
-        public var enabled: Bool
-        
-        public init(
-            enabled: Bool = true
-        ) {
-            self.enabled = enabled
+        public init() {
         }
         
-        public func log(level: Log.Level, category: String, message: String) {
-            guard self.enabled == true else { return }
-            NSLog("[\(category)]: \(message)")
-        }
-        
+    }
+    
+}
+
+extension Log.Target.OS : ILogTarget {
+    
+    public var files: [URL] {
+        return []
+    }
+    
+    public func log(level: Log.Level, category: String, message: String) {
+        NSLog("[\(category)]: \(message)")
     }
     
 }

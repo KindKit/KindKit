@@ -200,6 +200,20 @@ public extension UI.Container {
             return false
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            if self.screen.snake() == true {
+                return true
+            }
+            if let current = self._current {
+                return current.container.snake()
+            }
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self.screen.didChangeAppearance()
             for item in self._items {

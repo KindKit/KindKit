@@ -142,15 +142,27 @@ extension UI.Container.Push.Layout.Queue {
         }
     }
     
-    func progress(item: UI.Container.PushItem, delta: Double) -> Percent {
+    func state(item: UI.Container.PushItem, delta: Double) -> UI.Container.Push.State {
         if delta ~~ .zero {
-            return .zero
+            return .idle(push: item)
         }
         let size = self._size(item: item)
         if delta < 0 {
-            return .one + Percent(-delta / pow(size, 1.5))
+            return .present(
+                push: item,
+                progress: .one + Percent(-delta / pow(size, 1.5))
+            )
         }
-        return Percent(delta / size)
+        if delta > size {
+            return .dismiss(
+                push: item,
+                progress: .one
+            )
+        }
+        return .dismiss(
+            push: item,
+            progress: Percent(delta / size)
+        )
     }
     
 }

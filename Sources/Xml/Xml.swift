@@ -44,36 +44,22 @@ public extension Xml {
     
 }
 
-#if DEBUG
-
 extension Xml : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Xml : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-        
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<XmlDocument\n")
-        
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Xml")
         if self.nodes.count > 0 {
-            self.nodes.debugString(&buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, data: self.nodes)
         }
-        
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+        buff.append(footer: indent, data: ">")
     }
     
 }
-
-#endif

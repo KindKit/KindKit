@@ -163,6 +163,14 @@ public extension UI.Container {
             return self.content.activate()
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            return self.content.snake()
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             self.content.didChangeAppearance()
         }
@@ -205,5 +213,5 @@ private extension UI.Container.Root {
     
     func _destroy() {
     }
-    
+
 }

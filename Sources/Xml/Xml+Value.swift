@@ -59,34 +59,20 @@ public extension Xml.Value {
     
 }
 
-#if DEBUG
-
 extension Xml.Value : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Xml.Value : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-        
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<XmlValue\n")
-        
-        DebugString("\(self.text)\n", &buffer, indent, nextIndent, indent)
-        
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Xml.Value")
+            .append(inter: indent, data: self.text)
+            .append(footer: indent, data: ">")
     }
     
 }
-
-#endif

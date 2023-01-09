@@ -82,6 +82,14 @@ public extension UI.Container {
             return false
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
         }
         

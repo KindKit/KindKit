@@ -43,46 +43,29 @@ public extension Xml.Node {
     
 }
 
-#if DEBUG
-
 extension Xml.Node : CustomDebugStringConvertible {
 
     public var debugDescription: String {
-        return self.debugString()
+        return self.dump()
     }
     
 }
 
 extension Xml.Node : IDebug {
     
-    public func debugString(_ buffer: inout String, _ headerIndent: Int, _ indent: Int, _ footerIndent: Int) {
-        let nextIndent = indent + 1
-        
-        if headerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: headerIndent))
-        }
-        buffer.append("<XmlNode\n")
-        
-        DebugString("Name: \(self.name)\n", &buffer, indent, nextIndent, indent)
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(header: indent, data: "<Xml.Node")
+        buff.append(inter: indent, key: "Name", value: self.name)
         if self.attributes.count > 0 {
-            let debug = self.attributes.debugString(0, nextIndent, indent)
-            DebugString("Attributes: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "Attributes", value: self.attributes)
         }
         if self.nodes.count > 0 {
-            let debug = self.nodes.debugString(0, nextIndent, indent)
-            DebugString("Nodes: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "Nodes", value: self.nodes)
         }
         if let value = self.value {
-            let debug = value.debugString(0, nextIndent, indent)
-            DebugString("Value: \(debug)\n", &buffer, indent, nextIndent, indent)
+            buff.append(inter: indent, key: "Attributes", value: value)
         }
-        
-        if footerIndent > 0 {
-            buffer.append(String(repeating: "\t", count: footerIndent))
-        }
-        buffer.append(">")
+        buff.append(footer: indent, data: ">")
     }
     
 }
-
-#endif

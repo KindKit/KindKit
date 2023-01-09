@@ -73,7 +73,7 @@ public extension Permission {
             switch self._rawStatus() {
             case .notDetermined:
                 self._willRequest(source: source)
-                if #available(iOS 14, *) {
+                if #available(macOS 11.0, iOS 14, *) {
                     PHPhotoLibrary.requestAuthorization(for: self.access.level, handler: { [weak self] _ in
                         DispatchQueue.main.async(execute: {
                             self?._didRequest(source: source)
@@ -132,7 +132,7 @@ private extension Permission.PhotoLibrary {
 private extension Permission.PhotoLibrary {
     
     func _rawStatus() -> PHAuthorizationStatus {
-        if #available(iOS 14, *) {
+        if #available(macOS 11.0, iOS 14, *) {
             return PHPhotoLibrary.authorizationStatus(for: self.access.level)
         } else {
             return PHPhotoLibrary.authorizationStatus()

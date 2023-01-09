@@ -91,6 +91,17 @@ public extension UI.View {
                 if self.isLoaded == true {
                     self._view.update(contentInset: self.contentInset)
                 }
+                let oldContentOffset = self.contentOffset
+                let newContentOffset = Point(
+                    x: min(-self.contentInset.left, oldContentOffset.x),
+                    y: min(-self.contentInset.top, oldContentOffset.y)
+                )
+                if oldContentOffset != newContentOffset {
+                    self._contentOffset = newContentOffset
+                    if self.isLoaded == true {
+                        self._view.update(contentOffset: newContentOffset, normalized: true)
+                    }
+                }
                 if self.size.isStatic == false {
                     self.setNeedForceLayout()
                 }
@@ -343,6 +354,9 @@ public extension UI.View.Scroll {
     
     @discardableResult
     func contentOffset(_ value: Point, normalized: Bool = false) -> Self {
+        guard self.contentOffset != value else {
+            return self
+        }
         self._contentOffset = value
         if self.isLoaded == true {
             self._view.update(contentOffset: value, normalized: normalized)

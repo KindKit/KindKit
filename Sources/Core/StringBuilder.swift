@@ -6,41 +6,70 @@ import Foundation
 
 public final class StringBuilder {
     
-    private var _value: String
+    public var string: String
     
     public init(_ value: String = "") {
-        self._value = value
+        self.string = value
     }
     
 }
 
 public extension StringBuilder {
-    
-    var string: String {
-        return self._value
-    }
     
     var count: Int {
-        return self._value.count
+        return self.string.count
     }
     
 }
 
 public extension StringBuilder {
     
+    @inlinable
+    @discardableResult
+    func newline() -> Self {
+        self.string.append("\n")
+        return self
+    }
+    
+    @inlinable
     @discardableResult
     func append(
         _ value: String
     ) -> Self {
-        self._value.append(value)
+        self.string.append(value)
         return self
     }
     
+    @inlinable
     @discardableResult
     func append< Value : CustomStringConvertible >(
         _ value: Value
     ) -> Self {
-        self._value.append(value.description)
+        self.string.append(value.description)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func append(
+        _ value: Character,
+        repeating: Int
+    ) -> Self {
+        if repeating > 0 {
+            self.string.append(String(repeating: value, count: repeating))
+        }
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func append(
+        _ value: String,
+        repeating: Int
+    ) -> Self {
+        if repeating > 0 {
+            self.string.append(String(repeating: value, count: repeating))
+        }
         return self
     }
     
@@ -61,22 +90,24 @@ public extension StringBuilder {
         return self.append(formatter.format(value))
     }
     
+    @inlinable
     @discardableResult
     func append< Value : Sequence >(
         _ value: Value,
         separator: String
     ) -> Self where Value.Element == String {
-        self._value.append(value.joined(separator: separator))
+        self.append(value.joined(separator: separator))
         return self
     }
     
+    @inlinable
     @discardableResult
     func append< Value : Sequence >(
         _ value: Value,
         map: (Value.Element) -> String,
         separator: String
     ) -> Self {
-        self._value.append(value.map(map).joined(separator: separator))
+        self.append(value.map(map).joined(separator: separator))
         return self
     }
     

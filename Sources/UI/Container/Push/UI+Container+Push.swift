@@ -217,6 +217,22 @@ public extension UI.Container {
             return false
         }
         
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            if let current = self._current {
+                if current.container.snake() == true {
+                    return true
+                }
+            }
+            if let content = self.content {
+                return content.snake()
+            }
+            return false
+        }
+        
+#endif
+        
         public func didChangeAppearance() {
             for container in self.containers {
                 container.didChangeAppearance()
@@ -498,12 +514,7 @@ private extension UI.Container.Push {
         guard let beginLocation = self._interactiveBeginLocation else { return }
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = self._layout.delta(item: current, begin: beginLocation, current: currentLocation)
-        let progress = self._layout.progress(item: current, delta: deltaLocation)
-        if progress >= .one {
-            self._layout.state = .present(push: current, progress: progress)
-        } else {
-            self._layout.state = .dismiss(push: current, progress: progress)
-        }
+        self._layout.state = self._layout.state(item: current, delta: deltaLocation)
     }
     
     func _endInteractiveGesture(_ canceled: Bool) {
@@ -511,26 +522,14 @@ private extension UI.Container.Push {
         guard let beginLocation = self._interactiveBeginLocation else { return }
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = self._layout.delta(item: current, begin: beginLocation, current: currentLocation)
-        let baseProgress = self._layout.progress(item: current, delta: deltaLocation)
-        if deltaLocation > self.interactiveLimit {
-            let duration = self._layout.duration(item: current, velocity: self.animationVelocity)
-            let elapsed = duration * TimeInterval(baseProgress.value)
-            self._animation = Animation.default.run(
-                .custom(
-                    duration: duration,
-                    elapsed: elapsed,
-                    processing: { [weak self] progress in
-                        guard let self = self else { return }
-                        self._layout.state = .dismiss(push: current, progress: progress)
-                        self._layout.updateIfNeeded()
-                    },
-                    completion: { [weak self] in
-                        guard let self = self else { return }
-                        self._finishInteractiveAnimation()
-                    }
-                )
-            )
-        } else if baseProgress >= .one {
+        switch self._layout.state(item: current, delta: deltaLocation) {
+        case .empty:
+            self._layout.state = .idle(push: current)
+            self._cancelInteractiveAnimation()
+        case .idle:
+            self._layout.state = .idle(push: current)
+            self._cancelInteractiveAnimation()
+        case .present(_, let baseProgress):
             let overProgress = baseProgress - .one
             self._animation = Animation.default.run(
                 .custom(
@@ -546,9 +545,42 @@ private extension UI.Container.Push {
                     }
                 )
             )
-        } else {
-            self._layout.state = .idle(push: current)
-            self._cancelInteractiveAnimation()
+        case .dismiss(_, let baseProgress):
+            if deltaLocation > self.interactiveLimit {
+                let duration = self._layout.duration(item: current, velocity: self.animationVelocity)
+                let elapsed = duration * TimeInterval(baseProgress.value)
+                self._animation = Animation.default.run(
+                    .custom(
+                        duration: duration,
+                        elapsed: elapsed,
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
+                            self._layout.state = .dismiss(push: current, progress: progress)
+                            self._layout.updateIfNeeded()
+                        },
+                        completion: { [weak self] in
+                            guard let self = self else { return }
+                            self._finishInteractiveAnimation()
+                        }
+                    )
+                )
+            } else {
+                let overProgress = baseProgress - .one
+                self._animation = Animation.default.run(
+                    .custom(
+                        duration: self._layout.cancelDuration(item: current, progress: overProgress, velocity: self.animationVelocity),
+                        processing: { [weak self] progress in
+                            guard let self = self else { return }
+                            self._layout.state = .present(push: current, progress: .one + (overProgress * progress.invert))
+                            self._layout.updateIfNeeded()
+                        },
+                        completion: { [weak self] in
+                            guard let self = self else { return }
+                            self._cancelInteractiveAnimation()
+                        }
+                    )
+                )
+            }
         }
     }
     

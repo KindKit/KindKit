@@ -26,6 +26,7 @@ public extension UI {
         public override var shouldAutorotate: Bool {
             return true
         }
+        public let onSnake: Signal.Empty< Void > = .init()
         
         private var _containerView: UIView? {
             willSet {
@@ -162,12 +163,44 @@ public extension UI {
             self._updateStatusBarHeight()
         }
         
+        public override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+            if motion == .motionShake {
+                if self.container.snake() == false {
+                    self.onSnake.emit()
+                }
+            }
+        }
+        
+    }
+    
+}
+
+public extension UI.ViewController {
+    
+    @inlinable
+    @discardableResult
+    func onSnake(_ closure: (() -> Void)?) -> Self {
+        self.onSnake.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onSnake(_ closure: ((Self) -> Void)?) -> Self {
+        self.onSnake.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onSnake< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onSnake.link(sender, closure)
+        return self
     }
     
 }
 
 extension UI.ViewController : IRootContainerDelegate {
-    
     
     public func updateContentInset() {
         let contentInset = self.container.contentInset()
