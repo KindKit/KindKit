@@ -13,7 +13,11 @@ public protocol IRootContainerDelegate : AnyObject {
     
     func updateContentInset()
     
-#if os(iOS)
+#if os(macOS)
+    
+    func viewController() -> NSViewController?
+    
+#elseif os(iOS)
     
     func viewController() -> UIViewController?
     
@@ -32,7 +36,11 @@ public extension UI.Container {
         public var shouldInteractive: Bool {
             return self.content.shouldInteractive
         }
-#if os(iOS)
+#if os(macOS)
+        public var nsViewController: NSViewController? {
+            return self.delegate?.viewController()
+        }
+#elseif os(iOS)
         public var statusBar: UIStatusBarStyle {
             return self.content.statusBar
         }

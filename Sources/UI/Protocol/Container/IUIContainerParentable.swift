@@ -3,7 +3,9 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 
@@ -15,7 +17,13 @@ public protocol IUIContainerParentable : AnyObject {
 
 public extension IUIContainerParentable where Self : IUIContainer {
     
-#if os(iOS)
+#if os(macOS)
+    
+    var nsViewController: NSViewController? {
+        return self.parent?.nsViewController
+    }
+    
+#elseif os(iOS)
     
     var uiViewController: UIViewController? {
         return self.parent?.uiViewController

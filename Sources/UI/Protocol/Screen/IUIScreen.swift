@@ -117,8 +117,16 @@ public extension IUIScreen {
     
     func cancelHide(interactive: Bool) {
     }
+    
+#if os(macOS)
+    
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let container = self.container else { return false }
+        return container.dismiss(animated: animated, completion: completion)
+    }
 
-#if os(iOS)
+#elseif os(iOS)
     
     func refreshStatusBar() {
         self.container?.refreshStatusBar()

@@ -3,14 +3,18 @@
 //
 
 import Foundation
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 
 public protocol IUIContainer : AnyObject {
     
     var shouldInteractive: Bool { get }
-#if os(iOS)
+#if os(macOS)
+    var nsViewController: NSViewController? { get }
+#elseif os(iOS)
     var statusBar: UIStatusBarStyle { get }
     var statusBarAnimation: UIStatusBarAnimation { get }
     var statusBarHidden: Bool { get }
@@ -56,7 +60,18 @@ public extension IUIContainer {
         return .zero
     }
 
-#if os(iOS)
+#if os(macOS)
+    
+    @discardableResult
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        guard let viewController = self.nsViewController else { return false }
+        guard let parentViewController = viewController.presentingViewController else { return false }
+        parentViewController.dismiss(viewController)
+        completion?()
+        return true
+    }
+    
+#elseif os(iOS)
     
     @discardableResult
     func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {

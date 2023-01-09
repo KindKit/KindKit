@@ -133,6 +133,10 @@ extension UI.ViewController : IRootContainerDelegate {
         self.container.apply(contentInset: contentInset)
     }
     
+    public func viewController() -> NSViewController? {
+        return self
+    }
+    
 }
 
 extension UI.ViewController : IContainerBarControllerObserver {
