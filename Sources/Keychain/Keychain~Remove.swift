@@ -4,29 +4,24 @@
 
 import Foundation
 
-public extension UserDefaults {
+public extension Keychain {
     
     @inlinable
-    func remove(forKey key: String) {
-        self.removeObject(forKey: key)
-    }
-    
-    @inlinable
-    func remove(forKeys keys: [String]) {
+    func remove(_ keys: [String]) {
         for key in keys {
-            self.removeObject(forKey: key)
+            self.remove(key)
         }
     }
     
 }
 
-public extension UserDefaults {
+public extension Keychain {
     
     @inlinable
     func remove< Key : RawRepresentable >(
         forKey key: Key
     ) where Key.RawValue == String {
-        self.remove(forKey: key.rawValue)
+        self.remove(key.rawValue)
     }
     
     @inlinable
@@ -34,7 +29,7 @@ public extension UserDefaults {
         forKeys keys: [Key]
     ) where Key.RawValue == String {
         for key in keys {
-            self.remove(forKey: key.rawValue)
+            self.remove(key.rawValue)
         }
     }
     
@@ -43,7 +38,7 @@ public extension UserDefaults {
         forKeys keys: Key.Type
     ) where Key.RawValue == String {
         for key in keys.allCases {
-            self.remove(forKey: key.rawValue)
+            self.remove(key.rawValue)
         }
     }
     

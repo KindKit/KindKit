@@ -22,54 +22,20 @@ public final class Keychain {
 
 public extension Keychain {
     
-    enum AccessOptions {
-        case whenUnlocked
-        case whenUnlockedThisDeviceOnly
-        case afterFirstUnlock
-        case afterFirstUnlockThisDeviceOnly
-        case always
-        case whenPasscodeSetThisDeviceOnly
-        case alwaysThisDeviceOnly
-
-        public static var defaultOption: AccessOptions {
-            return .whenUnlocked
-        }
-
-        public var value: String {
-            switch self {
-            case .whenUnlocked: return kSecAttrAccessibleWhenUnlocked as String
-            case .whenUnlockedThisDeviceOnly: return kSecAttrAccessibleWhenUnlockedThisDeviceOnly as String
-            case .afterFirstUnlock: return kSecAttrAccessibleAfterFirstUnlock as String
-            case .afterFirstUnlockThisDeviceOnly: return kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as String
-            case .always: return kSecAttrAccessibleAlways as String
-            case .whenPasscodeSetThisDeviceOnly: return kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly as String
-            case .alwaysThisDeviceOnly: return kSecAttrAccessibleAlwaysThisDeviceOnly as String
-            }
-        }
-    }
-    
-}
-
-public extension Keychain {
-    
     @discardableResult
-    func set(_ value: Data?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        return self._processSet(value, key: key, access: access)
-    }
-
-    @discardableResult
-    func set(_ value: String?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        return self._processSet(value, key: key, access: access)
-    }
-
-    @discardableResult
-    func set(_ value: Bool?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        return self._processSet(value, key: key, access: access)
-    }
-    
-    @discardableResult
-    func set< Value : BinaryInteger >(_ value: Value?, key: String, access: AccessOptions = .defaultOption) -> Bool {
-        return self._processSet(value.flatMap({ String($0) }), key: key, access: access)
+    func set(_ value: Data, key: String, access: AccessOptions = .defaultOption) -> Bool {
+        self._remove(key)
+        let query = self._process(
+            query: [
+                Constants.klass : kSecClassGenericPassword,
+                Constants.attrAccount : key,
+                Constants.valueData : value,
+                Constants.accessible : access.value
+            ],
+            forceSync: true
+        )
+        let code = SecItemAdd(query as CFDictionary, nil)
+        return code == noErr
     }
 
     func get(_ key: String) -> Data? {
@@ -88,27 +54,9 @@ public extension Keychain {
         }
         return nil
     }
-
-    func get(_ key: String) -> String? {
-        guard let data: Data = self.get(key) else { return nil }
-        guard let string = String(data: data, encoding: .utf8) else { return nil }
-        return string
-    }
-
-    func get(_ key: String) -> Bool? {
-        guard let data: Data = self.get(key) else { return nil }
-        guard let firstBit = data.first else { return nil }
-        return firstBit != 0
-    }
     
-    func get(_ key: String, radix: Int = 10) -> Int? {
-        guard let string: String = self.get(key) else { return nil }
-        return Int(string, radix: radix)
-    }
-
-    func get(_ key: String, radix: Int = 10) -> UInt? {
-        guard let string: String = self.get(key) else { return nil }
-        return UInt(string, radix: radix)
+    func remove(_ key: String) {
+        self._remove(key)
     }
 
     @discardableResult
@@ -127,44 +75,8 @@ public extension Keychain {
 
 private extension Keychain {
 
-    func _processSet(_ value: Data?, key: String, access: AccessOptions) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
-        self._processDelete(key)
-        let query = self._process(
-            query: [
-                Constants.klass : kSecClassGenericPassword,
-                Constants.attrAccount : key,
-                Constants.valueData : value,
-                Constants.accessible : access.value
-            ],
-            forceSync: true
-        )
-        let code = SecItemAdd(query as CFDictionary, nil)
-        return code == noErr
-    }
-
-    func _processSet(_ value: String?, key: String, access: AccessOptions) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
-        guard let data = value.data(using: String.Encoding.utf8) else {
-            return false
-        }
-        return self._processSet(data, key: key, access: access)
-    }
-
-    func _processSet(_ value: Bool?, key: String, access: AccessOptions) -> Bool {
-        guard let value = value else {
-            return self._processDelete(key)
-        }
-        let bytes: [UInt8] = (value == true) ? [1] : [0]
-        return self._processSet(Data(bytes), key: key, access: access)
-    }
-
     @discardableResult
-    func _processDelete(_ key: String) -> Bool {
+    func _remove(_ key: String) -> Bool {
         let query = self._process(
             query: [
                 Constants.klass : kSecClassGenericPassword,
@@ -190,17 +102,21 @@ private extension Keychain {
         }
         return result
     }
+    
+}
+
+private extension Keychain {
 
     struct Constants {
 
-        static var accessGroup: String { return kSecAttrAccessGroup as String }
-        static var accessible: String { return kSecAttrAccessible as String }
-        static var attrAccount: String { return kSecAttrAccount as String }
-        static var attrSynchronizable: String { return kSecAttrSynchronizable as String }
-        static var klass: String { return kSecClass as String }
-        static var matchLimit: String { return kSecMatchLimit as String }
-        static var returnData: String { return kSecReturnData as String }
-        static var valueData: String { return kSecValueData as String }
+        static var accessGroup: String { kSecAttrAccessGroup as String }
+        static var accessible: String { kSecAttrAccessible as String }
+        static var attrAccount: String { kSecAttrAccount as String }
+        static var attrSynchronizable: String { kSecAttrSynchronizable as String }
+        static var klass: String { kSecClass as String }
+        static var matchLimit: String { kSecMatchLimit as String }
+        static var returnData: String { kSecReturnData as String }
+        static var valueData: String { kSecValueData as String }
 
     }
 

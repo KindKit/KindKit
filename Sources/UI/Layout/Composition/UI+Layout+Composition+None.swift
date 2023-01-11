@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct None {
+    final class None {
         
         public init() {
         }

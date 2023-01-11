@@ -13,7 +13,7 @@ public protocol IDebug {
 public extension IDebug {
     
     func dump(_ indent: Debug.Indent = .init()) -> String {
-        var buff = StringBuilder()
+        let buff = StringBuilder()
         self.dump(buff, indent)
         return buff.string
     }

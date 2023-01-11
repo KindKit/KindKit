@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Margin {
+    final class Margin {
         
         public let inset: Inset
         public var entity: IUICompositionLayoutEntity

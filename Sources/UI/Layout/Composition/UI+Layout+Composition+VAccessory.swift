@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct VAccessory {
+    final class VAccessory {
         
         public var leading: Info?
         public var center: IUICompositionLayoutEntity
@@ -25,7 +25,7 @@ public extension UI.Layout.Composition {
             self.filling = filling
         }
         
-        public init(
+        public convenience init(
             leading: Info? = nil,
             center: IUICompositionLayoutEntity,
             trailing: IUICompositionLayoutEntity,
@@ -39,7 +39,7 @@ public extension UI.Layout.Composition {
             )
         }
         
-        public init(
+        public convenience init(
             leading: IUICompositionLayoutEntity,
             center: IUICompositionLayoutEntity,
             trailing: Info? = nil,
@@ -53,7 +53,7 @@ public extension UI.Layout.Composition {
             )
         }
         
-        public init(
+        public convenience init(
             leading: IUICompositionLayoutEntity? = nil,
             center: IUICompositionLayoutEntity,
             trailing: IUICompositionLayoutEntity? = nil,
@@ -68,7 +68,7 @@ public extension UI.Layout.Composition {
         }
         
         @available(*, deprecated, renamed: "UI.Layout.Composition.VAccessory.init(leading:center:trailing:filling:)")
-        public init(
+        public convenience init(
             leading: IUICompositionLayoutEntity? = nil,
             leadingSpacing: Double = 0,
             center: IUICompositionLayoutEntity,

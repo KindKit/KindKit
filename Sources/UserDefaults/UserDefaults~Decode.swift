@@ -6,6 +6,7 @@ import Foundation
 
 public extension UserDefaults {
     
+    @inlinable
     func decode< Decoder : IUserDefaultsValueDecoder >(
         _ decoder: Decoder.Type,
         forKey key: String
@@ -14,6 +15,7 @@ public extension UserDefaults {
         return try? decoder.decode(value)
     }
     
+    @inlinable
     func decode< Alias : IUserDefaultsDecoderAlias >(
         _ alias: Alias.Type,
         forKey key: String
@@ -25,6 +27,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func decode< Decoder : IUserDefaultsValueDecoder, Key : RawRepresentable >(
         _ decoder: Decoder.Type,
         forKey key: Key
@@ -32,6 +35,7 @@ public extension UserDefaults {
         return self.decode(decoder, forKey: key.rawValue)
     }
     
+    @inlinable
     func decode< Alias : IUserDefaultsDecoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         forKey key: Key
@@ -43,6 +47,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func decode< Decoder : IUserDefaultsValueDecoder >(
         _ decoder: Decoder.Type,
         forKey key: String,
@@ -51,6 +56,7 @@ public extension UserDefaults {
         return self.decode(decoder, forKey: key) ?? `default`
     }
     
+    @inlinable
     func decode< Alias : IUserDefaultsDecoderAlias >(
         _ alias: Alias.Type,
         forKey key: String,
@@ -63,6 +69,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func decode< Decoder : IUserDefaultsValueDecoder, Key : RawRepresentable >(
         _ decoder: Decoder.Type,
         forKey key: Key,
@@ -71,6 +78,7 @@ public extension UserDefaults {
         return self.decode(decoder, forKey: key.rawValue, default: `default`)
     }
     
+    @inlinable
     func decode< Alias : IUserDefaultsDecoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         forKey key: Key,

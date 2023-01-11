@@ -6,16 +6,13 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct ZStack {
+    final class ZStack {
         
-        public var mode: Mode
         public var entities: [IUICompositionLayoutEntity]
         
         public init(
-            mode: Mode = [],
-            entities: [IUICompositionLayoutEntity]
+            _ entities: [IUICompositionLayoutEntity]
         ) {
-            self.mode = mode
             self.entities = entities
         }
         
@@ -40,12 +37,6 @@ extension UI.Layout.Composition.ZStack : IUICompositionLayoutEntity {
     @discardableResult
     public func layout(bounds: Rect) -> Size {
         var maxSize = Size.zero
-        if self.mode.contains(.horizontal) == true {
-            maxSize.width = bounds.width
-        }
-        if self.mode.contains(.vertical) == true {
-            maxSize.height = bounds.height
-        }
         for entity in self.entities {
             let size = entity.size(available: bounds.size)
             maxSize = maxSize.max(size)
@@ -63,12 +54,6 @@ extension UI.Layout.Composition.ZStack : IUICompositionLayoutEntity {
     
     public func size(available: Size) -> Size {
         var maxSize = Size.zero
-        if self.mode.contains(.horizontal) == true {
-            maxSize.width = available.width
-        }
-        if self.mode.contains(.vertical) == true {
-            maxSize.height = available.height
-        }
         for entity in self.entities {
             let size = entity.size(available: available)
             maxSize = maxSize.max(size)
@@ -90,13 +75,9 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     
     @inlinable
     static func zStack(
-        mode: UI.Layout.Composition.ZStack.Mode = [],
-        entities: [IUICompositionLayoutEntity]
+        _ entities: [IUICompositionLayoutEntity]
     ) -> UI.Layout.Composition.ZStack {
-        return .init(
-            mode: mode,
-            entities: entities
-        )
+        return .init(entities)
     }
     
 }

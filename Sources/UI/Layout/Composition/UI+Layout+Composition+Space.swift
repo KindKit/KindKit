@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Space {
+    final class Space {
         
         public var mode: Mode
         public var space: Double

@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct VGrid {
+    final class VGrid {
         
         public var columns: Int
         public var spacing: Point
@@ -72,7 +72,10 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
             height: .infinity
         ))
         self._layout(bounds: bounds, pass: pass)
-        return pass.bounding
+        return .init(
+            width: bounds.width,
+            height: pass.bounding.height
+        )
     }
     
     public func size(available: Size) -> Size {
@@ -80,7 +83,10 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
             width: available.width,
             height: .infinity
         ))
-        return pass.bounding
+        return .init(
+            width: available.width,
+            height: pass.bounding.height
+        )
     }
     
     public func views(bounds: Rect) -> [IUIView] {

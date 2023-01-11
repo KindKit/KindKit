@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct VSplitStack {
+    final class VSplitStack {
         
         public var alignment: Alignment
         public var spacing: Double

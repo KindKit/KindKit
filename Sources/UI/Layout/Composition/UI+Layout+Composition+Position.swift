@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Position {
+    final class Position {
         
         public var mode: Mode
         public var entity: IUICompositionLayoutEntity

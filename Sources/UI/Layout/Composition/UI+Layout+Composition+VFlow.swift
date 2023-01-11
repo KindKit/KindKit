@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct VFlow {
+    final class VFlow {
         
         public var alignment: Alignment
         public var entitySpacing: Double

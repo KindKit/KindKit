@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Layout {
+    final class Layout {
         
         public let layout: IUILayout
         

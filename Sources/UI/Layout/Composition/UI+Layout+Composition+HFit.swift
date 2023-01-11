@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Fill {
+    struct HFit {
         
         public var entity: IUICompositionLayoutEntity
         
@@ -20,7 +20,7 @@ public extension UI.Layout.Composition {
     
 }
 
-extension UI.Layout.Composition.Fill : IUICompositionLayoutEntity {
+extension UI.Layout.Composition.HFit : IUICompositionLayoutEntity {
     
     public func invalidate() {
         self.entity.invalidate()
@@ -32,11 +32,24 @@ extension UI.Layout.Composition.Fill : IUICompositionLayoutEntity {
     
     @discardableResult
     public func layout(bounds: Rect) -> Size {
-        return self.entity.layout(bounds: bounds)
+        let size = self.entity.size(available: .init(
+            width: .infinity,
+            height: bounds.height
+        ))
+        return self.entity.layout(
+            bounds: Rect(
+                x: bounds.x,
+                y: bounds.y,
+                size: size
+            )
+        )
     }
     
     public func size(available: Size) -> Size {
-        return available
+        return self.entity.size(available: .init(
+            width: .infinity,
+            height: available.height
+        ))
     }
     
     public func views(bounds: Rect) -> [IUIView] {
@@ -45,12 +58,12 @@ extension UI.Layout.Composition.Fill : IUICompositionLayoutEntity {
     
 }
 
-public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.Fill {
+public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.HFit {
     
     @inlinable
-    static func fill(
+    static func hFit(
         _ entity: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.Fill {
+    ) -> UI.Layout.Composition.HFit {
         return .init(entity)
     }
     

@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Overlay {
+    final class Overlay {
         
         public var content: IUICompositionLayoutEntity
         public var overlay: IUICompositionLayoutEntity

@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct VStack {
+    final class VStack {
         
         public var alignment: Alignment
         public var behaviour: Behaviour

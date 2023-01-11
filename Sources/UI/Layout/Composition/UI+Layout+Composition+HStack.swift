@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct HStack {
+    final class HStack {
         
         public var alignment: Alignment
         public var behaviour: Behaviour

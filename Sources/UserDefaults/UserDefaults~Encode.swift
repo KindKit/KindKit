@@ -6,6 +6,7 @@ import Foundation
 
 public extension UserDefaults {
     
+    @inlinable
     func encode< Encoder : IUserDefaultsValueEncoder >(
         _ encoder: Encoder.Type,
         value: Encoder.UserDefaultsEncoded,
@@ -18,6 +19,7 @@ public extension UserDefaults {
         }
     }
     
+    @inlinable
     func encode< Alias : IUserDefaultsEncoderAlias >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.UserDefaultsEncoded,
@@ -30,6 +32,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func encode< Encoder : IUserDefaultsValueEncoder, Key : RawRepresentable >(
         _ encoder: Encoder.Type,
         value: Encoder.UserDefaultsEncoded,
@@ -38,6 +41,7 @@ public extension UserDefaults {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
+    @inlinable
     func encode< Alias : IUserDefaultsEncoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.UserDefaultsEncoded,
@@ -50,6 +54,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func encode< Encoder : IUserDefaultsValueEncoder >(
         _ encoder: Encoder.Type,
         value: Encoder.UserDefaultsEncoded?,
@@ -62,6 +67,7 @@ public extension UserDefaults {
         }
     }
     
+    @inlinable
     func encode< Alias : IUserDefaultsEncoderAlias >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.UserDefaultsEncoded?,
@@ -74,6 +80,7 @@ public extension UserDefaults {
 
 public extension UserDefaults {
     
+    @inlinable
     func encode< Encoder : IUserDefaultsValueEncoder, Key : RawRepresentable >(
         _ encoder: Encoder.Type,
         value: Encoder.UserDefaultsEncoded?,
@@ -82,6 +89,7 @@ public extension UserDefaults {
         self.encode(encoder, value: value, forKey: key.rawValue)
     }
     
+    @inlinable
     func encode< Alias : IUserDefaultsEncoderAlias, Key : RawRepresentable >(
         _ alias: Alias.Type,
         value: Alias.UserDefaultsEncoder.UserDefaultsEncoded?,

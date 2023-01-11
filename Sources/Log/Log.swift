@@ -18,7 +18,7 @@ public final class Log {
 
 public extension Log {
     
-    static var shared = Log(
+    static let shared = Log(
         targets: [
             Target.Default()
         ]
@@ -41,6 +41,15 @@ public extension Log {
         self._targets.append(target)
     }
     
+    func remove(target: ILogTarget) {
+        guard let index = self._targets.firstIndex(where: { $0 === target }) else { return }
+        self._targets.remove(at: index)
+    }
+    
+}
+
+public extension Log {
+    
     func find< TargetType: ILogTarget >(_ type: TargetType.Type) -> TargetType? {
         for target in self._targets {
             guard let target = target as? TargetType else { continue }
@@ -49,10 +58,9 @@ public extension Log {
         return nil
     }
     
-    func remove(target: ILogTarget) {
-        guard let index = self._targets.firstIndex(where: { $0 === target }) else { return }
-        self._targets.remove(at: index)
-    }
+}
+
+public extension Log {
     
     func log(level: Log.Level, category: String, message: String) {
         for target in self._targets {

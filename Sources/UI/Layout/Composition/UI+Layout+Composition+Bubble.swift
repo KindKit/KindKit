@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct Bubble {
+    final class Bubble {
         
         public var content: IUICompositionLayoutEntity
         public var bubble: IUICompositionLayoutEntity
