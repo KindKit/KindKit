@@ -214,7 +214,7 @@ private extension UI.Layout.Composition.HAccessory {
             trailingSpacing = 0
         }
         let centerSize = self.center.size(available: Size(
-            width: available.width - (leadingSize.width + leadingSpacing) + (trailingSize.width + trailingSpacing),
+            width: available.width - ((leadingSize.width + leadingSpacing) + (trailingSize.width + trailingSpacing)),
             height: max(leadingSize.height, available.height, trailingSize.height)
         ))
         return (

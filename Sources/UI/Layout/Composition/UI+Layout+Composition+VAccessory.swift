@@ -215,7 +215,7 @@ private extension UI.Layout.Composition.VAccessory {
         }
         let centerSize = self.center.size(available: Size(
             width: max(leadingSize.width, available.width, trailingSize.width),
-            height: available.height - (leadingSize.height + leadingSpacing) + (trailingSize.height + trailingSpacing)
+            height: available.height - ((leadingSize.height + leadingSpacing) + (trailingSize.height + trailingSpacing))
         ))
         return (
             leadingSize: leadingSize,
