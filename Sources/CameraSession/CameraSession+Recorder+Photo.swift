@@ -27,11 +27,16 @@ public extension CameraSession.Recorder {
         public var isRecording: Bool {
             return self._delegate != nil && self._context != nil
         }
-        
         @available(macOS 13.0, *)
-        public var flash: Flash? {
-            set { self._settings.flashMode = newValue?.raw ?? .auto }
-            get { .init(self._settings.flashMode) }
+        public var flash: Flash {
+            set { self._settings.flashMode = newValue.raw }
+            get { .init(self._settings.flashMode) ?? .off }
+        }
+        @available(macOS 11.0, *)
+        public var supportedFlashes: [Flash] {
+            return self._output.supportedFlashModes.compactMap({
+                return Flash($0)
+            })
         }
         
         private let _settings = AVCapturePhotoSettings()
