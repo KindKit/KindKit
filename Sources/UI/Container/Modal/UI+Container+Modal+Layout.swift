@@ -28,6 +28,12 @@ extension UI.Container.Modal {
                 self.setNeedUpdate()
             }
         }
+        var hook: IUIView {
+            didSet {
+                guard self.hook !== oldValue else { return }
+                self.setNeedUpdate()
+            }
+        }
         var content: IUIView? {
             didSet {
                 guard self.content !== oldValue else { return }
@@ -36,8 +42,10 @@ extension UI.Container.Modal {
         }
 
         init(
+            _ hook: IUIView,
             _ content: IUIView?
         ) {
+            self.hook = hook
             self.content = content
         }
         
@@ -57,6 +65,7 @@ extension UI.Container.Modal {
             if let content = self.content {
                 content.frame = bounds
             }
+            self.hook.frame = bounds
             switch self.state {
             case .empty:
                 break
@@ -159,6 +168,7 @@ extension UI.Container.Modal {
             if let content = self.content {
                 views.append(content)
             }
+            views.append(self.hook)
             if let modal = self.state.modal {
                 if let sheet = modal.sheet {
                     views.append(contentsOf: [ sheet.background, modal.view ])

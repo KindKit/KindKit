@@ -96,6 +96,7 @@ public extension UI.Container {
         }
         public var animationVelocity: Double
         
+        private var _hookView: UI.View.Custom
         private var _layout: Layout
         private var _view: UI.View.Custom
         private var _tapGesture = UI.Gesture.Tap().enabled(false)
@@ -122,8 +123,9 @@ public extension UI.Container {
         ) {
             self.isPresented = false
             self.content = content
-            self._layout = Layout(content?.view)
-            self._view = UI.View.Custom()
+            self._hookView = .init()
+            self._layout = Layout(self._hookView, content?.view)
+            self._view = .init()
                 .content(self._layout)
 #if os(macOS)
             self.animationVelocity = NSScreen.kk_animationVelocity
@@ -325,7 +327,9 @@ extension UI.Container.Modal : IUIRootContentContainer {
 private extension UI.Container.Modal {
     
     func _setup() {
-        self._view.onHit(self, {
+        self._hookView.onHit(self, {
+            guard let current = $0._current else { return false }
+            guard current.isSheet == true else { return false }
             return $0._view.bounds.isContains($1)
         })
         self._tapGesture
@@ -339,7 +343,7 @@ private extension UI.Container.Modal {
                 guard let current = $0._current else { return }
                 current.container.modalPressedOutside()
             })
-        self._view.add(gesture: self._tapGesture)
+        self._hookView.add(gesture: self._tapGesture)
 #if os(iOS)
         self._interactiveGesture
             .onShouldBegin(self, {
