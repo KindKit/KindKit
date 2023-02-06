@@ -182,14 +182,20 @@ public extension UI.Container {
             case .idle(let modal, _):
                 return modal.container.contentInset()
             case .transition(let modal, let from, let to, let progress):
-                if from == modal.sheet?.minimalDetent {
-                    let modalInset = modal.container.contentInset()
-                    return contentInset.lerp(modalInset, progress: progress)
-                } else if to == modal.sheet?.minimalDetent {
-                    let modalInset = modal.container.contentInset()
-                    return modalInset.lerp(contentInset, progress: progress)
+                let modalInset = modal.container.contentInset()
+                guard contentInset != modalInset else {
+                    return modalInset
                 }
-                return modal.container.contentInset()
+                let finalInset: UI.Container.AccumulateInset
+                switch (from, to) {
+                case (.some, .none):
+                    finalInset = modalInset.lerp(contentInset, progress: progress)
+                case (.none, .some):
+                    finalInset = contentInset.lerp(modalInset, progress: progress)
+                default:
+                    finalInset = modalInset
+                }
+                return finalInset
             }
         }
         
