@@ -178,33 +178,11 @@ public extension UI.Layout {
 
 public extension UI.Layout.Expand {
     
-    func collapse(
-        duration: TimeInterval,
-        ease: IAnimationEase = Animation.Ease.Linear(),
-        completion: (() -> Void)? = nil
-    ) {
-        self._animation = Animation.default.run(
-            .custom(
-                duration: duration,
-                ease: ease,
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
-                    self._state = .changing(progress)
-                    self.updateIfNeeded()
-                },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    self._animation = nil
-                    self._state = .collapsed
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
-                    completion?()
-                }
-            )
-        )
+    func collapse() {
+        self._state = .collapsed
     }
     
-    func expand(
+    func collapse(
         duration: TimeInterval,
         ease: IAnimationEase = Animation.Ease.Linear(),
         completion: (() -> Void)? = nil
@@ -221,8 +199,36 @@ public extension UI.Layout.Expand {
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
+                    self._state = .collapsed
+                    self.updateIfNeeded()
+                    completion?()
+                }
+            )
+        )
+    }
+    
+    func expand() {
+        self._state = .expanded
+    }
+    
+    func expand(
+        duration: TimeInterval,
+        ease: IAnimationEase = Animation.Ease.Linear(),
+        completion: (() -> Void)? = nil
+    ) {
+        self._animation = Animation.default.run(
+            .custom(
+                duration: duration,
+                ease: ease,
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
+                    self._state = .changing(progress)
+                    self.updateIfNeeded()
+                },
+                completion: { [weak self] in
+                    guard let self = self else { return }
+                    self._animation = nil
                     self._state = .expanded
-                    self.setNeedForceUpdate()
                     self.updateIfNeeded()
                     completion?()
                 }
