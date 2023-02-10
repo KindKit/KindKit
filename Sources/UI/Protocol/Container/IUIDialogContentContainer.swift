@@ -36,6 +36,8 @@ public protocol IUIDialogContentContainer : IUIContainer, IUIContainerParentable
     var dialogAlignment: DialogContentContainerAlignment { get }
     var dialogBackground: (IUIView & IUIViewAlphable)? { get }
     
+    func dialogPressedOutside()
+    
 }
 
 public extension IUIDialogContentContainer {

@@ -305,6 +305,10 @@ extension UI.Container.Book : IUIDialogContentContainer where Screen : IUIScreen
         return self.screen.dialogBackgroundView
     }
     
+    public func dialogPressedOutside() {
+        self.screen.dialogPressedOutside()
+    }
+    
 }
 
 private extension UI.Container.Book {

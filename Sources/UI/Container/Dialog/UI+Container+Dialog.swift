@@ -99,8 +99,10 @@ public extension UI.Container {
         public var interactiveLimit: Double
 #endif
         
+        private var _hookView: UI.View.Custom
         private var _layout: Layout
         private var _view: UI.View.Custom
+        private var _tapGesture = UI.Gesture.Tap().enabled(false)
 #if os(iOS)
         private var _interactiveGesture = UI.Gesture.Pan().enabled(false)
         private var _interactiveBeginLocation: Point?
@@ -111,6 +113,7 @@ public extension UI.Container {
         private var _previous: UI.Container.DialogItem?
         private var _current: UI.Container.DialogItem? {
             didSet {
+                self._tapGesture.isEnabled = self._current != nil
 #if os(iOS)
                 self._interactiveGesture.isEnabled = self._current != nil
 #endif
@@ -131,8 +134,10 @@ public extension UI.Container {
             self.animationVelocity = 1200
             self.interactiveLimit = 20
 #endif
+            self._hookView = .init()
             self._layout = Layout(
                 inset: .zero,
+                hook: self._hookView,
                 content: content?.view,
                 state: .idle
             )
@@ -286,11 +291,21 @@ extension UI.Container.Dialog : IUIRootContentContainer {
 extension UI.Container.Dialog {
     
     func _setup() {
-        self._view.onHit(self, {
-            guard let current = $0._current else { return false }
-            guard current.container.shouldInteractive == true else { return false }
-            return current.container.view.isContains($1, from: $0._view)
+        self._hookView.onHit(self, {
+            guard $0._current != nil else { return false }
+            return $0._view.bounds.isContains($1)
         })
+        self._tapGesture
+            .onShouldBegin(self, {
+                guard let current = $0._current else { return false }
+                guard $0._tapGesture.contains(in: $0.view) == true else { return false }
+                return $0._tapGesture.contains(in: current.container.view) == false
+            })
+            .onTriggered(self, {
+                guard let current = $0._current else { return }
+                current.container.dialogPressedOutside()
+            })
+        self._hookView.add(gesture: self._tapGesture)
 #if os(iOS)
         self._interactiveGesture
             .onShouldBegin(self, {

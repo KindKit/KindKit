@@ -12,6 +12,8 @@ public protocol IUIScreenDialogable : AnyObject {
     var dialogAlignment: DialogContentContainerAlignment { get }
     var dialogBackgroundView: (IUIView & IUIViewAlphable)? { get }
     
+    func dialogPressedOutside()
+    
 }
 
 public extension IUIScreenDialogable {
@@ -52,9 +54,13 @@ public extension IUIScreenDialogable where Self : IUIScreen {
     }
     
     @discardableResult
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+    func dialogDismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
         guard let container = self.dialogContentContainer else { return false }
         return container.dismiss(animated: animated, completion: completion)
+    }
+    
+    func dialogPressedOutside() {
+        self.dialogDismiss()
     }
     
 }

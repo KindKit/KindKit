@@ -69,17 +69,6 @@ extension UI.Layout.Composition.HSplitStack : IUICompositionLayoutEntity {
 
 private extension UI.Layout.Composition.HSplitStack {
     
-    struct Pass {
-        
-        var sizes: [Size]
-        var bounding: Size
-        
-    }
-    
-}
-
-private extension UI.Layout.Composition.HSplitStack {
-    
     @inline(__always)
     func _availableSize(available: Size, entities: Int) -> Size {
         if entities > 1 {
@@ -106,32 +95,52 @@ private extension UI.Layout.Composition.HSplitStack {
             bounding: .zero
         )
         if self.entities.isEmpty == false {
-            var entityAvailableSize = self._availableSize(
-                available: available,
-                entities: pass.sizes.count
-            )
-            for (index, entity) in self.entities.enumerated() {
-                pass.sizes[index] = entity.size(available: entityAvailableSize)
-            }
-            let numberOfValid = pass.sizes.kk_count(where: { $0.width > 0 })
-            if numberOfValid < self.entities.count {
+            var entityAvailableSize: Size
+            let numberOfValid: Int
+            if available.height.isInfinite == false {
                 entityAvailableSize = self._availableSize(
                     available: available,
-                    entities: numberOfValid
+                    entities: self.entities.count
                 )
                 for (index, entity) in self.entities.enumerated() {
-                    let size = pass.sizes[index]
-                    guard size.width > 0 else { continue }
                     pass.sizes[index] = entity.size(available: entityAvailableSize)
                 }
+                numberOfValid = pass.sizes.kk_count(where: { $0.width > 0 })
+                if numberOfValid < self.entities.count {
+                    entityAvailableSize = self._availableSize(
+                        available: available,
+                        entities: numberOfValid
+                    )
+                    for (index, entity) in self.entities.enumerated() {
+                        guard pass.sizes[index].width > 0 else { continue }
+                        pass.sizes[index] = entity.size(available: entityAvailableSize)
+                    }
+                }
+            } else {
+                for (index, entity) in self.entities.enumerated() {
+                    pass.sizes[index] = entity.size(available: available)
+                }
+                entityAvailableSize = pass.sizes.kk_reduce({
+                    return .zero
+                }, {
+                    return $0
+                }, {
+                    return .init(
+                        width: max($0.width, $1.width),
+                        height: available.height
+                    )
+                })
+                numberOfValid = pass.sizes.kk_count(where: { $0.width > 0 })
             }
-            pass.bounding.width = available.width
+            if numberOfValid > 1 {
+                pass.bounding.width = (entityAvailableSize.width * Double(numberOfValid)) + (self.spacing * Double(numberOfValid - 1))
+            } else if numberOfValid > 0 {
+                pass.bounding.width = entityAvailableSize.width
+            }
             for (index, size) in pass.sizes.enumerated() {
                 guard size.width > 0 else { continue }
-                if size.width > 0 {
-                    pass.sizes[index] = Size(width: entityAvailableSize.width, height: size.height)
-                    pass.bounding.height = max(pass.bounding.height, size.height)
-                }
+                pass.sizes[index] = Size(width: entityAvailableSize.width, height: size.height)
+                pass.bounding.height = max(pass.bounding.height, size.height)
             }
         }
         return pass

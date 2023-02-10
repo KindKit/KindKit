@@ -172,9 +172,7 @@ extension UI.Container.None : IUIModalContentContainer {
     
     public var modalColor: UI.Color { .white }
     public var modalSheet: UI.Modal.Presentation.Sheet? { nil }
-    
-    public func modalPressedOutside() {
-    }
+    public func modalPressedOutside() {}
     
 }
 
@@ -185,6 +183,7 @@ extension UI.Container.None : IUIDialogContentContainer {
     public var dialogHeight: DialogContentContainerSize { .fill(before: 24, after: 24) }
     public var dialogAlignment: DialogContentContainerAlignment { .center }
     public var dialogBackground: (IUIView & IUIViewAlphable)? { nil }
+    public func dialogPressedOutside() {}
     
 }
 

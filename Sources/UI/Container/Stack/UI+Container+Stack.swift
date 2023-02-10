@@ -449,6 +449,10 @@ extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScree
         return self.screen.dialogBackgroundView
     }
     
+    public func dialogPressedOutside() {
+        self.screen.dialogPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreenModalable {

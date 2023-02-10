@@ -505,6 +505,10 @@ extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScre
         return self.screen.dialogBackgroundView
     }
     
+    public func dialogPressedOutside() {
+        self.screen.dialogPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Screen : IUIPushContentContainer where Screen : IUIScreenPushable {

@@ -294,6 +294,10 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
         return self.content.dialogBackground
     }
     
+    public func dialogPressedOutside() {
+        self.content.dialogPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Sticky : IUIModalContentContainer where ContentContainer : IUIModalContentContainer {

@@ -16,6 +16,12 @@ extension UI.Container.Dialog {
                 self.setNeedUpdate()
             }
         }
+        var hook: IUIView {
+            didSet {
+                guard self.hook !== oldValue else { return }
+                self.setNeedUpdate()
+            }
+        }
         var content: IUIView? {
             didSet {
                 guard self.content !== oldValue else { return }
@@ -45,10 +51,12 @@ extension UI.Container.Dialog {
         
         init(
             inset: Inset,
+            hook: IUIView,
             content: IUIView?,
             state: State
         ) {
             self.inset = inset
+            self.hook = hook
             self.content = content
             self.state = state
         }
@@ -69,6 +77,7 @@ extension UI.Container.Dialog {
                 self._dialogSize = nil
                 self._lastBoundsSize = bounds.size
             }
+            self.hook.frame = bounds
             if let content = self.content {
                 content.frame = bounds
             }
@@ -122,6 +131,7 @@ extension UI.Container.Dialog {
                 views.append(content)
             }
             if let dialogItem = self.dialogItem {
+                views.append(self.hook)
                 if let background = dialogItem.background {
                     views.append(background)
                 }

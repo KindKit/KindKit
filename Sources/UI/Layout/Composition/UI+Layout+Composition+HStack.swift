@@ -72,17 +72,6 @@ extension UI.Layout.Composition.HStack : IUICompositionLayoutEntity {
 
 private extension UI.Layout.Composition.HStack {
     
-    struct Pass {
-        
-        var sizes: [Size]
-        var bounding: Size
-        
-    }
-    
-}
-
-private extension UI.Layout.Composition.HStack {
-    
     @inline(__always)
     func _sizePass(available: Size) -> Pass {
         var pass: Pass

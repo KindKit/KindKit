@@ -26,6 +26,9 @@ public extension IUIScreenViewable {
         return .zero
     }
     
+    func apply(inset: UI.Container.AccumulateInset) {
+    }
+    
 }
 
 public extension IUIScreenViewable where Self : IUIScreen, AssociatedView == UI.View.Scroll {

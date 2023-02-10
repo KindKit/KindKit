@@ -29,17 +29,6 @@ public extension UI.Layout.Composition {
     
 }
 
-private extension UI.Layout.Composition.VStack {
-    
-    struct Pass {
-        
-        var sizes: [Size]
-        var bounding: Size
-        
-    }
-    
-}
-
 extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
     
     public func invalidate() {

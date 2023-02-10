@@ -168,8 +168,8 @@ extension UI.Container.Modal {
             if let content = self.content {
                 views.append(content)
             }
-            views.append(self.hook)
             if let modal = self.state.modal {
+                views.append(self.hook)
                 if let sheet = modal.sheet {
                     views.append(contentsOf: [ sheet.background, modal.view ])
                     if let view = sheet.grabber {

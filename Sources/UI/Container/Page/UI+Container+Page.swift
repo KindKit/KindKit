@@ -413,6 +413,10 @@ extension UI.Container.Page : IUIDialogContentContainer where Screen : IUIScreen
         return self.screen.dialogBackgroundView
     }
     
+    public func dialogPressedOutside() {
+        self.screen.dialogPressedOutside()
+    }
+    
 }
 
 extension UI.Container.Page : IContainerBarControllerObserver {
