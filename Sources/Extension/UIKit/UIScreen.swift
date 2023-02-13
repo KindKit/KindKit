@@ -19,8 +19,8 @@ public extension UIScreen {
         let bounds = UIScreen.main.bounds
         let size = Double(max(bounds.width, bounds.height))
         switch UIDevice.current.userInterfaceIdiom {
-        case .phone: return size * 2.2
-        case .pad: return size * 2.5
+        case .phone: return size * 1.75
+        case .pad: return size * 2
         default: return 100
         }
     }()

@@ -26,31 +26,6 @@ public extension UI.Layout.Composition {
     
 }
 
-private extension UI.Layout.Composition.VGrid {
-    
-    struct Pass {
-        
-        var rows: [PassRow]
-        var bounding: Size
-        
-    }
-    
-    struct PassRow {
-        
-        var items: [PassItem]
-        var size: Double
-        
-    }
-    
-    struct PassItem {
-        
-        var entity: IUICompositionLayoutEntity
-        var size: Size
-        
-    }
-    
-}
-
 extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
     
     public func invalidate() {

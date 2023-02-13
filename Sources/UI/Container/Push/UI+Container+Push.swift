@@ -140,9 +140,9 @@ public extension UI.Container {
         ) {
             self.isPresented = false
 #if os(macOS)
-            self.animationVelocity = NSScreen.kk_animationVelocity / 2.5
+            self.animationVelocity = NSScreen.kk_animationVelocity * 0.5
 #elseif os(iOS)
-            self.animationVelocity = UIScreen.kk_animationVelocity / 2.5
+            self.animationVelocity = UIScreen.kk_animationVelocity * 0.5
             self.interactiveLimit = 20
 #endif
             self.content = content

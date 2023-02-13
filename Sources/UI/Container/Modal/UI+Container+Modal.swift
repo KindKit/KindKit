@@ -128,9 +128,9 @@ public extension UI.Container {
             self._view = .init()
                 .content(self._layout)
 #if os(macOS)
-            self.animationVelocity = NSScreen.kk_animationVelocity
+            self.animationVelocity = NSScreen.kk_animationVelocity * 1.75
 #elseif os(iOS)
-            self.animationVelocity = Double(max(UIScreen.main.bounds.width, UIScreen.main.bounds.height) * 3)
+            self.animationVelocity = UIScreen.kk_animationVelocity * 1.75
 #endif
             self._items = []
             self._setup()

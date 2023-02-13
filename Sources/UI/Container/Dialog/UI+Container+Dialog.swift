@@ -129,9 +129,9 @@ public extension UI.Container {
             self.isPresented = false
             self.content = content
 #if os(macOS)
-            self.animationVelocity = 1200
+            self.animationVelocity = NSScreen.kk_animationVelocity * 0.5
 #elseif os(iOS)
-            self.animationVelocity = 1200
+            self.animationVelocity = UIScreen.kk_animationVelocity * 0.5
             self.interactiveLimit = 20
 #endif
             self._hookView = .init()
