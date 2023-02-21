@@ -149,20 +149,20 @@ extension UI.Container.Dialog.Layout {
     @inline(__always)
     func _size(bounds: Rect, dialog: UI.Container.DialogItem) -> Size {
         let width, height: Double
-        if dialog.container.dialogWidth == .fit && dialog.container.dialogHeight == .fit {
+        if dialog.container.dialogSize.width == .fit && dialog.container.dialogSize.height == .fit {
             let size = dialog.view.size(available: bounds.size)
             width = min(size.width, bounds.width)
             height = min(size.height, bounds.height)
-        } else if dialog.container.dialogWidth == .fit {
-            switch dialog.container.dialogHeight {
+        } else if dialog.container.dialogSize.width == .fit {
+            switch dialog.container.dialogSize.height {
             case .fill(let before, let after): height = bounds.size.height - (before + after)
             case .fixed(let value): height = value
             case .fit: height = bounds.height
             }
             let size = dialog.view.size(available: Size(width: bounds.size.width, height: height))
             width = min(size.width, bounds.width)
-        } else if dialog.container.dialogHeight == .fit {
-            switch dialog.container.dialogWidth {
+        } else if dialog.container.dialogSize.height == .fit {
+            switch dialog.container.dialogSize.width {
             case .fill(let before, let after): width = bounds.size.width - (before + after)
             case .fixed(let value): width = value
             case .fit: width = bounds.width
@@ -170,12 +170,12 @@ extension UI.Container.Dialog.Layout {
             let size = dialog.view.size(available: Size(width: width, height: bounds.size.height))
             height = min(size.height, bounds.height)
         } else {
-            switch dialog.container.dialogWidth {
+            switch dialog.container.dialogSize.width {
             case .fill(let before, let after): width = bounds.size.width - (before + after)
             case .fixed(let value): width = value
             case .fit: width = bounds.width
             }
-            switch dialog.container.dialogHeight {
+            switch dialog.container.dialogSize.height {
             case .fill(let before, let after): height = bounds.size.height - (before + after)
             case .fixed(let value): height = value
             case .fit: height = bounds.height

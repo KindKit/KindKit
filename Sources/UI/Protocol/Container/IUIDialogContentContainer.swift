@@ -4,36 +4,13 @@
 
 import Foundation
 
-public enum DialogContentContainerSize : Equatable {
-    
-    case fill(before: Double, after: Double)
-    case fixed(value: Double)
-    case fit
-    
-}
-
-public enum DialogContentContainerAlignment {
-    
-    case topLeft
-    case top
-    case topRight
-    case centerLeft
-    case center
-    case centerRight
-    case bottomLeft
-    case bottom
-    case bottomRight
-    
-}
-
 public protocol IUIDialogContentContainer : IUIContainer, IUIContainerParentable {
     
     var dialogContainer: IUIDialogContainer? { get }
     
     var dialogInset: Inset { get }
-    var dialogWidth: DialogContentContainerSize { get }
-    var dialogHeight: DialogContentContainerSize { get }
-    var dialogAlignment: DialogContentContainerAlignment { get }
+    var dialogSize: UI.Dialog.Size { get }
+    var dialogAlignment: UI.Dialog.Alignment { get }
     var dialogBackground: (IUIView & IUIViewAlphable)? { get }
     
     func dialogPressedOutside()

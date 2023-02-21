@@ -433,15 +433,11 @@ extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScree
         return self.screen.dialogInset
     }
     
-    public var dialogWidth: DialogContentContainerSize {
-        return self.screen.dialogWidth
+    public var dialogSize: UI.Dialog.Size {
+        return self.screen.dialogSize
     }
     
-    public var dialogHeight: DialogContentContainerSize {
-        return self.screen.dialogHeight
-    }
-    
-    public var dialogAlignment: DialogContentContainerAlignment {
+    public var dialogAlignment: UI.Dialog.Alignment {
         return self.screen.dialogAlignment
     }
     

@@ -278,15 +278,11 @@ extension UI.Container.Sticky : IUIDialogContentContainer where ContentContainer
         return self.content.dialogInset
     }
     
-    public var dialogWidth: DialogContentContainerSize {
-        return self.content.dialogWidth
+    public var dialogSize: UI.Dialog.Size {
+        return self.content.dialogSize
     }
     
-    public var dialogHeight: DialogContentContainerSize {
-        return self.content.dialogHeight
-    }
-    
-    public var dialogAlignment: DialogContentContainerAlignment {
+    public var dialogAlignment: UI.Dialog.Alignment {
         return self.content.dialogAlignment
     }
     

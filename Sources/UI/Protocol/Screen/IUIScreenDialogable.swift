@@ -7,9 +7,8 @@ import Foundation
 public protocol IUIScreenDialogable : AnyObject {
     
     var dialogInset: Inset { get }
-    var dialogWidth: DialogContentContainerSize { get }
-    var dialogHeight: DialogContentContainerSize { get }
-    var dialogAlignment: DialogContentContainerAlignment { get }
+    var dialogSize: UI.Dialog.Size { get }
+    var dialogAlignment: UI.Dialog.Alignment { get }
     var dialogBackgroundView: (IUIView & IUIViewAlphable)? { get }
     
     func dialogPressedOutside()
@@ -22,15 +21,11 @@ public extension IUIScreenDialogable {
         return .zero
     }
     
-    var dialogWidth: DialogContentContainerSize {
-        return .fit
+    var dialogSize: UI.Dialog.Size {
+        return .init(.fit, .fit)
     }
     
-    var dialogHeight: DialogContentContainerSize {
-        return .fit
-    }
-    
-    var dialogAlignment: DialogContentContainerAlignment {
+    var dialogAlignment: UI.Dialog.Alignment {
         return .center
     }
     

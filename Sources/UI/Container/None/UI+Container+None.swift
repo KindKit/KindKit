@@ -179,9 +179,8 @@ extension UI.Container.None : IUIModalContentContainer {
 extension UI.Container.None : IUIDialogContentContainer {
     
     public var dialogInset: Inset { .zero }
-    public var dialogWidth: DialogContentContainerSize { .fill(before: 24, after: 24) }
-    public var dialogHeight: DialogContentContainerSize { .fill(before: 24, after: 24) }
-    public var dialogAlignment: DialogContentContainerAlignment { .center }
+    public var dialogSize: UI.Dialog.Size { .init(.fill(before: 24, after: 24), .fill(before: 24, after: 24)) }
+    public var dialogAlignment: UI.Dialog.Alignment { .center }
     public var dialogBackground: (IUIView & IUIViewAlphable)? { nil }
     public func dialogPressedOutside() {}
     
