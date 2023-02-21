@@ -14,7 +14,7 @@ public extension Animation.Task {
         public let ease: IAnimationEase
         public let preparing: (() -> Void)?
         public let processing: (_ progress: Percent) -> Void
-        public let completion: () -> Void
+        public let completion: (() -> Void)?
         
         public var isRunning: Bool
         public var isCompletion: Bool
@@ -27,7 +27,7 @@ public extension Animation.Task {
             ease: IAnimationEase,
             preparing: (() -> Void)?,
             processing: @escaping (_ progress: Percent) -> Void,
-            completion: @escaping () -> Void
+            completion: (() -> Void)? = nil
         ) {
             self.delay = delay
             self.duration = duration
@@ -54,13 +54,13 @@ public extension Animation.Task {
                 let progress = Percent((self.elapsed - self.delay) / self.duration).normalized
                 self.processing(.init(self.ease.perform(progress.value)))
             }
-            return self.elapsed >= self.duration
+            return self.elapsed >= (self.duration + self.delay)
         }
         
         public func complete() {
             guard self.isCompletion == false else { return }
             self.isCompletion = true
-            self.completion()
+            self.completion?()
         }
         
         public func cancel() {
@@ -82,7 +82,7 @@ public extension IAnimationTask where Self == Animation.Task.Custom {
         ease: IAnimationEase = .linear(),
         preparing: (() -> Void)? = nil,
         processing: @escaping (_ progress: Percent) -> Void,
-        completion: @escaping () -> Void
+        completion: (() -> Void)? = nil
     ) -> Self {
         return .init(
             delay: delay,
@@ -104,7 +104,7 @@ public extension IAnimationTask where Self == Animation.Task.Custom {
         elapsed: TimeInterval = 0,
         ease: IAnimationEase = .linear(),
         to: Value,
-        completion: @escaping () -> Void
+        completion: (() -> Void)? = nil
     ) -> Self {
         let from = target[keyPath: path]
         return .init(
@@ -118,7 +118,7 @@ public extension IAnimationTask where Self == Animation.Task.Custom {
             },
             completion: { [weak target] in
                 target?[keyPath: path] = to
-                completion()
+                completion?()
             }
         )
     }

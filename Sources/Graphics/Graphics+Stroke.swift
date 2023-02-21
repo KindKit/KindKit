@@ -16,7 +16,7 @@ public extension Graphics {
         
         public init(
             width: Double,
-            join: Graphics.LineJoin = .miter,
+            join: Graphics.LineJoin = .miter(10),
             cap: Graphics.LineCap = .butt,
             dash: Graphics.LineDash? = nil,
             fill: Graphics.Fill

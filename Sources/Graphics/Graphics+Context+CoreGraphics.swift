@@ -291,6 +291,9 @@ private extension Graphics.Context {
     ) {
         self._instance.setLineWidth(CGFloat(stroke.width))
         self._instance.setLineJoin(stroke.join.cgLineJoin)
+        if let miterLimit = stroke.join.miterLimit {
+            self._instance.setMiterLimit(CGFloat(miterLimit))
+        }
         self._instance.setLineCap(stroke.cap.cgLineCap)
         if let dash = stroke.dash {
             self._instance.setLineDash(

@@ -8,6 +8,7 @@ import CoreGraphics
 
 public extension Graphics.LineCap {
     
+    @inlinable
     var cgLineCap: CGLineCap {
         switch self {
         case .butt: return .butt

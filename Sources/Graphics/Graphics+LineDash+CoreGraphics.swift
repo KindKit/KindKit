@@ -8,6 +8,7 @@ import CoreGraphics
 
 public extension Graphics.LineJoin {
     
+    @inlinable
     var cgLineJoin: CGLineJoin {
         switch self {
         case .miter: return .miter
