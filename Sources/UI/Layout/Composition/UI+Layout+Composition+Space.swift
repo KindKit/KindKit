@@ -8,15 +8,13 @@ public extension UI.Layout.Composition {
     
     final class Space {
         
-        public var mode: Mode
-        public var space: Double
+        public var size: UI.Size.Static
         
         public init(
-            mode: Mode,
-            space: Double
+            width: UI.Size.Static.Dimension,
+            height: UI.Size.Static.Dimension
         ) {
-            self.mode = mode
-            self.space = space
+            self.size = .init(width, height)
         }
         
     }
@@ -33,17 +31,11 @@ extension UI.Layout.Composition.Space : IUICompositionLayoutEntity {
     
     @discardableResult
     public func layout(bounds: Rect) -> Size {
-        switch self.mode {
-        case .horizontal: return Size(width: self.space, height: 0)
-        case .vertical: return Size(width: 0, height: self.space)
-        }
+        return self.size.apply(available: bounds.size)
     }
     
     public func size(available: Size) -> Size {
-        switch self.mode {
-        case .horizontal: return Size(width: self.space, height: 0)
-        case .vertical: return Size(width: 0, height: self.space)
-        }
+        return self.size.apply(available: available)
     }
     
     public func views(bounds: Rect) -> [IUIView] {
@@ -56,12 +48,12 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     
     @inlinable
     static func space(
-        mode: UI.Layout.Composition.Space.Mode,
-        space: Double
+        width: UI.Size.Static.Dimension,
+        height: UI.Size.Static.Dimension
     ) -> UI.Layout.Composition.Space {
         return .init(
-            mode: mode,
-            space: space
+            width: width,
+            height: height
         )
     }
     
