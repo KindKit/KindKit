@@ -22,7 +22,7 @@ extension RemoteImage.Loader {
             self.filter = filter
             super.init(
                 delegate: delegate,
-                lockQueue: DispatchQueue(label: "KindKitRemoteImageView.RemoteImageLoader.FilterTask"),
+                lockQueue: DispatchQueue(label: "KindKit.RemoteImage.Loader.FilterTask"),
                 workQueue: workQueue,
                 syncQueue: syncQueue,
                 cache: cache,
@@ -42,29 +42,25 @@ extension RemoteImage.Loader.FilterTask : IRemoteImageTarget {
     }
     
     func remoteImage(image: UI.Image) {
-        self.task = DispatchWorkItem.kk_async(block: {
+        self.task = DispatchWorkItem.kk_async(queue: self.workQueue, block: {
             if let image = self.cache.image(query: self.query, filter: self.filter) {
                 self.finish(image: image)
             } else {
-                do {
-                    if let image = self.filter.apply(image) {
-                        if let data = image.pngData() {
-                            try self.cache.set(data: data, image: image, query: self.query, filter: self.filter)
-                            self.finish(image: image)
-                        } else {
-                            throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
-                        }
+                if let image = self.filter.apply(image) {
+                    if let data = image.pngData() {
+                        try? self.cache.set(data: data, image: image, query: self.query, filter: self.filter)
+                        self.finish(image: image)
                     } else {
-                        throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
+                        self.finish(error: .unknown)
                     }
-                } catch let error {
-                    self.finish(error: error)
+                } else {
+                    self.finish(error: .unknown)
                 }
             }
-        }, queue: self.workQueue)
+        })
     }
     
-    func remoteImage(error: Error) {
+    func remoteImage(error: RemoteImage.Error) {
         self.finish(error: error)
     }
     

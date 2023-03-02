@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class MapValue< Input : IFlowResult, Transform > : IFlowOperator {
         
@@ -46,40 +46,48 @@ public extension FlowOperator {
 
 extension IFlowOperator {
     
-    func mapValue< Transform >(
+    func mapValue<
+        Transform
+    >(
         _ perform: @escaping (Output.Success) -> Transform
-    ) -> FlowOperator.MapValue< Output, Transform > {
-        let next = FlowOperator.MapValue< Output, Transform >(perform)
+    ) -> Flow.Operator.MapValue< Output, Transform > {
+        let next = Flow.Operator.MapValue< Output, Transform >(perform)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
-    func mapValue< Transform >(
+    func mapValue<
+        Transform
+    >(
         _ perform: @escaping (Input.Success) -> Transform
-    ) -> FlowBuilder.Head< FlowOperator.MapValue< Input, Transform > > {
+    ) -> Flow.Head.Builder< Flow.Operator.MapValue< Input, Transform > > {
         return .init(head: .init(perform))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
-    func mapValue< Transform >(
+    func mapValue<
+        Transform
+    >(
         _ perform: @escaping (Head.Output.Success) -> Transform
-    ) -> FlowBuilder.Chain< Head, FlowOperator.MapValue< Head.Output, Transform > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.MapValue< Head.Output, Transform > > {
         return .init(head: self.head, tail: self.head.mapValue(perform))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
-    func mapValue< Transform >(
+    func mapValue<
+        Transform
+    >(
         _ perform: @escaping (Tail.Output.Success) -> Transform
-    ) -> FlowBuilder.Chain< Head, FlowOperator.MapValue< Tail.Output, Transform > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.MapValue< Tail.Output, Transform > > {
         return .init(head: self.head, tail: self.tail.mapValue(perform))
     }
     

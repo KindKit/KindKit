@@ -8,7 +8,7 @@ import KindKit
 class TestFlow : XCTestCase {
     
     func testBase() {
-        let pipeline = Flow< Int, Never >()
+        let pipeline = Flow.Builder< Int, Never >()
             .mapValue({ String($0) })
             .pipeline()
         pipeline.send(value: 1)
@@ -16,7 +16,7 @@ class TestFlow : XCTestCase {
     
     func testDelay() {
         let expectation = self.expectation(description: "Test")
-        let pipeline = Flow< Int, Never >()
+        let pipeline = Flow.Builder< Int, Never >()
             .mapValue({ String($0) })
             .delay(
                 dispatch: .main,
@@ -40,9 +40,9 @@ class TestFlow : XCTestCase {
     
     func testChain() {
         let expectation = self.expectation(description: "Test")
-        let pipeline = Flow< Int, Never >()
+        let pipeline = Flow.Builder< Int, Never >()
             .run(
-                pipeline: Flow< Int, Never >()
+                pipeline: Flow.Builder< Int, Never >()
                     .dispatch(.background)
                     .accumulate()
                     .pipeline()
@@ -70,12 +70,12 @@ class TestFlow : XCTestCase {
     
     func testChain2() {
         let expectation = self.expectation(description: "Test")
-        let pipeline = Flow< Int, Never >()
+        let pipeline = Flow.Builder< Int, Never >()
             .run2(
-                pipeline1: Flow< Int, Never >()
+                pipeline1: Flow.Builder< Int, Never >()
                     .mapValue({ $0 * 2 })
                     .pipeline(),
-                pipeline2: Flow< Int, Never >()
+                pipeline2: Flow.Builder< Int, Never >()
                     .mapValue({ $0 * 2 })
                     .pipeline()
             )
@@ -107,7 +107,7 @@ class TestFlow : XCTestCase {
             case one(OneError)
         }
         
-        let pipeline = Flow< Void, OneError >()
+        let pipeline = Flow.Builder< Void, OneError >()
             .map({ input -> Result< Int, TwoError > in
                 switch input {
                 case .success: return .success(1)
@@ -121,7 +121,7 @@ class TestFlow : XCTestCase {
                     case .failure: return false
                     }
                 },
-                then: Flow()
+                then: Flow.Builder()
                     .mapValue({ $0 + 1 })
                     .pipeline()
             )

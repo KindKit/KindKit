@@ -10,16 +10,16 @@ class TestApiFlow : XCTestCase {
     func testPipeline() {
         let expectation = self.expectation(description: "Test")
         let provider = Api.Provider()
-        let pipeline = Flow< String, Never >()
-            .map({ input -> Result< URL, NSError > in
+        let pipeline = Flow.Builder< String, Never >()
+            .map({ input -> Result< URL, Query.Error > in
                 switch input {
                 case .success(let string):
                     guard let url = URL(string: string) else {
-                        return .failure(NSError())
+                        return .failure(.noUrl)
                     }
                     return .success(url)
                 case .failure:
-                    return .failure(NSError())
+                    return .failure(.invalidRequest)
                 }
             })
             .apiQuery(
@@ -61,8 +61,9 @@ extension TestApiFlow {
     
     enum Query {
         
-        enum ResponseError : Swift.Error {
+        enum Error : Swift.Error {
             
+            case noUrl
             case invalidRequest
             case invalidResponse
             
@@ -71,7 +72,7 @@ extension TestApiFlow {
         struct Response : IApiResponse {
             
             typealias Success = (Data, Date)
-            typealias Failure = ResponseError
+            typealias Failure = TestApiFlow.Query.Error
             
             func parse(meta: Api.Response.Meta, data: Data?) -> Result< Success, Failure > {
                 guard let data = data else {
@@ -80,7 +81,7 @@ extension TestApiFlow {
                 return .success((data, Date()))
             }
             
-            func parse(error: Error) -> Result< Success, Failure > {
+            func parse(error: Swift.Error) -> Result< Success, Failure > {
                 return .failure(.invalidResponse)
             }
             

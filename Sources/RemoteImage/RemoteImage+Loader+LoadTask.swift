@@ -8,7 +8,7 @@ extension RemoteImage.Loader {
     
     final class LoadTask : RemoteImage.Loader.Task {
         
-        let provider: IApiProvider
+        let provider: Api.Provider
         
         init(
             delegate: IRemoteImageLoaderTaskDelegate,
@@ -22,7 +22,7 @@ extension RemoteImage.Loader {
             self.provider = provider
             super.init(
                 delegate: delegate,
-                lockQueue: DispatchQueue(label: "KindKitRemoteImageView.RemoteImageLoader.LoadTask"),
+                lockQueue: DispatchQueue(label: "KindKit.RemoteImage.Loader.LoadTask"),
                 workQueue: workQueue,
                 syncQueue: syncQueue,
                 cache: cache,
@@ -39,20 +39,19 @@ extension RemoteImage.Loader {
 private extension RemoteImage.Loader.LoadTask {
     
     func _perform() {
-        self.task = DispatchWorkItem.kk_async(block: {
+        self.task = DispatchWorkItem.kk_async(queue: self.workQueue, block: {
             if let image = self.cache.image(query: self.query) {
                 self.finish(image: image)
             } else if self.query.isLocal == true {
-                do {
-                    let data = try self.query.local()
+                if let data = try? self.query.local() {
                     if let image = UI.Image(data: data) {
-                        try self.cache.set(data: data, image: image, query: self.query)
+                        try? self.cache.set(data: data, image: image, query: self.query)
                         self.finish(image: image)
                     } else {
-                        throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError)
+                        self.finish(error: .unknown)
                     }
-                } catch let error {
-                    self.finish(error: error)
+                } else {
+                    self.finish(error: .unknown)
                 }
             } else {
                 self.progress(progress: 0)
@@ -65,12 +64,8 @@ private extension RemoteImage.Loader.LoadTask {
                     },
                     success: { [weak self] data, image in
                         guard let self = self else { return }
-                        do {
-                            try self.cache.set(data: data, image: image, query: self.query)
-                            self.finish(image: image)
-                        } catch let error {
-                            self.finish(error: error)
-                        }
+                        try? self.cache.set(data: data, image: image, query: self.query)
+                        self.finish(image: image)
                     },
                     failure: { [weak self] error in
                         guard let self = self else { return }
@@ -78,7 +73,7 @@ private extension RemoteImage.Loader.LoadTask {
                     }
                 )
             }
-        }, queue: self.workQueue)
+        })
     }
     
 }

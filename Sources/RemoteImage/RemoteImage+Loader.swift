@@ -11,9 +11,9 @@ public extension RemoteImage {
         public let provider: Api.Provider
         public let cache: RemoteImage.Cache
 
-        var lockQueue: DispatchQueue
-        var workQueue: DispatchQueue
-        var syncQueue: DispatchQueue
+        public let lockQueue: DispatchQueue
+        public let workQueue: DispatchQueue
+        public let syncQueue: DispatchQueue
         
         private var _loadTasks: [LoadTask]
         private var _filterTasks: [FilterTask]
@@ -26,7 +26,7 @@ public extension RemoteImage {
         ) {
             self.provider = provider
             self.cache = cache
-            self.lockQueue = DispatchQueue(label: "KindKitRemoteImageView.RemoteImageLoader")
+            self.lockQueue = DispatchQueue(label: "KindKit.RemoteImage.Loader")
             self.workQueue = workQueue
             self.syncQueue = syncQueue
             self._loadTasks = []
@@ -61,35 +61,39 @@ public extension RemoteImage.Loader {
         )
     }()
     
-    func download(target: IRemoteImageTarget, query: IRemoteImageQuery) {
-        self.lockQueue.async(execute: {
-            if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
-                loadTask.add(target: target)
-            } else if let image = self.cache.image(query: query) {
-                self.syncQueue.async(execute: {
-                    target.remoteImage(image: image)
-                })
-            } else {
-                let loadTask = LoadTask(
-                    delegate: self,
-                    workQueue: self.workQueue,
-                    syncQueue: self.syncQueue,
-                    provider: self.provider,
-                    cache: self.cache,
-                    query: query,
-                    target: target
-                )
-                self._loadTasks.append(loadTask)
-            }
-        })
-    }
-    
-    func download(target: IRemoteImageTarget, query: IRemoteImageQuery, filter: IRemoteImageFilter) {
-        self.lockQueue.async(execute: {
-            if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
-                if let filterTask = self._filterTasks.first(where: { $0.query.key == query.key && $0.filter.name == filter.name }) {
-                    filterTask.add(target: target)
+    func download(target: IRemoteImageTarget, query: IRemoteImageQuery, filter: IRemoteImageFilter? = nil) {
+        if let filter = filter {
+            self.lockQueue.async(execute: {
+                if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
+                    if let filterTask = self._filterTasks.first(where: { $0.query.key == query.key && $0.filter.name == filter.name }) {
+                        filterTask.add(target: target)
+                    } else {
+                        let filterTask = FilterTask(
+                            delegate: self,
+                            workQueue: self.workQueue,
+                            syncQueue: self.syncQueue,
+                            cache: self.cache,
+                            query: query,
+                            filter: filter,
+                            target: target
+                        )
+                        loadTask.add(target: filterTask)
+                        self._filterTasks.append(filterTask)
+                    }
+                } else if let image = self.cache.image(query: query, filter: filter) {
+                    self.syncQueue.async(execute: {
+                        target.remoteImage(image: image)
+                    })
                 } else {
+                    let loadTask = LoadTask(
+                        delegate: self,
+                        workQueue: self.workQueue,
+                        syncQueue: self.syncQueue,
+                        provider: self.provider,
+                        cache: self.cache,
+                        query: query,
+                        target: target
+                    )
                     let filterTask = FilterTask(
                         delegate: self,
                         workQueue: self.workQueue,
@@ -100,36 +104,32 @@ public extension RemoteImage.Loader {
                         target: target
                     )
                     loadTask.add(target: filterTask)
+                    self._loadTasks.append(loadTask)
                     self._filterTasks.append(filterTask)
                 }
-            } else if let image = self.cache.image(query: query, filter: filter) {
-                self.syncQueue.async(execute: {
-                    target.remoteImage(image: image)
-                })
-            } else {
-                let loadTask = LoadTask(
-                    delegate: self,
-                    workQueue: self.workQueue,
-                    syncQueue: self.syncQueue,
-                    provider: self.provider,
-                    cache: self.cache,
-                    query: query,
-                    target: target
-                )
-                let filterTask = FilterTask(
-                    delegate: self,
-                    workQueue: self.workQueue,
-                    syncQueue: self.syncQueue,
-                    cache: self.cache,
-                    query: query,
-                    filter: filter,
-                    target: target
-                )
-                loadTask.add(target: filterTask)
-                self._loadTasks.append(loadTask)
-                self._filterTasks.append(filterTask)
-            }
-        })
+            })
+        } else {
+            self.lockQueue.async(execute: {
+                if let loadTask = self._loadTasks.first(where: { $0.query.key == query.key }) {
+                    loadTask.add(target: target)
+                } else if let image = self.cache.image(query: query) {
+                    self.syncQueue.async(execute: {
+                        target.remoteImage(image: image)
+                    })
+                } else {
+                    let loadTask = LoadTask(
+                        delegate: self,
+                        workQueue: self.workQueue,
+                        syncQueue: self.syncQueue,
+                        provider: self.provider,
+                        cache: self.cache,
+                        query: query,
+                        target: target
+                    )
+                    self._loadTasks.append(loadTask)
+                }
+            })
+        }
     }
 
     func cancel(target: IRemoteImageTarget) {

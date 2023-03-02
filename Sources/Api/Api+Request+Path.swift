@@ -17,7 +17,7 @@ public extension Api.Request {
 
 public extension Api.Request.Path {
     
-    func urlComponents(provider: IApiProvider) throws -> URLComponents {
+    func urlComponents(provider: Api.Provider) throws -> URLComponents {
         switch self {
         case .absolute(let url):
             guard let components = URLComponents(string: url.absoluteString) else {

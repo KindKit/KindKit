@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow {
     
-    enum Condition {
+    enum Head {
     }
     
 }

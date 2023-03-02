@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension DataSource {
+public extension RemoteImage {
 
-    enum Page {
+    enum Flow {
     }
     
 }

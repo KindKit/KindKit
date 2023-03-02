@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class Each< Input : IFlowResult > : IFlowOperator where Input.Success : Sequence {
         
@@ -44,32 +44,44 @@ public extension FlowOperator {
 
 extension IFlowOperator {
     
-    func each() -> FlowOperator.Each< Output > where Output.Success : Sequence {
-        let next = FlowOperator.Each< Output >()
+    func each(
+    ) -> Flow.Operator.Each< Output > where
+        Output.Success : Sequence
+    {
+        let next = Flow.Operator.Each< Output >()
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
-    func each() -> FlowBuilder.Head< FlowOperator.Each< Input > > where Input.Success : Sequence {
+    func each(
+    ) -> Flow.Head.Builder< Flow.Operator.Each< Input > > where
+        Input.Success : Sequence
+    {
         return .init(head: .init())
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
-    func each() -> FlowBuilder.Chain< Head, FlowOperator.Each< Head.Output > > where Head.Output.Success : Sequence {
+    func each(
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Each< Head.Output > > where
+        Head.Output.Success : Sequence
+    {
         return .init(head: self.head, tail: self.head.each())
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
-    func each() -> FlowBuilder.Chain< Head, FlowOperator.Each< Tail.Output > > where Tail.Output.Success : Sequence {
+    func each(
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Each< Tail.Output > > where
+        Tail.Output.Success : Sequence
+    {
         return .init(head: self.head, tail: self.tail.each())
     }
     

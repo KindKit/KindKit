@@ -24,6 +24,7 @@ public protocol IFlowPipeline : ICancellable {
 
 public extension IFlowPipeline {
     
+    @inlinable
     func subscribe(
         onReceiveValue: @escaping (Output.Success) -> Void = { _ in },
         onReceiveError: @escaping (Output.Failure) -> Void = { _ in },
@@ -34,6 +35,26 @@ public extension IFlowPipeline {
             onReceiveError: onReceiveError,
             onCompleted: onCompleted
         )
+    }
+    
+}
+
+public extension IFlowPipeline {
+    
+    @inlinable
+    func perform(_ input: Input.Success) {
+        self.send(value: input)
+        self.completed()
+    }
+    
+}
+
+public extension IFlowPipeline where Input.Success == Void {
+    
+    @inlinable
+    func perform() {
+        self.send(value: ())
+        self.completed()
     }
     
 }

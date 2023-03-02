@@ -6,11 +6,11 @@ import Foundation
 
 extension Api.Query {
     
-    final class Fail< Provider: IApiProvider, Response : IApiResponse > : IApiQuery {
+    final class Fail< Response : IApiResponse > : IApiQuery {
         
         typealias CompleteClosure = (_ response: Response.Result) -> Void
         
-        let provider: Provider
+        let provider: Api.Provider
         var createAt: Date
         
         let response: Response
@@ -21,7 +21,7 @@ extension Api.Query {
         private var _workItem: DispatchWorkItem!
         
         init(
-            provider: Provider,
+            provider: Api.Provider,
             response: Response,
             queue: DispatchQueue,
             onCompleted: @escaping CompleteClosure

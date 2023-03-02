@@ -4,9 +4,13 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
-    final class Map< Input : IFlowResult, Success, Failure : Swift.Error > : IFlowOperator {
+    final class Map<
+        Input : IFlowResult,
+        Success,
+        Failure : Swift.Error
+    > : IFlowOperator {
         
         public typealias Input = Input
         public typealias Output = Result< Success, Failure >
@@ -58,38 +62,38 @@ extension IFlowOperator {
     
     func map< Success, Failure : Swift.Error >(
         _ perform: @escaping (Result< Output.Success, Output.Failure >) -> Result< Success, Failure >
-    ) -> FlowOperator.Map< Output, Success, Failure > {
-        let next = FlowOperator.Map< Output, Success, Failure >(perform)
+    ) -> Flow.Operator.Map< Output, Success, Failure > {
+        let next = Flow.Operator.Map< Output, Success, Failure >(perform)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func map< Success, Failure : Swift.Error >(
         _ perform: @escaping (Result< Input.Success, Input.Failure >) -> Result< Success, Failure >
-    ) -> FlowBuilder.Head< FlowOperator.Map< Input, Success, Failure > > {
+    ) -> Flow.Head.Builder< Flow.Operator.Map< Input, Success, Failure > > {
         return .init(head: .init(perform))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func map< Success, Failure : Swift.Error >(
         _ perform: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Result< Success, Failure >
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Map< Head.Output, Success, Failure > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Map< Head.Output, Success, Failure > > {
         return .init(head: self.head, tail: self.head.map(perform))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func map< Success, Failure : Swift.Error >(
         _ perform: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Result< Success, Failure >
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Map< Tail.Output, Success, Failure > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Map< Tail.Output, Success, Failure > > {
         return .init(head: self.head, tail: self.tail.map(perform))
     }
     

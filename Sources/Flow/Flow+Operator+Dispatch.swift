@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     enum DispatchMode {
         
@@ -59,12 +59,12 @@ public extension FlowOperator {
     
 }
 
-public extension FlowOperator.DispatchMode {
+public extension Flow.Operator.DispatchMode {
     
     var queue: DispatchQueue {
         switch self {
         case .main: return DispatchQueue.main
-        case .background: return DispatchQueue(label: "KindKitFlow.Operator.Dispatch", attributes: [ .concurrent ])
+        case .background: return DispatchQueue(label: "KindKit.Flow.Operator.Dispatch", attributes: [ .concurrent ])
         }
     }
     
@@ -73,40 +73,40 @@ public extension FlowOperator.DispatchMode {
 extension IFlowOperator {
     
     func dispatch(
-        _ mode: FlowOperator.DispatchMode
-    ) -> FlowOperator.Dispatch< Output > {
-        let next = FlowOperator.Dispatch< Output >(mode)
+        _ mode: Flow.Operator.DispatchMode
+    ) -> Flow.Operator.Dispatch< Output > {
+        let next = Flow.Operator.Dispatch< Output >(mode)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func dispatch(
-        _ mode: FlowOperator.DispatchMode
-    ) -> FlowBuilder.Head< FlowOperator.Dispatch< Input > > {
+        _ mode: Flow.Operator.DispatchMode
+    ) -> Flow.Head.Builder< Flow.Operator.Dispatch< Input > > {
         return .init(head: .init(mode))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func dispatch(
-        _ mode: FlowOperator.DispatchMode
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Dispatch< Head.Output > > {
+        _ mode: Flow.Operator.DispatchMode
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Head.Output > > {
         return .init(head: self.head, tail: self.head.dispatch(mode))
     }
     
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func dispatch(
-        _ mode: FlowOperator.DispatchMode
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Dispatch< Tail.Output > > {
+        _ mode: Flow.Operator.DispatchMode
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Tail.Output > > {
         return .init(head: self.head, tail: self.tail.dispatch(mode))
     }
     

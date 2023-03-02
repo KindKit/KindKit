@@ -6,7 +6,7 @@ import Foundation
 
 public extension Api {
     
-    final class Provider : IApiProvider {
+    final class Provider {
 
         public var url: URL?
         public var headers: [Api.Request.Header]

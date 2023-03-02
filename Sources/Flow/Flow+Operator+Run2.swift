@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class Run2<
         Pipeline1 : IFlowPipeline,
@@ -73,7 +73,7 @@ public extension FlowOperator {
     
 }
 
-private extension FlowOperator.Run2 {
+private extension Flow.Operator.Run2 {
     
     func _receive1(value: Pipeline1.Output.Success) {
         self._received1.append(.success(value))
@@ -115,20 +115,20 @@ extension IFlowOperator {
         Pipeline1 : IFlowPipeline,
         Pipeline2 : IFlowPipeline
     >(
-        pipeline1: Pipeline1,
-        pipeline2: Pipeline2
-    ) -> FlowOperator.Run2< Pipeline1, Pipeline2 > where
+        _ pipeline1: Pipeline1,
+        _ pipeline2: Pipeline2
+    ) -> Flow.Operator.Run2< Pipeline1, Pipeline2 > where
         Pipeline1.Input == Pipeline2.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure
     {
-        let next = FlowOperator.Run2< Pipeline1, Pipeline2 >(pipeline1, pipeline2)
+        let next = Flow.Operator.Run2< Pipeline1, Pipeline2 >(pipeline1, pipeline2)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func run2<
         Pipeline1 : IFlowPipeline,
@@ -136,7 +136,7 @@ public extension Flow {
     >(
         pipeline1: Pipeline1,
         pipeline2: Pipeline2
-    ) -> FlowBuilder.Head< FlowOperator.Run2< Pipeline1, Pipeline2 > > where
+    ) -> Flow.Head.Builder< Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
         Input == Pipeline1.Input,
         Input == Pipeline2.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure
@@ -146,7 +146,7 @@ public extension Flow {
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func run2<
         Pipeline1 : IFlowPipeline,
@@ -154,16 +154,16 @@ public extension FlowBuilder.Head {
     >(
         pipeline1: Pipeline1,
         pipeline2: Pipeline2
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Run2< Pipeline1, Pipeline2 > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
         Head.Output == Pipeline1.Input,
         Head.Output == Pipeline2.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure
     {
-        return .init(head: self.head, tail: self.head.run2(pipeline1: pipeline1, pipeline2: pipeline2))
+        return .init(head: self.head, tail: self.head.run2(pipeline1, pipeline2))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func run2<
         Pipeline1 : IFlowPipeline,
@@ -171,12 +171,12 @@ public extension FlowBuilder.Chain {
     >(
         pipeline1: Pipeline1,
         pipeline2: Pipeline2
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Run2< Pipeline1, Pipeline2 > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
         Tail.Output == Pipeline1.Input,
         Tail.Output == Pipeline2.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure
     {
-        return .init(head: self.head, tail: self.tail.run2(pipeline1: pipeline1, pipeline2: pipeline2))
+        return .init(head: self.head, tail: self.tail.run2(pipeline1, pipeline2))
     }
     
 }

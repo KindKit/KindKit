@@ -5,8 +5,8 @@
 import Foundation
 
 public extension DataSource {
-
-    enum Page {
+    
+    enum Flow {
     }
     
 }

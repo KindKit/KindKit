@@ -39,7 +39,7 @@ public extension UI.View {
         public private(set) var isLoading: Bool = false
         public let onProgress: Signal.Args< Void, Double > = .init()
         public let onFinish: Signal.Args< IUIView?, UI.Image > = .init()
-        public let onError: Signal.Args< Void, Error > = .init()
+        public let onError: Signal.Args< Void, KindKit.RemoteImage.Error > = .init()
         
         private var _layout: Layout
         
@@ -68,11 +68,7 @@ private extension UI.View.RemoteImage {
                 self.isLoading = true
                 self._layout.state = .loading
                 self.progress?.progress(0)
-                if let filter = self.filter {
-                    self.loader.download(target: self, query: query, filter: filter)
-                } else {
-                    self.loader.download(target: self, query: query)
-                }
+                self.loader.download(target: self, query: query, filter: self.filter)
             }
         }
     }
@@ -243,14 +239,14 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onError(_ closure: ((Error) -> Void)?) -> Self {
+    func onError(_ closure: ((KindKit.RemoteImage.Error) -> Void)?) -> Self {
         self.onError.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onError(_ closure: ((Self, Error) -> Void)?) -> Self {
+    func onError(_ closure: ((Self, KindKit.RemoteImage.Error) -> Void)?) -> Self {
         self.onError.link(self, closure)
         return self
     }
@@ -264,7 +260,7 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Error) -> Void)?) -> Self {
+    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, KindKit.RemoteImage.Error) -> Void)?) -> Self {
         self.onError.link(sender, closure)
         return self
     }
@@ -297,7 +293,7 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
         self.imageView = self.onFinish.emit(image, default: UI.View.Image().image(image))
     }
     
-    public func remoteImage(error: Error) {
+    public func remoteImage(error: KindKit.RemoteImage.Error) {
         self.isLoading = false
         self._layout.state = .error
         self.onError.emit(error)

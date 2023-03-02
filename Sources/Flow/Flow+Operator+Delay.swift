@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class Delay< Value : IFlowResult > : IFlowOperator {
         
@@ -34,27 +34,27 @@ public extension FlowOperator {
         
         public func receive(value: Input.Success) {
             self._task = DispatchWorkItem.kk_async(
+                queue: self._queue,
+                delay: self._timeout(.success(value)),
                 block: { [weak self] in
                     guard let self = self else { return }
                     self._task = nil
                     self._next.send(value: value)
                     self._next.completed()
-                },
-                queue: self._queue,
-                delay: self._timeout(.success(value))
+                }
             )
         }
         
         public func receive(error: Input.Failure) {
             self._task = DispatchWorkItem.kk_async(
+                queue: self._queue,
+                delay: self._timeout(.failure(error)),
                 block: { [weak self] in
                     guard let self = self else { return }
                     self._task = nil
                     self._next.send(error: error)
                     self._next.completed()
-                },
-                queue: self._queue,
-                delay: self._timeout(.failure(error))
+                }
             )
         }
         
@@ -76,51 +76,45 @@ public extension FlowOperator {
 extension IFlowOperator {
     
     func delay(
-        dispatch: FlowOperator.DispatchMode,
-        timeout: @escaping (Result< Output.Success, Output.Failure >) -> TimeInterval
-    ) -> FlowOperator.Delay< Output > {
-        let next = FlowOperator.Delay< Output >(dispatch, timeout)
+        _ dispatch: Flow.Operator.DispatchMode,
+        _ timeout: @escaping (Result< Output.Success, Output.Failure >) -> TimeInterval
+    ) -> Flow.Operator.Delay< Output > {
+        let next = Flow.Operator.Delay< Output >(dispatch, timeout)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func delay(
-        dispatch: FlowOperator.DispatchMode,
+        dispatch: Flow.Operator.DispatchMode,
         timeout: @escaping (Result< Input.Success, Input.Failure >) -> TimeInterval
-    ) -> FlowBuilder.Head< FlowOperator.Delay< Input > > {
+    ) -> Flow.Head.Builder< Flow.Operator.Delay< Input > > {
         return .init(head: .init(dispatch, timeout))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func delay(
-        dispatch: FlowOperator.DispatchMode,
+        dispatch: Flow.Operator.DispatchMode,
         timeout: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> TimeInterval
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Delay< Head.Output > > {
-        return .init(head: self.head, tail: self.head.delay(
-            dispatch: dispatch,
-            timeout: timeout
-        ))
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Delay< Head.Output > > {
+        return .init(head: self.head, tail: self.head.delay(dispatch, timeout))
     }
     
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func delay(
-        dispatch: FlowOperator.DispatchMode,
+        dispatch: Flow.Operator.DispatchMode,
         timeout: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> TimeInterval
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Delay< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.delay(
-            dispatch: dispatch,
-            timeout: timeout
-        ))
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Delay< Tail.Output > > {
+        return .init(head: self.head, tail: self.tail.delay(dispatch, timeout))
     }
     
 }

@@ -4,21 +4,20 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
-    final class EachAndRun<
+    final class Lifo<
         Input : IFlowResult,
         Pipeline : IFlowPipeline
     > : IFlowOperator where
-        Input.Success : Collection,
-        Input.Success.Element == Pipeline.Input.Success,
+        Input.Success == Pipeline.Input.Success,
         Input.Failure == Pipeline.Input.Failure
     {
         
         public typealias Input = Input
         public typealias Output = Result< [Pipeline.Output.Success], Pipeline.Output.Failure >
         
-        private var _queue: [Input.Success.Element]
+        private var _queue: [Input.Success]
         private var _value: [Pipeline.Output.Success]
         private var _error: Pipeline.Output.Failure?
         private let _pipeline: Pipeline
@@ -44,7 +43,7 @@ public extension FlowOperator {
         }
         
         public func receive(value: Input.Success) {
-            self._queue.append(contentsOf: value)
+            self._queue.append(value)
         }
         
         public func receive(error: Input.Failure) {
@@ -64,7 +63,7 @@ public extension FlowOperator {
     
 }
 
-private extension FlowOperator.EachAndRun {
+private extension Flow.Operator.Lifo {
     
     func _receive(value: Pipeline.Output.Success) {
         self._value.append(value)
@@ -78,7 +77,7 @@ private extension FlowOperator.EachAndRun {
     
     func _completed() {
         if self._queue.isEmpty == false {
-            let value = self._queue.removeFirst()
+            let value = self._queue.removeLast()
             self._pipeline.send(value: value)
             self._pipeline.completed()
         } else if let error = self._error {
@@ -94,27 +93,25 @@ private extension FlowOperator.EachAndRun {
 
 extension IFlowOperator {
     
-    func each< Pipeline : IFlowPipeline >(
+    func lifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowOperator.EachAndRun< Output, Pipeline > where
-        Output.Success : Collection,
-        Output.Success.Element == Pipeline.Input.Success,
+    ) -> Flow.Operator.Lifo< Output, Pipeline > where
+        Output.Success == Pipeline.Input.Success,
         Output.Failure == Pipeline.Input.Failure
     {
-        let next = FlowOperator.EachAndRun< Output, Pipeline >(pipeline)
+        let next = Flow.Operator.Lifo< Output, Pipeline >(pipeline)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
-    func each< Pipeline : IFlowPipeline >(
+    func lifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Head< FlowOperator.EachAndRun< Input, Pipeline > > where
-        Input.Success : Collection,
-        Input.Success.Element == Pipeline.Input.Success,
+    ) -> Flow.Head.Builder< Flow.Operator.Lifo< Input, Pipeline > > where
+        Input.Success == Pipeline.Input.Success,
         Input.Failure == Pipeline.Input.Failure
     {
         return .init(head: .init(pipeline))
@@ -122,31 +119,29 @@ public extension Flow {
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
-    func each< Pipeline : IFlowPipeline >(
+    func lifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Chain< Head, FlowOperator.EachAndRun< Head.Output, Pipeline > > where
-        Head.Output.Success : Sequence,
-        Head.Output.Success.Element == Pipeline.Input.Success,
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Lifo< Head.Output, Pipeline > > where
+        Head.Output.Success == Pipeline.Input.Success,
         Head.Output.Failure == Pipeline.Input.Failure
     {
-        return .init(head: self.head, tail: self.head.each(
+        return .init(head: self.head, tail: self.head.lifo(
             pipeline: pipeline
         ))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
-    func each< Pipeline : IFlowPipeline >(
+    func lifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Chain< Head, FlowOperator.EachAndRun< Tail.Output, Pipeline > > where
-        Tail.Output.Success : Sequence,
-        Tail.Output.Success.Element == Pipeline.Input.Success,
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Lifo< Tail.Output, Pipeline > > where
+        Tail.Output.Success == Pipeline.Input.Success,
         Tail.Output.Failure == Pipeline.Input.Failure
     {
-        return .init(head: self.head, tail: self.tail.each(
+        return .init(head: self.head, tail: self.tail.lifo(
             pipeline: pipeline
         ))
     }

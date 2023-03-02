@@ -103,7 +103,7 @@ extension RemoteImage.Loader.Task {
         })
     }
     
-    func finish(error: Error) {
+    func finish(error: RemoteImage.Error) {
         self.task = nil
         self.syncQueue.async(execute: {
             self.delegate?.didFinish(self)

@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension FlowOperator.Condition {
+public extension Flow.Operator.Condition {
     
-    final class IfThen<
+    final class If<
         Then : IFlowPipeline
     > : IFlowOperator where
         Then.Input == Then.Output
@@ -66,7 +66,7 @@ public extension FlowOperator.Condition {
     
 }
 
-private extension FlowOperator.Condition.IfThen {
+private extension Flow.Operator.Condition.If {
     
     func _receive(value: Output.Success) {
         self._next.send(value: value)
@@ -87,26 +87,26 @@ extension IFlowOperator {
     func condition<
         Then : IFlowPipeline
     >(
-        `if`: @escaping (Result< Then.Input.Success, Then.Input.Failure >) -> Bool,
-        then: Then
-    ) -> FlowOperator.Condition.IfThen< Then > where
+        _ `if`: @escaping (Result< Then.Input.Success, Then.Input.Failure >) -> Bool,
+        _ then: Then
+    ) -> Flow.Operator.Condition.If< Then > where
         Then.Input == Then.Output
     {
-        let next = FlowOperator.Condition.IfThen< Then >(`if`, then)
+        let next = Flow.Operator.Condition.If< Then >(`if`, then)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func condition<
         Then : IFlowPipeline
     >(
         `if`: @escaping (Result< Input.Success, Input.Failure >) -> Bool,
         then: Then
-    ) -> FlowBuilder.Head< FlowOperator.Condition.IfThen< Then > > where
+    ) -> Flow.Head.Builder< Flow.Operator.Condition.If< Then > > where
         Input == Then.Input,
         Then.Input == Then.Output
     {
@@ -115,33 +115,33 @@ public extension Flow {
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func condition<
         Then : IFlowPipeline
     >(
         `if`: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Bool,
         then: Then
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThen< Then > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Condition.If< Then > > where
         Head.Output == Then.Input,
         Then.Input == Then.Output
     {
-        return .init(head: self.head, tail: self.head.condition(if: `if`, then: then))
+        return .init(head: self.head, tail: self.head.condition(`if`, then))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func condition<
         Then : IFlowPipeline
     >(
         `if`: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Bool,
         then: Then
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThen< Then > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Condition.If< Then > > where
         Tail.Output == Then.Input,
         Then.Input == Then.Output
     {
-        return .init(head: self.head, tail: self.tail.condition(if: `if`, then: then))
+        return .init(head: self.head, tail: self.tail.condition(`if`, then))
     }
     
 }

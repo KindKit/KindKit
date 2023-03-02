@@ -4,21 +4,22 @@
 
 import Foundation
 
-extension FlowPipeline {
+extension Flow {
     
-    final class Subscription : IFlowSubscription {
+    final class Subscription< Input : IFlowResult, Output : IFlowResult > : IFlowSubscription {
         
-        typealias Success = FlowPipeline.Output.Success
-        typealias Failure = FlowPipeline.Output.Failure
+        typealias Success = Output.Success
+        typealias Failure = Output.Failure
+        typealias Pipeline = Flow.Pipeline< Input, Output >
         
-        weak var pipeline: FlowPipeline?
+        weak var pipeline: Pipeline?
         
         private let onReceiveValue: (Success) -> Void
         private let onReceiveError: (Failure) -> Void
         private let onCompleted: () -> Void
         
         init(
-            pipeline: FlowPipeline,
+            pipeline: Pipeline,
             onReceiveValue: @escaping (Success) -> Void,
             onReceiveError: @escaping (Failure) -> Void,
             onCompleted: @escaping () -> Void

@@ -37,7 +37,7 @@ public extension Api {
             self.redirect = redirect
         }
 
-        public func urlRequest(provider: IApiProvider) throws -> URLRequest {
+        public func urlRequest(provider: Api.Provider) throws -> URLRequest {
             var components = try self.path.urlComponents(provider: provider)
             do {
                 var params: [Api.Request.Parameter] = (components.queryItems ?? []).map({

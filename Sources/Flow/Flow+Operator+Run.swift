@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class Run< Pipeline : IFlowPipeline > : IFlowOperator {
         
@@ -54,20 +54,20 @@ public extension FlowOperator {
 extension IFlowOperator {
     
     func run< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> FlowOperator.Run< Pipeline > {
-        let next = FlowOperator.Run< Pipeline >(pipeline)
+        _ pipeline: Pipeline
+    ) -> Flow.Operator.Run< Pipeline > {
+        let next = Flow.Operator.Run< Pipeline >(pipeline)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func run< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Head< FlowOperator.Run< Pipeline > > where
+    ) -> Flow.Head.Builder< Flow.Operator.Run< Pipeline > > where
         Input == Pipeline.Input
     {
         return .init(head: .init(pipeline))
@@ -75,25 +75,25 @@ public extension Flow {
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func run< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Run< Pipeline > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run< Pipeline > > where
         Head.Output == Pipeline.Input
     {
-        return .init(head: self.head, tail: self.head.run(pipeline: pipeline))
+        return .init(head: self.head, tail: self.head.run(pipeline))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func run< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Run< Pipeline > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run< Pipeline > > where
         Head.Output == Pipeline.Input
     {
-        return .init(head: self.head, tail: self.tail.run(pipeline: pipeline))
+        return .init(head: self.head, tail: self.tail.run(pipeline))
     }
     
 }

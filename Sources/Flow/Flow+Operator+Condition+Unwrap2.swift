@@ -4,20 +4,24 @@
 
 import Foundation
 
-public extension FlowOperator.Condition {
+public extension Flow.Operator.Condition {
     
-    final class IfThenElse<
+    final class Unwrap2<
+        Input : IFlowResult,
         Then : IFlowPipeline,
         Else : IFlowPipeline
     > : IFlowOperator where
-        Then.Input == Else.Input,
+        Input.Success : IOptionalConvertible,
+        Then.Input.Success == Input.Success.Wrapped,
+        Then.Input.Failure == Input.Failure,
+        Else.Input.Success == Void,
+        Else.Input.Failure == Input.Failure,
         Then.Output == Else.Output
     {
         
-        public typealias Input = Then.Input
+        public typealias Input = Input
         public typealias Output = Then.Output
         
-        private let _if: (Result< Input.Success, Input.Failure >) -> Bool
         private var _state: Bool?
         private let _then: Then
         private let _else: Else
@@ -26,11 +30,9 @@ public extension FlowOperator.Condition {
         private var _next: IFlowPipe!
         
         init(
-            _ `if`: @escaping (Result< Input.Success, Input.Failure >) -> Bool,
             _ then: Then,
             _ `else`: Else
         ) {
-            self._if = `if`
             self._then = then
             self._else = `else`
             self._thenSubscription = then.subscribe(
@@ -50,30 +52,39 @@ public extension FlowOperator.Condition {
         }
         
         public func receive(value: Input.Success) {
-            if self._if(.success(value)) == true {
+            if let value = value.asOptional {
                 self._state = true
                 self._then.send(value: value)
             } else {
                 self._state = false
-                self._else.send(value: value)
+                self._else.send(value: ())
             }
         }
         
         public func receive(error: Input.Failure) {
-            if self._if(.failure(error)) == true {
-                self._state = true
+            switch self._state {
+            case .some(let value):
+                if value == true {
+                    self._then.send(error: error)
+                } else {
+                    self._else.send(error: error)
+                }
+            case .none:
                 self._then.send(error: error)
-            } else {
-                self._state = false
                 self._else.send(error: error)
             }
         }
         
         public func completed() {
-            if self._state == true {
-                self._then.completed()
-            } else if self._state == false {
-                self._else.completed()
+            switch self._state {
+            case .some(let value):
+                if value == true {
+                    self._then.completed()
+                } else {
+                    self._else.completed()
+                }
+            case .none:
+                self._completed()
             }
         }
         
@@ -87,7 +98,7 @@ public extension FlowOperator.Condition {
     
 }
 
-private extension FlowOperator.Condition.IfThenElse {
+private extension Flow.Operator.Condition.Unwrap2 {
     
     func _receive(value: Output.Success) {
         self._next.send(value: value)
@@ -105,76 +116,85 @@ private extension FlowOperator.Condition.IfThenElse {
 
 extension IFlowOperator {
     
-    func condition<
+    func unwrap<
         Then : IFlowPipeline,
         Else : IFlowPipeline
     >(
-        `if`: @escaping (Result< Then.Input.Success, Then.Input.Failure >) -> Bool,
-        then: Then,
-        `else`: Else
-    ) -> FlowOperator.Condition.IfThenElse< Then, Else > where
-        Then.Input == Else.Input,
+        _ then: Then,
+        _ `else`: Else
+    ) -> Flow.Operator.Condition.Unwrap2< Output, Then, Else > where
+        Output.Success : IOptionalConvertible,
+        Then.Input.Success == Output.Success.Wrapped,
+        Then.Input.Failure == Output.Failure,
+        Else.Input.Success == Void,
+        Else.Input.Failure == Output.Failure,
         Then.Output == Else.Output
     {
-        let next = FlowOperator.Condition.IfThenElse< Then, Else >(`if`, then, `else`)
+        let next = Flow.Operator.Condition.Unwrap2< Output, Then, Else >(then, `else`)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
-    func condition<
+    func unwrap<
         Then : IFlowPipeline,
         Else : IFlowPipeline
     >(
-        `if`: @escaping (Result< Input.Success, Input.Failure >) -> Bool,
         then: Then,
         `else`: Else
-    ) -> FlowBuilder.Head< FlowOperator.Condition.IfThenElse< Then, Else > > where
-        Input == Then.Input,
-        Then.Input == Else.Input,
+    ) -> Flow.Head.Builder< Flow.Operator.Condition.Unwrap2< Input, Then, Else > > where
+        Input.Success : IOptionalConvertible,
+        Then.Input.Success == Input.Success.Wrapped,
+        Then.Input.Failure == Input.Failure,
+        Else.Input.Success == Void,
+        Else.Input.Failure == Input.Failure,
         Then.Output == Else.Output
     {
-        return .init(head: .init(`if`, then, `else`))
+        return .init(head: .init(then, `else`))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
-    func condition<
+    func unwrap<
         Then : IFlowPipeline,
         Else : IFlowPipeline
     >(
-        `if`: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Bool,
         then: Then,
         `else`: Else
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThenElse< Then, Else > > where
-        Head.Output == Then.Input,
-        Then.Input == Else.Input,
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Condition.Unwrap2< Head.Output, Then, Else > > where
+        Head.Output.Success : IOptionalConvertible,
+        Then.Input.Success == Head.Output.Success.Wrapped,
+        Then.Input.Failure == Head.Output.Failure,
+        Else.Input.Success == Void,
+        Else.Input.Failure == Head.Output.Failure,
         Then.Output == Else.Output
     {
-        return .init(head: self.head, tail: self.head.condition(if: `if`, then: then, else: `else`))
+        return .init(head: self.head, tail: self.head.unwrap(then, `else`))
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
-    func condition<
+    func unwrap<
         Then : IFlowPipeline,
         Else : IFlowPipeline
     >(
-        `if`: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Bool,
         then: Then,
         `else`: Else
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Condition.IfThenElse< Then, Else > > where
-        Tail.Output == Then.Input,
-        Then.Input == Else.Input,
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Condition.Unwrap2< Tail.Output, Then, Else > > where
+        Tail.Output.Success : IOptionalConvertible,
+        Then.Input.Success == Tail.Output.Success.Wrapped,
+        Then.Input.Failure == Tail.Output.Failure,
+        Else.Input.Success == Void,
+        Else.Input.Failure == Tail.Output.Failure,
         Then.Output == Else.Output
     {
-        return .init(head: self.head, tail: self.tail.condition(if: `if`, then: then, else: `else`))
+        return .init(head: self.head, tail: self.tail.unwrap(then, `else`))
     }
     
 }

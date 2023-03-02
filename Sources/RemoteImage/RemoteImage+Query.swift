@@ -28,11 +28,11 @@ public extension RemoteImage {
         }
         
         public func remote(
-            provider: IApiProvider,
+            provider: Api.Provider,
             queue: DispatchQueue,
             download: @escaping (_ progress: Progress) -> Void,
             success: @escaping (_ data: Data, _ image: UI.Image) -> Void,
-            failure: @escaping (_ error: Error) -> Void
+            failure: @escaping (_ error: RemoteImage.Error) -> Void
         ) -> ICancellable {
             return provider.send(
                 request: Api.Request(method: .get, path: .absolute(self.url)),
@@ -57,20 +57,30 @@ private extension RemoteImage.Query {
     struct Response : IApiResponse {
         
         typealias Success = (Data, UI.Image)
-        typealias Failure = Error
+        typealias Failure = RemoteImage.Error
         
         func parse(meta: Api.Response.Meta, data: Data?) -> Result< Success, Failure > {
             guard let data = data else {
-                return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorDataNotAllowed))
+                return .failure(.invalidResponse)
             }
             guard let image = UI.Image(data: data) else {
-                return .failure(NSError(domain: NSURLErrorDomain, code: NSURLErrorDataNotAllowed))
+                return .failure(.invalidResponse)
             }
             return .success((data, image))
         }
         
         func parse(error: Error) -> Result< Success, Failure > {
-            return .failure(error)
+            let nsError = error as NSError
+            switch nsError.domain {
+            case NSURLErrorDomain:
+                switch nsError.code {
+                case NSURLErrorUnknown: return .failure(.invalidRequest)
+                case NSURLErrorNotConnectedToInternet, NSURLErrorDataNotAllowed: return .failure(.notConnectedToInternet)
+                case NSURLErrorTimedOut: return .failure(.timeout)
+                default: return .failure(.invalidResponse)
+                }
+            default: return .failure(.invalidResponse)
+            }
         }
         
     }

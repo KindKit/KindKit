@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension FlowOperator {
+public extension Flow.Operator {
     
     final class Sink< Input : IFlowResult > : IFlowOperator {
         
@@ -59,33 +59,33 @@ extension IFlowOperator {
         onReceiveValue: @escaping (Output.Success) -> Void,
         onReceiveError: @escaping (Output.Failure) -> Void,
         onCompleted: @escaping () -> Void
-    ) -> FlowOperator.Sink< Output > {
-        let next = FlowOperator.Sink< Output >(onReceiveValue, onReceiveError, onCompleted)
+    ) -> Flow.Operator.Sink< Output > {
+        let next = Flow.Operator.Sink< Output >(onReceiveValue, onReceiveError, onCompleted)
         self.subscribe(next: next)
         return next
     }
     
 }
 
-public extension Flow {
+public extension Flow.Builder {
     
     func sink(
         onReceiveValue: @escaping (Input.Success) -> Void = { _ in },
         onReceiveError: @escaping (Input.Failure) -> Void = { _ in },
         onCompleted: @escaping () -> Void = {}
-    ) -> FlowBuilder.Head< FlowOperator.Sink< Input > > {
+    ) -> Flow.Head.Builder< Flow.Operator.Sink< Input > > {
         return .init(head: .init(onReceiveValue, onReceiveError, onCompleted))
     }
     
 }
 
-public extension FlowBuilder.Head {
+public extension Flow.Head.Builder {
     
     func sink(
         onReceiveValue: @escaping (Head.Output.Success) -> Void = { _ in },
         onReceiveError: @escaping (Head.Output.Failure) -> Void = { _ in },
         onCompleted: @escaping () -> Void = {}
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Sink< Head.Output > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Sink< Head.Output > > {
         return .init(head: self.head, tail: self.head.sink(
             onReceiveValue: onReceiveValue,
             onReceiveError: onReceiveError,
@@ -94,13 +94,13 @@ public extension FlowBuilder.Head {
     }
 }
 
-public extension FlowBuilder.Chain {
+public extension Flow.Chain.Builder {
     
     func sink(
         onReceiveValue: @escaping (Tail.Output.Success) -> Void = { _ in },
         onReceiveError: @escaping (Tail.Output.Failure) -> Void = { _ in },
         onCompleted: @escaping () -> Void = {}
-    ) -> FlowBuilder.Chain< Head, FlowOperator.Sink< Tail.Output > > {
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Sink< Tail.Output > > {
         return .init(head: self.head, tail: self.tail.sink(
             onReceiveValue: onReceiveValue,
             onReceiveError: onReceiveError,

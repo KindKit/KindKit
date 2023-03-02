@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension DataSource {
-
-    enum Page {
+public extension Flow {
+    
+    enum Operator {
     }
     
 }

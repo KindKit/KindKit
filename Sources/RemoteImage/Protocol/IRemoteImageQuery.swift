@@ -12,11 +12,11 @@ public protocol IRemoteImageQuery : AnyObject {
     func local() throws -> Data
     
     func remote(
-        provider: IApiProvider,
+        provider: Api.Provider,
         queue: DispatchQueue,
         download: @escaping (_ progress: Progress) -> Void,
         success: @escaping (_ data: Data, _ image: UI.Image) -> Void,
-        failure: @escaping (_ error: Error) -> Void
+        failure: @escaping (_ error: RemoteImage.Error) -> Void
     ) -> ICancellable
     
 }

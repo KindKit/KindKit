@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension DataSource {
+public extension Flow.Operator {
     
-    enum Sync {
+    enum Condition {
     }
     
 }
