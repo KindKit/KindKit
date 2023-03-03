@@ -41,7 +41,10 @@ extension UI.Layout.Composition.Bubble : IUICompositionLayoutEntity {
         if size.isZero == true {
             return size
         }
-        self.bubble.layout(bounds: bounds)
+        self.bubble.layout(bounds: .init(
+            topLeft: bounds.topLeft,
+            size: size
+        ))
         return size
     }
     
@@ -54,11 +57,7 @@ extension UI.Layout.Composition.Bubble : IUICompositionLayoutEntity {
     }
     
     public func views(bounds: Rect) -> [IUIView] {
-        let views = self.content.views(bounds: bounds)
-        if views.isEmpty == true {
-            return []
-        }
-        return self.bubble.views(bounds: bounds) + views
+        return self.bubble.views(bounds: bounds) + self.content.views(bounds: bounds)
     }
     
 }

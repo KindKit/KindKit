@@ -41,7 +41,10 @@ extension UI.Layout.Composition.Overlay : IUICompositionLayoutEntity {
         if size.isZero == true {
             return size
         }
-        self.overlay.layout(bounds: bounds)
+        self.overlay.layout(bounds: .init(
+            topLeft: bounds.topLeft,
+            size: size
+        ))
         return size
     }
     
@@ -54,11 +57,7 @@ extension UI.Layout.Composition.Overlay : IUICompositionLayoutEntity {
     }
     
     public func views(bounds: Rect) -> [IUIView] {
-        let views = self.content.views(bounds: bounds)
-        if views.isEmpty == true {
-            return []
-        }
-        return views + self.overlay.views(bounds: bounds)
+        return self.content.views(bounds: bounds) + self.overlay.views(bounds: bounds)
     }
     
 }
