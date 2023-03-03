@@ -280,6 +280,18 @@ extension UI.View.RemoteImage : IUIViewTransformable {
 extension UI.View.RemoteImage : IUIViewDynamicSizeable {
 }
 
+extension UI.View.RemoteImage : IUIViewHighlightable {
+}
+
+extension UI.View.RemoteImage : IUIViewLockable {
+}
+
+extension UI.View.RemoteImage : IUIViewColorable {
+}
+
+extension UI.View.RemoteImage : IUIViewAlphable {
+}
+
 extension UI.View.RemoteImage : IRemoteImageTarget {
     
     public func remoteImage(progress: Double) {
