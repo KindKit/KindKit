@@ -96,6 +96,12 @@ extension UI.Container.Dialog {
                 switch self.state {
                 case .idle:
                     dialog.view.frame = self._idleRect(bounds: availableBounds, dialog: dialog, size: size)
+                    if let view = dialog.view as? IUIViewAlphable {
+                        view.alpha = 1
+                    }
+                    if let background = dialog.background {
+                        background.alpha = 1
+                    }
                 case .present(let progress):
                     let beginRect = self._presentRect(bounds: availableBounds, dialog: dialog, size: size)
                     let endRect = self._idleRect(bounds: availableBounds, dialog: dialog, size: size)

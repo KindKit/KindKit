@@ -335,27 +335,32 @@ extension UI.Container.Dialog {
         if let current = current {
             self._dismiss(dialog: current, animated: animated, completion: { [weak self] in
                 guard let self = self else { return }
+                self._current = next
                 self._present(dialog: next, animated: animated, completion: completion)
             })
         } else {
+            self._current = next
             self._present(dialog: next, animated: animated, completion: completion)
         }
     }
     
     func _present(dialog: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
-        self._current = dialog
         self._layout.dialogItem = dialog
-        self._layout.state = .present(progress: .zero)
         if self.isPresented == true {
+            self._layout.state = .present(progress: .zero)
             dialog.container.refreshParentInset()
-        }
-        if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareShow(interactive: false)
-            if self.isPresented == true && animated == true {
-                let size = self._layout._size(dialog: dialog, size: dialogSize)
+            if animated == true {
+                let duration: TimeInterval
+                if let dialogSize = self._layout.dialogSize {
+                    let size = self._layout._size(dialog: dialog, size: dialogSize)
+                    duration = TimeInterval(size / self.animationVelocity)
+                } else {
+                    duration = 0.0
+                }
                 self._animation = Animation.default.run(
                     .custom(
-                        duration: TimeInterval(size / self.animationVelocity),
+                        duration: duration,
                         ease: Animation.Ease.QuadraticInOut(),
                         preparing: { [weak self] in
                             guard let self = self else { return }
@@ -383,8 +388,9 @@ extension UI.Container.Dialog {
                     )
                 )
             } else {
-                dialog.container.finishShow(interactive: false)
                 self._layout.state = .idle
+                self._layout.updateIfNeeded()
+                dialog.container.finishShow(interactive: false)
                 self.refreshContentInset()
 #if os(iOS)
                 self.refreshOrientations()
@@ -394,43 +400,42 @@ extension UI.Container.Dialog {
             }
         } else {
             self._layout.state = .idle
-            self._layout.dialogItem = nil
-            self.refreshContentInset()
-#if os(iOS)
-            self.refreshOrientations()
-            self.refreshStatusBar()
-#endif
-            completion?()
         }
     }
     
     func _dismiss(current: UI.Container.DialogItem, previous: UI.Container.DialogItem?, animated: Bool, completion: (() -> Void)?) {
         self._dismiss(dialog: current, animated: animated, completion: { [weak self] in
             guard let self = self else { return }
-            self._current = previous
             if let previous = previous {
+                self._current = previous
                 self._present(dialog: previous, animated: animated, completion: completion)
             } else  if self._current == nil && self._items.isEmpty == false {
+                self._current = self._items[0]
                 self._present(dialog: self._items[0], animated: animated, completion: completion)
             } else {
+                self._current = nil
                 completion?()
             }
         })
     }
     
     func _dismiss(dialog: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
-        self._layout.dialogItem = dialog
-        self._layout.state = .dismiss(progress: .zero)
         if self.isPresented == true {
+            self._layout.dialogItem = dialog
+            self._layout.state = .dismiss(progress: .zero)
             dialog.container.refreshParentInset()
-        }
-        if let dialogSize = self._layout.dialogSize {
             dialog.container.prepareHide(interactive: false)
-            if self.isPresented == true && animated == true {
-                let size = self._layout._size(dialog: dialog, size: dialogSize)
+            if animated == true {
+                let duration: TimeInterval
+                if let dialogSize = self._layout.dialogSize {
+                    let size = self._layout._size(dialog: dialog, size: dialogSize)
+                    duration = TimeInterval(size / self.animationVelocity)
+                } else {
+                    duration = 0.0
+                }
                 self._animation = Animation.default.run(
                     .custom(
-                        duration: TimeInterval(size / self.animationVelocity),
+                        duration: duration,
                         ease: Animation.Ease.QuadraticInOut(),
                         preparing: { [weak self] in
                             guard let self = self else { return }
@@ -459,9 +464,10 @@ extension UI.Container.Dialog {
                     )
                 )
             } else {
-                dialog.container.finishHide(interactive: false)
-                self._layout.state = .idle
                 self._layout.dialogItem = nil
+                self._layout.state = .idle
+                self._layout.updateIfNeeded()
+                dialog.container.finishHide(interactive: false)
                 self.refreshContentInset()
 #if os(iOS)
                 self.refreshOrientations()
@@ -470,14 +476,8 @@ extension UI.Container.Dialog {
                 completion?()
             }
         } else {
-            self._layout.state = .idle
             self._layout.dialogItem = nil
-            self.refreshContentInset()
-#if os(iOS)
-            self.refreshOrientations()
-            self.refreshStatusBar()
-#endif
-            completion?()
+            self._layout.state = .idle
         }
     }
     

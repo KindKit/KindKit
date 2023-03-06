@@ -144,6 +144,14 @@ public extension UI.Image {
 
 public extension UI.Image {
     
+    func compare(
+        expected: UI.Image,
+        tolerance: Double
+    ) -> Bool {
+        guard let origin = self.cgImage, let expected = expected.cgImage else { return false }
+        return origin.kk_compare(expected: expected, tolerance: CGFloat(tolerance))
+    }
+    
     func pngData() -> Data? {
         return self.native.pngData()
     }
