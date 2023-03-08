@@ -23,7 +23,8 @@ public extension UI.Screen.Modal.Presentation {
         detents: [UI.Size.Dynamic.Dimension] = [ .fit ],
         preferredDetent: UI.Size.Dynamic.Dimension? = nil,
         background: IUIView & IUIViewAlphable,
-        grabber: IUIView? = nil
+        grabber: IUIView? = nil,
+        grabberInset: Inset = .init(horizontal: 8, vertical: 8)
     ) -> Self {
         return .sheet(UI.Modal.Presentation.Sheet(
             inset: inset,
@@ -31,7 +32,8 @@ public extension UI.Screen.Modal.Presentation {
             detents: detents,
             preferredDetent: preferredDetent,
             background: background,
-            grabber: grabber
+            grabber: grabber,
+            grabberInset: grabberInset
         ))
     }
     

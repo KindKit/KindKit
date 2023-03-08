@@ -357,7 +357,7 @@ private extension UI.Container.Modal {
                 guard current.container.shouldInteractive == true else { return false }
                 if let sheet = current.sheet {
                     if let grabber = sheet.grabber {
-                        if $0._interactiveGesture.contains(in: grabber) == true {
+                        if $0._interactiveGesture.contains(in: grabber, inset: sheet.grabberInset) == true {
                             return true
                         }
                     }

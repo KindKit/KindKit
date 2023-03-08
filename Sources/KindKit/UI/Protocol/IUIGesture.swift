@@ -52,23 +52,30 @@ public protocol IUIGesture : AnyObject {
 }
 
 public extension IUIGesture {
-    
-    @discardableResult
-    func enabled(_ value: Bool) -> Self {
-        self.isEnabled = value
-        return self
-    }
 
-
-    func contains(in view: IUIView) -> Bool {
+    func contains(
+        in view: IUIView,
+        inset: Inset = .zero
+    ) -> Bool {
         let location = self.location(in: view)
-        return view.bounds.isContains(location)
+        let bounds = view.bounds.inset(-inset)
+        return bounds.isContains(location)
     }
 
     func location(in view: IUIView) -> Point {
         return Point(self.native.location(in: view.native))
     }
 
+}
+
+public extension IUIGesture {
+    
+    @discardableResult
+    func enabled(_ value: Bool) -> Self {
+        self.isEnabled = value
+        return self
+    }
+    
 }
 
 #if os(macOS)
