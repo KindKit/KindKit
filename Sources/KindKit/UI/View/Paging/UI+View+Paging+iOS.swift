@@ -48,6 +48,7 @@ final class KKPagingView : UIScrollView {
             let oldValue = super.frame
             if oldValue != newValue {
                 let oldContentOffset = self.contentOffset
+                let oldContentInset = self.contentInset
                 let oldContentSize = self.contentSize
                 super.frame = newValue
                 if oldValue.size != newValue.size {
@@ -55,6 +56,7 @@ final class KKPagingView : UIScrollView {
                         self._revalidatePage = Self._currentPage(
                             viewportSize: oldValue.size,
                             contentOffset: oldContentOffset,
+                            contentInset: oldContentInset,
                             contentSize: oldContentSize
                         )
                     }
@@ -132,15 +134,22 @@ final class KKPagingView : UIScrollView {
                     	size: bounds.size
                 	)
                 }
+                let contentInset = self.contentInset
                 self._layoutManager.layout(bounds: layoutBounds)
                 let size = self._layoutManager.size
                 self.contentSize = size.cgSize
-                self.kkDelegate?.update(self, numberOfPages: Self._numberOfPages(bounds: bounds, contentSize: size), contentSize: size)
+                let numberOfPages = Self._numberOfPages(
+                    viewportSize: bounds.size,
+                    contentInset: contentInset,
+                    contentSize: size
+                )
+                self.kkDelegate?.update(self, numberOfPages: numberOfPages, contentSize: size)
                 if let page = self._revalidatePage {
                     UIView.performWithoutAnimation({
                         self.contentOffset = Self._contentOffset(
                             currentPage: page,
                             viewportSize: bounds.size,
+                            contentInset: contentInset,
                             contentSize: size
                         )
                     })
@@ -218,6 +227,7 @@ extension KKPagingView {
                 direction: direction,
                 currentPage: currentPage,
                 numberOfPages: numberOfPages,
+                contentInset: self.contentInset,
                 contentSize: self.contentSize
             )
         }
@@ -249,6 +259,7 @@ private extension KKPagingView {
         direction: UI.View.Paging.Direction,
         currentPage: Double,
         numberOfPages: UInt,
+        contentInset: UIEdgeInsets,
         contentSize: CGSize
     ) -> CGPoint {
         if currentPage > .leastNonzeroMagnitude {
@@ -257,22 +268,32 @@ private extension KKPagingView {
                 let s = contentSize.width
                 if s > .leastNonzeroMagnitude {
                     let p = s / CGFloat(numberOfPages)
-                    return CGPoint(x: p * CGFloat(currentPage), y: 0)
+                    return CGPoint(
+                        x: -contentInset.left + (p * CGFloat(currentPage)),
+                        y: -contentInset.top
+                    )
                 }
             case .vertical:
                 let s = contentSize.height
                 if s > .leastNonzeroMagnitude {
                     let p = s / CGFloat(numberOfPages)
-                    return CGPoint(x: 0, y: p * CGFloat(currentPage))
+                    return CGPoint(
+                        x: -contentInset.left,
+                        y: -contentInset.top + (p * CGFloat(currentPage))
+                    )
                 }
             }
         }
-        return .zero
+        return CGPoint(
+            x: -contentInset.left,
+            y: -contentInset.top
+        )
     }
     
     static func _contentOffset(
         currentPage: Double,
         viewportSize: Size,
+        contentInset: UIEdgeInsets,
         contentSize: Size
     ) -> CGPoint {
         if currentPage > .leastNonzeroMagnitude {
@@ -280,40 +301,51 @@ private extension KKPagingView {
                 let s = contentSize.width
                 if s > .leastNonzeroMagnitude {
                     let p = s / (contentSize.width / viewportSize.width)
-                    return CGPoint(x: CGFloat(p * currentPage), y: 0)
+                    return CGPoint(
+                        x: -contentInset.left + (CGFloat(p * currentPage)),
+                        y: -contentInset.top
+                    )
                 }
             } else if contentSize.height > viewportSize.height {
                 let s = contentSize.height
                 if s > .leastNonzeroMagnitude {
                     let p = s / (contentSize.height / viewportSize.height)
-                    return CGPoint(x: 0, y: CGFloat(p * currentPage))
+                    return CGPoint(
+                        x: -contentInset.left,
+                        y: -contentInset.top + (CGFloat(p * currentPage))
+                    )
                 }
             }
         }
-        return .zero
+        return CGPoint(
+            x: -contentInset.left,
+            y: -contentInset.top
+        )
     }
     
     static func _currentPage(
         viewportSize: CGSize,
         contentOffset: CGPoint,
+        contentInset: UIEdgeInsets,
         contentSize: CGSize
     ) -> Double {
         if contentSize.width > viewportSize.width {
-            return Double(contentOffset.x / viewportSize.width)
+            return Double((-contentInset.left + contentOffset.x) / viewportSize.width)
         } else if contentSize.height > viewportSize.height {
-            return Double(contentOffset.y / viewportSize.height)
+            return Double((-contentInset.top + contentOffset.y) / viewportSize.height)
         }
         return 0
     }
     
     static func _numberOfPages(
-        bounds: Rect,
+        viewportSize: Size,
+        contentInset: UIEdgeInsets,
         contentSize: Size
     ) -> UInt {
-        if contentSize.width > bounds.width {
-            return UInt(contentSize.width / bounds.width)
-        } else if contentSize.height > bounds.height {
-            return UInt(contentSize.height / bounds.height)
+        if contentSize.width > viewportSize.width {
+            return UInt(contentSize.width / viewportSize.width)
+        } else if contentSize.height > viewportSize.height {
+            return UInt(contentSize.height / viewportSize.height)
         }
         return 1
     }
@@ -330,6 +362,7 @@ extension KKPagingView : UIScrollViewDelegate {
         let currentPage = Self._currentPage(
             viewportSize: self.bounds.size,
             contentOffset: self.contentOffset,
+            contentInset: self.contentInset,
             contentSize: self.contentSize
         )
         self.kkDelegate?.dragging(self, currentPage: currentPage)
