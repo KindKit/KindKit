@@ -129,29 +129,18 @@ private extension KKAttributedTextView {
     
     func _tapAttributes() -> [NSAttributedString.Key: Any]? {
         let layoutManager = NSLayoutManager()
-        let textContainer = NSTextContainer(size: CGSize.zero)
-        let textStorage = NSTextStorage(attributedString: self.attributedText!)
         
+        let textContainer = NSTextContainer(size: self.bounds.size)
+        textContainer.maximumNumberOfLines = self.numberOfLines
+        textContainer.lineBreakMode = self.lineBreakMode
+        textContainer.lineFragmentPadding = 0.0
         layoutManager.addTextContainer(textContainer)
+        
+        let textStorage = NSTextStorage(attributedString: self.attributedText!)
         textStorage.addLayoutManager(layoutManager)
         
-        textContainer.lineFragmentPadding = 0.0
-        textContainer.lineBreakMode = self.lineBreakMode
-        textContainer.maximumNumberOfLines = self.numberOfLines
-        let labelSize = self.bounds.size
-        textContainer.size = labelSize
-        
-        let locationOfTouchInLabel = self._tapGesture.location(in: self)
-        let textBoundingBox = layoutManager.usedRect(for: textContainer)
-        let textContainerOffset = CGPoint(
-            x: (labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
-            y: (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
-        )
-        let locationOfTouchInTextContainer = CGPoint(
-            x: locationOfTouchInLabel.x - textContainerOffset.x,
-            y: locationOfTouchInLabel.y - textContainerOffset.y
-        )
-        let indexOfCharacter = layoutManager.characterIndex(for: locationOfTouchInTextContainer, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+        let location = self._tapGesture.location(in: self)
+        let indexOfCharacter = layoutManager.characterIndex(for: location, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
         if indexOfCharacter >= textStorage.string.count {
             return nil
         }
