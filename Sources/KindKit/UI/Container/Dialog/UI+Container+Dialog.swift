@@ -255,6 +255,7 @@ public extension UI.Container {
             let item = UI.Container.DialogItem(container, self._view.bounds.size)
             self._items.append(item)
             if self._current == nil && self._animation == nil {
+                self._current = item
                 self._present(dialog: item, animated: animated, completion: completion)
             } else {
                 completion?()
@@ -330,6 +331,7 @@ extension UI.Container.Dialog {
     func _destroy() {
         self._animation = nil
     }
+    
     
     func _present(current: UI.Container.DialogItem?, next: UI.Container.DialogItem, animated: Bool, completion: (() -> Void)?) {
         if let current = current {
