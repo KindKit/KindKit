@@ -7,12 +7,12 @@ import Foundation
 public extension NSAttributedString {
     
     @inlinable
-    func kk_size(numberOfLines: UInt, available: Size) -> Size {
+    func kk_size(numberOfLines: UInt, available: CGSize) -> CGSize {
         let textStorage = NSTextStorage(attributedString: self)
 #if os(macOS)
-        let textContainer = NSTextContainer(containerSize: available.cgSize)
+        let textContainer = NSTextContainer(containerSize: available)
 #elseif os(iOS)
-        let textContainer = NSTextContainer(size: available.cgSize)
+        let textContainer = NSTextContainer(size: available)
 #endif
         textContainer.lineFragmentPadding = 0
         textContainer.maximumNumberOfLines = Int(numberOfLines)
@@ -25,7 +25,12 @@ public extension NSAttributedString {
             return .zero
         }
         let bounding = layoutManager.usedRect(for: textContainer)
-        return .init(bounding.size)
+        return bounding.size
+    }
+    
+    @inlinable
+    func kk_size(numberOfLines: UInt, available: Size) -> Size {
+        return .init(self.kk_size(numberOfLines: numberOfLines, available: available.cgSize))
     }
     
 }

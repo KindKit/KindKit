@@ -14,7 +14,7 @@ extension UI.View.Input.Secure {
         typealias Content = KKInputSecureView
 
         static var reuseIdentificator: String {
-            return "InputSecureView"
+            return "UI.View.Input.Secure"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -74,6 +74,68 @@ final class KKInputSecureView : UITextField {
         return bounds.inset(by: inset)
     }
 
+}
+
+extension KKInputSecureView {
+    
+    final class KKAccessoryView : UIInputView {
+        
+        weak var kkInput: KKInputDateView?
+        var kkToolbarView: UIView? {
+            willSet {
+                guard self.kkToolbarView !== newValue else { return }
+                self.kkToolbarView?.removeFromSuperview()
+            }
+            didSet {
+                guard self.kkToolbarView !== oldValue else { return }
+                if let view = self.kkToolbarView {
+                    self.addSubview(view)
+                }
+                self.kkInput?.reloadInputViews()
+            }
+        }
+        var kkContentViews: [UIView] {
+            var views: [UIView] = []
+            if let view = self.kkToolbarView {
+                views.append(view)
+            }
+            return views
+        }
+        var kkHeight: CGFloat {
+            var result: CGFloat = 0
+            for subview in self.kkContentViews {
+                result += subview.frame.height
+            }
+            return result
+        }
+        
+        init(frame: CGRect) {
+            super.init(frame: frame, inputViewStyle: .keyboard)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            let bounds = self.bounds
+            var offset: CGFloat = 0
+            for subview in self.kkContentViews {
+                let height = subview.frame.height
+                subview.frame = CGRect(
+                    x: bounds.origin.x,
+                    y: offset,
+                    width: bounds.size.width,
+                    height: height
+                )
+                offset += height
+            }
+        }
+        
+    }
+    
 }
 
 extension KKInputSecureView {

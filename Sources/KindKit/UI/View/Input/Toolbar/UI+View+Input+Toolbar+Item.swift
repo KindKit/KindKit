@@ -6,7 +6,7 @@
 
 import UIKit
 
-public protocol IInputToolbarItem {
+public protocol IInputToolbarItem : AnyObject {
     
     var barItem: UIBarButtonItem { get }
     

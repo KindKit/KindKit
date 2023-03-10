@@ -8,25 +8,40 @@ import Foundation
 
 public protocol IInputListItem : AnyObject {
     
+    var id: String { get }
     var title: String { get }
     
 }
 
 public extension UI.View.Input.List {
     
-    final class Item< Value > : IInputListItem {
+    final class Item : IInputListItem {
         
+        public let id: String
         public let title: String
-        public let value: Value
         
         public init(
-            title: String,
-            value: Value
+            id: String = UUID().uuidString,
+            title: String
         ) {
+            self.id = id
             self.title = title
-            self.value = value
         }
         
+    }
+    
+}
+
+public extension IInputListItem where Self == UI.View.Input.List.Item {
+    
+    static func item(
+        id: String = UUID().uuidString,
+        title: String
+    ) -> Self {
+        return .init(
+            id: id,
+            title: title
+        )
     }
     
 }

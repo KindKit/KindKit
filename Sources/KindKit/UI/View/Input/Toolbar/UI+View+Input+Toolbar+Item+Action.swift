@@ -8,67 +8,200 @@ import UIKit
 
 public extension UI.View.Input.Toolbar.Item {
     
-    struct Action : IInputToolbarItem {
+    final class Action : IInputToolbarItem {
         
-        public var barItem: UIBarButtonItem
-        public var callback: () -> Void
+        public let barItem: UIBarButtonItem
+        public let onPressed: Signal.Empty< Void > = .init()
         
         public init(
-            text: String,
-            callback: @escaping () -> Void
+            plain text: String
         ) {
-            self.callback = callback
             self.barItem = UIBarButtonItem(title: text, style: .plain, target: nil, action: nil)
         }
         
         public init(
-            image: UI.Image,
-            callback: @escaping () -> Void
+            bold text: String
         ) {
-            self.callback = callback
+            self.barItem = UIBarButtonItem(title: text, style: .done, target: nil, action: nil)
+        }
+        
+        public init(
+            image: UI.Image
+        ) {
             self.barItem = UIBarButtonItem(image: image.native, style: .plain, target: nil, action: nil)
         }
         
         public init(
-            system: UIBarButtonItem.SystemItem,
-            callback: @escaping () -> Void
+            item: UIBarButtonItem.SystemItem
         ) {
-            self.callback = callback
-            self.barItem = UIBarButtonItem(barButtonSystemItem: system, target: nil, action: nil)
+            self.barItem = UIBarButtonItem(barButtonSystemItem: item, target: nil, action: nil)
         }
         
         public func pressed() {
-            self.callback()
+            self.onPressed.emit()
         }
         
     }
     
 }
 
-public extension IInputToolbarItem {
+public extension UI.View.Input.Toolbar.Item.Action {
     
     @inlinable
-    static func action(
-        text: String,
-        callback: @escaping () -> Void
-    ) -> UI.View.Input.Toolbar.Item.Action {
-        return UI.View.Input.Toolbar.Item.Action(text: text, callback: callback)
+    @discardableResult
+    func onPressed(_ closure: (() -> Void)?) -> Self {
+        self.onPressed.link(closure)
+        return self
     }
     
     @inlinable
-    static func action(
-        image: UI.Image,
-        callback: @escaping () -> Void
-    ) -> UI.View.Input.Toolbar.Item.Action {
-        return UI.View.Input.Toolbar.Item.Action(image: image, callback: callback)
+    @discardableResult
+    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+        self.onPressed.link(self, closure)
+        return self
     }
     
     @inlinable
-    static func action(
-        system: UIBarButtonItem.SystemItem,
-        callback: @escaping () -> Void
+    @discardableResult
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+        self.onPressed.link(sender, closure)
+        return self
+    }
+    
+}
+
+public extension IInputToolbarItem where Self == UI.View.Input.Toolbar.Item.Action {
+    
+    @inlinable
+    static func plain(
+        _ text: String
     ) -> UI.View.Input.Toolbar.Item.Action {
-        return UI.View.Input.Toolbar.Item.Action(system: system, callback: callback)
+        return UI.View.Input.Toolbar.Item.Action(plain: text)
+    }
+    
+    @inlinable
+    static func bold(
+        _ text: String
+    ) -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(bold: text)
+    }
+    
+    @inlinable
+    static func image(
+        _ image: UI.Image
+    ) -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(image: image)
+    }
+    
+    @inlinable
+    static func done() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .done)
+    }
+    
+    @inlinable
+    static func cancel() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .cancel)
+    }
+    
+    @inlinable
+    static func edit() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .edit)
+    }
+    
+    @inlinable
+    static func save() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .save)
+    }
+    
+    @inlinable
+    static func add() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .add)
+    }
+    
+    @inlinable
+    static func compose() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .compose)
+    }
+    
+    @inlinable
+    static func reply() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .reply)
+    }
+    
+    @inlinable
+    static func action() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .action)
+    }
+    
+    @inlinable
+    static func organize() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .organize)
+    }
+    
+    @inlinable
+    static func bookmarks() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .bookmarks)
+    }
+    
+    @inlinable
+    static func search() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .search)
+    }
+    
+    @inlinable
+    static func refresh() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .refresh)
+    }
+    
+    @inlinable
+    static func stop() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .stop)
+    }
+    
+    @inlinable
+    static func camera() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .camera)
+    }
+    
+    @inlinable
+    static func trash() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .trash)
+    }
+    
+    @inlinable
+    static func play() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .play)
+    }
+    
+    @inlinable
+    static func pause() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .pause)
+    }
+    
+    @inlinable
+    static func rewind() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .rewind)
+    }
+    
+    @inlinable
+    static func fastForward() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .fastForward)
+    }
+    
+    @inlinable
+    static func undo() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .undo)
+    }
+    
+    @inlinable
+    static func redo() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .redo)
+    }
+    
+    @inlinable
+    @available(iOS 13.0, *)
+    static func close() -> UI.View.Input.Toolbar.Item.Action {
+        return UI.View.Input.Toolbar.Item.Action(item: .close)
     }
     
 }

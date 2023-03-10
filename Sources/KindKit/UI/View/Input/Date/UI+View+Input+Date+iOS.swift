@@ -14,7 +14,7 @@ extension UI.View.Input.Date {
         typealias Content = KKInputDateView
 
         static var reuseIdentificator: String {
-            return "InputDateView"
+            return "UI.View.Input.Date"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -36,13 +36,14 @@ extension UI.View.Input.Date {
 final class KKInputDateView : UITextField {
     
     weak var kkDelegate: KKInputDateViewDelegate?
+    let kkAccessoryView: KKAccessoryView
     var kkFormatter: DateFormatter? {
         didSet {
             guard self.kkFormatter != oldValue else { return }
             if let formatter = self.kkFormatter {
-                self._picker.calendar = formatter.calendar
-                self._picker.locale = formatter.locale
-                self._picker.timeZone = formatter.timeZone
+                self.kkPicker.calendar = formatter.calendar
+                self.kkPicker.locale = formatter.locale
+                self.kkPicker.timeZone = formatter.timeZone
             }
             self._applyText()
         }
@@ -51,7 +52,7 @@ final class KKInputDateView : UITextField {
         didSet {
             guard self.kkSelected != oldValue else { return }
             if let selected = self.kkSelected {
-                self._picker.date = selected
+                self.kkPicker.date = selected
             }
             self._applyText()
         }
@@ -69,25 +70,44 @@ final class KKInputDateView : UITextField {
         }
     }
 
-    private var _picker: UIDatePicker
+    private var kkPicker: UIDatePicker
     
     override init(frame: CGRect) {
-        self._picker = UIDatePicker()
+        self.kkAccessoryView = .init(
+            frame: .init(
+                x: 0,
+                y: 0,
+                width: UIScreen.main.bounds.width,
+                height: 0
+            )
+        )
+        self.kkPicker = UIDatePicker()
 
         super.init(frame: frame)
-
+        
+        self.kkAccessoryView.kkInput = self
+        self.inputAccessoryView = self.kkAccessoryView
         self.clipsToBounds = true
         self.delegate = self
         
         if #available(iOS 13.4, *) {
-            self._picker.preferredDatePickerStyle = .wheels
+            self.kkPicker.preferredDatePickerStyle = .wheels
         }
-        self._picker.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
-        self.inputView = self._picker
+        self.kkPicker.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
+        self.inputView = self.kkPicker
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func reloadInputViews() {
+        do {
+            let width = UIScreen.main.bounds.width
+            let height = self.kkAccessoryView.kkHeight
+            self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        }
+        super.reloadInputViews()
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
@@ -101,6 +121,68 @@ final class KKInputDateView : UITextField {
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         let inset = self.kkPlaceholderInset ?? self.kkTextInset
         return bounds.inset(by: inset)
+    }
+    
+}
+
+extension KKInputDateView {
+    
+    final class KKAccessoryView : UIInputView {
+        
+        weak var kkInput: KKInputDateView?
+        var kkToolbarView: UIView? {
+            willSet {
+                guard self.kkToolbarView !== newValue else { return }
+                self.kkToolbarView?.removeFromSuperview()
+            }
+            didSet {
+                guard self.kkToolbarView !== oldValue else { return }
+                if let view = self.kkToolbarView {
+                    self.addSubview(view)
+                }
+                self.kkInput?.reloadInputViews()
+            }
+        }
+        var kkContentViews: [UIView] {
+            var views: [UIView] = []
+            if let view = self.kkToolbarView {
+                views.append(view)
+            }
+            return views
+        }
+        var kkHeight: CGFloat {
+            var result: CGFloat = 0
+            for subview in self.kkContentViews {
+                result += subview.frame.height
+            }
+            return result
+        }
+        
+        init(frame: CGRect) {
+            super.init(frame: frame, inputViewStyle: .keyboard)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            let bounds = self.bounds
+            var offset: CGFloat = 0
+            for subview in self.kkContentViews {
+                let height = subview.frame.height
+                subview.frame = CGRect(
+                    x: bounds.origin.x,
+                    y: offset,
+                    width: bounds.size.width,
+                    height: height
+                )
+                offset += height
+            }
+        }
+        
     }
     
 }
@@ -134,7 +216,7 @@ extension KKInputDateView {
     }
     
     func update(mode: UI.View.Input.Date.Mode) {
-        self._picker.datePickerMode = mode.datePickerMode
+        self.kkPicker.datePickerMode = mode.datePickerMode
     }
     
     func update(formatter: DateFormatter) {
@@ -142,11 +224,11 @@ extension KKInputDateView {
     }
     
     func update(minimum: Foundation.Date?) {
-        self._picker.minimumDate = minimum
+        self.kkPicker.minimumDate = minimum
     }
     
     func update(maximum: Foundation.Date?) {
-        self._picker.maximumDate = maximum
+        self.kkPicker.maximumDate = maximum
     }
     
     func update(selected: Foundation.Date?) {
@@ -185,7 +267,7 @@ extension KKInputDateView {
     }
     
     func update(toolbar: UI.View.Input.Toolbar?) {
-        self.inputAccessoryView = toolbar?.native
+        self.kkAccessoryView.kkToolbarView = toolbar?.native
     }
     
     func cleanup() {
@@ -216,7 +298,7 @@ extension KKInputDateView : UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         self.kkDelegate?.beginEditing(self)
         if self.kkSelected == nil {
-            self.kkDelegate?.select(self, date: self._picker.date)
+            self.kkDelegate?.select(self, date: self.kkPicker.date)
         }
     }
     

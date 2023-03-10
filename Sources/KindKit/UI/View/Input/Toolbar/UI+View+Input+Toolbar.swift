@@ -32,35 +32,11 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var isTranslucent: Bool = false {
+        public var tintColor: UI.Color? = .white {
             didSet {
-                guard self.isTranslucent != oldValue else { return }
+                guard self.tintColor != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(translucent: self.isTranslucent)
-                }
-            }
-        }
-        public var barTintColor: UI.Color? {
-            didSet {
-                guard self.barTintColor != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(barTintColor: self.barTintColor)
-                }
-            }
-        }
-        public var contentTintColor: UI.Color = .white {
-            didSet {
-                guard self.contentTintColor != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(contentTintColor: self.contentTintColor)
-                }
-            }
-        }
-        public var color: UI.Color? {
-            didSet {
-                guard self.color != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.update(tintColor: self.tintColor)
                 }
             }
         }
@@ -94,27 +70,6 @@ public extension UI.View.Input.Toolbar {
     @discardableResult
     func size(available value: Double) -> Self {
         self.size = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func translucent(_ value: Bool) -> Self {
-        self.isTranslucent = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func barTintColor(_ value: UI.Color?) -> Self {
-        self.barTintColor = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func contentTintColor(_ value: UI.Color) -> Self {
-        self.contentTintColor = value
         return self
     }
     
@@ -173,7 +128,7 @@ extension UI.View.Input.Toolbar : IUIViewReusable {
     
 }
 
-extension UI.View.Input.Toolbar : IUIViewColorable {
+extension UI.View.Input.Toolbar : IUIViewTintColorable {
 }
 
 extension UI.View.Input.Toolbar : KKInputToolbarViewDelegate {

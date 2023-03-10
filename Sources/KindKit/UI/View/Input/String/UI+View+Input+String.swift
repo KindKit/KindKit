@@ -14,6 +14,7 @@ protocol KKInputStringViewDelegate : AnyObject {
     func editing(_ view: KKInputStringView, text: String)
     func endEditing(_ view: KKInputStringView)
     func pressedReturn(_ view: KKInputStringView)
+    func pressed(_ view: KKInputStringView, suggestion: String)
     
 }
 
@@ -125,11 +126,19 @@ public extension UI.View.Input {
             didSet {
                 guard self.keyboard != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(keyboard: self.keyboard)
+                    self._view.update(keyboard: self.keyboard, suggestion: self.suggestion)
                 }
             }
         }
 #endif
+        public var suggestion: IInputSuggestion? {
+            didSet {
+                guard self.toolbar !== oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(keyboard: self.keyboard, suggestion: self.suggestion)
+                }
+            }
+        }
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
@@ -146,6 +155,7 @@ public extension UI.View.Input {
         public let onEditing: Signal.Empty< Void > = .init()
         public let onEndEditing: Signal.Empty< Void > = .init()
         public let onPressedReturn: Signal.Empty< Void > = .init()
+        public let onSuggestion: Signal.Args< Void, Swift.String > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -237,6 +247,13 @@ public extension UI.View.Input.String {
     
 #endif
     
+    @inlinable
+    @discardableResult
+    func suggestion(_ value: IInputSuggestion?) -> Self {
+        self.suggestion = value
+        return self
+    }
+    
 }
 
 public extension UI.View.Input.String {
@@ -259,6 +276,27 @@ public extension UI.View.Input.String {
     @discardableResult
     func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
         self.onPressedReturn.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onSuggestion(_ closure: ((Swift.String) -> Void)?) -> Self {
+        self.onSuggestion.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onSuggestion(_ closure: ((Self, Swift.String) -> Void)?) -> Self {
+        self.onSuggestion.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Swift.String) -> Void)?) -> Self {
+        self.onSuggestion.link(sender, closure)
         return self
     }
     
@@ -390,6 +428,11 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
     
     func pressedReturn(_ view: KKInputStringView) {
         self.onPressedReturn.emit()
+    }
+    
+    func pressed(_ view: KKInputStringView, suggestion: String) {
+        self.editing(view, text: suggestion)
+        self.onSuggestion.emit(suggestion)
     }
     
 }

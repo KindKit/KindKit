@@ -14,7 +14,7 @@ extension UI.View.Input.Toolbar {
         typealias Content = KKInputToolbarView
 
         static var reuseIdentificator: String {
-            return "InputToolbarView"
+            return "UI.View.Input.Toolbar"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -40,11 +40,14 @@ extension UI.View.Input.Toolbar {
 
 final class KKInputToolbarView : UIToolbar {
     
-    private var kkDelegate: KKInputToolbarViewDelegate?
+    weak var kkDelegate: KKInputToolbarViewDelegate?
             
     override init(frame: CGRect) {
         super.init(frame: frame)
 
+        self.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+        self.backgroundColor = .clear
+        self.isTranslucent = true
         self.clipsToBounds = true
     }
     
@@ -59,10 +62,7 @@ extension KKInputToolbarView {
     func update(view: UI.View.Input.Toolbar) {
         self.update(items: view.items)
         self.update(size: view.size)
-        self.update(translucent: view.isTranslucent)
-        self.update(barTintColor: view.barTintColor)
-        self.update(contentTintColor: view.contentTintColor)
-        self.update(color: view.color)
+        self.update(tintColor: view.tintColor)
         self.kkDelegate = view
     }
     
@@ -76,29 +76,18 @@ extension KKInputToolbarView {
     }
     
     func update(size: Double) {
+        let bounds = self.bounds
         self.frame = CGRect(
-            origin: frame.origin,
+            origin: bounds.origin,
             size: CGSize(
-                width: frame.width,
+                width: bounds.width,
                 height: CGFloat(size)
             )
         )
     }
     
-    func update(translucent: Bool) {
-        self.isTranslucent = translucent
-    }
-    
-    func update(barTintColor: UI.Color?) {
-        self.barTintColor = barTintColor?.native
-    }
-    
-    func update(contentTintColor: UI.Color) {
-        self.tintColor = contentTintColor.native
-    }
-    
-    func update(color: UI.Color?) {
-        self.backgroundColor = color?.native
+    func update(tintColor: UI.Color?) {
+        self.tintColor = tintColor?.native
     }
     
     func cleanup() {

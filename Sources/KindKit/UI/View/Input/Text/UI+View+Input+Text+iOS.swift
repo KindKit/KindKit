@@ -14,7 +14,7 @@ extension UI.View.Input.Text {
         typealias Content = KKInputTextView
 
         static var reuseIdentificator: String {
-            return "InputTextView"
+            return "UI.View.Input.Text"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -35,11 +35,35 @@ extension UI.View.Input.Text {
 
 final class KKInputTextView : UIView {
     
+    weak var kkDelegate: KKInputTextViewDelegate?
+    var kkPlaceholder: UILabel
+    var kkPlaceholderInset: UIEdgeInsets? {
+        didSet {
+            guard self.kkPlaceholderInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+    var kkInput: KKInputView
+    var kkInputInset: UIEdgeInsets = .zero {
+        didSet {
+            guard self.kkInputInset != oldValue else { return }
+            self.kkInput.textContainerInset = self.kkInputInset
+            self.setNeedsLayout()
+        }
+    }
+    var kkInputTextHeight: CGFloat? {
+        didSet {
+            guard self.kkInputTextHeight != oldValue else { return }
+            if let height = self.kkInputTextHeight {
+                self.kkDelegate?.change(self, textHeight: Double(height))
+            }
+        }
+    }
     override var canBecomeFirstResponder: Bool {
-        return self._input.canBecomeFirstResponder
+        return self.kkInput.canBecomeFirstResponder
     }
     override var canResignFirstResponder: Bool {
-        return self._input.canResignFirstResponder
+        return self.kkInput.canResignFirstResponder
     }
     override var frame: CGRect {
         didSet {
@@ -48,49 +72,20 @@ final class KKInputTextView : UIView {
         }
     }
     
-    private weak var _delegate: KKInputTextViewDelegate?
-    private var _placeholder: UILabel
-    private var _placeholderInset: UIEdgeInsets? {
-        didSet {
-            guard self._placeholderInset != oldValue else { return }
-            self.setNeedsLayout()
-        }
-    }
-    private var _input: UITextView
-    private var _inputInset: UIEdgeInsets = .zero {
-        didSet {
-            guard self._inputInset != oldValue else { return }
-            self._input.textContainerInset = self._inputInset
-            self.setNeedsLayout()
-        }
-    }
-    private var _inputTextHeight: CGFloat? {
-        didSet {
-            guard self._inputTextHeight != oldValue else { return }
-            if let height = self._inputTextHeight {
-                self._delegate?.change(self, textHeight: Double(height))
-            }
-        }
-    }
-    
     override init(frame: CGRect) {
-        self._placeholder = UILabel()
-        self._placeholder.isHidden = true
+        self.kkPlaceholder = UILabel()
+        self.kkPlaceholder.isHidden = true
 
-        self._input = UITextView()
-        self._input.textContainerInset = .zero
-        self._input.backgroundColor = .clear
-        self._input.textContainer.lineFragmentPadding = 0
-        self._input.layoutManager.usesFontLeading = true
+        self.kkInput = KKInputView()
 
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self.addSubview(self._placeholder)
+        self.addSubview(self.kkPlaceholder)
         
-        self._input.delegate = self
-        self.addSubview(self._input)
+        self.kkInput.delegate = self
+        self.addSubview(self.kkInput)
     }
     
     required init?(coder: NSCoder) {
@@ -98,25 +93,133 @@ final class KKInputTextView : UIView {
     }
     
     override func becomeFirstResponder() -> Bool {
-        return self._input.becomeFirstResponder()
+        return self.kkInput.becomeFirstResponder()
     }
     
     override func resignFirstResponder() -> Bool {
-        return self._input.resignFirstResponder()
+        return self.kkInput.resignFirstResponder()
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        let placeholderInset = self._placeholderInset ?? self._inputInset
+        let placeholderInset = self.kkPlaceholderInset ?? self.kkInputInset
         let placeholderFrame = bounds.inset(by: placeholderInset)
-        let placeholderSize = self._placeholder.sizeThatFits(placeholderFrame.size)
-        self._placeholder.frame = CGRect(
+        let placeholderSize = self.kkPlaceholder.sizeThatFits(placeholderFrame.size)
+        self.kkPlaceholder.frame = CGRect(
             origin: placeholderFrame.origin,
             size: CGSize(width: placeholderFrame.width, height: placeholderSize.height)
         )
-        self._input.frame = bounds
+        self.kkInput.frame = bounds
+    }
+    
+}
+
+extension KKInputTextView {
+    
+    final class KKInputView : UITextView {
+        
+        let kkAccessoryView: KKAccessoryView
+        
+        override init(frame: CGRect, textContainer: NSTextContainer?) {
+            self.kkAccessoryView = .init(
+                frame: .init(
+                    x: 0,
+                    y: 0,
+                    width: UIScreen.main.bounds.width,
+                    height: 0
+                )
+            )
+
+            super.init(
+                frame: frame,
+                textContainer: textContainer
+            )
+            
+            self.textContainerInset = .zero
+            self.backgroundColor = .clear
+            self.textContainer.lineFragmentPadding = 0
+            self.layoutManager.usesFontLeading = true
+            self.inputAccessoryView = self.kkAccessoryView
+            self.kkAccessoryView.kkInput = self
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func reloadInputViews() {
+            do {
+                let width = UIScreen.main.bounds.width
+                let height = self.kkAccessoryView.kkHeight
+                self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+            }
+            super.reloadInputViews()
+        }
+        
+    }
+    
+}
+
+extension KKInputTextView {
+    
+    final class KKAccessoryView : UIInputView {
+        
+        weak var kkInput: KKInputTextView.KKInputView?
+        var kkToolbarView: UIView? {
+            willSet {
+                guard self.kkToolbarView !== newValue else { return }
+                self.kkToolbarView?.removeFromSuperview()
+            }
+            didSet {
+                guard self.kkToolbarView !== oldValue else { return }
+                if let view = self.kkToolbarView {
+                    self.addSubview(view)
+                }
+                self.kkInput?.reloadInputViews()
+            }
+        }
+        var kkContentViews: [UIView] {
+            var views: [UIView] = []
+            if let view = self.kkToolbarView {
+                views.append(view)
+            }
+            return views
+        }
+        var kkHeight: CGFloat {
+            var result: CGFloat = 0
+            for subview in self.kkContentViews {
+                result += subview.frame.height
+            }
+            return result
+        }
+        
+        init(frame: CGRect) {
+            super.init(frame: frame, inputViewStyle: .keyboard)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            let bounds = self.bounds
+            var offset: CGFloat = 0
+            for subview in self.kkContentViews {
+                let height = subview.frame.height
+                subview.frame = CGRect(
+                    x: bounds.origin.x,
+                    y: offset,
+                    width: bounds.size.width,
+                    height: height
+                )
+                offset += height
+            }
+        }
+        
     }
     
 }
@@ -137,7 +240,7 @@ extension KKInputTextView {
         self.update(toolbar: view.toolbar)
         self.update(keyboard: view.keyboard)
         self._updateInputTextHeight()
-        self._delegate = view
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -149,63 +252,63 @@ extension KKInputTextView {
     }
     
     func update(text: Swift.String) {
-        self._input.text = text
+        self.kkInput.text = text
     }
     
     func update(textFont: UI.Font) {
-        self._input.font = textFont.native
+        self.kkInput.font = textFont.native
     }
     
     func update(textColor: UI.Color) {
-        self._input.textColor = textColor.native
+        self.kkInput.textColor = textColor.native
     }
     
     func update(textInset: Inset) {
-        self._inputInset = textInset.uiEdgeInsets
+        self.kkInputInset = textInset.uiEdgeInsets
     }
     
     func update(editingColor: UI.Color?) {
-        self._input.tintColor = editingColor?.native
+        self.kkInput.tintColor = editingColor?.native
     }
     
     func update(placeholder: UI.View.Input.Placeholder?) {
         if let placeholder = placeholder {
-            self._placeholder.text = placeholder.text
-            self._placeholder.font = placeholder.font.native
-            self._placeholder.textColor = placeholder.color.native
+            self.kkPlaceholder.text = placeholder.text
+            self.kkPlaceholder.font = placeholder.font.native
+            self.kkPlaceholder.textColor = placeholder.color.native
         } else {
-            self._placeholder.text = ""
+            self.kkPlaceholder.text = ""
         }
-        self._placeholder.isHidden = self._input.text.isEmpty == false
+        self.kkPlaceholder.isHidden = self.kkInput.text.isEmpty == false
     }
     
     func update(placeholderInset: Inset?) {
-        self._placeholderInset = placeholderInset?.uiEdgeInsets
+        self.kkPlaceholderInset = placeholderInset?.uiEdgeInsets
     }
     
     func update(alignment: UI.Text.Alignment) {
-        self._input.textAlignment = alignment.nsTextAlignment
-        self._placeholder.textAlignment = alignment.nsTextAlignment
+        self.kkInput.textAlignment = alignment.nsTextAlignment
+        self.kkPlaceholder.textAlignment = alignment.nsTextAlignment
     }
     
     func update(toolbar: UI.View.Input.Toolbar?) {
-        self._input.inputAccessoryView = toolbar?.native
+        self.kkInput.kkAccessoryView.kkToolbarView = toolbar?.native
     }
     
     func update(keyboard: UI.View.Input.Keyboard?) {
-        self._input.keyboardType = keyboard?.type ?? .default
-        self._input.keyboardAppearance = keyboard?.appearance ?? .default
-        self._input.autocapitalizationType = keyboard?.autocapitalization ?? .sentences
-        self._input.autocorrectionType = keyboard?.autocorrection ?? .default
-        self._input.spellCheckingType = keyboard?.spellChecking ?? .default
-        self._input.returnKeyType = keyboard?.returnKey ?? .default
-        self._input.enablesReturnKeyAutomatically = keyboard?.enablesReturnKeyAutomatically ?? true
-        self._input.textContentType = keyboard?.textContent
+        self.kkInput.keyboardType = keyboard?.type ?? .default
+        self.kkInput.keyboardAppearance = keyboard?.appearance ?? .default
+        self.kkInput.autocapitalizationType = keyboard?.autocapitalization ?? .sentences
+        self.kkInput.autocorrectionType = keyboard?.autocorrection ?? .default
+        self.kkInput.spellCheckingType = keyboard?.spellChecking ?? .default
+        self.kkInput.returnKeyType = keyboard?.returnKey ?? .default
+        self.kkInput.enablesReturnKeyAutomatically = keyboard?.enablesReturnKeyAutomatically ?? true
+        self.kkInput.textContentType = keyboard?.textContent
     }
     
     func cleanup() {
-        self._inputTextHeight = nil
-        self._delegate = nil
+        self.kkInputTextHeight = nil
+        self.kkDelegate = nil
     }
     
 }
@@ -213,9 +316,9 @@ extension KKInputTextView {
 private extension KKInputTextView {
     
     func _updateInputTextHeight() {
-        let containerInset = self._input.textContainerInset
-        let usedRect = self._input.layoutManager.usedRect(for: self._input.textContainer)
-        self._inputTextHeight = containerInset.top + usedRect.height + containerInset.bottom
+        let containerInset = self.kkInput.textContainerInset
+        let usedRect = self.kkInput.layoutManager.usedRect(for: self.kkInput.textContainer)
+        self.kkInputTextHeight = containerInset.top + usedRect.height + containerInset.bottom
     }
     
 }
@@ -223,11 +326,11 @@ private extension KKInputTextView {
 extension KKInputTextView : UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        self._delegate?.beginEditing(self)
+        self.kkDelegate?.beginEditing(self)
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText replacement: String) -> Bool {
-        guard let delegate = self._delegate else {
+        guard let delegate = self.kkDelegate else {
             return false
         }
         let source = textView.text ?? ""
@@ -243,17 +346,17 @@ extension KKInputTextView : UITextViewDelegate {
             return false
         }
         let text = info.text.replacingCharacters(in: info.range, with: info.replacement)
-        self._delegate?.editing(self, text: text)
+        self.kkDelegate?.editing(self, text: text)
         return true
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        self._placeholder.isHidden = textView.text.isEmpty == false
+        self.kkPlaceholder.isHidden = textView.text.isEmpty == false
         self._updateInputTextHeight()
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        self._delegate?.endEditing(self)
+        self.kkDelegate?.endEditing(self)
     }
 
 }

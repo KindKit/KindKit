@@ -14,7 +14,7 @@ extension UI.View.Input.List {
         typealias Content = KKInputListView
 
         static var reuseIdentificator: String {
-            return "InputListView"
+            return "UI.View.Input.List"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -36,9 +36,10 @@ extension UI.View.Input.List {
 final class KKInputListView : UITextField {
     
     weak var kkDelegate: KKInputListViewDelegate?
+    let kkAccessoryView: KKAccessoryView
     var kkItems: [IInputListItem] = [] {
         didSet {
-            self._picker.reloadAllComponents()
+            self.kkPicker.reloadAllComponents()
             self._applyText()
         }
     }
@@ -48,12 +49,12 @@ final class KKInputListView : UITextField {
             let animated = self.isFirstResponder
             if let selected = self.kkSelected {
                 if let index = self.kkItems.firstIndex(where: { $0 === selected }) {
-                    self._picker.selectRow(index, inComponent: 0, animated: animated)
+                    self.kkPicker.selectRow(index, inComponent: 0, animated: animated)
                 } else {
-                    self._picker.selectRow(0, inComponent: 0, animated: animated)
+                    self.kkPicker.selectRow(0, inComponent: 0, animated: animated)
                 }
             } else {
-                self._picker.selectRow(0, inComponent: 0, animated: animated)
+                self.kkPicker.selectRow(0, inComponent: 0, animated: animated)
             }
             self._applyText()
         }
@@ -71,23 +72,42 @@ final class KKInputListView : UITextField {
         }
     }
 
-    private var _picker: UIPickerView
+    private var kkPicker: UIPickerView
     
     override init(frame: CGRect) {
-        self._picker = UIPickerView()
+        self.kkAccessoryView = .init(
+            frame: .init(
+                x: 0,
+                y: 0,
+                width: UIScreen.main.bounds.width,
+                height: 0
+            )
+        )
+        self.kkPicker = UIPickerView()
 
         super.init(frame: frame)
         
+        self.kkAccessoryView.kkInput = self
+        self.inputAccessoryView = self.kkAccessoryView
         self.clipsToBounds = true
         self.delegate = self
         
-        self._picker.dataSource = self
-        self._picker.delegate = self
-        self.inputView = self._picker
+        self.kkPicker.dataSource = self
+        self.kkPicker.delegate = self
+        self.inputView = self.kkPicker
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func reloadInputViews() {
+        do {
+            let width = UIScreen.main.bounds.width
+            let height = self.kkAccessoryView.kkHeight
+            self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        }
+        super.reloadInputViews()
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
@@ -103,6 +123,68 @@ final class KKInputListView : UITextField {
         return bounds.inset(by: inset)
     }
 
+}
+
+extension KKInputListView {
+    
+    final class KKAccessoryView : UIInputView {
+        
+        weak var kkInput: KKInputListView?
+        var kkToolbarView: UIView? {
+            willSet {
+                guard self.kkToolbarView !== newValue else { return }
+                self.kkToolbarView?.removeFromSuperview()
+            }
+            didSet {
+                guard self.kkToolbarView !== oldValue else { return }
+                if let view = self.kkToolbarView {
+                    self.addSubview(view)
+                }
+                self.kkInput?.reloadInputViews()
+            }
+        }
+        var kkContentViews: [UIView] {
+            var views: [UIView] = []
+            if let view = self.kkToolbarView {
+                views.append(view)
+            }
+            return views
+        }
+        var kkHeight: CGFloat {
+            var result: CGFloat = 0
+            for subview in self.kkContentViews {
+                result += subview.frame.height
+            }
+            return result
+        }
+        
+        init(frame: CGRect) {
+            super.init(frame: frame, inputViewStyle: .keyboard)
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            let bounds = self.bounds
+            var offset: CGFloat = 0
+            for subview in self.kkContentViews {
+                let height = subview.frame.height
+                subview.frame = CGRect(
+                    x: bounds.origin.x,
+                    y: offset,
+                    width: bounds.size.width,
+                    height: height
+                )
+                offset += height
+            }
+        }
+        
+    }
+    
 }
 
 extension KKInputListView {
@@ -170,7 +252,7 @@ extension KKInputListView {
     }
     
     func update(toolbar: UI.View.Input.Toolbar?) {
-        self.inputAccessoryView = toolbar?.native
+        self.kkAccessoryView.kkToolbarView = toolbar?.native
     }
     
     func cleanup() {
