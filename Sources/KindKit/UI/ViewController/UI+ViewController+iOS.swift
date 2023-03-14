@@ -214,13 +214,7 @@ extension UI.ViewController : IRootContainerDelegate {
     public func updateOrientations() {
         let supportedOrientations = self.supportedInterfaceOrientations
         if #available(iOS 16.0, *) {
-            if let window = self.view.window {
-                let application = UIApplication.shared
-                let windowsScenes = application.connectedScenes.compactMap({ $0 as? UIWindowScene })
-                if let scene = windowsScenes.first(where: { $0.windows.contains(where: { $0 === window }) }) {
-                    scene.requestGeometryUpdate(.iOS(interfaceOrientations: supportedOrientations))
-                }
-            }
+            self.setNeedsUpdateOfSupportedInterfaceOrientations()
         } else {
             let interfaceOrientation: UIInterfaceOrientation
             let currentDeviceOrientation = UIDevice.current.orientation
