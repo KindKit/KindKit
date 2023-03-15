@@ -32,7 +32,7 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var tintColor: UI.Color? = .white {
+        public var tintColor: UI.Color? = .system {
             didSet {
                 guard self.tintColor != oldValue else { return }
                 if self.isLoaded == true {
@@ -145,6 +145,17 @@ public extension IUIAccessoryView where Self == UI.View.Input.Toolbar {
     @inlinable
     static func inputToolbar() -> Self {
         return .init()
+    }
+    
+}
+
+fileprivate extension UI.Color {
+    
+    static var system: Self {
+        if #available(iOS 13.0, *) {
+            return .init(.label)
+        }
+        return .init(.black)
     }
     
 }
