@@ -81,6 +81,18 @@ public extension UI.View.Blur {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func style(_ value: () -> UIBlurEffect.Style) -> Self {
+        return self.style(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func style(_ value: (Self) -> UIBlurEffect.Style) -> Self {
+        return self.style(value(self))
+    }
+    
 }
 
 extension UI.View.Blur : IUIView {
@@ -165,8 +177,8 @@ extension UI.View.Blur : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Blur {
     
     @inlinable
-    static func blur() -> Self {
-        return .init()
+    static func blur(_ style: UIBlurEffect.Style) -> Self {
+        return .init().style(style)
     }
     
 }

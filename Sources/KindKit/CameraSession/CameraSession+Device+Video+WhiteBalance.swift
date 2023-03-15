@@ -2,7 +2,6 @@
 //  KindKit
 //
 
-import Foundation
 import AVFoundation
 
 public extension CameraSession.Device.Video {

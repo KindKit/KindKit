@@ -12,18 +12,8 @@ public extension StringFormatter {
         
         public let formatter: DateFormatter
         
-        public init(
-            format: String,
-            calendar: Calendar = Calendar.current,
-            locale: Locale = Locale.current,
-            timeZone: TimeZone = TimeZone.current
-        ) {
-            self.formatter = DateFormatter.kk_make(
-                format: format,
-                calendar: calendar,
-                locale: locale,
-                timeZone: timeZone
-            )
+        public init() {
+            self.formatter = DateFormatter()
         }
         
         public func format(_ input: InputType) -> String {
@@ -32,4 +22,40 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.Date {
+    
+    @inlinable
+    func format(_ value: String) -> Self {
+        self.formatter.dateFormat = value
+        return self
+    }
+    
+    @inlinable
+    func calendar(_ value: Calendar) -> Self {
+        self.formatter.calendar = value
+        return self
+    }
+    
+    @inlinable
+    func locale(_ value: Locale) -> Self {
+        self.formatter.locale = value
+        return self
+    }
+    
+    @inlinable
+    func timeZone(_ value: TimeZone) -> Self {
+        self.formatter.timeZone = value
+        return self
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Date {
+    
+    static func date() -> Self {
+        return .init()
+    }
+    
 }

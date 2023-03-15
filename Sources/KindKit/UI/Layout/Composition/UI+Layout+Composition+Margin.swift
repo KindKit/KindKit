@@ -8,7 +8,7 @@ public extension UI.Layout.Composition {
     
     final class Margin {
         
-        public let inset: Inset
+        public var inset: Inset
         public var entity: IUICompositionLayoutEntity
         
         public init(
@@ -34,7 +34,7 @@ extension UI.Layout.Composition.Margin : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let size = self.entity.layout(
             bounds: bounds.inset(self.inset)
         )
@@ -44,7 +44,7 @@ extension UI.Layout.Composition.Margin : IUICompositionLayoutEntity {
         return size.inset(-self.inset)
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let size = self.entity.size(
             available: available.inset(self.inset)
         )
@@ -66,7 +66,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     static func margin(
         inset: Inset,
         entity: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.Margin {
+    ) -> Self {
         return .init(
             inset: inset,
             entity: entity

@@ -2,10 +2,9 @@
 //  KindKit
 //
 
-import Foundation
-import Dispatch
-
 #if os(macOS)
+
+import Dispatch
 
 public final class Shell {
     

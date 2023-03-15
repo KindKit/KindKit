@@ -31,9 +31,33 @@ public extension IUIViewSelectable {
     
     @inlinable
     @discardableResult
+    func isSelected(_ value: () -> Bool) -> Self {
+        return self.isSelected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func isSelected(_ value: (Self) -> Bool) -> Self {
+        return self.isSelected(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func select(_ value: Bool) -> Self {
         self.isSelected = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func select(_ value: () -> Bool) -> Self {
+        return self.select(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func select(_ value: (Self) -> Bool) -> Self {
+        return self.select(value(self))
     }
     
 }

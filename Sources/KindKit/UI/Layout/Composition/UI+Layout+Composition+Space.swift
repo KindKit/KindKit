@@ -30,11 +30,11 @@ extension UI.Layout.Composition.Space : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         return self.size.apply(available: bounds.size)
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return self.size.apply(available: available)
     }
     
@@ -50,7 +50,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     static func space(
         width: UI.Size.Static.Dimension,
         height: UI.Size.Static.Dimension
-    ) -> UI.Layout.Composition.Space {
+    ) -> Self {
         return .init(
             width: width,
             height: height

@@ -168,6 +168,18 @@ public extension UI.View.Custom {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func gestures(_ value: () -> [IUIGesture]) -> Self {
+        return self.gestures(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func gestures(_ value: (Self) -> [IUIGesture]) -> Self {
+        return self.gestures(value(self))
+    }
+    
     @discardableResult
     func add(gesture: IUIGesture) -> Self {
         if self._gestures.contains(where: { $0 === gesture }) == false {
@@ -177,6 +189,12 @@ public extension UI.View.Custom {
             }
         }
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func add(gesture: (Self) -> IUIGesture) -> Self {
+        return self.add(gesture: gesture(self))
     }
     
     @discardableResult
@@ -192,9 +210,27 @@ public extension UI.View.Custom {
     
     @inlinable
     @discardableResult
+    func remove(gesture: (Self) -> IUIGesture) -> Self {
+        return self.remove(gesture: gesture(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func content(_ value: IUILayout) -> Self {
         self.content = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUILayout) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUILayout) -> Self {
+        return self.content(value(self))
     }
     
 }
@@ -332,8 +368,8 @@ extension UI.View.Custom : KKCustomViewDelegate {
 public extension IUIView where Self == UI.View.Custom {
     
     @inlinable
-    static func custom() -> Self {
-        return .init()
+    static func custom(_ content: IUILayout) -> Self {
+        return .init().content(content)
     }
     
 }

@@ -43,6 +43,24 @@ final class KKInputStringView : UITextField {
             self.setNeedsLayout()
         }
     }
+    var kkPlaceholder: String? {
+        didSet {
+            guard self.kkPlaceholder != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
+    var kkPlaceholderFont: UIFont? {
+        didSet {
+            guard self.kkPlaceholderFont != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
+    var kkPlaceholderColor: UIColor? {
+        didSet {
+            guard self.kkPlaceholderColor != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
     var kkPlaceholderInset: UIEdgeInsets? {
         didSet {
             guard self.kkPlaceholderInset != oldValue else { return }
@@ -72,21 +90,11 @@ final class KKInputStringView : UITextField {
         
         self.kkAccessoryView.kkInput = self
         self.inputAccessoryView = self.kkAccessoryView
-        self.clipsToBounds = true
         self.delegate = self
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func reloadInputViews() {
-        do {
-            let width = UIScreen.main.bounds.width
-            let height = self.kkAccessoryView.kkHeight
-            self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-        }
-        super.reloadInputViews()
     }
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {
@@ -104,10 +112,7 @@ final class KKInputStringView : UITextField {
     
     func select(suggestion: String) {
         self.text = suggestion
-        self.sendActions(for: .editingChanged)
-        NotificationCenter.default.post(name: UITextField.textDidChangeNotification, object: self)
         self.kkDelegate?.pressed(self, suggestion: suggestion)
-        self.endEditing(false)
     }
 
 }
@@ -151,7 +156,6 @@ extension KKInputStringView {
             didSet {
                 guard self.kkSuggestionVariants != oldValue else { return }
                 self.kkSuggestionView?.reloadData()
-                self.kkInput?.reloadInputViews()
             }
         }
         var kkToolbarView: UIView? {
@@ -164,7 +168,7 @@ extension KKInputStringView {
                 if let view = self.kkToolbarView {
                     self.addSubview(view)
                 }
-                self.kkInput?.reloadInputViews()
+                self.kkInput?.kk_resizeAccessoryViews()
             }
         }
         var kkSuggestionView: UICollectionView? {
@@ -179,7 +183,7 @@ extension KKInputStringView {
                     view.dataSource = self
                     self.addSubview(view)
                 }
-                self.kkInput?.reloadInputViews()
+                self.kkInput?.kk_resizeAccessoryViews()
             }
         }
         var kkContentViews: [UIView] {
@@ -364,6 +368,21 @@ extension KKInputStringView.KKAccessoryView {
 
 extension KKInputStringView {
     
+    func kk_resizeAccessoryViews() {
+        let width = UIScreen.main.bounds.width
+        let height = self.kkAccessoryView.kkHeight
+        let oldFrame = self.kkAccessoryView.frame
+        let newFrame = CGRect(x: 0, y: 0, width: width, height: height)
+        if oldFrame != newFrame {
+            self.kkAccessoryView.frame = newFrame
+            self.reloadInputViews()
+        }
+    }
+    
+}
+
+extension KKInputStringView {
+    
     func update(view: UI.View.Input.String) {
         self.update(frame: view.frame)
         self.update(transform: view.transform)
@@ -373,6 +392,8 @@ extension KKInputStringView {
         self.update(textInset: view.textInset)
         self.update(editingColor: view.editingColor)
         self.update(placeholder: view.placeholder)
+        self.update(placeholderFont: view.placeholderFont)
+        self.update(placeholderColor: view.placeholderColor)
         self.update(placeholderInset: view.placeholderInset)
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
@@ -408,15 +429,16 @@ extension KKInputStringView {
         self.tintColor = editingColor?.native
     }
     
-    func update(placeholder: UI.View.Input.Placeholder?) {
-        if let placeholder = placeholder {
-            self.attributedPlaceholder = NSAttributedString(string: placeholder.text, attributes: [
-                .font: placeholder.font.native,
-                .foregroundColor: placeholder.color.native
-            ])
-        } else {
-            self.attributedPlaceholder = nil
-        }
+    func update(placeholder: String?) {
+        self.kkPlaceholder = placeholder
+    }
+    
+    func update(placeholderFont: UI.Font?) {
+        self.kkPlaceholderFont = placeholderFont?.native
+    }
+    
+    func update(placeholderColor: UI.Color?) {
+        self.kkPlaceholderColor = placeholderColor?.native
     }
     
     func update(placeholderInset: Inset?) {
@@ -454,6 +476,26 @@ extension KKInputStringView {
     
 }
 
+private extension KKInputStringView {
+    
+    func _placeholder() -> NSAttributedString? {
+        guard let string = self.kkPlaceholder else {
+            return nil
+        }
+        guard let font = self.kkPlaceholderFont ?? self.font else {
+            return nil
+        }
+        guard let color = self.kkPlaceholderColor ?? self.textColor else {
+            return nil
+        }
+        return NSAttributedString(string: string, attributes: [
+            .font: font,
+            .foregroundColor: color
+        ])
+    }
+    
+}
+
 extension KKInputStringView : UITextFieldDelegate {
 
     func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -464,15 +506,27 @@ extension KKInputStringView : UITextFieldDelegate {
         self.kkDelegate?.beginEditing(self)
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString replacement: String) -> Bool {
+        guard let delegate = self.kkDelegate else {
+            return false
+        }
         let oldText = textField.text ?? ""
         guard let range = Range< String.Index >(range, in: oldText) else {
             return false
         }
-        var newText = oldText.kk_replacing(range, with: string)
+        let info = UI.View.Input.String.ShouldReplace(
+            text: oldText,
+            range: range,
+            replacement: replacement
+        )
+        guard delegate.shouldReplace(self, info: info) == true else {
+            return false
+        }
+        let newText = oldText.kk_replacing(range, with: replacement)
+        var modidfyText = newText
         let variants: [String]
         let caretLower: String.Index
-        if string.count > 0 {
+        if replacement.count > 0 {
             caretLower = newText.index(range.lowerBound, offsetBy: 1)
         } else {
             caretLower = range.lowerBound
@@ -480,38 +534,35 @@ extension KKInputStringView : UITextFieldDelegate {
         var caretUpper = caretLower
         if let suggestion = self.kkSuggestion {
             variants = suggestion.variants(newText)
-            if newText.isEmpty == false && string.isEmpty == false && caretLower <= newText.endIndex {
+            if newText.isEmpty == false && replacement.isEmpty == false && caretLower <= newText.endIndex {
                 if let autoComplete = suggestion.autoComplete(newText) {
                     caretUpper = autoComplete.endIndex
-                    newText = autoComplete
+                    modidfyText = autoComplete
                 }
             }
         } else {
             variants = []
         }
-        if oldText != newText {
-            textField.text = newText
-            textField.sendActions(for: .editingChanged)
-            NotificationCenter.default.post(
-                name: UITextField.textDidChangeNotification,
-                object: textField
-            )
+        self.kkSuggestionVariants = variants
+        if newText == modidfyText {
+            self.kkDelegate?.editing(self, text: newText)
+            return true
         }
-        do {
+        textField.text = modidfyText
+        if caretLower != caretUpper {
             let selectionLower = textField.position(
                 from: textField.beginningOfDocument,
-                offset: caretLower.utf16Offset(in: newText)
+                offset: caretLower.utf16Offset(in: modidfyText)
             )
             let selectionUpper = textField.position(
                 from: textField.beginningOfDocument,
-                offset: caretUpper.utf16Offset(in: newText)
+                offset: caretUpper.utf16Offset(in: modidfyText)
             )
             if let selectionLower = selectionLower, let selectionUpper = selectionUpper {
                 textField.selectedTextRange = textField.textRange(from: selectionLower, to: selectionUpper)
             }
         }
-        self.kkSuggestionVariants = variants
-        self.kkDelegate?.editing(self, text: newText)
+        self.kkDelegate?.editing(self, text: modidfyText)
         return false
     }
     

@@ -119,9 +119,33 @@ public extension UI.View.Shape {
     
     @inlinable
     @discardableResult
+    func path(_ value: () -> Path2?) -> Self {
+        return self.path(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func path(_ value: (Self) -> Path2?) -> Self {
+        return self.path(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func fill(_ value: Fill?) -> Self {
         self.fill = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func fill(_ value: () -> Fill?) -> Self {
+        return self.fill(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func fill(_ value: (Self) -> Fill?) -> Self {
+        return self.fill(value(self))
     }
     
     @inlinable
@@ -133,9 +157,33 @@ public extension UI.View.Shape {
     
     @inlinable
     @discardableResult
+    func stroke(_ value: () -> Stroke?) -> Self {
+        return self.stroke(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func stroke(_ value: (Self) -> Stroke?) -> Self {
+        return self.stroke(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func line(_ value: Line) -> Self {
         self.line = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func line(_ value: () -> Line) -> Self {
+        return self.line(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func line(_ value: (Self) -> Line) -> Self {
+        return self.line(value(self))
     }
     
 }
@@ -229,8 +277,8 @@ extension UI.View.Shape : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Shape {
     
     @inlinable
-    static func shape() -> Self {
-        return .init()
+    static func shape(_ path: Path2?) -> Self {
+        return .init().path(path)
     }
     
 }

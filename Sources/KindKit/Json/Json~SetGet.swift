@@ -171,8 +171,10 @@ private extension Json {
     }
 
     struct Const {
+        
         public static var pathSeparator = "."
-        public static var pathIndexPattern = try! NSRegularExpression(pattern: "^\\[\\d+\\]$", options: [ .anchorsMatchLines ])
+        public static var pathIndexPattern = try! NSRegularExpression(pattern: "^\\[\\d+\\]$", options: .anchorsMatchLines)
+        
     }
 
 }

@@ -10,6 +10,27 @@ public extension UI.Layout {
         
         public weak var delegate: IUILayoutDelegate?
         public weak var appearedView: IUIView?
+        public var state: State {
+            set {
+                guard self.state != newValue else { return }
+                switch self.state {
+                case .collapsed: self._status = .collapsed
+                case .expanded: self._status = .expanded
+                }
+            }
+            get {
+                switch self._status {
+                case .collapsed: return .collapsed
+                case .expanded: return .expanded
+                case .changing(let percent):
+                    if percent > .half {
+                        return .collapsed
+                    } else {
+                        return .expanded
+                    }
+                }
+            }
+        }
         public var contentInset: Inset {
             didSet { self.setNeedForceUpdate() }
         }
@@ -37,19 +58,27 @@ public extension UI.Layout {
         
         private var _contentSize: Size?
         private var _detailSize: Size?
-        private var _state: State = .collapsed {
-            didSet { self.setNeedForceUpdate() }
+        private var _status: Status {
+            didSet {
+                guard self._status != oldValue else { return }
+                self.setNeedForceUpdate()
+            }
         }
         private var _animation: ICancellable? {
             willSet { self._animation?.cancel() }
         }
         
         public init(
-            contentInset: Inset,
+            state: State = .collapsed,
+            contentInset: Inset = .zero,
             contentView: IUIView,
-            detailInset: Inset,
+            detailInset: Inset = .zero,
             detailView: IUIView
         ) {
+            switch state {
+            case .collapsed: self._status = .collapsed
+            case .expanded: self._status = .expanded
+            }
             self.contentInset = contentInset
             self.contentView = contentView
             self.detailInset = detailInset
@@ -88,7 +117,7 @@ public extension UI.Layout {
                 detailSize = self.detailView.size(available: bounds.size.inset(self.detailInset))
                 self._detailSize = detailSize
             }
-            switch self._state {
+            switch self._status {
             case .collapsed:
                 self.contentView.frame = Rect(
                     x: self.contentInset.left,
@@ -141,7 +170,7 @@ public extension UI.Layout {
         }
         
         public func size(available: Size) -> Size {
-            switch self._state {
+            switch self._status {
             case .collapsed:
                 let contentSize = self.contentView.size(available: available.inset(self.contentInset)).inset(-self.contentInset)
                 return contentSize
@@ -165,7 +194,7 @@ public extension UI.Layout {
         }
         
         public func views(bounds: Rect) -> [IUIView] {
-            switch self._state {
+            switch self._status {
             case .collapsed: return [ self.contentView ]
             case .expanded: return [ self.contentView, self.detailView ]
             case .changing: return [ self.contentView, self.detailView ]
@@ -178,62 +207,55 @@ public extension UI.Layout {
 
 public extension UI.Layout.Expand {
     
-    func collapse() {
-        self._state = .collapsed
-    }
-    
-    func collapse(
+    func animate(
+        to state: State,
         duration: TimeInterval,
         ease: IAnimationEase = Animation.Ease.Linear(),
+        processing: ((_ progress: Percent) -> Void)? = nil,
         completion: (() -> Void)? = nil
     ) {
-        self._animation = Animation.default.run(
-            .custom(
-                duration: duration,
-                ease: ease,
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
-                    self._state = .changing(progress.invert)
-                    self.updateIfNeeded()
-                },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    self._animation = nil
-                    self._state = .collapsed
-                    self.updateIfNeeded()
-                    completion?()
-                }
+        switch state {
+        case .collapsed:
+            self._animation = Animation.default.run(
+                .custom(
+                    duration: duration,
+                    ease: ease,
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
+                        self._status = .changing(progress.invert)
+                        processing?(progress)
+                        self.updateIfNeeded()
+                    },
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        self._animation = nil
+                        self._status = .collapsed
+                        completion?()
+                        self.updateIfNeeded()
+                    }
+                )
             )
-        )
-    }
-    
-    func expand() {
-        self._state = .expanded
-    }
-    
-    func expand(
-        duration: TimeInterval,
-        ease: IAnimationEase = Animation.Ease.Linear(),
-        completion: (() -> Void)? = nil
-    ) {
-        self._animation = Animation.default.run(
-            .custom(
-                duration: duration,
-                ease: ease,
-                processing: { [weak self] progress in
-                    guard let self = self else { return }
-                    self._state = .changing(progress)
-                    self.updateIfNeeded()
-                },
-                completion: { [weak self] in
-                    guard let self = self else { return }
-                    self._animation = nil
-                    self._state = .expanded
-                    self.updateIfNeeded()
-                    completion?()
-                }
+        case .expanded:
+            self._animation = Animation.default.run(
+                .custom(
+                    duration: duration,
+                    ease: ease,
+                    processing: { [weak self] progress in
+                        guard let self = self else { return }
+                        self._status = .changing(progress)
+                        processing?(progress)
+                        self.updateIfNeeded()
+                    },
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        self._animation = nil
+                        self._status = .expanded
+                        completion?()
+                        self.updateIfNeeded()
+                    }
+                )
             )
-        )
+        }
     }
     
 }

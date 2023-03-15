@@ -57,7 +57,7 @@ public extension UI {
             ))
         }
         
-        public convenience init< Screen : IUIScreen & IUIScreenViewable >(
+        public convenience init< Screen : IScreen & IScreenViewable >(
             _ screen: Screen
         ) {
             self.init(UI.Container.Screen(screen))

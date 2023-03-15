@@ -146,6 +146,18 @@ public extension UI.View.Control {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUILayout) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUILayout) -> Self {
+        return self.content(value(self))
+    }
+    
 }
 
 extension UI.View.Control : IUIView {
@@ -275,8 +287,8 @@ extension UI.View.Control : KKControlViewDelegate {
 public extension IUIView where Self == UI.View.Control {
     
     @inlinable
-    static func control() -> Self {
-        return .init()
+    static func control(_ content: IUILayout) -> Self {
+        return .init().content(content)
     }
     
 }

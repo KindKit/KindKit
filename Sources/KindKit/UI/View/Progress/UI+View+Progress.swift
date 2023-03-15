@@ -111,9 +111,33 @@ public extension UI.View.Progress {
     
     @inlinable
     @discardableResult
+    func progressColor(_ value: () -> UI.Color) -> Self {
+        return self.progressColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func progressColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.progressColor(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func trackColor(_ value: UI.Color) -> Self {
         self.trackColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trackColor(_ value: () -> UI.Color) -> Self {
+        return self.trackColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trackColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.trackColor(value(self))
     }
     
 }

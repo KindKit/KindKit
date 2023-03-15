@@ -270,16 +270,52 @@ public extension UI.View.SwipeCell {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUIView) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUIView) -> Self {
+        return self.content(value(self))
+    }
+    
     @discardableResult
     func leading(_ value: IUIView?) -> Self {
         self.leading = value
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func leading(_ value: () -> IUIView?) -> Self {
+        return self.leading(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leading(_ value: (Self) -> IUIView?) -> Self {
+        return self.leading(value(self))
+    }
+    
     @discardableResult
     func trailing(_ value: IUIView?) -> Self {
         self.trailing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailing(_ value: () -> IUIView?) -> Self {
+        return self.trailing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailing(_ value: (Self) -> IUIView?) -> Self {
+        return self.trailing(value(self))
     }
     
     @inlinable
@@ -291,9 +327,33 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
+    func leadingSize(_ value: () -> Double) -> Self {
+        return self.leadingSize(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leadingSize(_ value: (Self) -> Double) -> Self {
+        return self.leadingSize(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func leadingLimit(_ value: Double) -> Self {
         self.leadingLimit = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadingLimit(_ value: () -> Double) -> Self {
+        return self.leadingLimit(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leadingLimit(_ value: (Self) -> Double) -> Self {
+        return self.leadingLimit(value(self))
     }
     
     @inlinable
@@ -305,6 +365,18 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
+    func trailingSize(_ value: () -> Double) -> Self {
+        return self.trailingSize(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailingSize(_ value: (Self) -> Double) -> Self {
+        return self.trailingSize(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func trailingLimit(_ value: Double) -> Self {
         self.trailingLimit = value
         return self
@@ -312,9 +384,33 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
+    func trailingLimit(_ value: () -> Double) -> Self {
+        return self.trailingLimit(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailingLimit(_ value: (Self) -> Double) -> Self {
+        return self.trailingLimit(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func animationVelocity(_ value: Double) -> Self {
         self.animationVelocity = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func animationVelocity(_ value: () -> Double) -> Self {
+        return self.animationVelocity(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func animationVelocity(_ value: (Self) -> Double) -> Self {
+        return self.animationVelocity(value(self))
     }
     
 }
@@ -330,14 +426,14 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
-    func onLeading(_ closure: ((Self, Bool) -> Void)?) -> Self {
+    func onLeading(_ closure: @escaping (Self, Bool) -> Void) -> Self {
         self.onLeading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onLeading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
+    func onLeading< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Bool) -> Void) -> Self {
         self.onLeading.link(sender, closure)
         return self
     }
@@ -351,14 +447,14 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
-    func onTrailing(_ closure: ((Self, Bool) -> Void)?) -> Self {
+    func onTrailing(_ closure: @escaping (Self, Bool) -> Void) -> Self {
         self.onTrailing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onTrailing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
+    func onTrailing< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Bool) -> Void) -> Self {
         self.onTrailing.link(sender, closure)
         return self
     }
@@ -372,14 +468,14 @@ public extension UI.View.SwipeCell {
     
     @inlinable
     @discardableResult
-    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+    func onPressed(_ closure: @escaping (Self) -> Void) -> Self {
         self.onPressed.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onPressed.link(sender, closure)
         return self
     }
@@ -674,8 +770,8 @@ extension UI.View.SwipeCell : IUIViewPressable {
 public extension IUIView where Self == UI.View.SwipeCell {
     
     @inlinable
-    static func swipeCell() -> Self {
-        return .init()
+    static func swipeCell(_ content: IUIView) -> Self {
+        return .init().content(content)
     }
     
 }

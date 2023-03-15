@@ -113,6 +113,18 @@ public extension UI.View.Image {
     
     @inlinable
     @discardableResult
+    func image(_ value: () -> UI.Image?) -> Self {
+        return self.image(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func image(_ value: (Self) -> UI.Image?) -> Self {
+        return self.image(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func mode(_ value: Mode) -> Self {
         self.mode = value
         return self
@@ -120,9 +132,14 @@ public extension UI.View.Image {
     
     @inlinable
     @discardableResult
-    func tintColor(_ value: UI.Color?) -> Self {
-        self.tintColor = value
-        return self
+    func mode(_ value: () -> Mode) -> Self {
+        return self.mode(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func mode(_ value: (Self) -> Mode) -> Self {
+        return self.mode(value(self))
     }
     
 }
@@ -223,8 +240,8 @@ extension UI.View.Image : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Image {
     
     @inlinable
-    static func image() -> Self {
-        return .init()
+    static func image(_ image: UI.Image) -> Self {
+        return .init().image(image)
     }
     
 }

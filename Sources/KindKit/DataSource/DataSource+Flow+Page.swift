@@ -8,22 +8,55 @@ public extension DataSource.Flow {
     
     final class Page<
         Input : IFlowResult,
+        Success,
+        Failure : Swift.Error,
         DataSource : IPageDataSource
-    > : IFlowOperator where
-        Input.Failure == DataSource.Failure
-    {
+    > : IFlowOperator {
         
         public typealias Input = Input
-        public typealias Output = Result< DataSource.Success, DataSource.Failure >
+        public typealias Output = Result< Success, Failure >
         
         private let _dataSource: DataSource
+        private let _success: (Input.Success, DataSource.Success) -> Success
+        private let _failure: (Input.Success, DataSource.Failure) -> Failure
+        private var _listner: ICancellable?
         private var _next: IFlowPipe!
         
         init(
-            _ dataSource: DataSource
+            _ dataSource: DataSource,
+            _ success: @escaping (Input.Success, DataSource.Success) -> Success,
+            _ failure: @escaping (Input.Success, DataSource.Failure) -> Failure
         ) {
             self._dataSource = dataSource
-            self._setup()
+            self._success = success
+            self._failure = failure
+        }
+        
+        convenience init(
+            _ dataSource: DataSource,
+            _ success: @escaping (Input.Success, DataSource.Success) -> Success
+        ) where
+            Failure == DataSource.Failure
+        {
+            self.init(dataSource, success, { _, error in error })
+        }
+        
+        convenience init(
+            _ dataSource: DataSource,
+            _ failure: @escaping (Input.Success, DataSource.Failure) -> Failure
+        ) where
+            Success == DataSource.Success
+        {
+            self.init(dataSource, { _, value in value }, failure)
+        }
+        
+        convenience init(
+            _ dataSource: DataSource
+        ) where
+            Success == DataSource.Success,
+            Failure == DataSource.Failure
+        {
+            self.init(dataSource, { _, value in value }, { _, error in error })
         }
         
         public func subscribe(next: IFlowPipe) {
@@ -31,6 +64,7 @@ public extension DataSource.Flow {
         }
         
         public func receive(value: Input.Success) {
+            self._listner = self._dataSource.onFinish.subscribe(self, { $0._finish(value, $1) })
             self._dataSource.load()
         }
         
@@ -54,12 +88,14 @@ public extension DataSource.Flow {
 
 private extension DataSource.Flow.Page {
     
-    func _setup() {
-        self._dataSource.onFinish.link(self, { $0._onFinish($1) })
-    }
-    
-    func _onFinish(_ result: Output) {
-        self._next.send(value: result)
+    func _finish(_ input: Input.Success, _ result: DataSource.Result?) {
+        self._listner = nil
+        switch result {
+        case .success(let value): self._next.send(value: self._success(input, value))
+        case .failure(let error): self._next.send(error: self._failure(input, error))
+        case .none:
+            break
+        }
         self._next.completed()
     }
     
@@ -67,14 +103,58 @@ private extension DataSource.Flow.Page {
 
 extension IFlowOperator {
     
-    func dataSource<
+    func perform<
+        Success,
+        Failure : Swift.Error,
+        DataSource : IPageDataSource
+    >(
+        _ dataSource: DataSource,
+        _ success: @escaping (Output.Success, DataSource.Success) -> Success,
+        _ failure: @escaping (Output.Success, DataSource.Failure) -> Failure
+    ) -> KindKit.DataSource.Flow.Page< Output, Success, Failure, DataSource > where
+        Output.Failure == Failure
+    {
+        let next = KindKit.DataSource.Flow.Page< Output, Success, Failure, DataSource >(dataSource, success, failure)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func perform<
+        Success,
+        DataSource : IPageDataSource
+    >(
+        _ dataSource: DataSource,
+        _ success: @escaping (Output.Success, DataSource.Success) -> Success
+    ) -> KindKit.DataSource.Flow.Page< Output, Success, DataSource.Failure, DataSource > where
+        Output.Failure == DataSource.Failure
+    {
+        let next = KindKit.DataSource.Flow.Page< Output, Success, DataSource.Failure, DataSource >(dataSource, success)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func perform<
+        Failure : Swift.Error,
+        DataSource : IPageDataSource
+    >(
+        _ dataSource: DataSource,
+        _ failure: @escaping (Output.Success, DataSource.Failure) -> Failure
+    ) -> KindKit.DataSource.Flow.Page< Output, DataSource.Success, Failure, DataSource > where
+        Output.Failure == Failure
+    {
+        let next = KindKit.DataSource.Flow.Page< Output, DataSource.Success, Failure, DataSource >(dataSource, failure)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func perform<
         DataSource : IPageDataSource
     >(
         _ dataSource: DataSource
-    ) -> KindKit.DataSource.Flow.Page< Output, DataSource > where
+    ) -> KindKit.DataSource.Flow.Page< Output, DataSource.Success, DataSource.Failure, DataSource > where
         Output.Failure == DataSource.Failure
     {
-        let next = KindKit.DataSource.Flow.Page< Output, DataSource >(dataSource)
+        let next = KindKit.DataSource.Flow.Page< Output, DataSource.Success, DataSource.Failure, DataSource >(dataSource)
         self.subscribe(next: next)
         return next
     }
@@ -83,11 +163,43 @@ extension IFlowOperator {
 
 public extension Flow.Builder {
     
-    func dataSource<
+    func perform<
+        Success,
         DataSource : IPageDataSource
     >(
-        _ dataSource: DataSource
-    ) -> Flow.Head.Builder< KindKit.DataSource.Flow.Page< Input, DataSource > > where
+        dataSource: DataSource,
+        success: @escaping (Input.Success, DataSource.Success) -> Success,
+        failure: @escaping (Input.Success, DataSource.Failure) -> Input.Failure
+    ) -> Flow.Head.Builder< KindKit.DataSource.Flow.Page< Input, Success, Input.Failure, DataSource > > {
+        return .init(head: .init(dataSource, success, failure))
+    }
+    
+    func perform<
+        Success,
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        success: @escaping (Input.Success, DataSource.Success) -> Success
+    ) -> Flow.Head.Builder< KindKit.DataSource.Flow.Page< Input, Success, DataSource.Failure, DataSource > > where
+        Input.Failure == DataSource.Failure
+    {
+        return .init(head: .init(dataSource, success))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        failure: @escaping (Input.Success, DataSource.Failure) -> Input.Failure
+    ) -> Flow.Head.Builder< KindKit.DataSource.Flow.Page< Input, DataSource.Success, Input.Failure, DataSource > > {
+        return .init(head: .init(dataSource, failure))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource
+    ) -> Flow.Head.Builder< KindKit.DataSource.Flow.Page< Input, DataSource.Success, DataSource.Failure, DataSource > > where
         Input.Failure == DataSource.Failure
     {
         return .init(head: .init(dataSource))
@@ -97,28 +209,98 @@ public extension Flow.Builder {
 
 public extension Flow.Head.Builder {
     
-    func dataSource<
+    func perform<
+        Success,
+        Failure : Swift.Error,
         DataSource : IPageDataSource
     >(
-        _ dataSource: DataSource
-    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Head.Output, DataSource > > where
+        dataSource: DataSource,
+        success: @escaping (Head.Output.Success, DataSource.Success) -> Success,
+        failure: @escaping (Head.Output.Success, DataSource.Failure) -> Failure
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Head.Output, Success, Failure, DataSource > > where
+        Head.Output.Failure == Failure
+    {
+        return .init(head: self.head, tail: self.head.perform(dataSource, success, failure))
+    }
+    
+    func perform<
+        Success,
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        success: @escaping (Head.Output.Success, DataSource.Success) -> Success
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Head.Output, Success, DataSource.Failure, DataSource > > where
         Head.Output.Failure == DataSource.Failure
     {
-        return .init(head: self.head, tail: self.head.dataSource(dataSource))
+        return .init(head: self.head, tail: self.head.perform(dataSource, success))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        failure: @escaping (Head.Output.Success, DataSource.Failure) -> Head.Output.Failure
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Head.Output, DataSource.Success, Head.Output.Failure, DataSource > > {
+        return .init(head: self.head, tail: self.head.perform(dataSource, failure))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Head.Output, DataSource.Success, DataSource.Failure, DataSource > > where
+        Head.Output.Failure == DataSource.Failure
+    {
+        return .init(head: self.head, tail: self.head.perform(dataSource))
     }
     
 }
 
 public extension Flow.Chain.Builder {
     
-    func dataSource<
+    func perform<
+        Success,
+        Failure : Swift.Error,
         DataSource : IPageDataSource
     >(
-        _ dataSource: DataSource
-    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Tail.Output, DataSource > > where
+        dataSource: DataSource,
+        success: @escaping (Tail.Output.Success, DataSource.Success) -> Success,
+        failure: @escaping (Tail.Output.Success, DataSource.Failure) -> Failure
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Tail.Output, Success, Failure, DataSource > > where
+        Tail.Output.Failure == Failure
+    {
+        return .init(head: self.head, tail: self.tail.perform(dataSource, success, failure))
+    }
+    
+    func perform<
+        Success,
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        success: @escaping (Tail.Output.Success, DataSource.Success) -> Success
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Tail.Output, Success, DataSource.Failure, DataSource > > where
         Tail.Output.Failure == DataSource.Failure
     {
-        return .init(head: self.head, tail: self.tail.dataSource(dataSource))
+        return .init(head: self.head, tail: self.tail.perform(dataSource, success))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource,
+        failure: @escaping (Tail.Output.Success, DataSource.Failure) -> Tail.Output.Failure
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Tail.Output, DataSource.Success, Tail.Output.Failure, DataSource > > {
+        return .init(head: self.head, tail: self.tail.perform(dataSource, failure))
+    }
+    
+    func perform<
+        DataSource : IPageDataSource
+    >(
+        dataSource: DataSource
+    ) -> Flow.Chain.Builder< Head, KindKit.DataSource.Flow.Page< Tail.Output, DataSource.Success, DataSource.Failure, DataSource > > where
+        Tail.Output.Failure == DataSource.Failure
+    {
+        return .init(head: self.head, tail: self.tail.perform(dataSource))
     }
     
 }

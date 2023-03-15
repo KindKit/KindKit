@@ -109,6 +109,18 @@ public extension UI.View.Rect {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func fill(_ value: () -> UI.Color) -> Self {
+        return self.fill(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func fill(_ value: (Self) -> UI.Color) -> Self {
+        return self.fill(value(self))
+    }
+    
 }
 
 extension UI.View.Rect : IUIView {
@@ -206,8 +218,8 @@ extension UI.View.Rect : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Rect {
     
     @inlinable
-    static func rect() -> Self {
-        return .init()
+    static func rect(_ fill: UI.Color) -> Self {
+        return .init().fill(fill)
     }
     
 }

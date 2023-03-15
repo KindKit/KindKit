@@ -65,6 +65,24 @@ final class KKInputListView : UITextField {
             self.setNeedsLayout()
         }
     }
+    var kkPlaceholder: String? {
+        didSet {
+            guard self.kkPlaceholder != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
+    var kkPlaceholderFont: UIFont? {
+        didSet {
+            guard self.kkPlaceholderFont != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
+    var kkPlaceholderColor: UIColor? {
+        didSet {
+            guard self.kkPlaceholderColor != oldValue else { return }
+            self.attributedPlaceholder = self._placeholder()
+        }
+    }
     var kkPlaceholderInset: UIEdgeInsets? {
         didSet {
             guard self.kkPlaceholderInset != oldValue else { return }
@@ -89,7 +107,6 @@ final class KKInputListView : UITextField {
         
         self.kkAccessoryView.kkInput = self
         self.inputAccessoryView = self.kkAccessoryView
-        self.clipsToBounds = true
         self.delegate = self
         
         self.kkPicker.dataSource = self
@@ -198,6 +215,8 @@ extension KKInputListView {
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
         self.update(placeholder: view.placeholder)
+        self.update(placeholderFont: view.placeholderFont)
+        self.update(placeholderColor: view.placeholderColor)
         self.update(placeholderInset: view.placeholderInset)
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
@@ -232,15 +251,16 @@ extension KKInputListView {
         self.kkTextInset = textInset.uiEdgeInsets
     }
     
-    func update(placeholder: UI.View.Input.Placeholder?) {
-        if let placeholder = placeholder {
-            self.attributedPlaceholder = NSAttributedString(string: placeholder.text, attributes: [
-                .font: placeholder.font.native,
-                .foregroundColor: placeholder.color.native
-            ])
-        } else {
-            self.attributedPlaceholder = nil
-        }
+    func update(placeholder: String?) {
+        self.kkPlaceholder = placeholder
+    }
+    
+    func update(placeholderFont: UI.Font?) {
+        self.kkPlaceholderFont = placeholderFont?.native
+    }
+    
+    func update(placeholderColor: UI.Color?) {
+        self.kkPlaceholderColor = placeholderColor?.native
     }
     
     func update(placeholderInset: Inset?) {
@@ -269,6 +289,22 @@ private extension KKInputListView {
         } else {
             self.text = nil
         }
+    }
+    
+    func _placeholder() -> NSAttributedString? {
+        guard let string = self.kkPlaceholder else {
+            return nil
+        }
+        guard let font = self.kkPlaceholderFont ?? self.font else {
+            return nil
+        }
+        guard let color = self.kkPlaceholderColor ?? self.textColor else {
+            return nil
+        }
+        return NSAttributedString(string: string, attributes: [
+            .font: font,
+            .foregroundColor: color
+        ])
     }
     
 }

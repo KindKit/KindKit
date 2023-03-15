@@ -73,6 +73,7 @@ final class KKScrollView : UIScrollView {
             self.setNeedsLayout()
         }
     }
+    private let _virtualKeyboard = VirtualKeyboard()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -89,10 +90,16 @@ final class KKScrollView : UIScrollView {
         self.refreshControl = self._refreshView
         
         self._layoutManager = UI.Layout.Manager(contentView: self._contentView, delegate: self)
+        
+        self._virtualKeyboard.add(observer: self, priority: .public)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        self._virtualKeyboard.remove(observer: self)
     }
     
     override func willMove(toSuperview superview: UIView?) {
@@ -125,6 +132,7 @@ final class KKScrollView : UIScrollView {
                 let size = self._layoutManager.size
                 self.contentSize = size.cgSize
                 self.kkDelegate?.update(self, contentSize: size)
+                self.needLayoutContent = false
             }
             self._layoutManager.visible(
                 bounds: bounds,
@@ -138,6 +146,72 @@ final class KKScrollView : UIScrollView {
         super.safeAreaInsetsDidChange()
         
         self.scrollIndicatorInsets = self._scrollIndicatorInset()
+    }
+    
+}
+
+extension KKScrollView : IVirtualKeyboardObserver {
+
+    func willShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+    func didShow(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+        guard let view = self.kk_firstResponder else {
+            return
+        }
+        guard let contentOffset = self.contentOffset(with: view, horizontal: .center, vertical: .center) else {
+            return
+        }
+        self.setContentOffset(contentOffset, animated: true)
+    }
+
+    func willHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+    func didHide(virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+
+}
+
+extension KKScrollView {
+    
+    func contentOffset(
+        with view: UIView,
+        horizontal: UI.View.Scroll.ScrollAlignment,
+        vertical: UI.View.Scroll.ScrollAlignment
+    ) -> CGPoint? {
+        let contentInset = self.contentInset
+        let contentSize = self.contentSize
+        let visibleSize = self.bounds.size
+        let viewFrame = Rect(self.convert(view.frame, from: view))
+        let x: CGFloat
+        if contentSize.width > visibleSize.width {
+            switch horizontal {
+            case .leading: x = -contentInset.left + viewFrame.x
+            case .center: x = -contentInset.left + ((viewFrame.x + (viewFrame.width / 2)) - ((visibleSize.width - contentInset.right) / 2))
+            case .trailing: x = ((viewFrame.x + viewFrame.width) - visibleSize.width) + contentInset.right
+            }
+        } else {
+            x = -contentInset.left + viewFrame.x
+        }
+        let y: CGFloat
+        if contentSize.height > visibleSize.height {
+            switch vertical {
+            case .leading: y = -contentInset.top + viewFrame.y
+            case .center: y = -contentInset.top + ((viewFrame.y + (viewFrame.size.height / 2)) - ((visibleSize.height - contentInset.bottom) / 2))
+            case .trailing: y = ((viewFrame.y + viewFrame.size.height) - visibleSize.height) + contentInset.bottom
+            }
+        } else {
+            y = -contentInset.top + viewFrame.y
+        }
+        let lowerX = -contentInset.left
+        let lowerY = -contentInset.top
+        let upperX = (contentSize.width - visibleSize.width) + contentInset.right
+        let upperY = (contentSize.height - visibleSize.height) + contentInset.bottom
+        return CGPoint(
+            x: max(lowerX, min(x, upperX)),
+            y: max(lowerY, min(y, upperY))
+        )
     }
     
 }

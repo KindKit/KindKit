@@ -38,6 +38,22 @@ public extension IUIViewPressable {
     
     @inlinable
     @discardableResult
+    func shouldPressed(_ value: () -> Bool) -> Self {
+        return self.shouldPressed(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func shouldPressed(_ value: (Self) -> Bool) -> Self {
+        return self.shouldPressed(value(self))
+    }
+    
+}
+
+public extension IUIViewPressable {
+    
+    @inlinable
+    @discardableResult
     func onPressed(_ closure: (() -> Void)?) -> Self {
         self.onPressed.link(closure)
         return self
@@ -45,14 +61,14 @@ public extension IUIViewPressable {
     
     @inlinable
     @discardableResult
-    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+    func onPressed(_ closure: @escaping (Self) -> Void) -> Self {
         self.onPressed.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onPressed.link(sender, closure)
         return self
     }

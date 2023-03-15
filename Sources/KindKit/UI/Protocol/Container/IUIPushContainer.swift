@@ -17,6 +17,8 @@ public protocol IUIPushContainer : IUIContainer, IUIContainerParentable {
 #endif
     
     func present(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?)
-    func dismiss(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?)
+    
+    @discardableResult
+    func dismiss(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?) -> Bool
     
 }

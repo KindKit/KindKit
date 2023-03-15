@@ -16,6 +16,7 @@ public final class Observer< Target > {
 
 public extension Observer {
     
+    @inlinable
     func add< Priority : RawRepresentable >(_ observer: Target, priority: Priority) where Priority.RawValue == UInt {
         self.add(observer, priority: priority.rawValue)
     }
@@ -46,6 +47,7 @@ public extension Observer {
         )
     }
     
+    @inlinable
     func notify< Priority : RawRepresentable >(priorities: [Priority], closure: (_ observer: Target) -> Void) where Priority.RawValue == UInt {
         self.notify(priorities: priorities.map({ $0.rawValue }), closure: closure)
     }
@@ -64,6 +66,7 @@ public extension Observer {
         )
     }
     
+    @inlinable
     func reverseNotify< Priority : RawRepresentable >(priorities: [Priority], closure: (_ observer: Target) -> Void) where Priority.RawValue == UInt {
         self.reverseNotify(priorities: priorities.map({ $0.rawValue }), closure: closure)
     }

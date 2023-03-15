@@ -88,11 +88,27 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var placeholder: UI.View.Input.Placeholder? {
+        public var placeholder: Swift.String? {
             didSet {
                 guard self.placeholder != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(placeholder: self.placeholder)
+                }
+            }
+        }
+        public var placeholderFont: UI.Font? {
+            didSet {
+                guard self.placeholderFont != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderFont: self.placeholderFont)
+                }
+            }
+        }
+        public var placeholderColor: UI.Color? {
+            didSet {
+                guard self.placeholderColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderColor: self.placeholderColor)
                 }
             }
         }
@@ -173,9 +189,33 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
+    func text(_ value: () -> Swift.String) -> Self {
+        return self.text(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func text(_ value: (Self) -> Swift.String) -> Self {
+        return self.text(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func textFont(_ value: UI.Font) -> Self {
         self.textFont = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textFont(_ value: () -> UI.Font) -> Self {
+        return self.textFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textFont(_ value: (Self) -> UI.Font) -> Self {
+        return self.textFont(value(self))
     }
     
     @inlinable
@@ -185,6 +225,19 @@ public extension UI.View.Input.Secure {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func textColor(_ value: () -> UI.Color) -> Self {
+        return self.textColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.textColor(value(self))
+    }
+    
+    @inlinable
     @discardableResult
     func textInset(_ value: Inset) -> Self {
         self.textInset = value
@@ -193,16 +246,90 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
-    func editingColor(_ value: UI.Color?) -> Self {
-        self.editingColor = value
+    func textInset(_ value: () -> Inset) -> Self {
+        return self.textInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textInset(_ value: (Self) -> Inset) -> Self {
+        return self.textInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: Swift.String?) -> Self {
+        self.placeholder = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func placeholder(_ value: UI.View.Input.Placeholder?) -> Self {
-        self.placeholder = value
+    func placeholder(_ value: () -> Swift.String?) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: (Self) -> Swift.String?) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: Placeholder) -> Self {
+        self.placeholder = value.localized
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: () -> Placeholder) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: (Self) -> Placeholder) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: UI.Font?) -> Self {
+        self.placeholderFont = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: () -> UI.Font?) -> Self {
+        return self.placeholderFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: (Self) -> UI.Font?) -> Self {
+        return self.placeholderFont(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: UI.Color?) -> Self {
+        self.placeholderColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: () -> UI.Color?) -> Self {
+        return self.placeholderColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.placeholderColor(value(self))
     }
     
     @inlinable
@@ -214,9 +341,33 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
+    func placeholderInset(_ value: () -> Inset?) -> Self {
+        return self.placeholderInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderInset(_ value: (Self) -> Inset?) -> Self {
+        return self.placeholderInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func alignment(_ value: UI.Text.Alignment) -> Self {
         self.alignment = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> UI.Text.Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> UI.Text.Alignment) -> Self {
+        return self.alignment(value(self))
     }
     
 #if os(iOS)
@@ -230,9 +381,33 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
+    func toolbar(_ value: () -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func keyboard(_ value: UI.View.Input.Keyboard?) -> Self {
         self.keyboard = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func keyboard(_ value: () -> UI.View.Input.Keyboard?) -> Self {
+        return self.keyboard(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func keyboard(_ value: (Self) -> UI.View.Input.Keyboard?) -> Self {
+        return self.keyboard(value(self))
     }
     
 #endif
@@ -250,14 +425,14 @@ public extension UI.View.Input.Secure {
     
     @inlinable
     @discardableResult
-    func onPressedReturn(_ closure: ((Self) -> Void)?) -> Self {
+    func onPressedReturn(_ closure: @escaping (Self) -> Void) -> Self {
         self.onPressedReturn.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onPressedReturn.link(sender, closure)
         return self
     }

@@ -10,7 +10,7 @@ import KindKit
 public extension XCTestCase {
     
     func kk_makeWindow<
-        Screen : IUIScreen & IUIScreenDialogable & IUIScreenViewable
+        Screen : IScreen & IScreenDialogable & IScreenViewable
     >(
         screen: Screen,
         stylization: (UIWindow) -> Void = { _ in }

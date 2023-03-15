@@ -146,6 +146,18 @@ public extension UI.View.Text {
     
     @inlinable
     @discardableResult
+    func text(_ value: () -> String) -> Self {
+        return self.text(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func text(_ value: (Self) -> String) -> Self {
+        return self.text(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func text< Localized : IEnumLocalized >(_ value: Localized) -> Self {
         self.text = value.localized
         return self
@@ -160,9 +172,33 @@ public extension UI.View.Text {
     
     @inlinable
     @discardableResult
+    func textFont(_ value: () -> UI.Font) -> Self {
+        return self.textFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textFont(_ value: (Self) -> UI.Font) -> Self {
+        return self.textFont(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func textColor(_ value: UI.Color) -> Self {
         self.textColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textColor(_ value: () -> UI.Color) -> Self {
+        return self.textColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.textColor(value(self))
     }
     
     @inlinable
@@ -174,6 +210,18 @@ public extension UI.View.Text {
     
     @inlinable
     @discardableResult
+    func alignment(_ value: () -> UI.Text.Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> UI.Text.Alignment) -> Self {
+        return self.alignment(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func lineBreak(_ value: UI.Text.LineBreak) -> Self {
         self.lineBreak = value
         return self
@@ -181,9 +229,33 @@ public extension UI.View.Text {
     
     @inlinable
     @discardableResult
+    func lineBreak(_ value: () -> UI.Text.LineBreak) -> Self {
+        return self.lineBreak(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func lineBreak(_ value: (Self) -> UI.Text.LineBreak) -> Self {
+        return self.lineBreak(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func numberOfLines(_ value: UInt) -> Self {
         self.numberOfLines = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func numberOfLines(_ value: () -> UInt) -> Self {
+        return self.numberOfLines(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func numberOfLines(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfLines(value(self))
     }
     
 }
@@ -209,27 +281,27 @@ extension UI.View.Text : IUIView {
     
     public func size(available: Size) -> Size {
         guard self.isHidden == false else { return .zero }
-        if let cacheAvailable = self._cacheAvailable, let cacheSize = self._cacheSize {
-            if cacheAvailable == available {
-                return cacheSize
-            } else {
-                self._cacheAvailable = nil
-                self._cacheSize = nil
-            }
-        }
-        let size = self.size.apply(
+        return self.size.apply(
             available: available,
             size: {
-                self.text.kk_size(
+                if let cacheAvailable = self._cacheAvailable, let cacheSize = self._cacheSize {
+                    if cacheAvailable == available {
+                        return cacheSize
+                    } else {
+                        self._cacheAvailable = nil
+                        self._cacheSize = nil
+                    }
+                }
+                let size = self.text.kk_size(
                     font: self.textFont,
                     numberOfLines: self.numberOfLines,
                     available: $0
                 )
+                self._cacheAvailable = available
+                self._cacheSize = size
+                return size
             }
         )
-        self._cacheAvailable = available
-        self._cacheSize = size
-        return size
     }
     
     public func appear(to layout: IUILayout) {
@@ -297,8 +369,13 @@ extension UI.View.Text : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Text {
     
     @inlinable
-    static func text() -> Self {
-        return .init()
+    static func text(_ text: String) -> Self {
+        return .init().text(text)
+    }
+    
+    @inlinable
+    static func text< Text : IEnumLocalized >(_ text: Text) -> Self {
+        return .init().text(text)
     }
     
 }

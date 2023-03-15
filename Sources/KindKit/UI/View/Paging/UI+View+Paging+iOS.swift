@@ -119,8 +119,6 @@ final class KKPagingView : UIScrollView {
         
         do {
             if self.needLayoutContent == true {
-                self.needLayoutContent = false
-                
                 let bounds = Rect(self.bounds)
                 let layoutBounds: Rect
                 if #available(iOS 11.0, *) {
@@ -155,6 +153,7 @@ final class KKPagingView : UIScrollView {
                     })
                     self._revalidatePage = nil
                 }
+                self.needLayoutContent = false
             }
             self._layoutManager.visible(
                 bounds: Rect(self.bounds),

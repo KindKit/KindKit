@@ -16,8 +16,10 @@ public protocol IUIModalContainer : IUIContainer, IUIContainerParentable {
     
     func present< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer
     
-    func dismiss(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?)
+    @discardableResult
+    func dismiss(container: IUIModalContentContainer, animated: Bool, completion: (() -> Void)?) -> Bool
     
-    func dismiss< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer
+    @discardableResult
+    func dismiss< Wireframe : IUIWireframe >(wireframe: Wireframe, animated: Bool, completion: (() -> Void)?) -> Bool where Wireframe : AnyObject, Wireframe.Container : IUIModalContentContainer
     
 }

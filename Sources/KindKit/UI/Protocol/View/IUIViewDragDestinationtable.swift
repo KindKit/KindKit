@@ -29,4 +29,16 @@ public extension IUIViewDragDestinationtable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func dragDestination(_ value: () -> IUIDragAndDropDestination?) -> Self {
+        return self.dragDestination(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func dragDestination(_ value: (Self) -> IUIDragAndDropDestination?) -> Self {
+        return self.dragDestination(value(self))
+    }
+    
 }

@@ -8,7 +8,7 @@ public extension UI.Layout.Composition {
     
     final class Layout {
         
-        public let layout: IUILayout
+        public var layout: IUILayout
         
         public init(
             _ layout: IUILayout
@@ -31,11 +31,11 @@ extension UI.Layout.Composition.Layout : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         return self.layout.layout(bounds: bounds)
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return self.layout.size(available: available)
     }
     
@@ -50,7 +50,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func layout(
         _ layout: IUILayout
-    ) -> UI.Layout.Composition.Layout {
+    ) -> Self {
         return .init(layout)
     }
     

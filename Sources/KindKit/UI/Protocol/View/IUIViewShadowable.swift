@@ -29,4 +29,16 @@ public extension IUIViewShadowable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func shadow(_ value: () -> UI.Shadow?) -> Self {
+        return self.shadow(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func shadow(_ value: (Self) -> UI.Shadow?) -> Self {
+        return self.shadow(value(self))
+    }
+    
 }

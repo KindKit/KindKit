@@ -59,6 +59,18 @@ public extension UI.View.Bar {
     
     @inlinable
     @discardableResult
+    func size(_ value: () -> Double?) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Double?) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func safeArea(_ value: Inset) -> Self {
         self.safeArea = value
         return self
@@ -66,9 +78,33 @@ public extension UI.View.Bar {
     
     @inlinable
     @discardableResult
+    func safeArea(_ value: () -> Inset) -> Self {
+        return self.safeArea(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func safeArea(_ value: (Self) -> Inset) -> Self {
+        return self.safeArea(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func separator(_ value: IUIView?) -> Self {
         self.separator = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func separator(_ value: () -> IUIView?) -> Self {
+        return self.separator(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func separator(_ value: (Self) -> IUIView?) -> Self {
+        return self.separator(value(self))
     }
     
 }

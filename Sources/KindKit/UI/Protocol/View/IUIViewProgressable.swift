@@ -29,4 +29,16 @@ public extension IUIViewProgressable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func progress(_ value: () -> Double) -> Self {
+        return self.progress(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func progress(_ value: (Self) -> Double) -> Self {
+        return self.progress(value(self))
+    }
+    
 }

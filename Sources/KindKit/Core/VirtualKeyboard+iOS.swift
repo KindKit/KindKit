@@ -53,7 +53,7 @@ public extension VirtualKeyboard {
         public let endFrame: Rect
         public let duration: TimeInterval
 
-        init?(_ userInfo: [ AnyHashable : Any ]) {
+        init?(_ userInfo: [AnyHashable : Any]) {
             guard let beginFrameValue = userInfo[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue else { return nil }
             guard let endFrameValue = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return nil }
             guard let durationValue = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else { return nil }

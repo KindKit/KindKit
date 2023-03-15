@@ -36,7 +36,7 @@ extension UI.Layout.Composition.Bubble : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let size = self.content.layout(bounds: bounds)
         if size.isZero == true {
             return size
@@ -48,7 +48,7 @@ extension UI.Layout.Composition.Bubble : IUICompositionLayoutEntity {
         return size
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let size = self.content.size(available: available)
         if size.isZero == true {
             return size
@@ -68,7 +68,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     static func bubble(
         content: IUICompositionLayoutEntity,
         bubble: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.Bubble {
+    ) -> Self {
         return .init(content: content, bubble: bubble)
     }
     

@@ -287,9 +287,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func inset(_ value: () -> Inset) -> Self {
+        return self.inset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func inset(_ value: (Self) -> Inset) -> Self {
+        return self.inset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func header(_ value: IUIView?) -> Self {
         self.header = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func header(_ value: () -> IUIView?) -> Self {
+        return self.header(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func header(_ value: (Self) -> IUIView?) -> Self {
+        return self.header(value(self))
     }
     
     @inlinable
@@ -301,9 +325,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func headerSpacing(_ value: () -> Double) -> Self {
+        return self.headerSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func headerSpacing(_ value: (Self) -> Double) -> Self {
+        return self.headerSpacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func leadings(_ value: [IUIView]) -> Self {
         self.leadings = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func leadings(_ value: () -> [IUIView]) -> Self {
+        return self.leadings(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leadings(_ value: (Self) -> [IUIView]) -> Self {
+        return self.leadings(value(self))
     }
     
     @inlinable
@@ -315,9 +363,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func leadingsSpacing(_ value: () -> Double) -> Self {
+        return self.leadingsSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leadingsSpacing(_ value: (Self) -> Double) -> Self {
+        return self.leadingsSpacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func center(_ value: IUIView?) -> Self {
         self.center = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func center(_ value: () -> IUIView?) -> Self {
+        return self.center(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func center(_ value: (Self) -> IUIView?) -> Self {
+        return self.center(value(self))
     }
     
     @inlinable
@@ -329,9 +401,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func centerFilling(_ value: () -> Bool) -> Self {
+        return self.centerFilling(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func centerFilling(_ value: (Self) -> Bool) -> Self {
+        return self.centerFilling(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func centerSpacing(_ value: Double) -> Self {
         self.centerSpacing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func centerSpacing(_ value: () -> Double) -> Self {
+        return self.centerSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func centerSpacing(_ value: (Self) -> Double) -> Self {
+        return self.centerSpacing(value(self))
     }
     
     @inlinable
@@ -343,9 +439,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func trailings(_ value: () -> [IUIView]) -> Self {
+        return self.trailings(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailings(_ value: (Self) -> [IUIView]) -> Self {
+        return self.trailings(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func trailingsSpacing(_ value: Double) -> Self {
         self.trailingsSpacing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailingsSpacing(_ value: () -> Double) -> Self {
+        return self.trailingsSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailingsSpacing(_ value: (Self) -> Double) -> Self {
+        return self.trailingsSpacing(value(self))
     }
     
     @inlinable
@@ -357,9 +477,33 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func footer(_ value: () -> IUIView?) -> Self {
+        return self.footer(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func footer(_ value: (Self) -> IUIView?) -> Self {
+        return self.footer(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func footerSpacing(_ value: Double) -> Self {
         self.footerSpacing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func footerSpacing(_ value: () -> Double) -> Self {
+        return self.footerSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func footerSpacing(_ value: (Self) -> Double) -> Self {
+        return self.footerSpacing(value(self))
     }
     
 }

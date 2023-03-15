@@ -34,7 +34,7 @@ public extension UI.Container {
             self.viewController = .init(container)
         }
         
-        public init< Screen : IUIScreen & IUIScreenViewable >(
+        public init< Screen : IScreen & IScreenViewable >(
             _ screen: Screen
         ) {
             self.viewController = .init(screen)

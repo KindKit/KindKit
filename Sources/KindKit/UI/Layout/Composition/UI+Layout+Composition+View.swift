@@ -6,9 +6,9 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct View {
+    final class View {
         
-        public let view: IUIView
+        public var view: IUIView
         
         public init(
             _ view: IUIView
@@ -29,12 +29,12 @@ extension UI.Layout.Composition.View : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         self.view.frame = bounds
         return bounds.size
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return self.view.size(available: available)
     }
     
@@ -49,7 +49,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func view(
         _ view: IUIView
-    ) -> UI.Layout.Composition.View {
+    ) -> Self {
         return .init(view)
     }
     

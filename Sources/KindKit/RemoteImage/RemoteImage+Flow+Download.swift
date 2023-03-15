@@ -19,7 +19,7 @@ public extension RemoteImage.Flow {
         private let _loader: RemoteImage.Loader
         private let _query: (Input.Success) -> Query
         private let _filter: ((Input.Success) -> IRemoteImageFilter)?
-        private let _validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?
+        private let _validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?
         private let _success: (Input.Success, UI.Image) -> Success
         private let _failure: (Input.Success, RemoteImage.Error) -> Failure
         private var _state: State?
@@ -34,7 +34,7 @@ public extension RemoteImage.Flow {
             _ loader: RemoteImage.Loader,
             _ query: @escaping (Input.Success) -> Query,
             _ filter: ((Input.Success) -> IRemoteImageFilter)?,
-            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
             _ success: @escaping (Input.Success, UI.Image) -> Success,
             _ failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
         ) {
@@ -50,7 +50,7 @@ public extension RemoteImage.Flow {
             _ loader: RemoteImage.Loader,
             _ query: @escaping (Input.Success) -> Query,
             _ filter: ((Input.Success) -> IRemoteImageFilter)?,
-            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
             _ success: @escaping (Input.Success, UI.Image) -> Success
         ) where
             Failure == RemoteImage.Error
@@ -62,7 +62,7 @@ public extension RemoteImage.Flow {
             _ loader: RemoteImage.Loader,
             _ query: @escaping (Input.Success) -> Query,
             _ filter: ((Input.Success) -> IRemoteImageFilter)?,
-            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
             _ failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
         ) where
             Success == UI.Image
@@ -74,7 +74,7 @@ public extension RemoteImage.Flow {
             _ loader: RemoteImage.Loader,
             _ query: @escaping (Input.Success) -> Query,
             _ filter: ((Input.Success) -> IRemoteImageFilter)?,
-            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?
+            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?
         ) where
             Success == UI.Image,
             Failure == RemoteImage.Error
@@ -198,7 +198,7 @@ extension IFlowOperator {
         _ loader: RemoteImage.Loader,
         _ query: @escaping (Output.Success) -> Query,
         _ filter: ((Output.Success) -> IRemoteImageFilter)?,
-        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
         _ success: @escaping (Output.Success, UI.Image) -> Success,
         _ failure: @escaping (Output.Success, RemoteImage.Error) -> Failure
     ) -> RemoteImage.Flow.Download< Output, Success, Failure, Query > where
@@ -216,7 +216,7 @@ extension IFlowOperator {
         _ loader: RemoteImage.Loader,
         _ query: @escaping (Output.Success) -> Query,
         _ filter: ((Output.Success) -> IRemoteImageFilter)?,
-        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
         _ success: @escaping (Output.Success, UI.Image) -> Success
     ) -> RemoteImage.Flow.Download< Output, Success, RemoteImage.Error, Query > where
         Output.Failure == RemoteImage.Error
@@ -233,7 +233,7 @@ extension IFlowOperator {
         _ loader: RemoteImage.Loader,
         _ query: @escaping (Output.Success) -> Query,
         _ filter: ((Output.Success) -> IRemoteImageFilter)?,
-        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?,
+        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
         _ failure: @escaping (Output.Success, RemoteImage.Error) -> Failure
     ) -> RemoteImage.Flow.Download< Output, UI.Image, Failure, Query > where
         Output.Failure == Failure
@@ -249,7 +249,7 @@ extension IFlowOperator {
         _ loader: RemoteImage.Loader,
         _ query: @escaping (Output.Success) -> Query,
         _ filter: ((Output.Success) -> IRemoteImageFilter)?,
-        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)?
+        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?
     ) -> RemoteImage.Flow.Download< Output, UI.Image, RemoteImage.Error, Query > where
         Output.Failure == RemoteImage.Error
     {
@@ -269,7 +269,7 @@ public extension Flow.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Input.Success) -> Query,
         filter: ((Input.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Input.Success, UI.Image) -> Success,
         failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, Success, Input.Failure, Query > > {
@@ -283,7 +283,7 @@ public extension Flow.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Input.Success) -> Query,
         filter: ((Input.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Input.Success, UI.Image) -> Success
     ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, Success, RemoteImage.Error, Query > > where
         Input.Failure == RemoteImage.Error
@@ -297,7 +297,7 @@ public extension Flow.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Input.Success) -> Query,
         filter: ((Input.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, UI.Image, Input.Failure, Query > > {
         return .init(head: .init(loader, query, filter, validation, failure))
@@ -309,7 +309,7 @@ public extension Flow.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Input.Success) -> Query,
         filter: ((Input.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil
+        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil
     ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, UI.Image, RemoteImage.Error, Query > > where
         Input.Failure == RemoteImage.Error
     {
@@ -328,7 +328,7 @@ public extension Flow.Head.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Head.Output.Success) -> Query,
         filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Head.Output.Success, UI.Image) -> Success,
         failure: @escaping (Head.Output.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, Success, Failure, Query > > where
@@ -344,7 +344,7 @@ public extension Flow.Head.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Head.Output.Success) -> Query,
         filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Head.Output.Success, UI.Image) -> Success
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, Success, RemoteImage.Error, Query > > where
         Head.Output.Failure == RemoteImage.Error
@@ -358,7 +358,7 @@ public extension Flow.Head.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Head.Output.Success) -> Query,
         filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         failure: @escaping (Head.Output.Success, RemoteImage.Error) -> Head.Output.Failure
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, UI.Image, Head.Output.Failure, Query > > {
         return .init(head: self.head, tail: self.head.download(loader, query, filter, validation, failure))
@@ -370,7 +370,7 @@ public extension Flow.Head.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Head.Output.Success) -> Query,
         filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil
+        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, UI.Image, RemoteImage.Error, Query > > where
         Head.Output.Failure == RemoteImage.Error
     {
@@ -389,7 +389,7 @@ public extension Flow.Chain.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Tail.Output.Success) -> Query,
         filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Tail.Output.Success, UI.Image) -> Success,
         failure: @escaping (Tail.Output.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > where
@@ -405,7 +405,7 @@ public extension Flow.Chain.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Tail.Output.Success) -> Query,
         filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Tail.Output.Success, UI.Image) -> Success
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, Success, RemoteImage.Error, Query > > where
         Tail.Output.Failure == RemoteImage.Error
@@ -419,7 +419,7 @@ public extension Flow.Chain.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Tail.Output.Success) -> Query,
         filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil,
+        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         failure: @escaping (Tail.Output.Success, RemoteImage.Error) -> Tail.Output.Failure
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, UI.Image, Tail.Output.Failure, Query > > {
         return .init(head: self.head, tail: self.tail.download(loader, query, filter, validation, failure))
@@ -431,7 +431,7 @@ public extension Flow.Chain.Builder {
         loader: RemoteImage.Loader = .shared,
         query: @escaping (Tail.Output.Success) -> Query,
         filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
-        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> RemoteImage.Flow.Validation)? = nil
+        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil
     ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, UI.Image, RemoteImage.Error, Query > > where
         Tail.Output.Failure == RemoteImage.Error
     {

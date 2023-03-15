@@ -41,8 +41,8 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
-        let pass = self._pass(available: Size(
+    public func layout(bounds: Rect) -> KindKit.Size {
+        let pass = self._pass(available: .init(
             width: bounds.width,
             height: .infinity
         ))
@@ -53,8 +53,8 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
         )
     }
     
-    public func size(available: Size) -> Size {
-        let pass = self._pass(available: Size(
+    public func size(available: KindKit.Size) -> KindKit.Size {
+        let pass = self._pass(available: .init(
             width: available.width,
             height: .infinity
         ))
@@ -77,7 +77,7 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
 private extension UI.Layout.Composition.VGrid {
     
     @inline(__always)
-    func _width(available: Size) -> Double {
+    func _width(available: KindKit.Size) -> Double {
         if self.columns > 1 {
             return (available.width - (self.spacing.x * Double(self.columns - 1))) / Double(self.columns)
         }
@@ -85,12 +85,12 @@ private extension UI.Layout.Composition.VGrid {
     }
     
     @inline(__always)
-    func _pass(available: Size) -> Pass {
+    func _pass(available: KindKit.Size) -> Pass {
         var pass = Pass(rows: [], bounding: .zero)
         var row = PassRow(items: [], size: 0)
         let width = self._width(available: available)
         for entity in self.entities {
-            let size = entity.size(available: Size(
+            let size = entity.size(available: .init(
                 width: width,
                 height: available.height
             ))
@@ -143,7 +143,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
         columns: Int,
         spacing: Point = .zero,
         entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.VGrid {
+    ) -> Self {
         return .init(
             columns: columns,
             spacing: spacing,

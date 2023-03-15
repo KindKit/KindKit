@@ -7,7 +7,9 @@ import Foundation
 public extension Array {
     
     @inlinable
-    static func kk_make(range: Range< Element >) -> Self where Element : Strideable, Element.Stride : SignedInteger {
+    static func kk_make(
+        range: Range< Element >
+    ) -> Self where Element : Strideable, Element.Stride : SignedInteger {
         return Array(unsafeUninitializedCapacity: range.count, initializingWith: { buffer, count in
             for (index, value) in range.enumerated() {
                 buffer[index] = value
@@ -17,7 +19,55 @@ public extension Array {
     }
     
     @inlinable
-    func kk_appending(_ element: Element) -> Self {
+    func kk_previous(
+        `where`: (Element) -> Bool
+    ) -> Element? {
+        guard let index = self.firstIndex(where: `where`) else {
+            return nil
+        }
+        guard index > 0 else {
+            return nil
+        }
+        return self[index - 1]
+    }
+    
+    @inlinable
+    func kk_previous(
+        at index: Int
+    ) -> Element? {
+        guard index > 0 && index < self.count else {
+            return nil
+        }
+        return self[index - 1]
+    }
+    
+    @inlinable
+    func kk_next(
+        `where`: (Element) -> Bool
+    ) -> Element? {
+        guard let index = self.firstIndex(where: `where`) else {
+            return nil
+        }
+        guard index < self.count - 1 else {
+            return nil
+        }
+        return self[index + 1]
+    }
+    
+    @inlinable
+    func kk_next(
+        at index: Int
+    ) -> Element? {
+        guard index < self.count - 1 else {
+            return nil
+        }
+        return self[index + 1]
+    }
+    
+    @inlinable
+    func kk_appending(
+        _ element: Element
+    ) -> Self {
         if self.isEmpty == true {
             return [ element ]
         }
@@ -27,7 +77,9 @@ public extension Array {
     }
     
     @inlinable
-    func kk_appending< S : Sequence >(contentsOf contents: S) -> Self  where Element == S.Element {
+    func kk_appending< S : Sequence >(
+        contentsOf contents: S
+    ) -> Self  where Element == S.Element {
         if self.isEmpty == true {
             return Array(contents)
         }
@@ -37,8 +89,32 @@ public extension Array {
     }
     
     @inlinable
+    func kk_removingFirst(
+        count: Int = 1
+    ) -> Self {
+        if self.count < count {
+            return []
+        }
+        var result = self
+        result.removeFirst(count)
+        return result
+    }
+    
+    @inlinable
+    func kk_removingLast(
+        count: Int = 1
+    ) -> Self {
+        if self.count < count {
+            return []
+        }
+        var result = self
+        result.removeLast(count)
+        return result
+    }
+    
+    @inlinable
     func kk_reorder(
-        where block: (_ lhs: Element, _ rhs: Element) throws -> [Element]
+        `where` block: (_ lhs: Element, _ rhs: Element) throws -> [Element]
     ) rethrows -> Self {
         guard self.count > 1 else { return self }
         var result: [Element] = []
@@ -67,7 +143,9 @@ public extension Array {
     }
     
     @inlinable
-    func kk_count(where: (_ element: Element) -> Bool) -> Int {
+    func kk_count(
+        `where`: (Element) -> Bool
+    ) -> Int {
         var result = 0
         for element in self {
             if `where`(element) == true {
@@ -145,6 +223,28 @@ public extension Array {
             }
         }
         return result
+    }
+    
+    @inlinable
+    func kk_difference(
+        _ other: [Element],
+        `where`: (Element, Element) -> Bool
+    ) -> (
+        removed: [Element],
+        stayed: [Element],
+        added: [Element]
+    ) {
+        return (
+            removed: self.filter({ view in
+                other.contains(where: { `where`($0, view) }) == false
+            }),
+            stayed: self.filter({ view in
+                other.contains(where: { `where`($0, view) }) == true
+            }),
+            added: other.filter({ view in
+                self.contains(where: { `where`($0, view) }) == false
+            })
+        )
     }
     
 }

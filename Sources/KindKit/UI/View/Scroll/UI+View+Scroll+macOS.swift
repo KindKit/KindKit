@@ -120,12 +120,11 @@ final class KKScrollView : NSScrollView {
     
     func layoutContent() {
         if self.needLayoutContent == true {
-            self.needLayoutContent = false
-            
             let bounds = Rect(self.bounds)
             self._layoutManager.layout(bounds: bounds)
             self.contentSize = self._layoutManager.size.cgSize
             self.kkDelegate?.update(self, contentSize: self._layoutManager.size)
+            self.needLayoutContent = false
         }
         do {
             let visibleRect = Rect(self.contentView.documentVisibleRect)

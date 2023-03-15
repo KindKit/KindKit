@@ -15,7 +15,7 @@ public extension InputSuggestion {
         public init(
             items: [String],
             limit: UInt = 0,
-            options: Options = [ .allowEmpty ]
+            options: Options = .allowEmpty
         ) {
             self._items = items.map(options.makeItem)
             self._limit = limit
@@ -62,7 +62,7 @@ public extension IInputSuggestion where Self == InputSuggestion.Static {
     static func `static`(
         items: [String],
         limit: UInt = 0,
-        options: InputSuggestion.Static.Options = [ .allowEmpty ]
+        options: InputSuggestion.Static.Options = .allowEmpty
     ) -> Self {
         return .init(
             items: items,

@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct HSplitStack {
+    final class HSplitStack {
         
         public var alignment: Alignment
         public var spacing: Double
@@ -41,7 +41,7 @@ extension UI.Layout.Composition.HSplitStack : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let pass = self._sizePass(available: bounds.size)
         switch self.alignment {
         case .top: self._layoutTop(bounds: bounds, pass: pass)
@@ -52,7 +52,7 @@ extension UI.Layout.Composition.HSplitStack : IUICompositionLayoutEntity {
         return pass.bounding
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let pass = self._sizePass(available: available)
         return pass.bounding
     }
@@ -151,9 +151,10 @@ private extension UI.Layout.Composition.HSplitStack {
         var origin = bounds.topLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.width > 0 else { continue }
             entity.layout(bounds: Rect(topLeft: origin, size: size))
-            origin.x += size.width + self.spacing
+            if size.width > 0 {
+                origin.x += size.width + self.spacing
+            }
         }
     }
     
@@ -162,9 +163,10 @@ private extension UI.Layout.Composition.HSplitStack {
         var origin = bounds.left
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.width > 0 else { continue }
             entity.layout(bounds: Rect(left: origin, size: size))
-            origin.x += size.width + self.spacing
+            if size.width > 0 {
+                origin.x += size.width + self.spacing
+            }
         }
     }
     
@@ -173,9 +175,10 @@ private extension UI.Layout.Composition.HSplitStack {
         var origin = bounds.bottomLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.width > 0 else { continue }
             entity.layout(bounds: Rect(bottomLeft: origin, size: size))
-            origin.x += size.width + self.spacing
+            if size.width > 0 {
+                origin.x += size.width + self.spacing
+            }
         }
     }
     
@@ -184,9 +187,10 @@ private extension UI.Layout.Composition.HSplitStack {
         var origin = bounds.topLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.width > 0 else { continue }
             entity.layout(bounds: Rect(topLeft: origin, width: size.width, height: bounds.height))
-            origin.x += size.width + self.spacing
+            if size.width > 0 {
+                origin.x += size.width + self.spacing
+            }
         }
     }
     
@@ -199,7 +203,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
         alignment: UI.Layout.Composition.HSplitStack.Alignment = .fill,
         spacing: Double = 0,
         entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.HSplitStack {
+    ) -> Self {
         return .init(
             alignment: alignment,
             spacing: spacing,

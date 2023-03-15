@@ -157,7 +157,7 @@ private extension SemaVersion {
         )?
         $
         """#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: [ .allowCommentsAndWhitespace ]) else { return nil }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .allowCommentsAndWhitespace) else { return nil }
         guard let match = regex.firstMatch(in: string, options: [], range: NSRange(string.startIndex..., in: string)) else { return nil }
         let groups: [String] = (1...regex.numberOfCaptureGroups).map {
             if let r = Range(match.range(at: $0), in: string) {

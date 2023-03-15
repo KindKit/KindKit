@@ -162,9 +162,33 @@ public extension UI.View.Stepper {
     
     @inlinable
     @discardableResult
+    func minValue(_ value: () -> Double) -> Self {
+        return self.minValue(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func minValue(_ value: (Self) -> Double) -> Self {
+        return self.minValue(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func maxValue(_ value: Double) -> Self {
         self.maxValue = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func maxValue(_ value: () -> Double) -> Self {
+        return self.maxValue(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func maxValue(_ value: (Self) -> Double) -> Self {
+        return self.maxValue(value(self))
     }
     
     @inlinable
@@ -176,9 +200,33 @@ public extension UI.View.Stepper {
     
     @inlinable
     @discardableResult
+    func stepValue(_ value: () -> Double) -> Self {
+        return self.stepValue(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func stepValue(_ value: (Self) -> Double) -> Self {
+        return self.stepValue(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func value(_ value: Double) -> Self {
         self.value = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: () -> Double) -> Self {
+        return self.value(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func value(_ value: (Self) -> Double) -> Self {
+        return self.value(value(self))
     }
     
     @inlinable
@@ -190,9 +238,33 @@ public extension UI.View.Stepper {
     
     @inlinable
     @discardableResult
+    func isAutorepeat(_ value: () -> Bool) -> Self {
+        return self.isAutorepeat(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func isAutorepeat(_ value: (Self) -> Bool) -> Self {
+        return self.isAutorepeat(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func isWraps(_ value: Bool) -> Self {
         self.isWraps = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func isWraps(_ value: () -> Bool) -> Self {
+        return self.isWraps(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func isWraps(_ value: (Self) -> Bool) -> Self {
+        return self.isWraps(value(self))
     }
     
 }
@@ -303,8 +375,8 @@ extension UI.View.Stepper : KKStepperViewDelegate {
 public extension IUIView where Self == UI.View.Stepper {
     
     @inlinable
-    static func stepper() -> Self {
-        return .init()
+    static func stepper(_ value: Double) -> Self {
+        return .init().value(value)
     }
     
 }

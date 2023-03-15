@@ -30,7 +30,7 @@ public extension IUIViewHitable {
     
     @inlinable
     @discardableResult
-    func onHit(_ closure: ((Self) -> Bool?)?) -> Self {
+    func onHit(_ closure: @escaping (Self) -> Bool?) -> Self {
         self.onHit.link(self, closure)
         return self
     }
@@ -44,21 +44,21 @@ public extension IUIViewHitable {
     
     @inlinable
     @discardableResult
-    func onHit(_ closure: ((Self, Point) -> Bool?)?) -> Self {
+    func onHit(_ closure: @escaping (Self, Point) -> Bool?) -> Self {
         self.onHit.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onHit< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Bool?)?) -> Self {
+    func onHit< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Bool?) -> Self {
         self.onHit.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onHit< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Point) -> Bool?)?) -> Self {
+    func onHit< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Point) -> Bool?) -> Self {
         self.onHit.link(sender, closure)
         return self
     }

@@ -57,13 +57,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onStarted(_ closure: ((Self) -> Void)?) -> Self {
+    func onStarted(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onStarted.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onStarted< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onStarted< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onStarted.link(sender, closure)
         return self
     }
@@ -75,13 +75,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onRepeat(_ closure: ((Self) -> Void)?) -> Self {
+    func onRepeat(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onRepeat.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onRepeat< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onRepeat< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onRepeat.link(sender, closure)
         return self
     }
@@ -93,13 +93,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onFinished(_ closure: ((Self) -> Void)?) -> Self {
+    func onFinished(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onFinished.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onFinished.link(sender, closure)
         return self
     }
@@ -111,13 +111,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onStoped(_ closure: ((Self) -> Void)?) -> Self {
+    func onStoped(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onStoped.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onStoped< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onStoped< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onStoped.link(sender, closure)
         return self
     }
@@ -129,13 +129,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onPaused(_ closure: ((Self) -> Void)?) -> Self {
+    func onPaused(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onPaused.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onPaused< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPaused< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onPaused.link(sender, closure)
         return self
     }
@@ -147,13 +147,13 @@ public extension Timer {
     }
     
     @discardableResult
-    func onResumed(_ closure: ((Self) -> Void)?) -> Self {
+    func onResumed(_ closure: @escaping (Self) -> Void) -> Self {
         self._impl.onResumed.link(self, closure)
         return self
     }
     
     @discardableResult
-    func onResumed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onResumed< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self._impl.onResumed.link(sender, closure)
         return self
     }

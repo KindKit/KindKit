@@ -118,6 +118,18 @@ public extension UI.View.Mask {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUIView?) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUIView?) -> Self {
+        return self.content(value(self))
+    }
+    
 }
 
 extension UI.View.Mask : IUIView {
@@ -224,8 +236,8 @@ extension UI.View.Mask : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Mask {
     
     @inlinable
-    static func mask() -> Self {
-        return .init()
+    static func mask(_ content: IUIView) -> Self {
+        return .init().content(content)
     }
     
 }

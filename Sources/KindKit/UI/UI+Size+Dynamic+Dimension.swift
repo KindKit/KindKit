@@ -31,14 +31,16 @@ public extension UI.Size.Dynamic.Dimension {
         return .content(.one)
     }
     
-    @available(*, deprecated, renamed: "UI.Size.Dynamic.Dimension.parent")
-    static func percent(_ value: Percent) -> Self {
-        return .parent(value)
+    static func parent(_ value: Double) -> Self {
+        return .parent(Percent(value))
     }
     
-    @available(*, deprecated, renamed: "UI.Size.Dynamic.Dimension.content")
-    static func morph(_ value: Percent) -> Self {
-        return .content(value)
+    static func ratio(_ value: Double) -> Self {
+        return .ratio(Percent(value))
+    }
+    
+    static func content(_ value: Double) -> Self {
+        return .content(Percent(value))
     }
     
 }

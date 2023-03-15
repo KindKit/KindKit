@@ -44,7 +44,7 @@ extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let pass = self._sizePass(available: bounds.size)
         switch self.alignment {
         case .left: self._layoutLeft(bounds: bounds, pass: pass)
@@ -55,7 +55,7 @@ extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
         return pass.bounding
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let pass = self._sizePass(available: available)
         return pass.bounding
     }
@@ -73,7 +73,7 @@ extension UI.Layout.Composition.VStack : IUICompositionLayoutEntity {
 private extension UI.Layout.Composition.VStack {
     
     @inline(__always)
-    func _sizePass(available: Size) -> Pass {
+    func _sizePass(available: KindKit.Size) -> Pass {
         var pass: Pass
         if self.behaviour.contains(.fit) == true {
             let width: Double
@@ -128,9 +128,10 @@ private extension UI.Layout.Composition.VStack {
         var origin = bounds.topLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(topLeft: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -139,9 +140,10 @@ private extension UI.Layout.Composition.VStack {
         var origin = bounds.top
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(top: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -150,9 +152,10 @@ private extension UI.Layout.Composition.VStack {
         var origin = bounds.topRight
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(topRight: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -161,9 +164,10 @@ private extension UI.Layout.Composition.VStack {
         var origin = bounds.topLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(topLeft: origin, width: bounds.width, height: size.height))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -177,7 +181,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
         behaviour: UI.Layout.Composition.VStack.Behaviour = [],
         spacing: Double = 0,
         entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.VStack {
+    ) -> Self {
         return .init(
             alignment: alignment,
             behaviour: behaviour,

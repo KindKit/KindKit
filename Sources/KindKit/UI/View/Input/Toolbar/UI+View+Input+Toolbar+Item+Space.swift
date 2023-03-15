@@ -8,7 +8,7 @@ import UIKit
 
 public extension UI.View.Input.Toolbar.Item {
     
-    final class Space : IInputToolbarItem {
+    final class Space : IUIViewInputToolbarItem {
         
         public let barItem: UIBarButtonItem
         
@@ -30,7 +30,7 @@ public extension UI.View.Input.Toolbar.Item {
     
 }
 
-public extension IInputToolbarItem where Self == UI.View.Input.Toolbar.Item.Space {
+public extension IUIViewInputToolbarItem where Self == UI.View.Input.Toolbar.Item.Space {
 
     @inlinable
     static func flexible() -> UI.View.Input.Toolbar.Item.Space {

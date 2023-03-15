@@ -68,7 +68,7 @@ public extension FileManager {
     func kk_contents(
         at url: URL
     ) -> [(url: URL, attributes: [FileAttributeKey : Any])] {
-        guard let urls = try? self.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [ .skipsHiddenFiles ]) else {
+        guard let urls = try? self.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
             return []
         }
         return urls.compactMap({

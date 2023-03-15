@@ -29,4 +29,16 @@ public extension IUIViewBorderable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func border(_ value: () -> UI.Border) -> Self {
+        return self.border(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func border(_ value: (Self) -> UI.Border) -> Self {
+        return self.border(value(self))
+    }
+    
 }

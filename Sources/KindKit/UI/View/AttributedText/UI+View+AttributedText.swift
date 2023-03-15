@@ -137,9 +137,33 @@ public extension UI.View.AttributedText {
     
     @inlinable
     @discardableResult
+    func text(_ value: () -> NSAttributedString?) -> Self {
+        return self.text(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func text(_ value: (Self) -> NSAttributedString?) -> Self {
+        return self.text(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func alignment(_ value: UI.Text.Alignment?) -> Self {
         self.alignment = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> UI.Text.Alignment?) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> UI.Text.Alignment?) -> Self {
+        return self.alignment(value(self))
     }
     
     @inlinable
@@ -151,28 +175,38 @@ public extension UI.View.AttributedText {
     
     @inlinable
     @discardableResult
+    func lineBreak(_ value: () -> UI.Text.LineBreak) -> Self {
+        return self.lineBreak(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func lineBreak(_ value: (Self) -> UI.Text.LineBreak) -> Self {
+        return self.lineBreak(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func numberOfLines(_ value: UInt) -> Self {
         self.numberOfLines = value
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func numberOfLines(_ value: () -> UInt) -> Self {
+        return self.numberOfLines(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func numberOfLines(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfLines(value(self))
+    }
+    
 }
 
 public extension UI.View.AttributedText {
-    
-    @inlinable
-    @discardableResult
-    func onTap(_ closure: (() -> Void)?) -> Self {
-        self.onTap.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTap(_ closure: ((Self) -> Void)?) -> Self {
-        self.onTap.link(self, closure)
-        return self
-    }
     
     @inlinable
     @discardableResult
@@ -185,13 +219,6 @@ public extension UI.View.AttributedText {
     @discardableResult
     func onTap(_ closure: ((Self, [NSAttributedString.Key: Any]?) -> Void)?) -> Self {
         self.onTap.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTap< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onTap.link(sender, closure)
         return self
     }
     
@@ -225,27 +252,29 @@ extension UI.View.AttributedText : IUIView {
     
     public func size(available: Size) -> Size {
         guard self.isHidden == false else { return .zero }
-        if let cacheAvailable = self._cacheAvailable, let cacheSize = self._cacheSize {
-            if cacheAvailable == available {
-                return cacheSize
-            } else {
-                self._cacheAvailable = nil
-                self._cacheSize = nil
-            }
-        }
-        let size = self.size.apply(
+        return self.size.apply(
             available: available,
             size: {
-                guard let text = self.text else { return .zero }
-                return text.kk_size(
+                guard let text = self.text else {
+                    return .zero
+                }
+                if let cacheAvailable = self._cacheAvailable, let cacheSize = self._cacheSize {
+                    if cacheAvailable == available {
+                        return cacheSize
+                    } else {
+                        self._cacheAvailable = nil
+                        self._cacheSize = nil
+                    }
+                }
+                let size = text.kk_size(
                     numberOfLines: self.numberOfLines,
                     available: $0
                 )
+                self._cacheAvailable = available
+                self._cacheSize = size
+                return size
             }
         )
-        self._cacheAvailable = available
-        self._cacheSize = size
-        return size
     }
     
     public func appear(to layout: IUILayout) {
@@ -325,8 +354,8 @@ extension UI.View.AttributedText : KKAttributedTextViewDelegate {
 public extension IUIView where Self == UI.View.AttributedText {
     
     @inlinable
-    static func attributedText() -> Self {
-        return .init()
+    static func attributedText(_ text: NSAttributedString) -> Self {
+        return .init().text(text)
     }
     
 }

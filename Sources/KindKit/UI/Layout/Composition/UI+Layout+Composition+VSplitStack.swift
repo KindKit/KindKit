@@ -41,7 +41,7 @@ extension UI.Layout.Composition.VSplitStack : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let pass = self._sizePass(available: bounds.size)
         switch self.alignment {
         case .left: self._layoutLeft(bounds: bounds, pass: pass)
@@ -52,7 +52,7 @@ extension UI.Layout.Composition.VSplitStack : IUICompositionLayoutEntity {
         return pass.bounding
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let pass = self._sizePass(available: available)
         return pass.bounding
     }
@@ -70,14 +70,14 @@ extension UI.Layout.Composition.VSplitStack : IUICompositionLayoutEntity {
 private extension UI.Layout.Composition.VSplitStack {
     
     @inline(__always)
-    func _availableSize(available: Size, entities: Int) -> Size {
+    func _availableSize(available: KindKit.Size, entities: Int) -> KindKit.Size {
         if entities > 1 {
-            return Size(
+            return .init(
                 width: available.width,
                 height: (available.height - (self.spacing * Double(entities - 1))) / Double(entities)
             )
         } else if entities > 0 {
-            return Size(
+            return .init(
                 width: available.width,
                 height: available.height / Double(entities)
             )
@@ -86,7 +86,7 @@ private extension UI.Layout.Composition.VSplitStack {
     }
     
     @inline(__always)
-    func _sizePass(available: Size) -> Pass {
+    func _sizePass(available: KindKit.Size) -> Pass {
         var pass = Pass(
             sizes: Array(
                 repeating: .zero,
@@ -95,7 +95,7 @@ private extension UI.Layout.Composition.VSplitStack {
             bounding: .zero
         )
         if self.entities.isEmpty == false {
-            var entityAvailableSize: Size
+            var entityAvailableSize: KindKit.Size
             let numberOfValid: Int
             if available.width.isInfinite == false {
                 entityAvailableSize = self._availableSize(
@@ -139,7 +139,7 @@ private extension UI.Layout.Composition.VSplitStack {
             }
             for (index, size) in pass.sizes.enumerated() {
                 guard size.height > 0 else { continue }
-                pass.sizes[index] = Size(width: size.width, height: entityAvailableSize.height)
+                pass.sizes[index] = .init(width: size.width, height: entityAvailableSize.height)
                 pass.bounding.width = max(pass.bounding.width, size.width)
             }
         }
@@ -151,9 +151,10 @@ private extension UI.Layout.Composition.VSplitStack {
         var origin = bounds.left
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(left: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -162,9 +163,10 @@ private extension UI.Layout.Composition.VSplitStack {
         var origin = bounds.center
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(center: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -173,9 +175,10 @@ private extension UI.Layout.Composition.VSplitStack {
         var origin = bounds.right
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(right: origin, size: size))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -184,9 +187,10 @@ private extension UI.Layout.Composition.VSplitStack {
         var origin = bounds.topLeft
         for (index, entity) in self.entities.enumerated() {
             let size = pass.sizes[index]
-            guard size.height > 0 else { continue }
             entity.layout(bounds: Rect(topLeft: origin, width: bounds.width, height: size.height))
-            origin.y += size.height + self.spacing
+            if size.height > 0 {
+                origin.y += size.height + self.spacing
+            }
         }
     }
     
@@ -199,7 +203,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
         alignment: UI.Layout.Composition.VSplitStack.Alignment = .fill,
         spacing: Double = 0,
         entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.VSplitStack {
+    ) -> Self {
         return .init(
             alignment: alignment,
             spacing: spacing,

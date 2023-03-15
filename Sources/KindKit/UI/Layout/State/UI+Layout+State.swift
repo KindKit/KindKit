@@ -162,6 +162,7 @@ public extension UI.Layout.State {
         ease: IAnimationEase = Animation.Ease.Linear(),
         transition: Transition,
         state: State,
+        processing: ((_ progress: Percent) -> Void)? = nil,
         completion: (() -> Void)? = nil
     ) {
         let fromState = self.state
@@ -173,14 +174,13 @@ public extension UI.Layout.State {
                 processing: { [weak self] progress in
                     guard let self = self else { return }
                     self._internalState = .animation(transition: transition, from: fromState, to: state, progress: progress)
-                    self.setNeedForceUpdate()
+                    processing?(progress)
                     self.updateIfNeeded()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
                     self._animation = nil
                     self._internalState = .idle(state: state)
-                    self.setNeedForceUpdate()
                     self.updateIfNeeded()
                     completion?()
                 }

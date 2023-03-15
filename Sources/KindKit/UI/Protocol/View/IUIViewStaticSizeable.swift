@@ -50,6 +50,18 @@ public extension IUIViewStaticSizeable {
     
     @inlinable
     @discardableResult
+    func size(_ value: () -> UI.Size.Static) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> UI.Size.Static) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func width(_ value: UI.Size.Static.Dimension) -> Self {
         self.width = value
         return self
@@ -57,9 +69,33 @@ public extension IUIViewStaticSizeable {
     
     @inlinable
     @discardableResult
+    func width(_ value: () -> UI.Size.Static.Dimension) -> Self {
+        return self.width(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func width(_ value: (Self) -> UI.Size.Static.Dimension) -> Self {
+        return self.width(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func height(_ value: UI.Size.Static.Dimension) -> Self {
         self.height = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func height(_ value: () -> UI.Size.Static.Dimension) -> Self {
+        return self.height(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func height(_ value: (Self) -> UI.Size.Static.Dimension) -> Self {
+        return self.height(value(self))
     }
     
 }

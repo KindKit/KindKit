@@ -29,4 +29,16 @@ public extension IUIViewTransformable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func transform(_ value: () -> UI.Transform) -> Self {
+        return self.transform(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func transform(_ value: (Self) -> UI.Transform) -> Self {
+        return self.transform(value(self))
+    }
+    
 }

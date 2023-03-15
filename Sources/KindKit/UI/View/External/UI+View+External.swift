@@ -77,6 +77,18 @@ public extension UI.View.External {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> NativeView) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> NativeView) -> Self {
+        return self.content(value(self))
+    }
+    
 }
 
 extension UI.View.External : IUIView {
@@ -162,8 +174,8 @@ extension UI.View.External : IUIViewStaticSizeable {
 public extension IUIView where Self == UI.View.External {
     
     @inlinable
-    static func external() -> Self {
-        return .init()
+    static func external(_ content: NativeView) -> Self {
+        return .init().content(content)
     }
     
 }

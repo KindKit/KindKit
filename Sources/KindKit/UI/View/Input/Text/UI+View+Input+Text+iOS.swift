@@ -235,6 +235,8 @@ extension KKInputTextView {
         self.update(textInset: view.textInset)
         self.update(editingColor: view.editingColor)
         self.update(placeholder: view.placeholder)
+        self.update(placeholderFont: view.placeholderFont)
+        self.update(placeholderColor: view.placeholderColor)
         self.update(placeholderInset: view.placeholderInset)
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
@@ -253,6 +255,7 @@ extension KKInputTextView {
     
     func update(text: Swift.String) {
         self.kkInput.text = text
+        self.kkPlaceholder.isHidden = self.kkInput.text.isEmpty == false
     }
     
     func update(textFont: UI.Font) {
@@ -271,15 +274,17 @@ extension KKInputTextView {
         self.kkInput.tintColor = editingColor?.native
     }
     
-    func update(placeholder: UI.View.Input.Placeholder?) {
-        if let placeholder = placeholder {
-            self.kkPlaceholder.text = placeholder.text
-            self.kkPlaceholder.font = placeholder.font.native
-            self.kkPlaceholder.textColor = placeholder.color.native
-        } else {
-            self.kkPlaceholder.text = ""
-        }
+    func update(placeholder: String?) {
+        self.kkPlaceholder.text = placeholder ?? ""
         self.kkPlaceholder.isHidden = self.kkInput.text.isEmpty == false
+    }
+    
+    func update(placeholderFont: UI.Font?) {
+        self.kkPlaceholder.font = placeholderFont?.native ?? self.kkInput.font
+    }
+    
+    func update(placeholderColor: UI.Color?) {
+        self.kkPlaceholder.textColor = placeholderColor?.native ?? self.kkInput.textColor
     }
     
     func update(placeholderInset: Inset?) {
@@ -345,7 +350,7 @@ extension KKInputTextView : UITextViewDelegate {
         guard delegate.shouldReplace(self, info: info) == true else {
             return false
         }
-        let text = info.text.replacingCharacters(in: info.range, with: info.replacement)
+        let text = info.text.kk_replacing(range, with: replacement)
         self.kkDelegate?.editing(self, text: text)
         return true
     }

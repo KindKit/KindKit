@@ -17,7 +17,7 @@ public extension UI.View.Input {
     final class Toolbar {
         
         public private(set) weak var parentView: IUIView?
-        public var items: [IInputToolbarItem] = [] {
+        public var items: [IUIViewInputToolbarItem] = [] {
             didSet {
                 if self.isLoaded == true {
                     self._view.update(items: self.items)
@@ -61,16 +61,40 @@ public extension UI.View.Input.Toolbar {
     
     @inlinable
     @discardableResult
-    func items(_ value: [IInputToolbarItem]) -> Self {
+    func items(_ value: [IUIViewInputToolbarItem]) -> Self {
         self.items = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func size(available value: Double) -> Self {
+    func items(_ value: () -> [IUIViewInputToolbarItem]) -> Self {
+        return self.items(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func items(_ value: (Self) -> [IUIViewInputToolbarItem]) -> Self {
+        return self.items(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: Double) -> Self {
         self.size = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: () -> Double) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Double) -> Self {
+        return self.size(value(self))
     }
     
 }

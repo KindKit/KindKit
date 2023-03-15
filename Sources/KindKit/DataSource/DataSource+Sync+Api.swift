@@ -12,9 +12,6 @@ public extension DataSource.Sync {
         public typealias Failure = Response.Failure
         public typealias Result = Swift.Result< Success, Failure >
         
-        public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
-        public let behaviour: Behaviour
         public var isSyncing: Bool {
             return self._task != nil
         }
@@ -22,6 +19,9 @@ public extension DataSource.Sync {
             return self.behaviour.isNeedSync(self.syncAt)
         }
         public private(set) var syncAt: Date?
+        public private(set) var result: Result?
+        public let onFinish: Signal.Args< Void, Result > = .init()
+        public let behaviour: Behaviour
         
         private let _provider: KindKit.Api.Provider
         private let _request: () throws -> KindKit.Api.Request?
@@ -51,9 +51,8 @@ public extension DataSource.Sync {
             self.syncAt = nil
         }
         
-        public func syncIfNeeded() {
+        public func sync() {
             guard self.isSyncing == false else { return }
-            guard self.isNeedSync == true else { return }
             self._task = self._provider.send(
                 request: try self._request(),
                 response: self._response(),

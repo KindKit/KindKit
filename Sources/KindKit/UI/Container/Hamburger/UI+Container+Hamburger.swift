@@ -355,6 +355,16 @@ public extension UI.Container {
             }
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
         public func showLeading(animated: Bool, completion: (() -> Void)?) {
             self._showLeading(interactive: false, animated: animated, completion: completion)
         }

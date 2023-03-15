@@ -16,13 +16,13 @@ extension Flow {
         
         private let onReceiveValue: (Success) -> Void
         private let onReceiveError: (Failure) -> Void
-        private let onCompleted: () -> Void
+        private let onCompleted: (() -> Void)?
         
         init(
             pipeline: Pipeline,
             onReceiveValue: @escaping (Success) -> Void,
             onReceiveError: @escaping (Failure) -> Void,
-            onCompleted: @escaping () -> Void
+            onCompleted: (() -> Void)?
         ) {
             self.pipeline = pipeline
             self.onReceiveValue = onReceiveValue
@@ -49,7 +49,7 @@ extension Flow {
         }
         
         func completed() {
-            self.onCompleted()
+            self.onCompleted?()
         }
         
     }

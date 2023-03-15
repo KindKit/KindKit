@@ -22,7 +22,12 @@ class TestIntersection2 : XCTestCase {
         let c2 = Circle(origin: Point(x: 1, y: 0), radius: 2)
         
         let result = Intersection2.find(c1, c2)
-        if result != .two(Point(x: 0, y: 1.73205078), Point(x: 0, y: -1.73205078)) {
+        switch result {
+        case .two(let p1, let p2):
+            if p1 !~ Point(x: 0, y: 1.7320508075688772) || p2 !~ Point(x: 0, y: -1.7320508075688772) {
+                XCTFail()
+            }
+        default:
             XCTFail()
         }
     }

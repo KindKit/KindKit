@@ -12,7 +12,7 @@ protocol KKTapGestureDelegate : KKGestureDelegate {
 
 public extension UI.Gesture {
     
-    final class Tap : IUIGesture {        
+    final class Tap {
         
         public var native: NativeGesture {
             return self._gesture
@@ -148,11 +148,16 @@ public extension UI.Gesture {
 }
 
 public extension UI.Gesture.Tap {
-        
+    
     @discardableResult
     func numberOfTapsRequired(_ value: UInt) -> Self {
         self.numberOfTapsRequired = value
         return self
+    }
+        
+    @discardableResult
+    func numberOfTapsRequired(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfTapsRequired(value(self))
     }
     
     @discardableResult
@@ -161,31 +166,17 @@ public extension UI.Gesture.Tap {
         return self
     }
     
+    @discardableResult
+    func numberOfTouchesRequired(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfTouchesRequired(value(self))
+    }
+    
 }
 
-public extension UI.Gesture.Tap {
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ closure: (() -> Void)?) -> Self {
-        self.onTriggered.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ closure: ((Self) -> Void)?) -> Self {
-        self.onTriggered.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onTriggered.link(sender, closure)
-        return self
-    }
-    
+extension UI.Gesture.Tap : IUIGesture {
+}
+
+extension UI.Gesture.Tap : IUIGestureTriggerable {
 }
 
 extension UI.Gesture.Tap : KKGestureDelegate {

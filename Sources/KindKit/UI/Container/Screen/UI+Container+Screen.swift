@@ -11,7 +11,7 @@ import UIKit
 
 public extension UI.Container {
     
-    final class Screen< Screen : IUIScreen & IUIScreenViewable > : IUIScreenContainer, IUIContainerScreenable {
+    final class Screen< Screen : IScreen & IScreenViewable > : IScreenContainer, IUIContainerScreenable {
         
         public weak var parent: IUIContainer? {
             didSet {
@@ -132,6 +132,16 @@ public extension UI.Container {
         
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
+        }
+        
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
         }
         
     }
@@ -409,7 +419,7 @@ extension UI.Container.Screen : IVirtualKeyboardObserver {
 extension UI.Container.Screen : IUIRootContentContainer {
 }
 
-extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScreenStackable {
+extension UI.Container.Screen : IUIStackContentContainer where Screen : IScreenStackable {
     
     public var stackBar: UI.View.StackBar {
         return self.screen.stackBar
@@ -425,7 +435,7 @@ extension UI.Container.Screen : IUIStackContentContainer where Screen : IUIScree
     
 }
 
-extension UI.Container.Screen : IUIGroupContentContainer where Screen : IUIScreenGroupable {
+extension UI.Container.Screen : IUIGroupContentContainer where Screen : IScreenGroupable {
     
     public var groupItem: UI.View.GroupBar.Item {
         return self.screen.groupItem
@@ -433,7 +443,7 @@ extension UI.Container.Screen : IUIGroupContentContainer where Screen : IUIScree
     
 }
 
-extension UI.Container.Screen : IUIPageContentContainer where Screen : IUIScreenPageable {
+extension UI.Container.Screen : IUIPageContentContainer where Screen : IScreenPageable {
     
     public var pageItem: UI.View.PageBar.Item {
         return self.screen.pageItem
@@ -441,7 +451,7 @@ extension UI.Container.Screen : IUIPageContentContainer where Screen : IUIScreen
     
 }
 
-extension UI.Container.Screen : IUIBookContentContainer where Screen : IUIScreenBookable {
+extension UI.Container.Screen : IUIBookContentContainer where Screen : IScreenBookable {
     
     public var bookIdentifier: Any {
         return self.screen.bookIdentifier
@@ -452,7 +462,7 @@ extension UI.Container.Screen : IUIBookContentContainer where Screen : IUIScreen
 extension UI.Container.Screen : IUIHamburgerContentContainer {
 }
 
-extension UI.Container.Screen : IHamburgerMenuContainer where Screen : IUIScreenHamburgerable {
+extension UI.Container.Screen : IHamburgerMenuContainer where Screen : IScreenHamburgerable {
     
     public var hamburgerSize: Double {
         return self.screen.hamburgerSize
@@ -464,7 +474,7 @@ extension UI.Container.Screen : IHamburgerMenuContainer where Screen : IUIScreen
     
 }
 
-extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScreenModalable {
+extension UI.Container.Screen : IUIModalContentContainer where Screen : IScreenModalable {
     
     public var modalColor: UI.Color {
         return self.screen.modalColor
@@ -483,7 +493,7 @@ extension UI.Container.Screen : IUIModalContentContainer where Screen : IUIScree
     
 }
 
-extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScreenDialogable {
+extension UI.Container.Screen : IUIDialogContentContainer where Screen : IScreenDialogable {
     
     public var dialogInset: Inset {
         return self.screen.dialogInset
@@ -507,7 +517,7 @@ extension UI.Container.Screen : IUIDialogContentContainer where Screen : IUIScre
     
 }
 
-extension UI.Container.Screen : IUIPushContentContainer where Screen : IUIScreenPushable {
+extension UI.Container.Screen : IUIPushContentContainer where Screen : IScreenPushable {
     
     public var pushPlacement: UI.Push.Placement {
         return self.screen.pushPlacement

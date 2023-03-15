@@ -146,9 +146,33 @@ public extension UI.View.AnimatedImage {
     
     @inlinable
     @discardableResult
+    func images(_ value: () -> [UI.Image]) -> Self {
+        return self.images(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func images(_ value: (Self) -> [UI.Image]) -> Self {
+        return self.images(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func duration(_ value: TimeInterval) -> Self {
         self.duration = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func duration(_ value: () -> TimeInterval) -> Self {
+        return self.duration(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func duration(_ value: (Self) -> TimeInterval) -> Self {
+        return self.duration(value(self))
     }
     
     @inlinable
@@ -160,6 +184,12 @@ public extension UI.View.AnimatedImage {
     
     @inlinable
     @discardableResult
+    func `repeat`(_ value: (Self) -> Repeat) -> Self {
+        return self.repeat(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func mode(_ value: Mode) -> Self {
         self.mode = value
         return self
@@ -167,9 +197,14 @@ public extension UI.View.AnimatedImage {
     
     @inlinable
     @discardableResult
-    func tintColor(_ value: UI.Color?) -> Self {
-        self.tintColor = value
-        return self
+    func mode(_ value: () -> Mode) -> Self {
+        return self.mode(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func mode(_ value: (Self) -> Mode) -> Self {
+        return self.mode(value(self))
     }
     
 }
@@ -271,8 +306,8 @@ extension UI.View.AnimatedImage :  IUIViewAlphable {
 public extension IUIView where Self == UI.View.AnimatedImage {
     
     @inlinable
-    static func animatedImage() -> Self {
-        return .init()
+    static func animatedImage(_ images: [UI.Image]) -> Self {
+        return .init().images(images)
     }
     
 }

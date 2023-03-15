@@ -29,4 +29,16 @@ public extension IUIViewTintColorable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func tintColor(_ value: () -> UI.Color?) -> Self {
+        return self.tintColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func tintColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.tintColor(value(self))
+    }
+    
 }

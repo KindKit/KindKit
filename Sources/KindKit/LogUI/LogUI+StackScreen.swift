@@ -6,7 +6,7 @@ import Foundation
 
 public extension LogUI {
     
-    final class StackScreen : IUIStackScreen, IUIScreenModalable {
+    final class StackScreen : IStackScreen, IScreenModalable {
         
         public var container: IUIContainer?
         public var modalPresentation: UI.Screen.Modal.Presentation {

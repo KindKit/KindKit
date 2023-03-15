@@ -165,8 +165,8 @@ extension UI.View.Color : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Color {
     
     @inlinable
-    static func color() -> Self {
-        return .init()
+    static func color(_ color: UI.Color) -> Self {
+        return .init().color(color)
     }
     
 }

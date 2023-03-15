@@ -142,9 +142,33 @@ public extension UI.View.Switch {
     
     @inlinable
     @discardableResult
+    func thumbColor(_ value: () -> UI.Color) -> Self {
+        return self.thumbColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func thumbColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.thumbColor(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func offColor(_ value: UI.Color) -> Self {
         self.offColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func offColor(_ value: () -> UI.Color) -> Self {
+        return self.offColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func offColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.offColor(value(self))
     }
     
     @inlinable
@@ -156,9 +180,33 @@ public extension UI.View.Switch {
     
     @inlinable
     @discardableResult
+    func onColor(_ value: () -> UI.Color) -> Self {
+        return self.onColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func onColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.onColor(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func value(_ value: Bool) -> Self {
         self.value = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: () -> Bool) -> Self {
+        return self.value(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func value(_ value: (Self) -> Bool) -> Self {
+        return self.value(value(self))
     }
     
 }
@@ -269,8 +317,8 @@ extension UI.View.Switch : KKSwitchViewDelegate {
 public extension IUIView where Self == UI.View.Switch {
     
     @inlinable
-    static func `switch`() -> Self {
-        return .init()
+    static func `switch`(_ value: Bool) -> Self {
+        return .init().value(value)
     }
     
 }

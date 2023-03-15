@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IUIContainerScreenable : AnyObject {
     
-    associatedtype Screen: IUIScreen
+    associatedtype Screen: IScreen
     
     var screen: Screen { get }
     

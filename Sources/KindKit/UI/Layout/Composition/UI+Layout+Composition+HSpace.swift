@@ -29,12 +29,12 @@ extension UI.Layout.Composition.HSpace : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
-        return Size(width: self.value, height: 0)
+    public func layout(bounds: Rect) -> KindKit.Size {
+        return .init(width: self.value, height: 0)
     }
     
-    public func size(available: Size) -> Size {
-        return Size(width: self.value, height: 0)
+    public func size(available: KindKit.Size) -> KindKit.Size {
+        return .init(width: self.value, height: 0)
     }
     
     public func views(bounds: Rect) -> [IUIView] {
@@ -48,7 +48,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func hSpace(
         _ value: Double
-    ) -> UI.Layout.Composition.HSpace {
+    ) -> Self {
         return .init(value)
     }
     

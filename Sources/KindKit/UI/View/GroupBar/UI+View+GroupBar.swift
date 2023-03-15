@@ -78,9 +78,33 @@ public extension UI.View.GroupBar {
     
     @inlinable
     @discardableResult
+    func items(_ value: () -> [UI.View.GroupBar.Item]) -> Self {
+        return self.items(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func items(_ value: (Self) -> [UI.View.GroupBar.Item]) -> Self {
+        return self.items(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func itemsInset(_ value: Inset) -> Self {
         self.itemsInset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func itemsInset(_ value: () -> Inset) -> Self {
+        return self.itemsInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemsInset(_ value: (Self) -> Inset) -> Self {
+        return self.itemsInset(value(self))
     }
     
     @inlinable
@@ -92,9 +116,33 @@ public extension UI.View.GroupBar {
     
     @inlinable
     @discardableResult
+    func itemsSpacing(_ value: () -> Double) -> Self {
+        return self.itemsSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemsSpacing(_ value: (Self) -> Double) -> Self {
+        return self.itemsSpacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func selected(_ value: UI.View.GroupBar.Item?) -> Self {
         self.selected = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selected(_ value: () -> UI.View.GroupBar.Item?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func selected(_ value: (Self) -> UI.View.GroupBar.Item?) -> Self {
+        return self.selected(value(self))
     }
     
 }
@@ -129,8 +177,8 @@ extension UI.View.GroupBar : IGroupBarItemViewDelegate {
 public extension IUIView where Self == UI.View.GroupBar {
     
     @inlinable
-    static func groupBar() -> Self {
-        return .init()
+    static func groupBar(_ items: [UI.View.GroupBar.Item]) -> Self {
+        return .init().items(items)
     }
     
 }

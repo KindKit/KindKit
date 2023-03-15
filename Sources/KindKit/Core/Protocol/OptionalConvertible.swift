@@ -8,13 +8,13 @@ public protocol IOptionalConvertible {
     
     associatedtype Wrapped
     
-    var asOptional: Optional< Wrapped > { get }
+    var asOptional: Wrapped? { get }
     
 }
 
 extension Optional : IOptionalConvertible {
     
-    public var asOptional: Optional< Wrapped > {
+    public var asOptional: Wrapped? {
         return self
     }
     

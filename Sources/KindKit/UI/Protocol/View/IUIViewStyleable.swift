@@ -26,6 +26,10 @@ public extension IUIViewStyleable {
         self.onStyle.emit(userInteraction)
     }
     
+}
+
+public extension IUIViewStyleable {
+    
     @inlinable
     @discardableResult
     func onStyle(_ closure: (() -> Void)?) -> Self {
@@ -35,7 +39,7 @@ public extension IUIViewStyleable {
     
     @inlinable
     @discardableResult
-    func onStyle(_ closure: ((Self) -> Void)?) -> Self {
+    func onStyle(_ closure: @escaping (Self) -> Void) -> Self {
         self.onStyle.link(self, closure)
         return self
     }
@@ -49,21 +53,21 @@ public extension IUIViewStyleable {
     
     @inlinable
     @discardableResult
-    func onStyle(_ closure: ((Self, Bool) -> Void)?) -> Self {
+    func onStyle(_ closure: @escaping (Self, Bool) -> Void) -> Self {
         self.onStyle.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onStyle< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onStyle< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onStyle.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onStyle< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Bool) -> Void)?) -> Self {
+    func onStyle< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Bool) -> Void) -> Self {
         self.onStyle.link(sender, closure)
         return self
     }

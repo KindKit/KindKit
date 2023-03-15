@@ -16,6 +16,8 @@ public protocol IUIDialogContainer : IUIContainer, IUIContainerParentable {
 #endif
     
     func present(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?)
-    func dismiss(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?)
+    
+    @discardableResult
+    func dismiss(container: IUIDialogContentContainer, animated: Bool, completion: (() -> Void)?) -> Bool
     
 }

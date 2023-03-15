@@ -15,11 +15,11 @@ public extension DataSource.Action {
         public typealias Failure = Response.Failure
         public typealias Result = Swift.Result< Success, Failure >
         
-        public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
         public var isPerforming: Bool {
             return self._task != nil
         }
+        public private(set) var result: Result?
+        public let onFinish: Signal.Args< Void, Result > = .init()
         
         private let _provider: KindKit.Api.Provider
         private let _request: (Params) throws -> KindKit.Api.Request?

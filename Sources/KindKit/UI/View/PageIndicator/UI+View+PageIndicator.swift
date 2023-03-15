@@ -135,10 +135,31 @@ public extension UI.View {
 public extension UI.View.PageIndicator {
     
     @inlinable
+    func animate(currentPage: Double, completion: (() -> Void)?) {
+        self.currentPage = currentPage
+    }
+    
+}
+
+public extension UI.View.PageIndicator {
+    
+    @inlinable
     @discardableResult
     func pageColor(_ value: UI.Color?) -> Self {
         self.pageColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func pageColor(_ value: () -> UI.Color?) -> Self {
+        return self.pageColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func pageColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.pageColor(value(self))
     }
     
     @inlinable
@@ -150,14 +171,33 @@ public extension UI.View.PageIndicator {
     
     @inlinable
     @discardableResult
+    func currentPageColor(_ value: () -> UI.Color?) -> Self {
+        return self.currentPageColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func currentPageColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.currentPageColor(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func currentPage(_ value: Double) -> Self {
         self.currentPage = value
         return self
     }
     
     @inlinable
-    func animate(currentPage: Double, completion: (() -> Void)?) {
-        self.currentPage = currentPage
+    @discardableResult
+    func currentPage(_ value: () -> Double) -> Self {
+        return self.currentPage(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func currentPage(_ value: (Self) -> Double) -> Self {
+        return self.currentPage(value(self))
     }
     
 }

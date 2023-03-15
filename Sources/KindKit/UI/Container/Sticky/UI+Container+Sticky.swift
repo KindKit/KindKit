@@ -46,7 +46,7 @@ public extension UI.Container {
         public var view: IUIView {
             return self._view
         }
-        public private(set) var screen: IUIStickyScreen
+        public private(set) var screen: IStickyScreen
         public private(set) var sticky: UI.View.Bar {
             set {
                 guard self._sticky !== newValue else { return }
@@ -94,7 +94,7 @@ public extension UI.Container {
         private var _view: UI.View.Custom
         
         public init(
-            screen: IUIStickyScreen,
+            screen: IStickyScreen,
             content: ContentContainer
         ) {
             self.screen = screen
@@ -205,6 +205,16 @@ public extension UI.Container {
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
             self._content.cancelHide(interactive: interactive)
+        }
+        
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
         }
         
         public func updateSticky(animated: Bool, completion: (() -> Void)?) {

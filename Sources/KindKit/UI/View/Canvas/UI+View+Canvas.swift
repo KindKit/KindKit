@@ -115,6 +115,18 @@ public extension UI.View.Canvas {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func canvas(_ value: () -> IGraphicsCanvas?) -> Self {
+        return self.canvas(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func canvas(_ value: (Self) -> IGraphicsCanvas?) -> Self {
+        return self.canvas(value(self))
+    }
+    
 }
 
 extension UI.View.Canvas : IUIView {
@@ -214,8 +226,8 @@ extension UI.View.Canvas : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Canvas {
     
     @inlinable
-    static func canvas() -> Self {
-        return .init()
+    static func canvas(_ canvas: IGraphicsCanvas) -> Self {
+        return .init().canvas(canvas)
     }
     
 }

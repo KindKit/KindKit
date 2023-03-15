@@ -11,7 +11,7 @@ public protocol ISyncDataSource : IDataSource {
     var syncAt: Date? { get }
     
     func setNeedSync(reset: Bool)
-    func syncIfNeeded()
+    func sync()
     
 }
 

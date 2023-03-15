@@ -44,14 +44,14 @@ extension UI.Layout.Composition.VFlow : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let itemRange = Range(
             uncheckedBounds: (
                 lower: bounds.x,
                 upper: bounds.x + bounds.width
             )
         )
-        var itemsSize: Size = .zero
+        var itemsSize: KindKit.Size = .zero
         var items: [Item] = []
         var line: Double = 0
         for entity in self.entities {
@@ -80,14 +80,14 @@ extension UI.Layout.Composition.VFlow : IUICompositionLayoutEntity {
         if line > 0 {
             line -= self.lineSpacing
         }
-        return Size(
+        return .init(
             width: bounds.width,
             height: line
         )
     }
     
-    public func size(available: Size) -> Size {
-        var itemsSize: Size = .zero
+    public func size(available: KindKit.Size) -> KindKit.Size {
+        var itemsSize: KindKit.Size = .zero
         var items: [Item] = []
         var line: Double = 0
         for entity in self.entities {
@@ -114,7 +114,7 @@ extension UI.Layout.Composition.VFlow : IUICompositionLayoutEntity {
         if line > 0 {
             line -= self.lineSpacing
         }
-        return Size(
+        return .init(
             width: available.width,
             height: line
         )
@@ -230,7 +230,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
         entitySpacing: Double,
         lineSpacing: Double,
         entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.VFlow {
+    ) -> Self {
         return .init(
             alignment: alignment,
             entitySpacing: entitySpacing,

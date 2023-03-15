@@ -222,10 +222,9 @@ extension Api.Query.Task : IDebug {
             inter: indent,
             key: "Duration",
             value: -self.createAt.timeIntervalSinceNow,
-            valueFormatter: StringFormatter.DateComponents(
-                unitsStyle: .abbreviated,
-                allowedUnits: [ .second, .nanosecond ]
-            )
+            valueFormatter: .dateComponents()
+                .unitsStyle(.abbreviated)
+                .allowedUnits([ .second, .nanosecond ])
         )
         if let request = self.task.originalRequest {
             buff.append(inter: indent, key: "Request", value: request)

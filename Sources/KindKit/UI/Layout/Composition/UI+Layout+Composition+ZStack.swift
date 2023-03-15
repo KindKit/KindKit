@@ -35,8 +35,8 @@ extension UI.Layout.Composition.ZStack : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
-        var maxSize = Size.zero
+    public func layout(bounds: Rect) -> KindKit.Size {
+        var maxSize = KindKit.Size.zero
         for entity in self.entities {
             let size = entity.size(available: bounds.size)
             maxSize = maxSize.max(size)
@@ -52,8 +52,8 @@ extension UI.Layout.Composition.ZStack : IUICompositionLayoutEntity {
         return maxSize
     }
     
-    public func size(available: Size) -> Size {
-        var maxSize = Size.zero
+    public func size(available: KindKit.Size) -> KindKit.Size {
+        var maxSize = KindKit.Size.zero
         for entity in self.entities {
             let size = entity.size(available: available)
             maxSize = maxSize.max(size)
@@ -76,7 +76,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func zStack(
         _ entities: [IUICompositionLayoutEntity]
-    ) -> UI.Layout.Composition.ZStack {
+    ) -> Self {
         return .init(entities)
     }
     

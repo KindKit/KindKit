@@ -4,5 +4,5 @@
 
 import Foundation
 
-public protocol IUIScreenContainer : IUIContainer, IUIContainerParentable {
+public protocol IScreenContainer : IUIContainer, IUIContainerParentable {
 }

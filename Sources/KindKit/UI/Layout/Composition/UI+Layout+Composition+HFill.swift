@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct HFill {
+    final class HFill {
         
         public var entity: IUICompositionLayoutEntity
         
@@ -31,13 +31,13 @@ extension UI.Layout.Composition.HFill : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         return self.entity.layout(bounds: bounds)
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         let size = self.entity.size(available: available)
-        return Size(
+        return .init(
             width: available.width,
             height: size.height
         )
@@ -54,7 +54,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func hFill(
         _ entity: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.HFill {
+    ) -> Self {
         return .init(entity)
     }
     

@@ -98,7 +98,7 @@ private extension Api.Provider.SessionDelegate {
             return (disposition: .cancelAuthenticationChallenge, credential: nil)
         }
         var trustResult: SecTrustResultType = .otherError
-        SecTrustSetAnchorCertificates(trust, [ localCertificate ] as CFArray)
+        SecTrustSetAnchorCertificates(trust, [localCertificate] as CFArray)
         SecTrustEvaluate(trust, &trustResult)
         if trustResult == SecTrustResultType.recoverableTrustFailure {
             SecTrustSetExceptions(trust, SecTrustCopyExceptions(trust))

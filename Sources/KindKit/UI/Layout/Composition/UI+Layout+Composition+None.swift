@@ -24,11 +24,11 @@ extension UI.Layout.Composition.None : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         return .zero
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return .zero
     }
     
@@ -41,7 +41,7 @@ extension UI.Layout.Composition.None : IUICompositionLayoutEntity {
 public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.None {
     
     @inlinable
-    static func none() -> UI.Layout.Composition.None {
+    static func none() -> Self {
         return .init()
     }
     

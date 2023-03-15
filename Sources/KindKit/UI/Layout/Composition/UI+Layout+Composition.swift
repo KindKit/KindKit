@@ -53,7 +53,7 @@ public extension UI.Layout {
         }
         
         @discardableResult
-        public func layout(bounds: Rect) -> Size {
+        public func layout(bounds: Rect) -> KindKit.Size {
             let size = self.entity.layout(
                 bounds: bounds.inset(self.inset)
             )
@@ -63,7 +63,7 @@ public extension UI.Layout {
             return size.inset(-self.inset)
         }
         
-        public func size(available: Size) -> Size {
+        public func size(available: KindKit.Size) -> KindKit.Size {
             let size = self.entity.size(
                 available: available.inset(self.inset)
             )

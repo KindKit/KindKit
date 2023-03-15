@@ -30,4 +30,16 @@ public extension IUIViewColorable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func color(_ value: () -> UI.Color?) -> Self {
+        return self.color(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func color(_ value: (Self) -> UI.Color?) -> Self {
+        return self.color(value(self))
+    }
+    
 }

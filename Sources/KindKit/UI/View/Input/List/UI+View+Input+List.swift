@@ -86,11 +86,27 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var placeholder: UI.View.Input.Placeholder? {
+        public var placeholder: Swift.String? {
             didSet {
                 guard self.placeholder != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(placeholder: self.placeholder)
+                }
+            }
+        }
+        public var placeholderFont: UI.Font? {
+            didSet {
+                guard self.placeholderFont != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderFont: self.placeholderFont)
+                }
+            }
+        }
+        public var placeholderColor: UI.Color? {
+            didSet {
+                guard self.placeholderColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderColor: self.placeholderColor)
                 }
             }
         }
@@ -143,14 +159,6 @@ public extension UI.View.Input {
         public init() {
         }
         
-        @inlinable
-        public convenience init(
-            configure: (UI.View.Input.List) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
-        }
-        
         deinit {
             self._reuse.destroy()
         }
@@ -170,9 +178,33 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
+    func items(_ value: () -> [IInputListItem]) -> Self {
+        return self.items(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func items(_ value: (Self) -> [IInputListItem]) -> Self {
+        return self.items(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func selected(_ value: IInputListItem?) -> Self {
         self.selected = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selected(_ value: () -> IInputListItem?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func selected(_ value: (Self) -> IInputListItem?) -> Self {
+        return self.selected(value(self))
     }
     
     @inlinable
@@ -184,9 +216,33 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
+    func textFont(_ value: () -> UI.Font) -> Self {
+        return self.textFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textFont(_ value: (Self) -> UI.Font) -> Self {
+        return self.textFont(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func textColor(_ value: UI.Color) -> Self {
         self.textColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textColor(_ value: () -> UI.Color) -> Self {
+        return self.textColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.textColor(value(self))
     }
     
     @inlinable
@@ -198,9 +254,90 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
-    func placeholder(_ value: UI.View.Input.Placeholder?) -> Self {
+    func textInset(_ value: () -> Inset) -> Self {
+        return self.textInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textInset(_ value: (Self) -> Inset) -> Self {
+        return self.textInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: Swift.String?) -> Self {
         self.placeholder = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: () -> Swift.String?) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: (Self) -> Swift.String?) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: Placeholder) -> Self {
+        self.placeholder = value.localized
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: () -> Placeholder) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: (Self) -> Placeholder) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: UI.Font?) -> Self {
+        self.placeholderFont = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: () -> UI.Font?) -> Self {
+        return self.placeholderFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: (Self) -> UI.Font?) -> Self {
+        return self.placeholderFont(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: UI.Color?) -> Self {
+        self.placeholderColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: () -> UI.Color?) -> Self {
+        return self.placeholderColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.placeholderColor(value(self))
     }
     
     @inlinable
@@ -212,9 +349,33 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
+    func placeholderInset(_ value: () -> Inset?) -> Self {
+        return self.placeholderInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderInset(_ value: (Self) -> Inset?) -> Self {
+        return self.placeholderInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func alignment(_ value: UI.Text.Alignment) -> Self {
         self.alignment = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> UI.Text.Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> UI.Text.Alignment) -> Self {
+        return self.alignment(value(self))
     }
     
 #if os(iOS)
@@ -224,6 +385,18 @@ public extension UI.View.Input.List {
     func toolbar(_ value: UI.View.Input.Toolbar?) -> Self {
         self.toolbar = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: () -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value(self))
     }
     
 #endif

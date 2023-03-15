@@ -10,6 +10,8 @@ import Foundation
 
 protocol KKInputStringViewDelegate : AnyObject {
     
+    func shouldReplace(_ view: KKInputStringView, info: UI.View.Input.String.ShouldReplace) -> Bool
+    
     func beginEditing(_ view: KKInputStringView)
     func editing(_ view: KKInputStringView, text: String)
     func endEditing(_ view: KKInputStringView)
@@ -89,11 +91,27 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var placeholder: UI.View.Input.Placeholder? {
+        public var placeholder: Swift.String? {
             didSet {
                 guard self.placeholder != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(placeholder: self.placeholder)
+                }
+            }
+        }
+        public var placeholderFont: UI.Font? {
+            didSet {
+                guard self.placeholderFont != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderFont: self.placeholderFont)
+                }
+            }
+        }
+        public var placeholderColor: UI.Color? {
+            didSet {
+                guard self.placeholderColor != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(placeholderColor: self.placeholderColor)
                 }
             }
         }
@@ -151,6 +169,7 @@ public extension UI.View.Input {
         public let onVisible: Signal.Empty< Void > = .init()
         public let onVisibility: Signal.Empty< Void > = .init()
         public let onInvisible: Signal.Empty< Void > = .init()
+        public let onShouldReplace: Signal.Args< Bool?, ShouldReplace > = .init()
         public let onBeginEditing: Signal.Empty< Void > = .init()
         public let onEditing: Signal.Empty< Void > = .init()
         public let onEndEditing: Signal.Empty< Void > = .init()
@@ -183,9 +202,33 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
+    func text(_ value: () -> Swift.String) -> Self {
+        return self.text(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func text(_ value: (Self) -> Swift.String) -> Self {
+        return self.text(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func textFont(_ value: UI.Font) -> Self {
         self.textFont = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textFont(_ value: () -> UI.Font) -> Self {
+        return self.textFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textFont(_ value: (Self) -> UI.Font) -> Self {
+        return self.textFont(value(self))
     }
     
     @inlinable
@@ -195,10 +238,34 @@ public extension UI.View.Input.String {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func textColor(_ value: () -> UI.Color) -> Self {
+        return self.textColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textColor(_ value: (Self) -> UI.Color) -> Self {
+        return self.textColor(value(self))
+    }
+    
     @discardableResult
     func textInset(_ value: Inset) -> Self {
         self.textInset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func textInset(_ value: () -> Inset) -> Self {
+        return self.textInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func textInset(_ value: (Self) -> Inset) -> Self {
+        return self.textInset(value(self))
     }
     
     @inlinable
@@ -210,9 +277,90 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func placeholder(_ value: UI.View.Input.Placeholder?) -> Self {
+    func editingColor(_ value: () -> UI.Color?) -> Self {
+        return self.editingColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func editingColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.editingColor(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: Swift.String?) -> Self {
         self.placeholder = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: () -> Swift.String?) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: (Self) -> Swift.String?) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: Placeholder) -> Self {
+        self.placeholder = value.localized
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: () -> Placeholder) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder< Placeholder : IEnumLocalized >(_ value: (Self) -> Placeholder) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: UI.Font?) -> Self {
+        self.placeholderFont = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: () -> UI.Font?) -> Self {
+        return self.placeholderFont(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderFont(_ value: (Self) -> UI.Font?) -> Self {
+        return self.placeholderFont(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: UI.Color?) -> Self {
+        self.placeholderColor = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: () -> UI.Color?) -> Self {
+        return self.placeholderColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.placeholderColor(value(self))
     }
     
     @inlinable
@@ -224,9 +372,33 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
+    func placeholderInset(_ value: () -> Inset?) -> Self {
+        return self.placeholderInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholderInset(_ value: (Self) -> Inset?) -> Self {
+        return self.placeholderInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func alignment(_ value: UI.Text.Alignment) -> Self {
         self.alignment = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> UI.Text.Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> UI.Text.Alignment) -> Self {
+        return self.alignment(value(self))
     }
     
 #if os(iOS)
@@ -240,9 +412,33 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
+    func toolbar(_ value: () -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> UI.View.Input.Toolbar?) -> Self {
+        return self.toolbar(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func keyboard(_ value: UI.View.Input.Keyboard?) -> Self {
         self.keyboard = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func keyboard(_ value: () -> UI.View.Input.Keyboard?) -> Self {
+        return self.keyboard(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func keyboard(_ value: (Self) -> UI.View.Input.Keyboard?) -> Self {
+        return self.keyboard(value(self))
     }
     
 #endif
@@ -254,9 +450,42 @@ public extension UI.View.Input.String {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func suggestion(_ value: () -> IInputSuggestion?) -> Self {
+        return self.suggestion(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func suggestion(_ value: (Self) -> IInputSuggestion?) -> Self {
+        return self.suggestion(value(self))
+    }
+    
 }
 
 public extension UI.View.Input.String {
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace(_ closure: ((ShouldReplace) -> Bool?)?) -> Self {
+        self.onShouldReplace.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace(_ closure: @escaping (Self, ShouldReplace) -> Bool?) -> Self {
+        self.onShouldReplace.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onShouldReplace< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, ShouldReplace) -> Bool?) -> Self {
+        self.onShouldReplace.link(sender, closure)
+        return self
+    }
     
     @inlinable
     @discardableResult
@@ -267,14 +496,14 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func onPressedReturn(_ closure: ((Self) -> Void)?) -> Self {
+    func onPressedReturn(_ closure: @escaping (Self) -> Void) -> Self {
         self.onPressedReturn.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onPressedReturn.link(sender, closure)
         return self
     }
@@ -288,14 +517,14 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func onSuggestion(_ closure: ((Self, Swift.String) -> Void)?) -> Self {
+    func onSuggestion(_ closure: @escaping (Self, Swift.String) -> Void) -> Self {
         self.onSuggestion.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Swift.String) -> Void)?) -> Self {
+    func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Swift.String) -> Void) -> Self {
         self.onSuggestion.link(sender, closure)
         return self
     }
@@ -411,6 +640,10 @@ extension UI.View.Input.String : IUIViewInputable {
 
 extension UI.View.Input.String : KKInputStringViewDelegate {
     
+    func shouldReplace(_ view: KKInputStringView, info: ShouldReplace) -> Bool {
+        return self.onShouldReplace.emit(info, default: true)
+    }
+    
     func beginEditing(_ view: KKInputStringView) {
         self.onBeginEditing.emit()
     }
@@ -431,8 +664,12 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
     }
     
     func pressed(_ view: KKInputStringView, suggestion: String) {
-        self.editing(view, text: suggestion)
-        self.onSuggestion.emit(suggestion)
+        if self._text != suggestion {
+            self._text = suggestion
+            self.onEditing.emit()
+            self.onSuggestion.emit(suggestion)
+            self.onPressedReturn.emit()
+        }
     }
     
 }

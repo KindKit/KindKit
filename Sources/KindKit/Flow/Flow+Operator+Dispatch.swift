@@ -64,7 +64,7 @@ public extension Flow.Operator.DispatchMode {
     var queue: DispatchQueue {
         switch self {
         case .main: return DispatchQueue.main
-        case .background: return DispatchQueue(label: "KindKit.Flow.Operator.Dispatch", attributes: [ .concurrent ])
+        case .background: return DispatchQueue(label: "KindKit.Flow.Operator.Dispatch", attributes: .concurrent)
         }
     }
     

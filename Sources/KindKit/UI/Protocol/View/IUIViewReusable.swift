@@ -41,6 +41,18 @@ public extension IUIViewReusable {
     
     @inlinable
     @discardableResult
+    func reuseUnloadBehaviour(_ value: () -> UI.Reuse.UnloadBehaviour) -> Self {
+        return self.reuseUnloadBehaviour(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func reuseUnloadBehaviour(_ value: (Self) -> UI.Reuse.UnloadBehaviour) -> Self {
+        return self.reuseUnloadBehaviour(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func reuseCache(_ value: UI.Reuse.Cache?) -> Self {
         self.reuseCache = value
         return self
@@ -48,9 +60,33 @@ public extension IUIViewReusable {
     
     @inlinable
     @discardableResult
+    func reuseCache(_ value: () -> UI.Reuse.Cache?) -> Self {
+        return self.reuseCache(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func reuseCache(_ value: (Self) -> UI.Reuse.Cache?) -> Self {
+        return self.reuseCache(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func reuseName(_ value: String?) -> Self {
         self.reuseName = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func reuseName(_ value: () -> String?) -> Self {
+        return self.reuseName(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func reuseName(_ value: (Self) -> String?) -> Self {
+        return self.reuseName(value(self))
     }
     
 }

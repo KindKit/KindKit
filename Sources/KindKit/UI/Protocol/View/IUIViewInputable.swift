@@ -69,14 +69,14 @@ public extension IUIViewInputable {
     
     @inlinable
     @discardableResult
-    func onBeginEditing(_ closure: ((Self) -> Void)?) -> Self {
+    func onBeginEditing(_ closure: @escaping (Self) -> Void) -> Self {
         self.onBeginEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBeginEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onBeginEditing< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onBeginEditing.link(sender, closure)
         return self
     }
@@ -90,14 +90,14 @@ public extension IUIViewInputable {
     
     @inlinable
     @discardableResult
-    func onEditing(_ closure: ((Self) -> Void)?) -> Self {
+    func onEditing(_ closure: @escaping (Self) -> Void) -> Self {
         self.onEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onEditing< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEditing.link(sender, closure)
         return self
     }
@@ -111,14 +111,14 @@ public extension IUIViewInputable {
     
     @inlinable
     @discardableResult
-    func onEndEditing(_ closure: ((Self) -> Void)?) -> Self {
+    func onEndEditing(_ closure: @escaping (Self) -> Void) -> Self {
         self.onEndEditing.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEndEditing< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onEndEditing< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEndEditing.link(sender, closure)
         return self
     }

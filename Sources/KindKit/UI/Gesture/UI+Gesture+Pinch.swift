@@ -19,7 +19,7 @@ protocol KKPinchGestureDelegate : KKGestureDelegate {
 
 public extension UI.Gesture {
     
-    final class Pinch : IUIGesture {
+    final class Pinch {
         
         public var native: NativeGesture {
             return self._gesture
@@ -147,92 +147,10 @@ public extension UI.Gesture {
     
 }
 
-public extension UI.Gesture.Pinch {
-    
-    @inlinable
-    @discardableResult
-    func onBegin(_ closure: (() -> Void)?) -> Self {
-        self.onBegin.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBegin(_ closure: ((Self) -> Void)?) -> Self {
-        self.onBegin.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onBegin.link(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChange(_ closure: (() -> Void)?) -> Self {
-        self.onChange.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChange(_ closure: ((Self) -> Void)?) -> Self {
-        self.onChange.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onChange< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onChange.link(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onCancel(_ closure: (() -> Void)?) -> Self {
-        self.onCancel.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onCancel(_ closure: ((Self) -> Void)?) -> Self {
-        self.onCancel.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onCancel< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onCancel.link(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEnd(_ closure: (() -> Void)?) -> Self {
-        self.onEnd.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEnd(_ closure: ((Self) -> Void)?) -> Self {
-        self.onEnd.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onEnd.link(sender, closure)
-        return self
-    }
-    
+extension UI.Gesture.Pinch : IUIGesture {
+}
+
+extension UI.Gesture.Pinch : IUIGestureContinusable {
 }
 
 extension UI.Gesture.Pinch : KKGestureDelegate {

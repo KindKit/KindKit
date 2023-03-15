@@ -15,10 +15,28 @@ public protocol IPermission : AnyObject {
     
 }
 
+public extension IPermission {
+    
+    func request() {
+        self.request(source: self)
+    }
+    
+}
+
 public protocol IPermissionObserver : AnyObject {
     
     func didRedirectToSettings(_ permission: IPermission, source: Any?)
     func willRequest(_ permission: IPermission, source: Any?)
     func didRequest(_ permission: IPermission, source: Any?)
+    
+}
+
+public extension IPermissionObserver {
+    
+    func didRedirectToSettings(_ permission: IPermission, source: Any?) {
+    }
+    
+    func willRequest(_ permission: IPermission, source: Any?) {
+    }
     
 }

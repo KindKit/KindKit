@@ -60,10 +60,10 @@ extension KKEdgePanGesture {
     
     func update(mode: UI.Gesture.EdgePan.Mode) {
         switch mode {
-        case .top: self.edges = [ .top ]
-        case .left: self.edges = [ .left ]
-        case .right: self.edges = [ .right ]
-        case .bottom: self.edges = [ .bottom ]
+        case .top: self.edges = .top
+        case .left: self.edges = .left
+        case .right: self.edges = .right
+        case .bottom: self.edges = .bottom
         }
     }
     

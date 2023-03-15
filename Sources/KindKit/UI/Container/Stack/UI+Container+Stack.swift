@@ -11,7 +11,7 @@ import UIKit
 
 public extension UI.Container {
     
-    final class Stack< Screen : IUIStackScreen > : IUIStackContainer, IUIContainerScreenable {
+    final class Stack< Screen : IStackScreen > : IUIStackContainer, IUIContainerScreenable {
         
         public weak var parent: IUIContainer? {
             didSet {
@@ -107,7 +107,7 @@ public extension UI.Container {
         
         @inlinable
         public convenience init<
-            RootScreen : IUIScreen & IUIScreenStackable & IUIScreenViewable
+            RootScreen : IScreen & IScreenStackable & IScreenViewable
         >(
             screen: Screen,
             root: RootScreen,
@@ -243,6 +243,25 @@ public extension UI.Container {
         public func cancelHide(interactive: Bool) {
             self.screen.cancelHide(interactive: interactive)
             self._current.container.cancelHide(interactive: interactive)
+        }
+        
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            if let container = container as? IUIStackContentContainer {
+                if self.root === container {
+                    return self.close(animated: animated, completion: completion)
+                } else if self.current === container {
+                    self.pop(animated: animated, completion: completion)
+                    return true
+                }
+            } else if let parent = self.parent {
+                return parent.close(container: self, animated: animated, completion: completion)
+            }
+            return false
         }
         
         public func update(container: IUIStackContentContainer, animated: Bool, completion: (() -> Void)?) {
@@ -419,7 +438,7 @@ public extension UI.Container {
 extension UI.Container.Stack : IUIRootContentContainer {
 }
 
-extension UI.Container.Stack : IUIGroupContentContainer where Screen : IUIScreenGroupable {
+extension UI.Container.Stack : IUIGroupContentContainer where Screen : IScreenGroupable {
     
     public var groupItem: UI.View.GroupBar.Item {
         return self.screen.groupItem
@@ -427,7 +446,7 @@ extension UI.Container.Stack : IUIGroupContentContainer where Screen : IUIScreen
     
 }
 
-extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScreenDialogable {
+extension UI.Container.Stack : IUIDialogContentContainer where Screen : IScreenDialogable {
     
     public var dialogInset: Inset {
         return self.screen.dialogInset
@@ -451,7 +470,7 @@ extension UI.Container.Stack : IUIDialogContentContainer where Screen : IUIScree
     
 }
 
-extension UI.Container.Stack : IUIModalContentContainer where Screen : IUIScreenModalable {
+extension UI.Container.Stack : IUIModalContentContainer where Screen : IScreenModalable {
     
     public var modalColor: UI.Color {
         return self.screen.modalColor

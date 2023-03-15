@@ -96,7 +96,7 @@ public extension UI.Container {
         
         @inlinable
         public convenience init<
-            Screen : IUIScreen & IUIScreenViewable
+            Screen : IScreen & IScreenViewable
         >(
             _ screen: Screen
         ) {
@@ -162,6 +162,16 @@ public extension UI.Container {
         
         public func cancelHide(interactive: Bool) {
             self.content?.cancelHide(interactive: interactive)
+        }
+        
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
         }
         
     }

@@ -93,6 +93,18 @@ public extension UI.View.Gradient {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func fill(_ value: () -> Fill?) -> Self {
+        return self.fill(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func fill(_ value: (Self) -> Fill?) -> Self {
+        return self.fill(value(self))
+    }
+    
 }
 
 extension UI.View.Gradient : IUIView {
@@ -181,8 +193,8 @@ extension UI.View.Gradient : IUIViewColorable {
 public extension IUIView where Self == UI.View.Gradient {
     
     @inlinable
-    static func gradient() -> Self {
-        return .init()
+    static func gradient(_ fill: UI.View.Gradient.Fill) -> Self {
+        return .init().fill(fill)
     }
     
 }

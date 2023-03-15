@@ -29,4 +29,16 @@ public extension IUIViewDragSourceable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func dragSource(_ value: () -> IUIDragAndDropSource?) -> Self {
+        return self.dragSource(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func dragSource(_ value: (Self) -> IUIDragAndDropSource?) -> Self {
+        return self.dragSource(value(self))
+    }
+    
 }

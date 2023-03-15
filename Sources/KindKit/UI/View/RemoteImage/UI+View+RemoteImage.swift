@@ -109,9 +109,27 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
+    func placeholder(_ value: () -> IUIView) -> Self {
+        return self.placeholder(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func placeholder(_ value: (Self) -> IUIView) -> Self {
+        return self.placeholder(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func progress(_ value: (IUIView & IUIViewProgressable)?) -> Self {
         self.progress = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func progress(_ value: (Self) -> (IUIView & IUIViewProgressable)?) -> Self {
+        return self.progress(value(self))
     }
     
     @inlinable
@@ -123,6 +141,18 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
+    func error(_ value: () -> IUIView?) -> Self {
+        return self.error(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func error(_ value: (Self) -> IUIView?) -> Self {
+        return self.error(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func query(_ value: IRemoteImageQuery) -> Self {
         self.query = value
         return self
@@ -130,9 +160,33 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
+    func query(_ value: () -> IRemoteImageQuery) -> Self {
+        return self.query(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func query(_ value: (Self) -> IRemoteImageQuery) -> Self {
+        return self.query(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func filter(_ value: IRemoteImageFilter?) -> Self {
         self.filter = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func filter(_ value: () -> IRemoteImageFilter?) -> Self {
+        return self.filter(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func filter(_ value: (Self) -> IRemoteImageFilter?) -> Self {
+        return self.filter(value(self))
     }
     
 }
@@ -148,7 +202,7 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onProgress(_ closure: ((Self) -> Void)?) -> Self {
+    func onProgress(_ closure: @escaping (Self) -> Void) -> Self {
         self.onProgress.link(self, closure)
         return self
     }
@@ -162,21 +216,21 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onProgress(_ closure: ((Self, Double) -> Void)?) -> Self {
+    func onProgress(_ closure: @escaping (Self, Double) -> Void) -> Self {
         self.onProgress.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onProgress.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Double) -> Void)?) -> Self {
+    func onProgress< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Double) -> Void) -> Self {
         self.onProgress.link(sender, closure)
         return self
     }
@@ -190,7 +244,7 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onFinish(_ closure: ((Self) -> IUIView?)?) -> Self {
+    func onFinish(_ closure: @escaping (Self) -> IUIView?) -> Self {
         self.onFinish.link(self, closure)
         return self
     }
@@ -204,21 +258,21 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onFinish(_ closure: ((Self, UI.Image) -> IUIView?)?) -> Self {
+    func onFinish(_ closure: @escaping (Self, UI.Image) -> IUIView?) -> Self {
         self.onFinish.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> IUIView?)?) -> Self {
+    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> IUIView?) -> Self {
         self.onFinish.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.Image) -> IUIView?)?) -> Self {
+    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, UI.Image) -> IUIView?) -> Self {
         self.onFinish.link(sender, closure)
         return self
     }
@@ -232,7 +286,7 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onError(_ closure: ((Self) -> Void)?) -> Self {
+    func onError(_ closure: @escaping (Self) -> Void) -> Self {
         self.onError.link(self, closure)
         return self
     }
@@ -246,21 +300,21 @@ public extension UI.View.RemoteImage {
     
     @inlinable
     @discardableResult
-    func onError(_ closure: ((Self, KindKit.RemoteImage.Error) -> Void)?) -> Self {
+    func onError(_ closure: @escaping (Self, KindKit.RemoteImage.Error) -> Void) -> Self {
         self.onError.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onError.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, KindKit.RemoteImage.Error) -> Void)?) -> Self {
+    func onError< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, KindKit.RemoteImage.Error) -> Void) -> Self {
         self.onError.link(sender, closure)
         return self
     }
@@ -316,8 +370,8 @@ extension UI.View.RemoteImage : IRemoteImageTarget {
 public extension IUIView where Self == UI.View.RemoteImage {
     
     @inlinable
-    static func remoteImage() -> Self {
-        return .init()
+    static func remoteImage(_ query: IRemoteImageQuery) -> Self {
+        return .init().query(query)
     }
     
 }

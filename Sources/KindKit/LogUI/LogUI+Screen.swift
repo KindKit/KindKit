@@ -6,10 +6,9 @@ import Foundation
 
 extension LogUI {
     
-    final class Screen : IUIScreen, IUIScreenStackable, IUIScreenViewable {
+    final class Screen : IScreen, IScreenStackable, IScreenViewable {
         
         let target: LogUI.Target
-        var onClose: (() -> Void)?
         
         var container: IUIContainer?
         
@@ -57,11 +56,9 @@ extension LogUI {
             .textColor(.black)
             .textInset(.init(horizontal: 12, vertical: 4))
             .editingColor(.black)
-            .placeholder(.init(
-                text: "Enter filter",
-                font: .init(weight: .regular, size: 16),
-                color: .platinum
-            ))
+            .placeholder("Enter filter")
+            .placeholderFont(.init(weight: .regular, size: 16))
+            .placeholderColor(.platinum)
             .keyboard(.init(
                 returnKey: .search,
                 enablesReturnKeyAutomatically: false
@@ -176,7 +173,7 @@ extension LogUI {
 private extension LogUI.Screen {
     
     func _pressedClose() {
-        self.onClose?()
+        self.close()
     }
     
     func _scrollToBottom() {

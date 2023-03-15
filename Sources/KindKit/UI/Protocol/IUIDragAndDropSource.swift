@@ -93,14 +93,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onAllow(_ closure: ((Self, UI.DragAndDrop.Operation) -> Bool?)?) -> Self {
+    func onAllow(_ closure: @escaping (Self, UI.DragAndDrop.Operation) -> Bool?) -> Self {
         self.onAllow.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onAllow< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.DragAndDrop.Operation) -> Bool?)?) -> Self {
+    func onAllow< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, UI.DragAndDrop.Operation) -> Bool?) -> Self {
         self.onAllow.link(sender, closure)
         return self
     }
@@ -114,14 +114,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onBegin(_ closure: ((Self) -> Void)?) -> Self {
+    func onBegin(_ closure: @escaping (Self) -> Void) -> Self {
         self.onBegin.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onBegin< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onBegin.link(sender, closure)
         return self
     }
@@ -135,21 +135,21 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onEnd(_ closure: ((Self, UI.DragAndDrop.Operation) -> Void)?) -> Self {
+    func onEnd(_ closure: @escaping (Self, UI.DragAndDrop.Operation) -> Void) -> Self {
         self.onEnd.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEnd.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.DragAndDrop.Operation) -> Void)?) -> Self {
+    func onEnd< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, UI.DragAndDrop.Operation) -> Void) -> Self {
         self.onEnd.link(sender, closure)
         return self
     }
@@ -163,14 +163,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onPreview(_ closure: ((Self, NSItemProvider) -> NativeView?)?) -> Self {
+    func onPreview(_ closure: @escaping (Self, NSItemProvider) -> NativeView?) -> Self {
         self.onPreview.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> NativeView?)?) -> Self {
+    func onPreview< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, NSItemProvider) -> NativeView?) -> Self {
         self.onPreview.link(sender, closure)
         return self
     }
@@ -186,14 +186,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onPreviewParameters(_ closure: ((Self, NSItemProvider) -> UIDragPreviewParameters?)?) -> Self {
+    func onPreviewParameters(_ closure: @escaping (Self, NSItemProvider) -> UIDragPreviewParameters?) -> Self {
         self.onPreviewParameters.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPreviewParameters< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> UIDragPreviewParameters?)?) -> Self {
+    func onPreviewParameters< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, NSItemProvider) -> UIDragPreviewParameters?) -> Self {
         self.onPreviewParameters.link(sender, closure)
         return self
     }
@@ -209,14 +209,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onBeginPreview(_ closure: ((Self, NSItemProvider) -> Void)?) -> Self {
+    func onBeginPreview(_ closure: @escaping (Self, NSItemProvider) -> Void) -> Self {
         self.onBeginPreview.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBeginPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> Void)?) -> Self {
+    func onBeginPreview< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, NSItemProvider) -> Void) -> Self {
         self.onBeginPreview.link(sender, closure)
         return self
     }
@@ -230,14 +230,14 @@ public extension IUIDragAndDropSource {
     
     @inlinable
     @discardableResult
-    func onEndPreview(_ closure: ((Self, NSItemProvider) -> Void)?) -> Self {
+    func onEndPreview(_ closure: @escaping (Self, NSItemProvider) -> Void) -> Self {
         self.onEndPreview.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEndPreview< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, NSItemProvider) -> Void)?) -> Self {
+    func onEndPreview< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, NSItemProvider) -> Void) -> Self {
         self.onEndPreview.link(sender, closure)
         return self
     }

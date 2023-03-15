@@ -34,7 +34,7 @@ extension UI.Layout.Composition.Position : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
+    public func layout(bounds: Rect) -> KindKit.Size {
         let size = self.entity.size(available: bounds.size)
         switch self.mode {
         case .topLeft: return self.entity.layout(bounds: Rect(topLeft: bounds.topLeft, size: size))
@@ -49,7 +49,7 @@ extension UI.Layout.Composition.Position : IUICompositionLayoutEntity {
         }
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return self.entity.size(available: available)
     }
     
@@ -65,7 +65,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     static func position(
         mode: UI.Layout.Composition.Position.Mode,
         entity: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.Position {
+    ) -> Self {
         return .init(
             mode: mode,
             entity: entity

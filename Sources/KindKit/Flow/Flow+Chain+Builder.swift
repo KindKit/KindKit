@@ -30,9 +30,21 @@ public extension Flow.Chain.Builder {
     }
     
     func pipeline(
+        onReceive: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Void,
+        onCompleted: (() -> Void)? = nil
+    ) -> Flow.Pipeline< Head.Input, Tail.Output > {
+        let pipeline = self.pipeline()
+        _ = pipeline.subscribe(
+            onReceive: onReceive,
+            onCompleted: onCompleted
+        )
+        return pipeline
+    }
+    
+    func pipeline(
         onReceiveValue: @escaping (Tail.Output.Success) -> Void,
         onReceiveError: @escaping (Tail.Output.Failure) -> Void,
-        onCompleted: @escaping () -> Void
+        onCompleted: (() -> Void)? = nil
     ) -> Flow.Pipeline< Head.Input, Tail.Output > {
         let pipeline = self.pipeline()
         _ = pipeline.subscribe(

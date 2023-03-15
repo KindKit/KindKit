@@ -159,9 +159,33 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
+    func items(_ value: () -> [Item]) -> Self {
+        return self.items(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func items(_ value: (Self) -> [Item]) -> Self {
+        return self.items(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func selected(_ value: Item?) -> Self {
         self.selected = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selected(_ value: () -> Item?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func selected(_ value: (Self) -> Item?) -> Self {
+        return self.selected(value(self))
     }
     
     @inlinable
@@ -173,9 +197,33 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
+    func preset(_ value: () -> Preset?) -> Self {
+        return self.preset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func preset(_ value: (Self) -> Preset?) -> Self {
+        return self.preset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func selectedPreset(_ value: Preset?) -> Self {
         self.selectedPreset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selectedPreset(_ value: () -> Preset?) -> Self {
+        return self.selectedPreset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func selectedPreset(_ value: (Self) -> Preset?) -> Self {
+        return self.selectedPreset(value(self))
     }
     
 }
@@ -191,7 +239,7 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
-    func onSelect(_ closure: ((Self) -> Void)?) -> Self {
+    func onSelect(_ closure: @escaping (Self) -> Void) -> Self {
         self.onSelect.link(self, closure)
         return self
     }
@@ -205,21 +253,21 @@ public extension UI.View.Segmented {
     
     @inlinable
     @discardableResult
-    func onSelect(_ closure: ((Self, UI.View.Segmented.Item) -> Void)?) -> Self {
+    func onSelect(_ closure: @escaping (Self, UI.View.Segmented.Item) -> Void) -> Self {
         self.onSelect.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onSelect.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, UI.View.Segmented.Item) -> Void)?) -> Self {
+    func onSelect< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, UI.View.Segmented.Item) -> Void) -> Self {
         self.onSelect.link(sender, closure)
         return self
     }
@@ -330,8 +378,8 @@ extension UI.View.Segmented : KKSegmentedViewDelegate {
 public extension IUIView where Self == UI.View.Segmented {
     
     @inlinable
-    static func segmented() -> Self {
-        return .init()
+    static func segmented(_ items: () -> [UI.View.Segmented.Item]) -> Self {
+        return .init().items(items)
     }
     
 }

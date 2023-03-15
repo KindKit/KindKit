@@ -11,22 +11,11 @@ class TestSignal : XCTestCase {
         let signal = Signal.Empty< Void >()
         do {
             var isEmit = false
-            let slot = signal.link({
+            signal.link({
                 isEmit = true
             })
             signal.emit()
             if isEmit != true {
-                XCTFail("Fail")
-            }
-        }
-        do {
-            var isEmit = false
-            let slot = signal.link({
-                isEmit = true
-            })
-            slot?.cancel()
-            signal.emit()
-            if isEmit != false {
                 XCTFail("Fail")
             }
         }
@@ -36,9 +25,9 @@ class TestSignal : XCTestCase {
         let signal = Signal.Empty< Void >()
         do {
             var isEmit = false
-            let slot = signal.append({
+            let slot = signal.subscribe({
                 isEmit = true
-            })
+            }).autoCancel()
             signal.emit()
             if isEmit != true {
                 XCTFail("Fail")
@@ -46,9 +35,9 @@ class TestSignal : XCTestCase {
         }
         do {
             var isEmit = false
-            _ = signal.append({
+            _ = signal.subscribe({
                 isEmit = true
-            })
+            }).autoCancel()
             signal.emit()
             if isEmit != false {
                 XCTFail("Fail")

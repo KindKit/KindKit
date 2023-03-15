@@ -22,9 +22,12 @@ public extension UI.Size.Static.Dimension {
         return .parent(.one)
     }
     
-    @available(*, deprecated, renamed: "UI.Size.Static.Dimension.parent")
-    static func percent(_ value: Percent) -> Self {
-        return .parent(value)
+    static func parent(_ value: Double) -> Self {
+        return .parent(Percent(value))
+    }
+    
+    static func ratio(_ value: Double) -> Self {
+        return .ratio(Percent(value))
     }
     
 }

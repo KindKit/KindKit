@@ -11,7 +11,7 @@ import UIKit
 
 public extension UI.Container {
 
-    final class Book< Screen : IUIBookScreen > : IUIBookContainer {
+    final class Book< Screen : IBookScreen > : IUIBookContainer {
         
         public weak var parent: IUIContainer? {
             didSet {
@@ -209,6 +209,16 @@ public extension UI.Container {
             self.current?.cancelHide(interactive: interactive)
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
         public func reload(backward: Bool, forward: Bool) {
             let newBackward: BookItem?
             let newForward: BookItem?
@@ -255,7 +265,7 @@ public extension UI.Container {
     
 }
 
-extension UI.Container.Book : IUIStackContentContainer where Screen : IUIScreenStackable {
+extension UI.Container.Book : IUIStackContentContainer where Screen : IScreenStackable {
     
     public var stackBar: UI.View.StackBar {
         return self.screen.stackBar
@@ -271,7 +281,7 @@ extension UI.Container.Book : IUIStackContentContainer where Screen : IUIScreenS
     
 }
 
-extension UI.Container.Book : IUIGroupContentContainer where Screen : IUIScreenGroupable  {
+extension UI.Container.Book : IUIGroupContentContainer where Screen : IScreenGroupable  {
     
     public var groupItem: UI.View.GroupBar.Item {
         return self.screen.groupItem
@@ -283,7 +293,7 @@ extension UI.Container.Book : IUIGroupContentContainer where Screen : IUIScreenG
     
 }
 
-extension UI.Container.Book : IUIDialogContentContainer where Screen : IUIScreenDialogable {
+extension UI.Container.Book : IUIDialogContentContainer where Screen : IScreenDialogable {
     
     public var dialogInset: Inset {
         return self.screen.dialogInset

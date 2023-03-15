@@ -10,6 +10,22 @@ public typealias NativeView = UIView
 
 public extension UIView {
     
+    var kk_firstResponder: UIView? {
+        if self.isFirstResponder == true {
+            return self
+        }
+        for subview in subviews {
+            if let firstResponder = subview.kk_firstResponder {
+                return firstResponder
+            }
+        }
+        return nil
+    }
+    
+}
+
+public extension UIView {
+    
     func kk_snapshot() -> UIImage? {
         let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
         return renderer.image(actions: {

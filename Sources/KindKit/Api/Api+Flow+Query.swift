@@ -20,7 +20,7 @@ public extension Api.Flow {
         private let _queue: DispatchQueue
         private let _request: (Input.Success) throws -> Api.Request?
         private let _response: (Input.Success) -> Response
-        private let _validation: ((Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation)?
+        private let _validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?
         private let _success: (Input.Success, Response.Success) -> Success
         private let _failure: (Input.Success, Response.Failure) -> Failure
         private var _task: ICancellable? {
@@ -35,7 +35,7 @@ public extension Api.Flow {
             _ dispatch: Flow.Operator.DispatchMode,
             _ request: @escaping (Input.Success) throws -> Api.Request?,
             _ response: @escaping (Input.Success) -> Response,
-            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation)?,
+            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
             _ success: @escaping (Input.Success, Response.Success) -> Success,
             _ failure: @escaping (Input.Success, Response.Failure) -> Failure
         ) {
@@ -53,7 +53,7 @@ public extension Api.Flow {
             _ dispatch: Flow.Operator.DispatchMode,
             _ request: @escaping (Input.Success) throws -> Api.Request?,
             _ response: @escaping (Input.Success) -> Response,
-            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation)?,
+            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
             _ success: @escaping (Input.Success, Response.Success) -> Success
         ) where
             Failure == Response.Failure
@@ -66,8 +66,8 @@ public extension Api.Flow {
             _ dispatch: Flow.Operator.DispatchMode,
             _ request: @escaping (Input.Success) throws -> Api.Request?,
             _ response: @escaping (Input.Success) -> Response,
-            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation)?,
-            _ failure: @escaping (Input.Success, Response.Result.Failure) -> Failure
+            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
+            _ failure: @escaping (Input.Success, Response.Failure) -> Failure
         ) where
             Success == Response.Success
         {
@@ -79,7 +79,7 @@ public extension Api.Flow {
             _ dispatch: Flow.Operator.DispatchMode,
             _ request: @escaping (Input.Success) throws -> Api.Request?,
             _ response: @escaping (Input.Success) -> Response,
-            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation)?
+            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?
         ) where
             Success == Response.Success,
             Failure == Response.Failure
@@ -177,7 +177,7 @@ extension IFlowOperator {
         _ dispatch: Flow.Operator.DispatchMode,
         _ request: @escaping (Output.Success) throws -> Api.Request?,
         _ response: @escaping (Output.Success) -> Response,
-        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ success: @escaping (Output.Success, Response.Success) -> Success,
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
     ) -> Api.Flow.Query< Output, Success, Failure, Response > where
@@ -196,7 +196,7 @@ extension IFlowOperator {
         _ dispatch: Flow.Operator.DispatchMode,
         _ request: @escaping (Output.Success) throws -> Api.Request?,
         _ response: @escaping (Output.Success) -> Response,
-        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ success: @escaping (Output.Success, Response.Success) -> Success
     ) -> Api.Flow.Query< Output, Success, Response.Failure, Response > where
         Output.Failure == Response.Failure
@@ -214,7 +214,7 @@ extension IFlowOperator {
         _ dispatch: Flow.Operator.DispatchMode,
         _ request: @escaping (Output.Success) throws -> Api.Request?,
         _ response: @escaping (Output.Success) -> Response,
-        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
     ) -> Api.Flow.Query< Output, Response.Success, Failure, Response > where
         Output.Failure == Failure
@@ -231,7 +231,7 @@ extension IFlowOperator {
         _ dispatch: Flow.Operator.DispatchMode,
         _ request: @escaping (Output.Success) throws -> Api.Request?,
         _ response: @escaping (Output.Success) -> Response,
-        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
+        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Api.Flow.Query< Output, Response.Success, Response.Failure, Response > where
         Output.Failure == Response.Failure
     {
@@ -252,9 +252,9 @@ public extension Flow.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
-        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Input.Success, Response.Success) -> Success,
-        failure: @escaping (Input.Success, Response.Failure) -> Failure
+        failure: @escaping (Input.Success, Response.Failure) -> Input.Failure
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Input.Failure, Response > > {
         return .init(head: .init(provider, dispatch, request, response, validation, success, failure))
     }
@@ -267,7 +267,7 @@ public extension Flow.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
-        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Input.Success, Response.Success) -> Success
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Response.Failure, Response > > where
         Input.Failure == Response.Failure
@@ -282,7 +282,7 @@ public extension Flow.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
-        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Input.Success, Response.Failure) -> Input.Failure
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Input.Failure, Response > > {
         return .init(head: .init(provider, dispatch, request, response, validation, failure))
@@ -295,7 +295,7 @@ public extension Flow.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Input.Success) throws -> Api.Request?,
         response: @escaping (Input.Success) -> Response,
-        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
+        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Response.Failure, Response > > where
         Input.Failure == Response.Failure
     {
@@ -315,7 +315,7 @@ public extension Flow.Head.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
-        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Head.Output.Success, Response.Success) -> Success,
         failure: @escaping (Head.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > where
@@ -332,7 +332,7 @@ public extension Flow.Head.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
-        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Head.Output.Success, Response.Success) -> Success
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Response.Failure, Response > > where
         Head.Output.Failure == Response.Failure
@@ -347,7 +347,7 @@ public extension Flow.Head.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
-        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Head.Output.Success, Response.Failure) -> Head.Output.Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Head.Output.Failure, Response > > {
         return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, failure))
@@ -360,7 +360,7 @@ public extension Flow.Head.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Head.Output.Success) throws -> Api.Request?,
         response: @escaping (Head.Output.Success) -> Response,
-        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
+        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Response.Failure, Response > > where
         Head.Output.Failure == Response.Failure
     {
@@ -380,7 +380,7 @@ public extension Flow.Chain.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > where
@@ -397,7 +397,7 @@ public extension Flow.Chain.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
@@ -412,7 +412,7 @@ public extension Flow.Chain.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done },
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Tail.Output.Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Response.Success, Tail.Output.Failure, Response > > {
         return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, failure))
@@ -425,7 +425,7 @@ public extension Flow.Chain.Builder {
         dispatch: Flow.Operator.DispatchMode,
         request: @escaping (Tail.Output.Success) throws -> Api.Request?,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Api.Flow.Validation = { _, _, _ in .done }
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {

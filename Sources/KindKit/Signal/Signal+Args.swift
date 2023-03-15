@@ -49,96 +49,92 @@ private extension Signal.Args {
 
 public extension Signal.Args {
     
-    @discardableResult
     func link(
         _ closure: ((Argument) -> Result)?
-    ) -> ICancellable? {
-        guard let closure = closure else {
+    ) {
+        if let closure = closure {
+            let slot = Slot.Args.Simple(self, closure)
+            self.slot = slot
+        } else {
             self.slot = nil
-            return nil
         }
-        let slot = Slot.Args.Simple(self, closure)
-        self.slot = slot
-        return slot
     }
     
-    @discardableResult
     func link(
         _ closure: (() -> Result)?
-    ) -> ICancellable? {
-        guard let closure = closure else {
+    ) {
+        if let closure = closure {
+            let slot = Slot.Args.Empty.Simple< Result, Argument >(self, closure)
+            self.slot = slot
+        } else {
             self.slot = nil
-            return nil
         }
-        let slot = Slot.Args.Empty.Simple< Result, Argument >(self, closure)
-        self.slot = slot
-        return slot
     }
 
-    @discardableResult
     func link< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: ((Sender, Argument) -> Result)?
-    ) -> ICancellable? {
-        guard let closure = closure else {
+    ) {
+        if let closure = closure {
+            let slot = Slot.Args.Sender(self, sender, closure)
+            self.slot = slot
+        } else {
             self.slot = nil
-            return nil
         }
-        let slot = Slot.Args.Sender(self, sender, closure)
-        self.slot = slot
-        return slot
     }
     
-    @discardableResult
     func link< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: ((Sender) -> Result)?
-    ) -> ICancellable? {
-        guard let closure = closure else {
+    ) {
+        if let closure = closure {
+            let slot = Slot.Args.Empty.Sender< Sender, Result, Argument >(self, sender, closure)
+            self.slot = slot
+        } else {
             self.slot = nil
-            return nil
         }
-        let slot = Slot.Args.Empty.Sender< Sender, Result, Argument >(self, sender, closure)
-        self.slot = slot
-        return slot
     }
     
 }
 
 public extension Signal.Args {
-
-    func append(
+    
+    @discardableResult
+    func subscribe(
         _ closure: @escaping (Argument) -> Result
     ) -> ICancellable {
         let slot = Slot.Args.Simple(self, closure)
         self.slots.append(slot)
-        return AutoCancel(slot)
+        return slot
     }
     
-    func append(
+    @discardableResult
+    func subscribe(
         _ closure: @escaping () -> Result
     ) -> ICancellable {
         let slot = Slot.Args.Empty.Simple< Result, Argument >(self, closure)
         self.slots.append(slot)
-        return AutoCancel(slot)
+        return slot
     }
     
-    func append< Sender : AnyObject >(
+    @discardableResult
+    func subscribe< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: @escaping (Sender, Argument) -> Result
     ) -> ICancellable {
         let slot = Slot.Args.Sender(self, sender, closure)
         self.slots.append(slot)
-        return AutoCancel(slot)
+        return slot
     }
     
-    func append< Sender : AnyObject >(
+    @discardableResult
+    func subscribe< Sender : AnyObject >(
         _ sender: Sender,
         _ closure: @escaping (Sender) -> Result
     ) -> ICancellable {
         let slot = Slot.Args.Empty.Sender< Sender, Result, Argument >(self, sender, closure)
         self.slots.append(slot)
-        return AutoCancel(slot)
+        return slot
     }
     
 }
@@ -177,7 +173,7 @@ public extension Signal.Args where Result == Void {
 
 public extension Signal.Args where Result : IOptionalConvertible {
     
-    func emit(_ argument: Argument) -> Optional< Result.Wrapped > {
+    func emit(_ argument: Argument) -> Result.Wrapped? {
         if let slot = self.slot {
             do {
                 if let result = try slot.perform(argument).asOptional {

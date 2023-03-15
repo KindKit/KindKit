@@ -11,7 +11,7 @@ import UIKit
 
 public extension UI.Container {
     
-    final class Group< Screen : IUIGroupScreen > : IUIGroupContainer, IUIContainerScreenable {
+    final class Group< Screen : IGroupScreen > : IUIGroupContainer, IUIContainerScreenable {
         
         public weak var parent: IUIContainer? {
             didSet {
@@ -253,6 +253,16 @@ public extension UI.Container {
             self.current?.cancelHide(interactive: interactive)
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
             self.bar = self.screen.groupBar
             self.barVisibility = self.screen.groupBarVisibility
@@ -354,7 +364,7 @@ extension UI.Container.Group : IGroupBarViewDelegate {
 extension UI.Container.Group : IUIRootContentContainer {
 }
 
-extension UI.Container.Group : IUIStackContentContainer where Screen : IUIScreenStackable {
+extension UI.Container.Group : IUIStackContentContainer where Screen : IScreenStackable {
     
     public var stackBar: UI.View.StackBar {
         return self.screen.stackBar
@@ -370,7 +380,7 @@ extension UI.Container.Group : IUIStackContentContainer where Screen : IUIScreen
     
 }
 
-extension UI.Container.Group : IUIDialogContentContainer where Screen : IUIScreenDialogable {
+extension UI.Container.Group : IUIDialogContentContainer where Screen : IScreenDialogable {
     
     public var dialogInset: Inset {
         return self.screen.dialogInset

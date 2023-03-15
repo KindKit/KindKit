@@ -8,7 +8,7 @@ import UIKit
 
 public extension UI.View.Input.Toolbar.Item {
     
-    final class Action : IInputToolbarItem {
+    final class Action : IUIViewInputToolbarItem {
         
         public let barItem: UIBarButtonItem
         public let onPressed: Signal.Empty< Void > = .init()
@@ -56,21 +56,21 @@ public extension UI.View.Input.Toolbar.Item.Action {
     
     @inlinable
     @discardableResult
-    func onPressed(_ closure: ((Self) -> Void)?) -> Self {
+    func onPressed(_ closure: @escaping (Self) -> Void) -> Self {
         self.onPressed.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onPressed< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onPressed.link(sender, closure)
         return self
     }
     
 }
 
-public extension IInputToolbarItem where Self == UI.View.Input.Toolbar.Item.Action {
+public extension IUIViewInputToolbarItem where Self == UI.View.Input.Toolbar.Item.Action {
     
     @inlinable
     static func plain(

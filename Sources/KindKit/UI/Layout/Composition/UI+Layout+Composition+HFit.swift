@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.Layout.Composition {
     
-    struct HFit {
+    final class HFit {
         
         public var entity: IUICompositionLayoutEntity
         
@@ -31,11 +31,18 @@ extension UI.Layout.Composition.HFit : IUICompositionLayoutEntity {
     }
     
     @discardableResult
-    public func layout(bounds: Rect) -> Size {
-        return self.entity.layout(bounds: bounds)
+    public func layout(bounds: Rect) -> KindKit.Size {
+        let size = self.entity.size(available: .init(
+            width: .infinity,
+            height: bounds.height
+        ))
+        return self.entity.layout(bounds: .init(
+            origin: bounds.origin,
+            size: size
+        ))
     }
     
-    public func size(available: Size) -> Size {
+    public func size(available: KindKit.Size) -> KindKit.Size {
         return self.entity.size(available: .init(
             width: .infinity,
             height: available.height
@@ -53,7 +60,7 @@ public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.
     @inlinable
     static func hFit(
         _ entity: IUICompositionLayoutEntity
-    ) -> UI.Layout.Composition.HFit {
+    ) -> Self {
         return .init(entity)
     }
     

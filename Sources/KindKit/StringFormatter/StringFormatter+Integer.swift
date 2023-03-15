@@ -10,64 +10,9 @@ public extension StringFormatter {
         
         public let formatter: NumberFormatter
         
-        public init(
-            minIntegerDigits: Int? = nil,
-            maxIntegerDigits: Int? = nil,
-            zero: String? = nil,
-            plusSign: String? = nil,
-            minusSign: String? = nil,
-            positivePrefix: String? = nil,
-            positiveSuffix: String? = nil,
-            negativePrefix: String? = nil,
-            negativeSuffix: String? = nil,
-            usesGroupingSeparator: Bool? = nil,
-            groupingSeparator: String? = nil,
-            groupingSize: Int? = nil,
-            secondaryGroupingSize: Int? = nil,
-            locale: Locale = Locale.current
-        ) {
+        public init() {
             self.formatter = NumberFormatter()
             self.formatter.numberStyle = .decimal
-            self.formatter.locale = locale
-            if let minIntegerDigits = minIntegerDigits {
-                self.formatter.minimumIntegerDigits = minIntegerDigits
-            }
-            if let maxIntegerDigits = maxIntegerDigits {
-                self.formatter.maximumIntegerDigits = maxIntegerDigits
-            }
-            if let zero = zero {
-                self.formatter.zeroSymbol = zero
-            }
-            if let plusSign = plusSign {
-                self.formatter.plusSign = plusSign
-            }
-            if let minusSign = minusSign {
-                self.formatter.zeroSymbol = minusSign
-            }
-            if let positivePrefix = positivePrefix {
-                self.formatter.positivePrefix = positivePrefix
-            }
-            if let positiveSuffix = positiveSuffix {
-                self.formatter.positiveSuffix = positiveSuffix
-            }
-            if let negativePrefix = negativePrefix {
-                self.formatter.negativePrefix = negativePrefix
-            }
-            if let negativeSuffix = negativeSuffix {
-                self.formatter.negativeSuffix = negativeSuffix
-            }
-            if let usesGroupingSeparator = usesGroupingSeparator {
-                self.formatter.usesGroupingSeparator = usesGroupingSeparator
-            }
-            if let groupingSeparator = groupingSeparator {
-                self.formatter.groupingSeparator = groupingSeparator
-            }
-            if let groupingSize = groupingSize {
-                self.formatter.groupingSize = groupingSize
-            }
-            if let secondaryGroupingSize = secondaryGroupingSize {
-                self.formatter.secondaryGroupingSize = secondaryGroupingSize
-            }
         }
         
         public func format(_ input: InputType) -> String {
@@ -88,4 +33,172 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.Integer {
+    
+    @inlinable
+    func minIntegerDigits(_ value: Int) -> Self {
+        self.formatter.minimumIntegerDigits = value
+        return self
+    }
+    
+    @inlinable
+    func maxIntegerDigits(_ value: Int) -> Self {
+        self.formatter.maximumIntegerDigits = value
+        return self
+    }
+    
+    @inlinable
+    func zero(_ value: String) -> Self {
+        self.formatter.zeroSymbol = value
+        return self
+    }
+    
+    @inlinable
+    func plusSign(_ value: String) -> Self {
+        self.formatter.plusSign = value
+        return self
+    }
+    
+    @inlinable
+    func minusSign(_ value: String) -> Self {
+        self.formatter.minusSign = value
+        return self
+    }
+    
+    @inlinable
+    func positivePrefix(_ value: String) -> Self {
+        self.formatter.positivePrefix = value
+        return self
+    }
+    
+    @inlinable
+    func positiveSuffix(_ value: String) -> Self {
+        self.formatter.positiveSuffix = value
+        return self
+    }
+    
+    @inlinable
+    func negativePrefix(_ value: String) -> Self {
+        self.formatter.negativePrefix = value
+        return self
+    }
+    
+    @inlinable
+    func negativeSuffix(_ value: String) -> Self {
+        self.formatter.negativeSuffix = value
+        return self
+    }
+    
+    @inlinable
+    func usesGroupingSeparator(_ value: Bool) -> Self {
+        self.formatter.usesGroupingSeparator = value
+        return self
+    }
+    
+    @inlinable
+    func groupingSeparator(_ value: String) -> Self {
+        self.formatter.groupingSeparator = value
+        return self
+    }
+    
+    @inlinable
+    func groupingSize(_ value: Int) -> Self {
+        self.formatter.groupingSize = value
+        return self
+    }
+    
+    @inlinable
+    func secondaryGroupingSize(_ value: Int) -> Self {
+        self.formatter.secondaryGroupingSize = value
+        return self
+    }
+    
+    @inlinable
+    func locale(_ value: Locale) -> Self {
+        self.formatter.locale = value
+        return self
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int > {
+    
+    static func int() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt > {
+    
+    static func uint() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int8 > {
+    
+    static func int8() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int16 > {
+    
+    static func int16() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int32 > {
+    
+    static func int32() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int64 > {
+    
+    static func int64() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt8 > {
+    
+    static func uint8() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt16 > {
+    
+    static func uint16() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt32 > {
+    
+    static func uint32() -> Self {
+        return .init()
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt64 > {
+    
+    static func uint64() -> Self {
+        return .init()
+    }
+    
 }

@@ -98,9 +98,33 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
+    func inset(_ value: () -> Inset) -> Self {
+        return self.inset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func inset(_ value: (Self) -> Inset) -> Self {
+        return self.inset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func alignment(_ value: Alignment) -> Self {
         self.alignment = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> Alignment) -> Self {
+        return self.alignment(value(self))
     }
     
     @inlinable
@@ -112,9 +136,33 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
+    func background(_ value: () -> IUIView?) -> Self {
+        return self.background(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func background(_ value: (Self) -> IUIView?) -> Self {
+        return self.background(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func spinnerPosition(_ value: SpinnerPosition) -> Self {
         self.spinnerPosition = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func spinnerPosition(_ value: () -> SpinnerPosition) -> Self {
+        return self.spinnerPosition(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func spinnerPosition(_ value: (Self) -> SpinnerPosition) -> Self {
+        return self.spinnerPosition(value(self))
     }
     
     @inlinable
@@ -126,9 +174,33 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
+    func spinner(_ value: () -> IUIView?) -> Self {
+        return self.spinner(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func spinner(_ value: (Self) -> IUIView?) -> Self {
+        return self.spinner(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func primary(_ value: IUIView?) -> Self {
         self.primary = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func primary(_ value: () -> IUIView?) -> Self {
+        return self.primary(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func primary(_ value: (Self) -> IUIView?) -> Self {
+        return self.primary(value(self))
     }
     
     @inlinable
@@ -140,9 +212,33 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
+    func primaryInset(_ value: () -> Inset) -> Self {
+        return self.primaryInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func primaryInset(_ value: (Self) -> Inset) -> Self {
+        return self.primaryInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func secondary(_ value: IUIView?) -> Self {
         self.secondary = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func secondary(_ value: () -> IUIView?) -> Self {
+        return self.secondary(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func secondary(_ value: (Self) -> IUIView?) -> Self {
+        return self.secondary(value(self))
     }
     
     @inlinable
@@ -154,9 +250,33 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
+    func secondaryPosition(_ value: () -> SecondaryPosition) -> Self {
+        return self.secondaryPosition(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func secondaryPosition(_ value: (Self) -> SecondaryPosition) -> Self {
+        return self.secondaryPosition(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func secondaryInset(_ value: Inset) -> Self {
         self.secondaryInset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func secondaryInset(_ value: () -> Inset) -> Self {
+        return self.secondaryInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func secondaryInset(_ value: (Self) -> Inset) -> Self {
+        return self.secondaryInset(value(self))
     }
     
 }

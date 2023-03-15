@@ -52,6 +52,9 @@ public protocol IUIContainer : AnyObject {
     func finishHide(interactive: Bool)
     func cancelHide(interactive: Bool)
     
+    func close(animated: Bool, completion: (() -> Void)?) -> Bool
+    func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool
+    
 }
 
 public extension IUIContainer {
@@ -59,27 +62,5 @@ public extension IUIContainer {
     func parentInset() -> UI.Container.AccumulateInset {
         return .zero
     }
-
-#if os(macOS)
-    
-    @discardableResult
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
-        guard let viewController = self.nsViewController else { return false }
-        guard let parentViewController = viewController.presentingViewController else { return false }
-        parentViewController.dismiss(viewController)
-        completion?()
-        return true
-    }
-    
-#elseif os(iOS)
-    
-    @discardableResult
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
-        guard let viewController = self.uiViewController else { return false }
-        viewController.dismiss(animated: animated, completion: completion)
-        return true
-    }
-    
-#endif
     
 }

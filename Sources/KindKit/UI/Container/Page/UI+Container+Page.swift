@@ -11,7 +11,7 @@ import UIKit
 
 public extension UI.Container {
     
-    final class Page< Screen : IUIPageScreen > : IUIPageContainer, IUIContainerScreenable {
+    final class Page< Screen : IPageScreen > : IUIPageContainer, IUIContainerScreenable {
         
         public weak var parent: IUIContainer? {
             didSet {
@@ -262,6 +262,16 @@ public extension UI.Container {
             self.current?.cancelHide(interactive: interactive)
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
         public func updateBar(animated: Bool, completion: (() -> Void)?) {
             self.bar = self.screen.pageBar
             self.barVisibility = self.screen.pageBarVisibility
@@ -363,7 +373,7 @@ extension UI.Container.Page : IPageBarViewDelegate {
 extension UI.Container.Page : IUIRootContentContainer {
 }
 
-extension UI.Container.Page : IUIStackContentContainer where Screen : IUIScreenStackable {
+extension UI.Container.Page : IUIStackContentContainer where Screen : IScreenStackable {
     
     public var stackBar: UI.View.StackBar {
         return self.screen.stackBar
@@ -379,7 +389,7 @@ extension UI.Container.Page : IUIStackContentContainer where Screen : IUIScreenS
     
 }
 
-extension UI.Container.Page : IUIGroupContentContainer where Screen : IUIScreenGroupable  {
+extension UI.Container.Page : IUIGroupContentContainer where Screen : IScreenGroupable  {
     
     public var groupItem: UI.View.GroupBar.Item {
         return self.screen.groupItem
@@ -391,7 +401,7 @@ extension UI.Container.Page : IUIGroupContentContainer where Screen : IUIScreenG
     
 }
 
-extension UI.Container.Page : IUIDialogContentContainer where Screen : IUIScreenDialogable {
+extension UI.Container.Page : IUIDialogContentContainer where Screen : IScreenDialogable {
     
     public var dialogInset: Inset {
         return self.screen.dialogInset

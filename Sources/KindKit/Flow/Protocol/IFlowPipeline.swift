@@ -12,7 +12,7 @@ public protocol IFlowPipeline : ICancellable {
     func subscribe(
         onReceiveValue: @escaping (Output.Success) -> Void,
         onReceiveError: @escaping (Output.Failure) -> Void,
-        onCompleted: @escaping () -> Void
+        onCompleted: (() -> Void)?
     ) -> IFlowSubscription
     
     func send(value: Input.Success)
@@ -26,9 +26,21 @@ public extension IFlowPipeline {
     
     @inlinable
     func subscribe(
-        onReceiveValue: @escaping (Output.Success) -> Void = { _ in },
-        onReceiveError: @escaping (Output.Failure) -> Void = { _ in },
-        onCompleted: @escaping () -> Void = {}
+        onReceive: @escaping (Result< Output.Success, Output.Failure >) -> Void,
+        onCompleted: (() -> Void)? = nil
+    ) -> IFlowSubscription {
+        return self.subscribe(
+            onReceiveValue: { onReceive(.success($0)) },
+            onReceiveError: { onReceive(.failure($0)) },
+            onCompleted: onCompleted
+        )
+    }
+    
+    @inlinable
+    func subscribe(
+        onReceiveValue: @escaping (Output.Success) -> Void,
+        onReceiveError: @escaping (Output.Failure) -> Void,
+        onCompleted: (() -> Void)? = nil
     ) -> IFlowSubscription {
         return self.subscribe(
             onReceiveValue: onReceiveValue,
@@ -42,9 +54,11 @@ public extension IFlowPipeline {
 public extension IFlowPipeline {
     
     @inlinable
-    func perform(_ input: Input.Success) {
+    @discardableResult
+    func perform(_ input: Input.Success) -> Self {
         self.send(value: input)
         self.completed()
+        return self
     }
     
 }
@@ -52,9 +66,11 @@ public extension IFlowPipeline {
 public extension IFlowPipeline where Input.Success == Void {
     
     @inlinable
-    func perform() {
+    @discardableResult
+    func perform() -> Self {
         self.send(value: ())
         self.completed()
+        return self
     }
     
 }

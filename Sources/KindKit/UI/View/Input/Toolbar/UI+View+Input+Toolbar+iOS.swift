@@ -66,7 +66,7 @@ extension KKInputToolbarView {
         self.kkDelegate = view
     }
     
-    func update(items: [IInputToolbarItem]) {
+    func update(items: [IUIViewInputToolbarItem]) {
         let barItems = items.map({ $0.barItem })
         for barItem in barItems {
             barItem.target = self

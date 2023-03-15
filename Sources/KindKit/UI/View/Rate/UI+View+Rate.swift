@@ -148,9 +148,33 @@ public extension UI.View.Rate {
     
     @inlinable
     @discardableResult
+    func itemSize(_ value: () -> Size) -> Self {
+        return self.itemSize(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemSize(_ value: (Self) -> Size) -> Self {
+        return self.itemSize(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func itemSpacing(_ value: Double) -> Self {
         self.itemSpacing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func itemSpacing(_ value: () -> Double) -> Self {
+        return self.itemSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemSpacing(_ value: (Self) -> Double) -> Self {
+        return self.itemSpacing(value(self))
     }
     
     @inlinable
@@ -162,9 +186,33 @@ public extension UI.View.Rate {
     
     @inlinable
     @discardableResult
+    func numberOfItem(_ value: () -> UInt) -> Self {
+        return self.numberOfItem(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func numberOfItem(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfItem(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func rounding(_ value: Rounding) -> Self {
         self.rounding = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func rounding(_ value: () -> Rounding) -> Self {
+        return self.rounding(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func rounding(_ value: (Self) -> Rounding) -> Self {
+        return self.rounding(value(self))
     }
     
     @inlinable
@@ -176,9 +224,33 @@ public extension UI.View.Rate {
     
     @inlinable
     @discardableResult
+    func states(_ value: () -> [State]) -> Self {
+        return self.states(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func states(_ value: (Self) -> [State]) -> Self {
+        return self.states(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func rating(_ value: Double) -> Self {
         self.rating = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func rating(_ value: () -> Double) -> Self {
+        return self.rating(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func rating(_ value: (Self) -> Double) -> Self {
+        return self.rating(value(self))
     }
     
 }
@@ -277,8 +349,8 @@ extension UI.View.Rate : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Rate {
     
     @inlinable
-    static func rate() -> Self {
-        return .init()
+    static func rate(_ rating: Double) -> Self {
+        return .init().rating(rating)
     }
     
 }

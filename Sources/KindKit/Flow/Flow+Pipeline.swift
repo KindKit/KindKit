@@ -36,7 +36,7 @@ public extension Flow {
         public func subscribe(
             onReceiveValue: @escaping (Output.Success) -> Void = { _ in },
             onReceiveError: @escaping (Output.Failure) -> Void = { _ in },
-            onCompleted: @escaping () -> Void = {}
+            onCompleted: (() -> Void)?
         ) -> IFlowSubscription {
             let subscription = Subscription(
                 pipeline: self,

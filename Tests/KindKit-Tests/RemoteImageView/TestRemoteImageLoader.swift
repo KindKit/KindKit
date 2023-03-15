@@ -10,7 +10,7 @@ class TestRemoteImageLoader : XCTestCase {
     func testLoad() {
         let loader = RemoteImage.Loader(
             provider: Api.Provider(
-                authenticationChallenge: [ .allowUntrusted ],
+                authenticationChallenge: .allowUntrusted,
                 configuration: .default
             )
         )
@@ -54,7 +54,7 @@ class TestRemoteImageLoader : XCTestCase {
     func testFilter() {
         let loader = RemoteImage.Loader(
             provider: Api.Provider(
-                authenticationChallenge: [ .allowUntrusted ],
+                authenticationChallenge: .allowUntrusted,
                 configuration: .default
             )
         )

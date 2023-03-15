@@ -209,6 +209,26 @@ public extension UI.Container {
             self.content.cancelHide(interactive: interactive)
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+#if os(macOS)
+            guard let viewController = self.nsViewController else { return false }
+            guard let parentViewController = viewController.presentingViewController else { return false }
+            parentViewController.dismiss(viewController)
+            completion?()
+            return true
+#elseif os(iOS)
+            guard let viewController = self.uiViewController else { return false }
+            viewController.dismiss(animated: animated, completion: completion)
+            return true
+#else
+            return false
+#endif
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            return self.close(animated: animated, completion: completion)
+        }
+        
     }
     
 }

@@ -154,6 +154,18 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
+    func cameraSession(_ value: () -> CameraSession) -> Self {
+        return self.cameraSession(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func cameraSession(_ value: (Self) -> CameraSession) -> Self {
+        return self.cameraSession(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func mode(_ value: Mode) -> Self {
         self.mode = value
         return self
@@ -161,9 +173,33 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
+    func mode(_ value: () -> Mode) -> Self {
+        return self.mode(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func mode(_ value: (Self) -> Mode) -> Self {
+        return self.mode(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func shouldFocus(_ value: Bool) -> Self {
         self.shouldFocus = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func shouldFocus(_ value: () -> Bool) -> Self {
+        return self.shouldFocus(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func shouldFocus(_ value: (Self) -> Bool) -> Self {
+        return self.shouldFocus(value(self))
     }
     
 #if os(iOS)
@@ -177,9 +213,33 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
+    func shouldZoom(_ value: () -> Bool) -> Self {
+        return self.shouldZoom(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func shouldZoom(_ value: (Self) -> Bool) -> Self {
+        return self.shouldZoom(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func zoom(_ value: Double) -> Self {
         self.zoom = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func zoom(_ value: () -> Double) -> Self {
+        return self.zoom(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func zoom(_ value: (Self) -> Double) -> Self {
+        return self.zoom(value(self))
     }
     
 #endif
@@ -197,7 +257,7 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
-    func onFocus(_ closure: ((Self) -> Void)?) -> Self {
+    func onFocus(_ closure: @escaping (Self) -> Void) -> Self {
         self.onFocus.link(self, closure)
         return self
     }
@@ -211,21 +271,21 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
-    func onFocus(_ closure: ((Self, Point) -> Void)?) -> Self {
+    func onFocus(_ closure: @escaping (Self, Point) -> Void) -> Self {
         self.onFocus.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onFocus.link(sender, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, Point) -> Void)?) -> Self {
+    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Point) -> Void) -> Self {
         self.onFocus.link(sender, closure)
         return self
     }
@@ -241,14 +301,14 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
-    func onBeginZooming(_ closure: ((Self) -> Void)?) -> Self {
+    func onBeginZooming(_ closure: @escaping (Self) -> Void) -> Self {
         self.onBeginZooming.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBeginZooming< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onBeginZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onBeginZooming.link(sender, closure)
         return self
     }
@@ -262,14 +322,14 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
-    func onZooming(_ closure: ((Self) -> Void)?) -> Self {
+    func onZooming(_ closure: @escaping (Self) -> Void) -> Self {
         self.onZooming.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onZooming< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onZooming.link(sender, closure)
         return self
     }
@@ -283,14 +343,14 @@ public extension UI.View.CameraPreview {
     
     @inlinable
     @discardableResult
-    func onEndZooming(_ closure: ((Self) -> Void)?) -> Self {
+    func onEndZooming(_ closure: @escaping (Self) -> Void) -> Self {
         self.onEndZooming.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEndZooming< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onEndZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEndZooming.link(sender, closure)
         return self
     }
@@ -475,9 +535,7 @@ extension UI.View.CameraPreview : KKCameraPreviewViewDelegate {
 public extension IUIView where Self == UI.View.CameraPreview {
     
     @inlinable
-    static func cameraPreview(
-        _ cameraSession: CameraSession
-    ) -> Self {
+    static func cameraPreview(_ cameraSession: CameraSession) -> Self {
         return .init(cameraSession)
     }
     

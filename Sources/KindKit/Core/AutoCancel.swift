@@ -4,12 +4,12 @@
 
 import Foundation
 
-public final class AutoCancel< Object : ICancellable > : ICancellable {
+public final class AutoCancel : ICancellable {
     
-    let object: Object
+    let object: ICancellable
     
     public init(
-        _ object: Object
+        _ object: ICancellable
     ) {
         self.object = object
     }
@@ -22,4 +22,12 @@ public final class AutoCancel< Object : ICancellable > : ICancellable {
         self.object.cancel()
     }
 
+}
+
+public extension ICancellable {
+    
+    func autoCancel() -> AutoCancel {
+        return AutoCancel(self)
+    }
+    
 }

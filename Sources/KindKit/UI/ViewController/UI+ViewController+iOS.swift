@@ -78,7 +78,7 @@ public extension UI {
             ))
         }
         
-        public convenience init< Screen : IUIScreen & IUIScreenViewable >(
+        public convenience init< Screen : IScreen & IScreenViewable >(
             _ screen: Screen
         ) {
             self.init(UI.Container.Screen(screen))
@@ -131,6 +131,10 @@ public extension UI {
         }
         
         public override func viewDidDisappear(_ animated: Bool) {
+            if self.container.isPresented == true {
+                self.container.prepareHide(interactive: false)
+                self.container.finishHide(interactive: false)
+            }
             self._containerView = nil
             super.viewDidDisappear(animated)
         }
@@ -186,14 +190,14 @@ public extension UI.ViewController {
     
     @inlinable
     @discardableResult
-    func onSnake(_ closure: ((Self) -> Void)?) -> Self {
+    func onSnake(_ closure: @escaping (Self) -> Void) -> Self {
         self.onSnake.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSnake< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onSnake< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onSnake.link(sender, closure)
         return self
     }

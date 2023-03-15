@@ -18,17 +18,17 @@ public extension Percent {
     
     @inlinable
     static var zero: Self {
-        return Percent(0.0)
+        return .init(0.0)
     }
     
     @inlinable
     static var half: Self {
-        return Percent(0.5)
+        return .init(0.5)
     }
     
     @inlinable
     static var one: Self {
-        return Percent(1.0)
+        return .init(1.0)
     }
 
 }
@@ -57,7 +57,7 @@ public extension Percent {
     
     @inlinable
     var normalized: Self {
-        return Percent(self.value.clamp(0, 1))
+        return .init(self.value.clamp(0, 1))
     }
     
 }
@@ -66,7 +66,12 @@ public extension Percent {
     
     @inlinable
     func clamp(_ lower: Self, _ upper: Self) -> Self {
-        return Percent(self.value.clamp(lower.value, upper.value))
+        return .init(self.value.clamp(lower.value, upper.value))
+    }
+    
+    @inlinable
+    func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(self.value.lerp(to.value, progress: progress))
     }
     
 }
@@ -75,12 +80,12 @@ public extension Percent {
     
     @inlinable
     static prefix func - (arg: Self) -> Self {
-        return Percent(-arg.value)
+        return .init(-arg.value)
     }
     
     @inlinable
     static func + (lhs: Self, rhs: Self) -> Self {
-        return Percent(lhs.value + rhs.value)
+        return .init(lhs.value + rhs.value)
     }
     
     @inlinable
@@ -90,7 +95,7 @@ public extension Percent {
     
     @inlinable
     static func - (lhs: Self, rhs: Self) -> Self {
-        return Percent(lhs.value - rhs.value)
+        return .init(lhs.value - rhs.value)
     }
     
     @inlinable
@@ -100,7 +105,7 @@ public extension Percent {
     
     @inlinable
     static func * (lhs: Self, rhs: Self) -> Self {
-        return Percent(lhs.value * rhs.value)
+        return .init(lhs.value * rhs.value)
     }
     
     @inlinable
@@ -110,7 +115,7 @@ public extension Percent {
     
     @inlinable
     static func / (lhs: Self, rhs: Self) -> Self {
-        return Percent(lhs.value / rhs.value)
+        return .init(lhs.value / rhs.value)
     }
     
     @inlinable

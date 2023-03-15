@@ -274,6 +274,22 @@ public extension UI.Container {
             self.current?.cancelHide(interactive: interactive)
         }
         
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            if let container = container as? IUIPushContentContainer {
+                if self.dismiss(container: container, animated: true, completion: completion) == false {
+                    return self.close(animated: animated, completion: completion)
+                }
+            } else if let parent = self.parent {
+                return parent.close(container: self, animated: animated, completion: completion)
+            }
+            return false
+        }
+        
         public func present(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?) {
             guard self._items.contains(where: { $0.container === container }) == false else {
                 completion?()
@@ -294,10 +310,11 @@ public extension UI.Container {
             }
         }
         
-        public func dismiss(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?) {
+        @discardableResult
+        public func dismiss(container: IUIPushContentContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
             guard let index = self._items.firstIndex(where: { $0.container === container }) else {
                 completion?()
-                return
+                return false
             }
             let item = self._items[index]
             if self._current === item {
@@ -312,6 +329,7 @@ public extension UI.Container {
                 self._items.remove(at: index)
                 completion?()
             }
+            return true
         }
         
     }

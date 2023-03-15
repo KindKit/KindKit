@@ -113,14 +113,6 @@ public extension UI.View {
         public init() {
         }
         
-        @inlinable
-        public convenience init(
-            configure: (UI.View.Web) -> Void
-        ) {
-            self.init()
-            self.modify(configure)
-        }
-        
         deinit {
             self._reuse.destroy()
         }
@@ -139,12 +131,20 @@ public extension UI.View.Web {
         return self._view.canGoForward
     }
     
-    func evaluate< Result >(
-        javaScript: String,
-        success: @escaping (Result) -> Void,
-        failure: @escaping (Error) -> Void
-    ) {
-        self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
+}
+
+public extension UI.View.Web {
+    
+    @discardableResult
+    func goBack() -> Self {
+        self._view.goBack()
+        return self
+    }
+    
+    @discardableResult
+    func goForward() -> Self {
+        self._view.goForward()
+        return self
     }
     
     @discardableResult
@@ -153,6 +153,14 @@ public extension UI.View.Web {
             self._view.update(request: self.request)
         }
         return self
+    }
+    
+    func evaluate< Result >(
+        javaScript: String,
+        success: @escaping (Result) -> Void,
+        failure: @escaping (Error) -> Void
+    ) {
+        self._view.evaluate(javaScript: javaScript, success: success, failure: failure)
     }
     
 }
@@ -168,9 +176,33 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
+    func request(_ value: () -> Request) -> Self {
+        return self.request(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func request(_ value: (Self) -> Request) -> Self {
+        return self.request(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func contentInset(_ value: Inset) -> Self {
         self.contentInset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: () -> Inset) -> Self {
+        return self.contentInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: (Self) -> Inset) -> Self {
+        return self.contentInset(value(self))
     }
     
     @inlinable
@@ -180,16 +212,16 @@ public extension UI.View.Web {
         return self
     }
     
+    @inlinable
     @discardableResult
-    func goBack() -> Self {
-        self._view.goBack()
-        return self
+    func enablePinchGesture(_ value: () -> Bool) -> Self {
+        return self.enablePinchGesture(value())
     }
-    
+
+    @inlinable
     @discardableResult
-    func goForward() -> Self {
-        self._view.goForward()
-        return self
+    func enablePinchGesture(_ value: (Self) -> Bool) -> Self {
+        return self.enablePinchGesture(value(self))
     }
     
 }
@@ -205,14 +237,14 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onContentSize(_ closure: ((Self) -> Void)?) -> Self {
+    func onContentSize(_ closure: @escaping (Self) -> Void) -> Self {
         self.onContentSize.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onContentSize< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onContentSize< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onContentSize.link(sender, closure)
         return self
     }
@@ -226,14 +258,14 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onBeginLoading(_ closure: ((Self) -> Void)?) -> Self {
+    func onBeginLoading(_ closure: @escaping (Self) -> Void) -> Self {
         self.onBeginLoading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onBeginLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onBeginLoading< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onBeginLoading.link(sender, closure)
         return self
     }
@@ -247,14 +279,14 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onEndLoading(_ closure: ((Self) -> Void)?) -> Self {
+    func onEndLoading(_ closure: @escaping (Self) -> Void) -> Self {
         self.onEndLoading.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onEndLoading< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onEndLoading< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEndLoading.link(sender, closure)
         return self
     }
@@ -268,7 +300,7 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onDecideNavigation(_ closure: ((Self) -> NavigationPolicy?)?) -> Self {
+    func onDecideNavigation(_ closure: @escaping (Self) -> NavigationPolicy?) -> Self {
         self.onDecideNavigation.link(self, closure)
         return self
     }
@@ -282,14 +314,14 @@ public extension UI.View.Web {
     
     @inlinable
     @discardableResult
-    func onDecideNavigation(_ closure: ((Self, URLRequest) -> NavigationPolicy?)?) -> Self {
+    func onDecideNavigation(_ closure: @escaping (Self, URLRequest) -> NavigationPolicy?) -> Self {
         self.onDecideNavigation.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onDecideNavigation< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender, URLRequest) -> NavigationPolicy?)?) -> Self {
+    func onDecideNavigation< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, URLRequest) -> NavigationPolicy?) -> Self {
         self.onDecideNavigation.link(sender, closure)
         return self
     }
@@ -410,8 +442,8 @@ extension UI.View.Web : KKWebViewDelegate {
 public extension IUIView where Self == UI.View.Web {
     
     @inlinable
-    static func web() -> Self {
-        return .init()
+    static func web(_ request: UI.View.Web.Request) -> Self {
+        return .init().request(request)
     }
     
 }

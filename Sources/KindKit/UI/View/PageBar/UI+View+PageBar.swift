@@ -133,9 +133,33 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
+    func leading(_ value: () -> IUIView?) -> Self {
+        return self.leading(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func leading(_ value: (Self) -> IUIView?) -> Self {
+        return self.leading(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func trailing(_ value: IUIView?) -> Self {
         self.trailing = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func trailing(_ value: () -> IUIView?) -> Self {
+        return self.trailing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func trailing(_ value: (Self) -> IUIView?) -> Self {
+        return self.trailing(value(self))
     }
     
     @inlinable
@@ -147,9 +171,33 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
+    func indicator(_ value: () -> IUIView?) -> Self {
+        return self.indicator(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func indicator(_ value: (Self) -> IUIView?) -> Self {
+        return self.indicator(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func items(_ value: [UI.View.PageBar.Item]) -> Self {
         self.items = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func items(_ value: () -> [UI.View.PageBar.Item]) -> Self {
+        return self.items(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func items(_ value: (Self) -> [UI.View.PageBar.Item]) -> Self {
+        return self.items(value(self))
     }
     
     @inlinable
@@ -161,6 +209,18 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
+    func itemsInset(_ value: () -> Inset) -> Self {
+        return self.itemsInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemsInset(_ value: (Self) -> Inset) -> Self {
+        return self.itemsInset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func itemsSpacing(_ value: Double) -> Self {
         self.itemsSpacing = value
         return self
@@ -168,9 +228,33 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
+    func itemsSpacing(_ value: () -> Double) -> Self {
+        return self.itemsSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func itemsSpacing(_ value: (Self) -> Double) -> Self {
+        return self.itemsSpacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func selected(_ value: UI.View.PageBar.Item?) -> Self {
         self.selected = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func selected(_ value: () -> UI.View.PageBar.Item?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func selected(_ value: (Self) -> UI.View.PageBar.Item?) -> Self {
+        return self.selected(value(self))
     }
     
 }
@@ -205,8 +289,8 @@ extension UI.View.PageBar : IPageBarItemViewDelegate {
 public extension IUIView where Self == UI.View.PageBar {
     
     @inlinable
-    static func pageBar() -> Self {
-        return .init()
+    static func pageBar(_ items: [UI.View.PageBar.Item]) -> Self {
+        return .init().items(items)
     }
     
 }

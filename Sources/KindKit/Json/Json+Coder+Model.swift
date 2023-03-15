@@ -13,7 +13,7 @@ public extension Json.Coder {
 
 extension Json.Coder.Model : IJsonValueDecoder where Coder : IJsonModelDecoder {
     
-    public static func decode(_ value: IJsonValue) throws -> Coder.Model {
+    public static func decode(_ value: IJsonValue) throws -> Coder.JsonModelDecoded {
         return try Coder.decode(Json(root: value))
     }
     
@@ -21,7 +21,7 @@ extension Json.Coder.Model : IJsonValueDecoder where Coder : IJsonModelDecoder {
 
 extension Json.Coder.Model : IJsonValueEncoder where Coder : IJsonModelEncoder {
     
-    public static func encode(_ value: Coder.Model) throws -> IJsonValue {
+    public static func encode(_ value: Coder.JsonModelEncoded) throws -> IJsonValue {
         let json = Json()
         try Coder.encode(value, json: json)
         if let root = json.root {

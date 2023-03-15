@@ -67,6 +67,18 @@ public extension UI.View.Cell {
     
     @inlinable
     @discardableResult
+    func background(_ value: () -> IUIView) -> Self {
+        return self.background(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func background(_ value: (Self) -> IUIView) -> Self {
+        return self.background(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func content(_ value: IUIView) -> Self {
         self.content = value
         return self
@@ -74,9 +86,33 @@ public extension UI.View.Cell {
     
     @inlinable
     @discardableResult
+    func content(_ value: () -> IUIView) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUIView) -> Self {
+        return self.content(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func contentInset(_ value: Inset) -> Self {
         self.contentInset = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: () -> Inset) -> Self {
+        return self.contentInset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func contentInset(_ value: (Self) -> Inset) -> Self {
+        return self.contentInset(value(self))
     }
     
 }

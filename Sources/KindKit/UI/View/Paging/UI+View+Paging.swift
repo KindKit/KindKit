@@ -247,6 +247,11 @@ public extension UI.View.Paging {
         }
     }
     
+    @inlinable
+    func animate(currentPage: Double, completion: (() -> Void)?) {
+        self.scrollTo(page: UInt(currentPage), duration: 0.2, completion: completion)
+    }
+    
 }
 
 public extension UI.View.Paging {
@@ -260,14 +265,33 @@ public extension UI.View.Paging {
     
     @inlinable
     @discardableResult
-    func content(_ value: IUILayout) -> Self {
+    func direction(_ value: () -> Direction) -> Self {
+        return self.direction(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func direction(_ value: (Self) -> Direction) -> Self {
+        return self.direction(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func content(_ value: IUILayout?) -> Self {
         self.content = value
         return self
     }
     
     @inlinable
-    func animate(currentPage: Double, completion: (() -> Void)?) {
-        self.scrollTo(page: UInt(currentPage), duration: 0.2, completion: completion)
+    @discardableResult
+    func content(_ value: () -> IUILayout?) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUILayout?) -> Self {
+        return self.content(value(self))
     }
     
 }
@@ -430,8 +454,8 @@ extension UI.View.Paging : KKPagingViewDelegate {
 public extension IUIView where Self == UI.View.Paging {
     
     @inlinable
-    static func paging() -> Self {
-        return .init()
+    static func paging(_ direction: UI.View.Paging.Direction) -> Self {
+        return .init().direction(direction)
     }
     
 }

@@ -12,13 +12,8 @@ public extension StringFormatter {
         
         public let formatter: ByteCountFormatter
         
-        public init(
-            units: ByteCountFormatter.Units,
-            style: ByteCountFormatter.CountStyle
-        ) {
+        public init() {
             self.formatter = ByteCountFormatter()
-            self.formatter.allowedUnits = units
-            self.formatter.countStyle = style
         }
         
         public func format(_ input: InputType) -> String {
@@ -27,4 +22,28 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.ByteCount {
+    
+    @inlinable
+    func units(_ value: ByteCountFormatter.Units) -> Self {
+        self.formatter.allowedUnits = value
+        return self
+    }
+    
+    @inlinable
+    func style(_ value: ByteCountFormatter.CountStyle) -> Self {
+        self.formatter.countStyle = value
+        return self
+    }
+    
+}
+
+public extension IStringFormatter where Self == StringFormatter.ByteCount {
+    
+    static func byteCount() -> Self {
+        return .init()
+    }
+    
 }

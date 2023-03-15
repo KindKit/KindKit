@@ -146,6 +146,19 @@ public extension UI.Layout.List {
         return self.views.firstIndex(where: { $0 === view })
     }
     
+    func index(`where`: (IUIView) -> Bool) -> Int? {
+        return self.views.firstIndex(where: `where`)
+    }
+    
+    func index< View : IUIView >(`as`: View.Type, `where`: (View) -> Bool) -> Int? {
+        return self.views.firstIndex(where: {
+            switch $0 {
+            case let view as View: return `where`(view)
+            default: return false
+            }
+        })
+    }
+    
     func indices(views: [IUIView]) -> [Int] {
         return views.compactMap({ view in
             self.views.firstIndex(where: { $0 === view })
@@ -184,6 +197,21 @@ public extension UI.Layout.List {
     
     func insert(index: Int, view: IUIView) {
         self.insert(index: index, views: [ view ])
+    }
+    
+    func delete(index: Int) {
+        self._firstVisible = nil
+        if self._animations.isEmpty == false {
+            self._operations.append(Helper.Operation(
+                type: .delete,
+                indices: [ index ],
+                progress: .zero
+            ))
+        } else {
+            self._views.remove(at: index)
+            self._cache.remove(at: index)
+            self.setNeedForceUpdate()
+        }
     }
     
     func delete(range: Range< Int >) {

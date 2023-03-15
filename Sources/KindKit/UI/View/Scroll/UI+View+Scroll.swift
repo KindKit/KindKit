@@ -259,35 +259,45 @@ private extension UI.View.Scroll {
 
 public extension UI.View.Scroll {
     
+    var estimatedContentOffset: Point {
+        let size = self.bounds.size
+        let contentOffset = self.contentOffset
+        let contentSize = self.contentSize
+        let contentInset = self.contentInset
+        return Point(
+            x: (contentInset.left + contentSize.width + contentInset.right) - (contentOffset.x + size.width),
+            y: (contentInset.top + contentSize.height + contentInset.bottom) - (contentOffset.y + size.height)
+        )
+    }
+    
+}
+
+public extension UI.View.Scroll {
+    
     func contentOffset(
         with view: IUIView,
         horizontal: ScrollAlignment,
         vertical: ScrollAlignment
     ) -> Point? {
-        let contentInset = self.contentInset
-        let contentSize = self.contentSize
-        let visibleSize = self.bounds.size
-        let viewFrame = view.frame
-        let x: Double
-        switch horizontal {
-        case .leading: x = -contentInset.left + viewFrame.x
-        case .center: x = -contentInset.left + ((viewFrame.x + (viewFrame.width / 2)) - ((visibleSize.width - contentInset.right) / 2))
-        case .trailing: x = ((viewFrame.x + viewFrame.width) - visibleSize.width) + contentInset.right
-        }
-        let y: Double
-        switch vertical {
-        case .leading: y = -contentInset.top + viewFrame.y
-        case .center: y = -contentInset.top + ((viewFrame.y + (viewFrame.size.height / 2)) - ((visibleSize.height - contentInset.bottom) / 2))
-        case .trailing: y = ((viewFrame.y + viewFrame.size.height) - visibleSize.height) + contentInset.bottom
-        }
-        let lowerX = -contentInset.left
-        let lowerY = -contentInset.top
-        let upperX = (contentSize.width - visibleSize.width) + contentInset.right
-        let upperY = (contentSize.height - visibleSize.height) + contentInset.bottom
-        return Point(
-            x: max(lowerX, min(x, upperX)),
-            y: max(lowerY, min(y, upperY))
+        return self.contentOffset(
+            with: view.native,
+            horizontal: horizontal,
+            vertical: vertical
         )
+    }
+    
+    func contentOffset(
+        with view: NativeView,
+        horizontal: ScrollAlignment,
+        vertical: ScrollAlignment
+    ) -> Point? {
+        guard self.isLoaded == true else {
+            return nil
+        }
+        guard let contentOffset = self._view.contentOffset(with: view, horizontal: horizontal, vertical: vertical) else {
+            return nil
+        }
+        return Point(contentOffset)
     }
     
 #if os(iOS)
@@ -306,13 +316,51 @@ public extension UI.View.Scroll {
     
 #endif
     
-    func scrollToTop(animated: Bool = true, completion: (() -> Void)? = nil) {
+    func scroll(
+        to view: IUIView,
+        horizontal: ScrollAlignment,
+        vertical: ScrollAlignment,
+        velocity: Double? = nil,
+        animated: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
+        guard let to = self.contentOffset(with: view, horizontal: horizontal, vertical: vertical) else {
+            return
+        }
+        self.scroll(
+            to: to,
+            velocity: velocity,
+            animated: animated,
+            completion: completion
+        )
+    }
+    
+    func scrollToTop(
+        velocity: Double? = nil,
+        animated: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
+        let contentInset = self.contentInset
+        self.scroll(
+            to: Point(x: -contentInset.left, y: -contentInset.top),
+            velocity: velocity,
+            animated: animated,
+            completion: completion
+        )
+    }
+    
+    func scroll(
+        to: Point,
+        velocity: Double? = nil,
+        animated: Bool = true,
+        completion: (() -> Void)? = nil
+    ) {
         let contentInset = self.contentInset
         let beginContentOffset = self.contentOffset
-        let endContentOffset = Point(x: -contentInset.left, y: -contentInset.top)
+        let endContentOffset = to
         let deltaContentOffset = beginContentOffset.distance(endContentOffset).real.abs
         if animated == true && deltaContentOffset > 0 {
-            let velocity = max(self.bounds.width, self.bounds.height) * 5
+            let velocity = velocity ?? max(self.bounds.width, self.bounds.height) * 5
             self._animation = Animation.default.run(
                 .custom(
                     duration: TimeInterval(deltaContentOffset / velocity),
@@ -341,17 +389,6 @@ public extension UI.View.Scroll {
 
 public extension UI.View.Scroll {
     
-    var estimatedContentOffset: Point {
-        let size = self.bounds.size
-        let contentOffset = self.contentOffset
-        let contentSize = self.contentSize
-        let contentInset = self.contentInset
-        return Point(
-            x: (contentInset.left + contentSize.width + contentInset.right) - (contentOffset.x + size.width),
-            y: (contentInset.top + contentSize.height + contentInset.bottom) - (contentOffset.y + size.height)
-        )
-    }
-    
     @discardableResult
     func contentOffset(_ value: Point, normalized: Bool = false) -> Self {
         guard self.contentOffset != value else {
@@ -364,10 +401,34 @@ public extension UI.View.Scroll {
         return self
     }
     
+    @inlinable
     @discardableResult
-    func content(_ value: IUILayout) -> Self {
+    func contentOffset(_ value: () -> Point) -> Self {
+        return self.contentOffset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func contentOffset(_ value: (Self) -> Point) -> Self {
+        return self.contentOffset(value(self))
+    }
+    
+    @discardableResult
+    func content(_ value: IUILayout?) -> Self {
         self.content = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUILayout) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUILayout) -> Self {
+        return self.content(value(self))
     }
     
     @inlinable
@@ -379,9 +440,33 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
+    func direction(_ value: () -> Direction) -> Self {
+        return self.direction(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func direction(_ value: (Self) -> Direction) -> Self {
+        return self.direction(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func indicatorDirection(_ value: Direction) -> Self {
         self.indicatorDirection = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func indicatorDirection(_ value: () -> Direction) -> Self {
+        return self.indicatorDirection(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func indicatorDirection(_ value: (Self) -> Direction) -> Self {
+        return self.indicatorDirection(value(self))
     }
     
 #if os(iOS)
@@ -395,9 +480,33 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
+    func delaysContentTouches(_ value: () -> Bool) -> Self {
+        return self.delaysContentTouches(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func delaysContentTouches(_ value: (Self) -> Bool) -> Self {
+        return self.delaysContentTouches(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func refreshColor(_ value: UI.Color?) -> Self {
         self.refreshColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func refreshColor(_ value: () -> UI.Color?) -> Self {
+        return self.refreshColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func refreshColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.refreshColor(value(self))
     }
     
 #endif
@@ -415,14 +524,14 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
-    func onTriggeredRefresh(_ closure: ((Self) -> Void)?) -> Self {
+    func onTriggeredRefresh(_ closure: @escaping (Self) -> Void) -> Self {
         self.onTriggeredRefresh.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onTriggeredRefresh< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onTriggeredRefresh< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onTriggeredRefresh.link(sender, closure)
         return self
     }
@@ -436,14 +545,14 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
-    func onScrollToTop(_ closure: ((Self) -> Void)?) -> Self {
+    func onScrollToTop(_ closure: @escaping (Self) -> Void) -> Self {
         self.onScrollToTop.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onScrollToTop< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onScrollToTop< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onScrollToTop.link(sender, closure)
         return self
     }
@@ -611,8 +720,8 @@ extension UI.View.Scroll : KKScrollViewDelegate {
 public extension IUIView where Self == UI.View.Scroll {
     
     @inlinable
-    static func scroll() -> Self {
-        return .init()
+    static func scroll(_ direction: UI.View.Scroll.Direction) -> Self {
+        return .init().direction(direction)
     }
     
 }

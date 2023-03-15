@@ -34,7 +34,8 @@ public extension Log.Target {
             self.sizePolicy = sizePolicy
             self.encoding = encoding
             self._queue = .init(label: "KindKit.Log.Target.File")
-            self._dateFormatter = StringFormatter.Date(format: "yy-MM-dd-HH-mm-ss")
+            self._dateFormatter = .init()
+                .format("yy-MM-dd-HH-mm-ss")
         }
         
     }

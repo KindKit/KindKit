@@ -99,9 +99,33 @@ public extension UI.View.Spinner {
     
     @inlinable
     @discardableResult
+    func size(_ value: () -> UI.Size.Static) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> UI.Size.Static) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func activityColor(_ value: UI.Color?) -> Self {
         self.activityColor = value
         return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func activityColor(_ value: () -> UI.Color?) -> Self {
+        return self.activityColor(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func activityColor(_ value: (Self) -> UI.Color?) -> Self {
+        return self.activityColor(value(self))
     }
     
 }
@@ -195,8 +219,8 @@ extension UI.View.Spinner : IUIViewAlphable {
 public extension IUIView where Self == UI.View.Spinner {
     
     @inlinable
-    static func spinner() -> Self {
-        return .init()
+    static func spinner(_ activityColor: UI.Color) -> Self {
+        return .init().activityColor(activityColor)
     }
     
 }

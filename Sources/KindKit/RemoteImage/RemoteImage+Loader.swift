@@ -55,7 +55,7 @@ public extension RemoteImage.Loader {
         
         return RemoteImage.Loader(
             provider: Api.Provider(
-                authenticationChallenge: [ .allowUntrusted ],
+                authenticationChallenge: .allowUntrusted,
                 configuration: configuration
             )
         )

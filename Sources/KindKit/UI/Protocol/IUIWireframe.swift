@@ -23,11 +23,11 @@ public extension IUIWireframe {
         return self.container.uiViewController
     }
     
-    @discardableResult
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
-        return self.container.dismiss(animated: animated, completion: completion)
-    }
-    
 #endif
+    
+    @discardableResult
+    func close(animated: Bool = true, completion: (() -> Void)? = nil) -> Bool {
+        return self.container.close(animated: animated, completion: completion)
+    }
     
 }

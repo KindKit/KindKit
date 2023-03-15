@@ -24,13 +24,6 @@ public extension IUIAnyView {
     
     @inlinable
     @discardableResult
-    func modify(_ block: (Self) -> Void) -> Self {
-        block(self)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
     func onAppear(_ closure: (() -> Void)?) -> Self {
         self.onAppear.link(closure)
         return self
@@ -38,14 +31,14 @@ public extension IUIAnyView {
     
     @inlinable
     @discardableResult
-    func onAppear(_ closure: ((Self) -> Void)?) -> Self {
+    func onAppear(_ closure: @escaping (Self) -> Void) -> Self {
         self.onAppear.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onAppear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onAppear< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onAppear.link(sender, closure)
         return self
     }
@@ -59,14 +52,14 @@ public extension IUIAnyView {
     
     @inlinable
     @discardableResult
-    func onDisappear(_ closure: ((Self) -> Void)?) -> Self {
+    func onDisappear(_ closure: @escaping (Self) -> Void) -> Self {
         self.onDisappear.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onDisappear< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
+    func onDisappear< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onDisappear.link(sender, closure)
         return self
     }

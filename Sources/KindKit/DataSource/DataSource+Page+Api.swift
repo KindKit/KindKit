@@ -12,12 +12,12 @@ public extension DataSource.Page {
         public typealias Failure = Response.Failure
         public typealias Result = Swift.Result< Success, Failure >
         
-        public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
         public var isLoading: Bool {
             return self._task != nil
         }
         public private(set) var canMore: Bool
+        public private(set) var result: Result?
+        public let onFinish: Signal.Args< Void, Result > = .init()
         
         private let _provider: KindKit.Api.Provider
         private let _request: (Cursor?) throws -> KindKit.Api.Request?

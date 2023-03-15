@@ -29,4 +29,16 @@ public extension IUIViewAlphable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func alpha(_ value: () -> Double) -> Self {
+        return self.alpha(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alpha(_ value: (Self) -> Double) -> Self {
+        return self.alpha(value(self))
+    }
+    
 }

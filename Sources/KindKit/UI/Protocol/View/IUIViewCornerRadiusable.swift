@@ -29,4 +29,16 @@ public extension IUIViewCornerRadiusable {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func cornerRadius(_ value: () -> UI.CornerRadius) -> Self {
+        return self.cornerRadius(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func cornerRadius(_ value: (Self) -> UI.CornerRadius) -> Self {
+        return self.cornerRadius(value(self))
+    }
+    
 }
