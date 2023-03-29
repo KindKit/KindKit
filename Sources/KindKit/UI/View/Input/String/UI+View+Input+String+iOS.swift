@@ -75,6 +75,13 @@ final class KKInputStringView : UITextField {
         set { self.kkAccessoryView.kkSuggestionVariants = newValue }
         get { self.kkAccessoryView.kkSuggestionVariants }
     }
+    override var text: String? {
+        didSet {
+            let newText = self.text ?? ""
+            guard newText != oldValue else { return }
+            self.kkRefreshSuggestionVariants(newText)
+        }
+    }
 
     override init(frame: CGRect) {
         self.kkAccessoryView = .init(
@@ -112,6 +119,27 @@ final class KKInputStringView : UITextField {
     func select(suggestion: String) {
         self.text = suggestion
         self.kkDelegate?.pressed(self, suggestion: suggestion)
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        guard self.canBecomeFirstResponder == true else {
+            return false
+        }
+        self.inputAccessoryView = self.kkAccessoryView
+        return super.becomeFirstResponder()
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        guard self.canResignFirstResponder == true else {
+            return false
+        }
+        guard super.resignFirstResponder() == true else {
+            return false
+        }
+        self.inputAccessoryView = nil
+        return true
     }
 
 }
@@ -367,6 +395,16 @@ extension KKInputStringView.KKAccessoryView {
 
 extension KKInputStringView {
     
+    func kkRefreshSuggestionVariants(_ newText: String) {
+        let variants: [String]
+        if let suggestion = self.kkSuggestion {
+            variants = suggestion.variants(newText)
+        } else {
+            variants = []
+        }
+        self.kkSuggestionVariants = variants
+    }
+    
     func kkResizeAccessoryViews() {
         let width = UIScreen.main.bounds.width
         let height = self.kkAccessoryView.kkHeight
@@ -374,7 +412,9 @@ extension KKInputStringView {
         let newFrame = CGRect(x: 0, y: 0, width: width, height: height)
         if oldFrame != newFrame {
             self.kkAccessoryView.frame = newFrame
-            self.reloadInputViews()
+            if self.inputAccessoryView != nil {
+                self.reloadInputViews()
+            }
         }
     }
     
@@ -397,7 +437,6 @@ extension KKInputStringView {
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
         self.update(keyboard: view.keyboard, suggestion: view.suggestion)
-        self.inputAccessoryView = self.kkAccessoryView
         self.kkDelegate = view
     }
     
@@ -471,7 +510,6 @@ extension KKInputStringView {
     }
     
     func cleanup() {
-        self.inputAccessoryView = nil
         self.kkDelegate = nil
     }
     
@@ -525,7 +563,6 @@ extension KKInputStringView : UITextFieldDelegate {
         }
         let newText = oldText.kk_replacing(range, with: replacement)
         var modidfyText = newText
-        let variants: [String]
         let caretLower: String.Index
         if replacement.count > 0 {
             caretLower = newText.index(range.lowerBound, offsetBy: 1)
@@ -534,17 +571,14 @@ extension KKInputStringView : UITextFieldDelegate {
         }
         var caretUpper = caretLower
         if let suggestion = self.kkSuggestion {
-            variants = suggestion.variants(newText)
             if newText.isEmpty == false && replacement.isEmpty == false && caretLower <= newText.endIndex {
                 if let autoComplete = suggestion.autoComplete(newText) {
                     caretUpper = autoComplete.endIndex
                     modidfyText = autoComplete
                 }
             }
-        } else {
-            variants = []
         }
-        self.kkSuggestionVariants = variants
+        self.kkRefreshSuggestionVariants(newText)
         if newText == modidfyText {
             self.kkDelegate?.editing(self, text: newText)
             return true

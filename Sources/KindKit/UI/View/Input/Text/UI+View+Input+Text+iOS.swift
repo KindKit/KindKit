@@ -141,7 +141,6 @@ extension KKInputTextView {
             self.backgroundColor = .clear
             self.textContainer.lineFragmentPadding = 0
             self.layoutManager.usesFontLeading = true
-            self.inputAccessoryView = self.kkAccessoryView
             self.kkAccessoryView.kkInput = self
         }
         
@@ -149,13 +148,25 @@ extension KKInputTextView {
             fatalError("init(coder:) has not been implemented")
         }
         
-        override func reloadInputViews() {
-            do {
-                let width = UIScreen.main.bounds.width
-                let height = self.kkAccessoryView.kkHeight
-                self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        @discardableResult
+        override func becomeFirstResponder() -> Bool {
+            guard self.canBecomeFirstResponder == true else {
+                return false
             }
-            super.reloadInputViews()
+            self.inputAccessoryView = self.kkAccessoryView
+            return super.becomeFirstResponder()
+        }
+        
+        @discardableResult
+        override func resignFirstResponder() -> Bool {
+            guard self.canResignFirstResponder == true else {
+                return false
+            }
+            guard super.resignFirstResponder() == true else {
+                return false
+            }
+            self.inputAccessoryView = nil
+            return true
         }
         
     }
@@ -177,7 +188,7 @@ extension KKInputTextView {
                 if let view = self.kkToolbarView {
                     self.addSubview(view)
                 }
-                self.kkInput?.reloadInputViews()
+                self.kkInput?.kkResizeAccessoryViews()
             }
         }
         var kkContentViews: [UIView] {
@@ -220,6 +231,23 @@ extension KKInputTextView {
             }
         }
         
+    }
+    
+}
+
+extension KKInputTextView.KKInputView {
+    
+    func kkResizeAccessoryViews() {
+        let width = UIScreen.main.bounds.width
+        let height = self.kkAccessoryView.kkHeight
+        let oldFrame = self.kkAccessoryView.frame
+        let newFrame = CGRect(x: 0, y: 0, width: width, height: height)
+        if oldFrame != newFrame {
+            self.kkAccessoryView.frame = newFrame
+            if self.inputAccessoryView != nil {
+                self.reloadInputViews()
+            }
+        }
     }
     
 }

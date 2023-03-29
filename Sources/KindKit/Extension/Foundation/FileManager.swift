@@ -61,8 +61,11 @@ public extension FileManager {
     func kk_fileSize(
         at url: URL
     ) -> UInt64 {
-        guard let attributes = try? self.attributesOfItem(atPath: url.path) else { return 0 }
-        return (attributes[.size] as? UInt64) ?? 0
+        return url.kk_access({
+            guard let attributes = try? self.attributesOfItem(atPath: $0.path) else { return 0 }
+            guard let size = attributes[.size] as? UInt64 else { return 0 }
+            return size
+        })
     }
     
     func kk_contents(

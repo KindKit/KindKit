@@ -104,7 +104,6 @@ final class KKInputDateView : UITextField {
         super.init(frame: frame)
         
         self.kkAccessoryView.kkInput = self
-        self.inputAccessoryView = self.kkAccessoryView
         self.delegate = self
         
         if #available(iOS 13.4, *) {
@@ -118,15 +117,6 @@ final class KKInputDateView : UITextField {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func reloadInputViews() {
-        do {
-            let width = UIScreen.main.bounds.width
-            let height = self.kkAccessoryView.kkHeight
-            self.kkAccessoryView.frame = CGRect(x: 0, y: 0, width: width, height: height)
-        }
-        super.reloadInputViews()
-    }
-    
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: self.kkTextInset)
     }
@@ -138,6 +128,27 @@ final class KKInputDateView : UITextField {
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         let inset = self.kkPlaceholderInset ?? self.kkTextInset
         return bounds.inset(by: inset)
+    }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        guard self.canBecomeFirstResponder == true else {
+            return false
+        }
+        self.inputAccessoryView = self.kkAccessoryView
+        return super.becomeFirstResponder()
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        guard self.canResignFirstResponder == true else {
+            return false
+        }
+        guard super.resignFirstResponder() == true else {
+            return false
+        }
+        self.inputAccessoryView = nil
+        return true
     }
     
 }
@@ -157,7 +168,7 @@ extension KKInputDateView {
                 if let view = self.kkToolbarView {
                     self.addSubview(view)
                 }
-                self.kkInput?.reloadInputViews()
+                self.kkInput?.kkResizeAccessoryViews()
             }
         }
         var kkContentViews: [UIView] {
@@ -200,6 +211,23 @@ extension KKInputDateView {
             }
         }
         
+    }
+    
+}
+
+extension KKInputDateView {
+    
+    func kkResizeAccessoryViews() {
+        let width = UIScreen.main.bounds.width
+        let height = self.kkAccessoryView.kkHeight
+        let oldFrame = self.kkAccessoryView.frame
+        let newFrame = CGRect(x: 0, y: 0, width: width, height: height)
+        if oldFrame != newFrame {
+            self.kkAccessoryView.frame = newFrame
+            if self.inputAccessoryView != nil {
+                self.reloadInputViews()
+            }
+        }
     }
     
 }
