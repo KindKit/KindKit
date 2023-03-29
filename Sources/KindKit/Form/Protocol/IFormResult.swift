@@ -16,7 +16,7 @@ public extension IFormResult {
     
     @inlinable
     func contains(id: Form.Id) -> Bool {
-        return self.find(by: id) == nil
+        return self.find(by: id) != nil
     }
     
 }
