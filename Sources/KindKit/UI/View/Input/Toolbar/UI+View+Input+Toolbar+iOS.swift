@@ -44,11 +44,12 @@ final class KKInputToolbarView : UIToolbar {
             
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.clipsToBounds = true
+        self.isTranslucent = true
         self.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
         self.backgroundColor = .clear
-        self.isTranslucent = true
-        self.clipsToBounds = true
     }
     
     required init(coder: NSCoder) {

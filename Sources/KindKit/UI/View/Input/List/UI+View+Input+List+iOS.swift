@@ -188,6 +188,8 @@ extension KKInputListView {
         
         init(frame: CGRect) {
             super.init(frame: frame, inputViewStyle: .keyboard)
+            
+            self.translatesAutoresizingMaskIntoConstraints = false
         }
         
         required init?(coder: NSCoder) {

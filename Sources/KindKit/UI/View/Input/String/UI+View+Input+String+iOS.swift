@@ -165,6 +165,7 @@ extension KKInputStringView {
                         frame: CGRect(x: 0, y: 0, width: size.width, height: 56),
                         collectionViewLayout: layout
                     )
+                    view.translatesAutoresizingMaskIntoConstraints = false
                     view.contentInsetAdjustmentBehavior = .never
                     view.showsHorizontalScrollIndicator = false
                     view.showsVerticalScrollIndicator = false
@@ -233,6 +234,8 @@ extension KKInputStringView {
         
         init(frame: CGRect) {
             super.init(frame: frame, inputViewStyle: .keyboard)
+            
+            self.translatesAutoresizingMaskIntoConstraints = false
         }
         
         required init?(coder: NSCoder) {

@@ -80,6 +80,7 @@ final class KKInputTextView : UIView {
 
         super.init(frame: frame)
         
+        self.translatesAutoresizingMaskIntoConstraints = false
         self.clipsToBounds = true
         
         self.addSubview(self.kkPlaceholder)
@@ -137,6 +138,7 @@ extension KKInputTextView {
                 textContainer: textContainer
             )
             
+            self.translatesAutoresizingMaskIntoConstraints = false
             self.textContainerInset = .zero
             self.backgroundColor = .clear
             self.textContainer.lineFragmentPadding = 0
@@ -208,6 +210,8 @@ extension KKInputTextView {
         
         init(frame: CGRect) {
             super.init(frame: frame, inputViewStyle: .keyboard)
+            
+            self.translatesAutoresizingMaskIntoConstraints = false
         }
         
         required init?(coder: NSCoder) {
