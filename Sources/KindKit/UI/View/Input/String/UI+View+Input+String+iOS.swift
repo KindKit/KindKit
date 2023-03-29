@@ -89,7 +89,6 @@ final class KKInputStringView : UITextField {
         super.init(frame: frame)
         
         self.kkAccessoryView.kkInput = self
-        self.inputAccessoryView = self.kkAccessoryView
         self.delegate = self
     }
     
@@ -168,7 +167,7 @@ extension KKInputStringView {
                 if let view = self.kkToolbarView {
                     self.addSubview(view)
                 }
-                self.kkInput?.kk_resizeAccessoryViews()
+                self.kkInput?.kkResizeAccessoryViews()
             }
         }
         var kkSuggestionView: UICollectionView? {
@@ -183,7 +182,7 @@ extension KKInputStringView {
                     view.dataSource = self
                     self.addSubview(view)
                 }
-                self.kkInput?.kk_resizeAccessoryViews()
+                self.kkInput?.kkResizeAccessoryViews()
             }
         }
         var kkContentViews: [UIView] {
@@ -368,7 +367,7 @@ extension KKInputStringView.KKAccessoryView {
 
 extension KKInputStringView {
     
-    func kk_resizeAccessoryViews() {
+    func kkResizeAccessoryViews() {
         let width = UIScreen.main.bounds.width
         let height = self.kkAccessoryView.kkHeight
         let oldFrame = self.kkAccessoryView.frame
@@ -398,6 +397,7 @@ extension KKInputStringView {
         self.update(alignment: view.alignment)
         self.update(toolbar: view.toolbar)
         self.update(keyboard: view.keyboard, suggestion: view.suggestion)
+        self.inputAccessoryView = self.kkAccessoryView
         self.kkDelegate = view
     }
     
@@ -471,6 +471,7 @@ extension KKInputStringView {
     }
     
     func cleanup() {
+        self.inputAccessoryView = nil
         self.kkDelegate = nil
     }
     
