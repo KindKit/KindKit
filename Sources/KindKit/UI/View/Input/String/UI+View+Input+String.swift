@@ -667,9 +667,9 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
         if self._text != suggestion {
             self._text = suggestion
             self.onEditing.emit()
-            self.onSuggestion.emit(suggestion)
-            self.onPressedReturn.emit()
         }
+        self.onSuggestion.emit(suggestion)
+        self.onPressedReturn.emit()
     }
     
 }

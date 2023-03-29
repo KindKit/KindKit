@@ -24,29 +24,29 @@ public extension Permission {
         
         public init() {
 #if os(iOS)
-        self._becomeActiveObserver = NotificationCenter.default.addObserver(
-            forName: UIApplication.didBecomeActiveNotification,
-            object: nil,
-            queue: .main,
-            using: { [weak self] in self?._didBecomeActive($0) }
-        )
-        self._resignActiveObserver = NotificationCenter.default.addObserver(
-            forName: UIApplication.willResignActiveNotification,
-            object: nil,
-            queue: .main,
-            using: { [weak self] in self?._didResignActive($0) }
-        )
+            self._becomeActiveObserver = NotificationCenter.default.addObserver(
+                forName: UIApplication.didBecomeActiveNotification,
+                object: nil,
+                queue: .main,
+                using: { [weak self] in self?._didBecomeActive($0) }
+            )
+            self._resignActiveObserver = NotificationCenter.default.addObserver(
+                forName: UIApplication.willResignActiveNotification,
+                object: nil,
+                queue: .main,
+                using: { [weak self] in self?._didResignActive($0) }
+            )
 #endif
         }
         
         deinit {
 #if os(iOS)
-        if let observer = self._becomeActiveObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        if let observer = self._resignActiveObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
+            if let observer = self._becomeActiveObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
+            if let observer = self._resignActiveObserver {
+                NotificationCenter.default.removeObserver(observer)
+            }
 #endif
         }
         
