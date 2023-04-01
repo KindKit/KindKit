@@ -34,13 +34,13 @@ extension UI.View.Gradient {
 }
 
 final class KKGradientView : UIView {
+
+    var kkLayer: CAGradientLayer {
+        return super.layer as! CAGradientLayer
+    }
     
     override class var layerClass: AnyClass {
         return CAGradientLayer.self
-    }
-
-    private var _layer: CAGradientLayer {
-        return super.layer as! CAGradientLayer
     }
     
     override init(frame: CGRect) {
@@ -77,16 +77,16 @@ extension KKGradientView {
     func update(fill: UI.View.Gradient.Fill?) {
         if let fill = fill {
             switch fill.mode {
-            case .axial: self._layer.type = .axial
-            case .radial: self._layer.type = .radial
+            case .axial: self.kkLayer.type = .axial
+            case .radial: self.kkLayer.type = .radial
             }
-            self._layer.colors = fill.points.map({ $0.color.cgColor })
-            self._layer.locations = fill.points.map({ NSNumber(value: $0.location) })
-            self._layer.startPoint = fill.start.cgPoint
-            self._layer.endPoint = fill.end.cgPoint
-            self._layer.isHidden = false
+            self.kkLayer.colors = fill.points.map({ $0.color.cgColor })
+            self.kkLayer.locations = fill.points.map({ NSNumber(value: $0.location) })
+            self.kkLayer.startPoint = fill.start.cgPoint
+            self.kkLayer.endPoint = fill.end.cgPoint
+            self.kkLayer.isHidden = false
         } else {
-            self._layer.isHidden = true
+            self.kkLayer.isHidden = true
         }
     }
     

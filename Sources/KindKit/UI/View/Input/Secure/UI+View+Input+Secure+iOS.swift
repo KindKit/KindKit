@@ -79,9 +79,10 @@ final class KKInputSecureView : UITextField {
         )
         super.init(frame: frame)
         
-        self.kkAccessoryView.kkInput = self
         self.isSecureTextEntry = true
         self.delegate = self
+        
+        self.kkAccessoryView.kkInput = self
     }
     
     required init?(coder: NSCoder) {

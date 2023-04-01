@@ -34,49 +34,48 @@ extension UI.View.Custom {
 }
 
 final class KKCustomView : NSView {
-        
+    
     weak var kkDelegate: KKCustomViewDelegate?
-    var contentSize: Size {
-        return self._layoutManager.size
+    var kkLayoutManager: UI.Layout.Manager!
+    var kkGestures: [IUIGesture] = []
+    var kkDragDestination: IUIDragAndDropDestination?
+    var kkDragSource: IUIDragAndDropSource? {
+        willSet {
+            guard self.kkDragSource !== newValue else { return }
+            self.unregisterDraggedTypes()
+        }
+        didSet {
+            guard self.kkDragSource !== oldValue else { return }
+            if let dragSource = self.kkDragSource {
+                self.registerForDraggedTypes(dragSource.pasteboardTypes)
+            }
+        }
+    }
+    var kkContentSize: Size {
+        return self.kkLayoutManager.size
+    }
+    var kkIsLocked: Bool = false
+    
+    override var isFlipped: Bool {
+        return true
     }
     override var frame: CGRect {
         didSet {
             guard self.frame != oldValue else { return }
             if self.frame.size != oldValue.size {
                 if self.window != nil {
-                    self._layoutManager.invalidate()
+                    self.kkLayoutManager.invalidate()
                 }
             }
         }
     }
-    override var isFlipped: Bool {
-        return true
-    }
-    
-    private var _layoutManager: UI.Layout.Manager!
-    private var _gestures: [IUIGesture] = []
-    private var _dragDestination: IUIDragAndDropDestination?
-    private var _dragSource: IUIDragAndDropSource? {
-        willSet {
-            guard self._dragSource !== newValue else { return }
-            self.unregisterDraggedTypes()
-        }
-        didSet {
-            guard self._dragSource !== oldValue else { return }
-            if let dragSource = self._dragSource {
-                self.registerForDraggedTypes(dragSource.pasteboardTypes)
-            }
-        }
-    }
-    private var _isLocked: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
         
-        self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self.kkLayoutManager = UI.Layout.Manager(contentView: self, delegate: self)
     }
         
     required init?(coder: NSCoder) {
@@ -87,7 +86,7 @@ final class KKCustomView : NSView {
         super.viewWillMove(toSuperview: superview)
         
         if superview == nil {
-            self._layoutManager.clear()
+            self.kkLayoutManager.clear()
         }
     }
     
@@ -95,12 +94,12 @@ final class KKCustomView : NSView {
         super.layout()
         
         let bounds = Rect(self.bounds)
-        self._layoutManager.layout(bounds: bounds)
-        self._layoutManager.visible(bounds: bounds)
+        self.kkLayoutManager.layout(bounds: bounds)
+        self.kkLayoutManager.visible(bounds: bounds)
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
-        guard self._isLocked == false else {
+        guard self.kkIsLocked == false else {
             return nil
         }
         let hitView = super.hitTest(point)
@@ -115,7 +114,7 @@ final class KKCustomView : NSView {
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)
         
-        if let dragSource = self._dragSource {
+        if let dragSource = self.kkDragSource {
             self.beginDraggingSession(
                 with: dragSource.onItems.emit(default: []).compactMap({
                     return NSDraggingItem(pasteboardWriter: $0)
@@ -147,26 +146,26 @@ extension KKCustomView {
     }
     
     func update(gestures: [IUIGesture]) {
-        for gesture in self._gestures {
+        for gesture in self.kkGestures {
             self.removeGestureRecognizer(gesture.native)
         }
-        self._gestures = gestures
-        for gesture in self._gestures {
+        self.kkGestures = gestures
+        for gesture in self.kkGestures {
             self.addGestureRecognizer(gesture.native)
         }
     }
     
     func update(content: IUILayout?) {
-        self._layoutManager.layout = content
+        self.kkLayoutManager.layout = content
         self.needsLayout = true
     }
     
     func update(dragDestination: IUIDragAndDropDestination?) {
-        self._dragDestination = dragDestination
+        self.kkDragDestination = dragDestination
     }
     
     func update(dragSource: IUIDragAndDropSource?) {
-        self._dragSource = dragSource
+        self.kkDragSource = dragSource
     }
     
     func update(color: UI.Color?) {
@@ -179,28 +178,28 @@ extension KKCustomView {
     }
     
     func update(locked: Bool) {
-        self._isLocked = locked
+        self.kkIsLocked = locked
     }
     
     func cleanup() {
-        self._layoutManager.layout = nil
-        for gesture in self._gestures {
+        self.kkLayoutManager.layout = nil
+        for gesture in self.kkGestures {
             self.removeGestureRecognizer(gesture.native)
         }
-        self._gestures.removeAll()
+        self.kkGestures.removeAll()
         self.kkDelegate = nil
     }
     
     func add(gesture: IUIGesture) {
-        if self._gestures.contains(where: { $0 === gesture }) == false {
-            self._gestures.append(gesture)
+        if self.kkGestures.contains(where: { $0 === gesture }) == false {
+            self.kkGestures.append(gesture)
         }
         self.addGestureRecognizer(gesture.native)
     }
     
     func remove(gesture: IUIGesture) {
-        if let index = self._gestures.firstIndex(where: { $0 === gesture }) {
-            self._gestures.remove(at: index)
+        if let index = self.kkGestures.firstIndex(where: { $0 === gesture }) {
+            self.kkGestures.remove(at: index)
         }
         self.removeGestureRecognizer(gesture.native)
     }
@@ -218,7 +217,7 @@ extension KKCustomView : NSDraggingSource {
 extension KKCustomView {
     
     override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        guard self._dragDestination != nil else { return false }
+        guard self.kkDragDestination != nil else { return false }
         return true
     }
     

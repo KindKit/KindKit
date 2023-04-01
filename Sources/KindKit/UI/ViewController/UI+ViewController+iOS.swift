@@ -10,7 +10,6 @@ public extension UI {
     
     final class ViewController : UIViewController {
         
-        public let container: UI.Container.Root
         public override var preferredStatusBarStyle: UIStatusBarStyle {
             return self.container.statusBar
         }
@@ -26,32 +25,20 @@ public extension UI {
         public override var shouldAutorotate: Bool {
             return true
         }
+        public let owner: AnyObject?
+        public let container: UI.Container.Root
         public let onSnake: Signal.Empty< Void > = .init()
         
-        private var _containerView: UIView? {
-            willSet {
-                guard self._containerView != newValue else { return }
-                if let containerView = self._containerView {
-                    containerView.removeFromSuperview()
-                }
-            }
-            didSet {
-                guard self._containerView != oldValue else { return }
-                if let containerView = self._containerView {
-                    containerView.frame = self.view.bounds
-                    self.view.addSubview(containerView)
-                    containerView.layoutIfNeeded()
-                }
-            }
+        var kkRootView: KKRootView! {
+            didSet { self.view = self.kkRootView }
         }
-        private var _owner: AnyObject?
         
         private init(
             owner: AnyObject? = nil,
             container: UI.Container.Root
         ) {
             self.container = container
-            self._owner = owner
+            self.owner = owner
             
             super.init(nibName: nil, bundle: nil)
             
@@ -112,13 +99,22 @@ public extension UI {
             self._free()
         }
         
+        public override func loadView() {
+            self.kkRootView = .init(
+                frame: .init(
+                    origin: .zero,
+                    size: self.preferredContentSize
+                )
+            )
+        }
+        
         public override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
             self.container.safeArea = self._safeArea()
             if let substrate = self.container.statusBarSubstrate {
                 substrate.height = .fixed(self._statusBarHeight())
             }
-            self._containerView = self.container.view.native
+            self.kkRootView.kkContent = self.container.view.native
             if self.container.isPresented == false {
                 self.container.prepareShow(interactive: false)
                 self.container.finishShow(interactive: false)
@@ -135,15 +131,12 @@ public extension UI {
                 self.container.prepareHide(interactive: false)
                 self.container.finishHide(interactive: false)
             }
-            self._containerView = nil
+            self.kkRootView.kkContent = nil
             super.viewDidDisappear(animated)
         }
         
         public override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
-            if let containerView = self._containerView {
-                containerView.frame = self.view.bounds
-            }
             if self.container.isPresented == true {
                 self.container.safeArea = self._safeArea()
             }
@@ -172,6 +165,44 @@ public extension UI {
                 if self.container.snake() == false {
                     self.onSnake.emit()
                 }
+            }
+        }
+        
+    }
+    
+}
+
+extension UI.ViewController {
+    
+    final class KKRootView : UIView {
+        
+        var kkContent: UIView? {
+            willSet {
+                self.kkContent?.removeFromSuperview()
+            }
+            didSet {
+                guard let content = self.kkContent else { return }
+                content.frame = self.bounds
+                self.addSubview(content)
+                self.layoutIfNeeded()
+            }
+        }
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            
+            self.clipsToBounds = true
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            if let content = self.kkContent {
+                content.frame = self.bounds
             }
         }
         

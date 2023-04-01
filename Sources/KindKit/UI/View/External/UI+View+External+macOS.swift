@@ -35,16 +35,17 @@ extension UI.View.External {
 
 final class KKExternalView : NSView {
     
-    var content: NSView? {
+    var kkContent: NSView? {
         willSet {
-            self.content?.removeFromSuperview()
+            self.kkContent?.removeFromSuperview()
         }
         didSet {
-            guard let content = self.content else { return }
+            guard let content = self.kkContent else { return }
             content.frame = self.bounds
             self.addSubview(content)
         }
     }
+    
     override var isFlipped: Bool {
         return true
     }
@@ -52,7 +53,6 @@ final class KKExternalView : NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
     }
     
@@ -72,7 +72,7 @@ final class KKExternalView : NSView {
     override func layout() {
         super.layout()
         
-        if let content = self.content {
+        if let content = self.kkContent {
             content.frame = self.bounds
         }
     }
@@ -91,11 +91,11 @@ extension KKExternalView {
     }
     
     func update(content: NSView?) {
-        self.content = content
+        self.kkContent = content
     }
     
     func cleanup() {
-        self.content = nil
+        self.kkContent = nil
     }
     
 }

@@ -35,16 +35,16 @@ extension UI.View.Shape {
 
 final class KKShapeView : UIView {
     
-    let _shapeLayer: CAShapeLayer
+    let kkShapeLayer: CAShapeLayer
     
     override init(frame: CGRect) {
-        self._shapeLayer = CAShapeLayer()
+        self.kkShapeLayer = CAShapeLayer()
         
         super.init(frame: frame)
         
         self.isUserInteractionEnabled = false
         
-        self.layer.addSublayer(self._shapeLayer)
+        self.layer.addSublayer(self.kkShapeLayer)
     }
     
     required init?(coder: NSCoder) {
@@ -55,9 +55,9 @@ final class KKShapeView : UIView {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        if let path = self._shapeLayer.path {
+        if let path = self.kkShapeLayer.path {
             let shapeSize = path.boundingBoxOfPath.size
-            self._shapeLayer.frame = CGRect(
+            self.kkShapeLayer.frame = CGRect(
                 origin: CGPoint(
                     x: bounds.midX - (shapeSize.width / 2),
                     y: bounds.midY - (shapeSize.height / 2)
@@ -65,7 +65,7 @@ final class KKShapeView : UIView {
                 size: shapeSize
             )
         } else {
-            self._shapeLayer.frame = bounds
+            self.kkShapeLayer.frame = bounds
         }
     }
     
@@ -94,7 +94,7 @@ extension KKShapeView {
     
     func update(path: Path2?) {
         CATransaction.kk_withoutActions({
-            self._shapeLayer.path = path?.cgPath
+            self.kkShapeLayer.path = path?.cgPath
             self.setNeedsLayout()
         })
     }
@@ -102,14 +102,14 @@ extension KKShapeView {
     func update(fill: UI.View.Shape.Fill?) {
         CATransaction.kk_withoutActions({
             if let fill = fill {
-                self._shapeLayer.fillColor = fill.color.cgColor
+                self.kkShapeLayer.fillColor = fill.color.cgColor
                 switch fill.rule {
-                case .nonZero: self._shapeLayer.fillRule = .nonZero
-                case .evenOdd: self._shapeLayer.fillRule = .evenOdd
+                case .nonZero: self.kkShapeLayer.fillRule = .nonZero
+                case .evenOdd: self.kkShapeLayer.fillRule = .evenOdd
                 }
             } else {
-                self._shapeLayer.fillColor = nil
-                self._shapeLayer.fillRule = .nonZero
+                self.kkShapeLayer.fillColor = nil
+                self.kkShapeLayer.fillRule = .nonZero
             }
         })
     }
@@ -117,38 +117,38 @@ extension KKShapeView {
     func update(stroke: UI.View.Shape.Stroke?) {
         CATransaction.kk_withoutActions({
             if let stroke = stroke {
-                self._shapeLayer.strokeColor = stroke.color.cgColor
-                self._shapeLayer.strokeStart = CGFloat(stroke.start)
-                self._shapeLayer.strokeEnd = CGFloat(stroke.end)
+                self.kkShapeLayer.strokeColor = stroke.color.cgColor
+                self.kkShapeLayer.strokeStart = CGFloat(stroke.start)
+                self.kkShapeLayer.strokeEnd = CGFloat(stroke.end)
             } else {
-                self._shapeLayer.strokeColor = nil
-                self._shapeLayer.strokeStart = 0
-                self._shapeLayer.strokeEnd = 1
+                self.kkShapeLayer.strokeColor = nil
+                self.kkShapeLayer.strokeStart = 0
+                self.kkShapeLayer.strokeEnd = 1
             }
         })
     }
     
     func update(line: UI.View.Shape.Line) {
         CATransaction.kk_withoutActions({
-            self._shapeLayer.lineWidth = CGFloat(line.width)
+            self.kkShapeLayer.lineWidth = CGFloat(line.width)
             switch line.cap {
-            case .butt: self._shapeLayer.lineCap = .butt
-            case .square: self._shapeLayer.lineCap = .square
-            case .round: self._shapeLayer.lineCap = .round
+            case .butt: self.kkShapeLayer.lineCap = .butt
+            case .square: self.kkShapeLayer.lineCap = .square
+            case .round: self.kkShapeLayer.lineCap = .round
             }
             switch line.join {
             case .miter(let limit):
-                self._shapeLayer.lineJoin = .miter
-                self._shapeLayer.miterLimit = CGFloat(limit)
-            case .bevel: self._shapeLayer.lineJoin = .bevel
-            case .round: self._shapeLayer.lineJoin = .round
+                self.kkShapeLayer.lineJoin = .miter
+                self.kkShapeLayer.miterLimit = CGFloat(limit)
+            case .bevel: self.kkShapeLayer.lineJoin = .bevel
+            case .round: self.kkShapeLayer.lineJoin = .round
             }
             if let dash = line.dash {
-                self._shapeLayer.lineDashPhase = dash.phase
-                self._shapeLayer.lineDashPattern = dash.lengths.map(NSNumber.init(value:))
+                self.kkShapeLayer.lineDashPhase = dash.phase
+                self.kkShapeLayer.lineDashPattern = dash.lengths.map(NSNumber.init(value:))
             } else {
-                self._shapeLayer.lineDashPhase = 0
-                self._shapeLayer.lineDashPattern = nil
+                self.kkShapeLayer.lineDashPhase = 0
+                self.kkShapeLayer.lineDashPattern = nil
             }
         })
     }

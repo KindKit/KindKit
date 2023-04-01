@@ -42,7 +42,6 @@ final class KKColorView : NSView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
     }
     

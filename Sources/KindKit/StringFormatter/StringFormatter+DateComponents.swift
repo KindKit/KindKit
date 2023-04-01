@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct DateComponents : IStringFormatter {
+    struct DateComponents : IStringFormatter, Equatable {
         
         public typealias InputType = TimeInterval
         
@@ -22,6 +22,45 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.DateComponents {
+    
+    @inlinable
+    var unitsStyle: DateComponentsFormatter.UnitsStyle {
+        return self.formatter.unitsStyle
+    }
+    
+    @inlinable
+    var allowedUnits: NSCalendar.Unit {
+        return self.formatter.allowedUnits
+    }
+    
+    @inlinable
+    var zeroBehavior: DateComponentsFormatter.ZeroFormattingBehavior {
+        return self.formatter.zeroFormattingBehavior
+    }
+    
+    @inlinable
+    var calendar: Calendar {
+        return self.formatter.calendar ?? .current
+    }
+    
+    @inlinable
+    var maximumUnitCount: Int {
+        return self.formatter.maximumUnitCount
+    }
+    
+    @inlinable
+    var collapsesLargestUnit: Bool {
+        return self.formatter.collapsesLargestUnit
+    }
+    
+    @inlinable
+    var includesApproximationPhrase: Bool {
+        return self.formatter.includesApproximationPhrase
+    }
+    
 }
 
 public extension StringFormatter.DateComponents {

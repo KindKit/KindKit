@@ -35,17 +35,17 @@ extension UI.View.Progress {
 
 final class KKProgressView : UIView {
     
-    private var _progress: UIProgressView
+    let kkProgress: UIProgressView
     
     override init(frame: CGRect) {
-        self._progress = UIProgressView()
+        self.kkProgress = UIProgressView()
 
         super.init(frame: frame)
         
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
         
-        self.addSubview(self._progress)
+        self.addSubview(self.kkProgress)
     }
     
     required init(coder: NSCoder) {
@@ -56,8 +56,8 @@ final class KKProgressView : UIView {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        let progressSize = self._progress.sizeThatFits(bounds.size)
-        self._progress.frame = CGRect(
+        let progressSize = self.kkProgress.sizeThatFits(bounds.size)
+        self.kkProgress.frame = CGRect(
             x: bounds.midX - (progressSize.width / 2),
             y: bounds.midY - (progressSize.height / 2),
             width: progressSize.width,
@@ -88,15 +88,15 @@ extension KKProgressView {
     }
     
     func update(progress: Double) {
-        self._progress.progress = Float(progress)
+        self.kkProgress.progress = Float(progress)
     }
     
     func update(progressColor: UI.Color?) {
-        self._progress.progressTintColor = progressColor?.native
+        self.kkProgress.progressTintColor = progressColor?.native
     }
     
     func update(trackColor: UI.Color?) {
-        self._progress.trackTintColor = trackColor?.native
+        self.kkProgress.trackTintColor = trackColor?.native
     }
     
     func update(color: UI.Color?) {

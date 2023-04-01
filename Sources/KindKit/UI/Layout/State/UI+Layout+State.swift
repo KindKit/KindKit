@@ -326,15 +326,9 @@ private extension UI.Layout.State {
     func _size(available: Size, state: State) -> Size {
         guard let data = self.data[state] else { return .zero }
         guard let view = data.view else { return .zero }
-        switch data.alignment {
-        case .topLeft, .top, .topRight, .left, .center, .right, .bottomLeft, .bottom, .bottomRight:
-            let inset = self.inset + data.inset
-            let availableSize = available.inset(inset)
-            let size = view.size(available: availableSize)
-            return size.inset(-inset)
-        case .fill:
-            return available
-        }
+        let inset = self.inset + data.inset
+        let size = view.size(available: available.inset(inset))
+        return size.inset(-inset)
     }
     
 }

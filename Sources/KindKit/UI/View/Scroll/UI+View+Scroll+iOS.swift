@@ -36,62 +36,65 @@ extension UI.View.Scroll {
 final class KKScrollView : UIScrollView {
     
     weak var kkDelegate: KKScrollViewDelegate?
-    var needLayoutContent: Bool = true {
+    var kkContentView: UIView!
+    var kkRefreshView: UIRefreshControl!
+    var kkLayoutManager: UI.Layout.Manager!
+    var kkVisibleInset: Inset = .zero {
         didSet {
-            if self.needLayoutContent == true {
+            guard self.kkVisibleInset != oldValue else { return }
+            self.setNeedsLayout()
+        }
+    }
+    var kkNeedLayoutContent: Bool = true {
+        didSet {
+            if self.kkNeedLayoutContent == true {
                 self.setNeedsLayout()
             }
         }
     }
+    let kkVirtualKeyboard = VirtualKeyboard()
+    
     override var frame: CGRect {
         didSet {
             guard self.frame != oldValue else { return }
             if self.frame.size != oldValue.size {
                 if self.window != nil {
-                    self._layoutManager.invalidate()
+                    self.kkLayoutManager.invalidate()
                 }
-                self.needLayoutContent = true
+                self.kkNeedLayoutContent = true
             }
         }
     }
     override var contentSize: CGSize {
         set {
             guard super.contentSize != newValue else { return }
-            self._contentView.frame = CGRect(origin: CGPoint.zero, size: newValue)
+            self.kkContentView.frame = CGRect(origin: CGPoint.zero, size: newValue)
             super.contentSize = newValue
             self.setNeedsLayout()
         }
         get { super.contentSize }
     }
     
-    private var _contentView: UIView!
-    private var _refreshView: UIRefreshControl!
-    private var _layoutManager: UI.Layout.Manager!
-    private var _visibleInset: Inset = .zero {
-        didSet {
-            guard self._visibleInset != oldValue else { return }
-            self.setNeedsLayout()
-        }
-    }
-    private let _virtualKeyboard = VirtualKeyboard()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.contentInsetAdjustmentBehavior = .never
         self.clipsToBounds = true
         self.delegate = self
+        self.contentInsetAdjustmentBehavior = .never
+
+        self.kkContentView = UIView(frame: .init(
+            origin: .zero,
+            size: frame.size
+        ))
+        self.addSubview(self.kkContentView)
         
-        self._contentView = UIView(frame: .zero)
-        self.addSubview(self._contentView)
+        self.kkRefreshView = UIRefreshControl()
+        self.kkRefreshView.addTarget(self, action: #selector(self._triggeredRefresh(_:)), for: .valueChanged)
+        self.refreshControl = self.kkRefreshView
         
-        self._refreshView = UIRefreshControl()
-        self._refreshView.addTarget(self, action: #selector(self._triggeredRefresh(_:)), for: .valueChanged)
-        self.refreshControl = self._refreshView
+        self.kkLayoutManager = UI.Layout.Manager(contentView: self.kkContentView, delegate: self)
         
-        self._layoutManager = UI.Layout.Manager(contentView: self._contentView, delegate: self)
-        
-        self._virtualKeyboard.add(observer: self, priority: .public)
+        self.kkVirtualKeyboard.add(observer: self, priority: .public)
     }
     
     required init?(coder: NSCoder) {
@@ -99,14 +102,14 @@ final class KKScrollView : UIScrollView {
     }
     
     deinit {
-        self._virtualKeyboard.remove(observer: self)
+        self.kkVirtualKeyboard.remove(observer: self)
     }
     
     override func willMove(toSuperview superview: UIView?) {
         super.willMove(toSuperview: superview)
         
         if superview == nil {
-            self._layoutManager.clear()
+            self.kkLayoutManager.clear()
         }
     }
     
@@ -114,8 +117,8 @@ final class KKScrollView : UIScrollView {
         super.layoutSubviews()
         
         do {
-            let bounds = Rect(self.bounds)
-            if self.needLayoutContent == true {
+            if self.kkNeedLayoutContent == true {
+                let bounds = Rect(self.bounds)
                 let layoutBounds: Rect
                 if #available(iOS 11.0, *) {
                     layoutBounds = .init(
@@ -128,15 +131,15 @@ final class KKScrollView : UIScrollView {
                     	size: bounds.size
                 	)
                 }
-                self._layoutManager.layout(bounds: layoutBounds)
-                let size = self._layoutManager.size
+                self.kkLayoutManager.layout(bounds: layoutBounds)
+                let size = self.kkLayoutManager.size
                 self.contentSize = size.cgSize
                 self.kkDelegate?.update(self, contentSize: size)
-                self.needLayoutContent = false
+                self.kkNeedLayoutContent = false
             }
-            self._layoutManager.visible(
-                bounds: bounds,
-                inset: self._visibleInset
+            self.kkLayoutManager.visible(
+                bounds: Rect(self.bounds),
+                inset: self.kkVisibleInset
             )
         }
     }
@@ -246,14 +249,14 @@ extension KKScrollView {
     }
     
     func update(content: IUILayout?) {
-        self._layoutManager.layout = content
-        self.needLayoutContent = true
+        self.kkLayoutManager.layout = content
+        self.kkNeedLayoutContent = true
     }
     
     func update(direction: UI.View.Scroll.Direction) {
         self.alwaysBounceHorizontal = direction.contains(.horizontal) && direction.contains(.bounds)
         self.alwaysBounceVertical = direction.contains(.vertical) && direction.contains(.bounds)
-        self.needLayoutContent = true
+        self.kkNeedLayoutContent = true
     }
     
     func update(indicatorDirection: UI.View.Scroll.Direction) {
@@ -266,16 +269,16 @@ extension KKScrollView {
     }
     
     func update(visibleInset: Inset) {
-        self._visibleInset = visibleInset
+        self.kkVisibleInset = visibleInset
     }
     
     func update(contentInset: Inset) {
         self.contentInset = contentInset.uiEdgeInsets
         self.scrollIndicatorInsets = self._scrollIndicatorInset()
         if self.superview != nil {
-            self._layoutManager.invalidate()
+            self.kkLayoutManager.invalidate()
         }
-        self.needLayoutContent = true
+        self.kkNeedLayoutContent = true
     }
     
     func update(contentSize: Size) {
@@ -300,12 +303,12 @@ extension KKScrollView {
     
     func update(refreshColor: UI.Color?) {
         if let refreshColor = refreshColor {
-            self._refreshView.tintColor = refreshColor.native
-            if self.refreshControl != self._refreshView {
-                self.refreshControl = self._refreshView
+            self.kkRefreshView.tintColor = refreshColor.native
+            if self.refreshControl != self.kkRefreshView {
+                self.refreshControl = self.kkRefreshView
             }
         } else {
-            if self.refreshControl == self._refreshView {
+            if self.refreshControl == self.kkRefreshView {
                 self.refreshControl = nil
             }
         }
@@ -313,9 +316,9 @@ extension KKScrollView {
     
     func update(isRefreshing: Bool) {
         if isRefreshing == true {
-            self._refreshView.beginRefreshing()
+            self.kkRefreshView.beginRefreshing()
         } else {
-            self._refreshView.endRefreshing()
+            self.kkRefreshView.endRefreshing()
         }
     }
     
@@ -332,7 +335,7 @@ extension KKScrollView {
     }
     
     func cleanup() {
-        self._layoutManager.layout = nil
+        self.kkLayoutManager.layout = nil
         self.kkDelegate = nil
         self.scrollIndicatorInsets = .zero
         self.contentInset = .zero
@@ -397,8 +400,7 @@ extension KKScrollView : UIScrollViewDelegate {
 extension KKScrollView : IUILayoutDelegate {
     
     func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
-        self.needLayoutContent = true
-        self.setNeedsLayout()
+        self.kkNeedLayoutContent = true
         if let kkDelegate = self.kkDelegate {
             return kkDelegate.isDynamicSize(self)
         }

@@ -60,7 +60,7 @@ public extension UI.View {
         }
         public var contentSize: Size {
             guard self.isLoaded == true else { return .zero }
-            return self._view.contentSize
+            return self._view.kkContentSize
         }
         public var color: UI.Color? {
             didSet {

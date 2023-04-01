@@ -10,32 +10,19 @@ public extension UI {
     
     final class ViewController : NSViewController {
         
+        public let owner: AnyObject?
         public let container: UI.Container.Root
         
-        private var _containerView: NSView? {
-            willSet {
-                guard self._containerView != newValue else { return }
-                if let containerView = self._containerView {
-                    containerView.removeFromSuperview()
-                }
-            }
-            didSet {
-                guard self._containerView != oldValue else { return }
-                if let containerView = self._containerView {
-                    containerView.frame = self.view.bounds
-                    self.view.addSubview(containerView)
-                    containerView.layoutSubtreeIfNeeded()
-                }
-            }
+        var kkRootView: KKRootView! {
+            didSet { self.view = self.kkRootView }
         }
-        private var _owner: AnyObject?
         
         private init(
             owner: AnyObject? = nil,
             container: UI.Container.Root
         ) {
             self.container = container
-            self._owner = owner
+            self.owner = owner
             
             super.init(nibName: nil, bundle: nil)
             
@@ -92,15 +79,18 @@ public extension UI {
         }
         
         public override func loadView() {
-            let view = NSView(frame: .init(x: 0, y: 0, width: 800, height: 600))
-            view.translatesAutoresizingMaskIntoConstraints = false
-            self.view = view
+            self.kkRootView = .init(
+                frame: .init(
+                    origin: .zero,
+                    size: self.preferredContentSize
+                )
+            )
         }
         
         public override func viewWillAppear() {
             super.viewWillAppear()
             self.container.safeArea = self._safeArea()
-            self._containerView = self.container.view.native
+            self.kkRootView.kkContent = self.container.view.native
             if self.container.isPresented == false {
                 self.container.prepareShow(interactive: false)
                 self.container.finishShow(interactive: false)
@@ -108,20 +98,52 @@ public extension UI {
         }
         
         public override func viewDidDisappear() {
-            self._containerView = nil
+            if self.container.isPresented == true {
+                self.container.prepareHide(interactive: false)
+                self.container.finishHide(interactive: false)
+            }
+            self.kkRootView.kkContent = nil
             super.viewDidDisappear()
         }
         
         public override func viewDidLayout() {
             super.viewDidLayout()
-            if let containerView = self._containerView {
-                containerView.frame = self.view.bounds
-            }
             if self.container.isPresented == true {
                 self.container.safeArea = self._safeArea()
             }
         }
                 
+    }
+    
+}
+
+extension UI.ViewController {
+    
+    final class KKRootView : NSView {
+        
+        var kkContent: NSView? {
+            willSet {
+                self.kkContent?.removeFromSuperview()
+            }
+            didSet {
+                guard let content = self.kkContent else { return }
+                content.frame = self.bounds
+                self.addSubview(content)
+            }
+        }
+        
+        override var isFlipped: Bool {
+            return true
+        }
+        
+        override func layout() {
+            super.layout()
+            
+            if let content = self.kkContent {
+                content.frame = self.bounds
+            }
+        }
+        
     }
     
 }

@@ -97,7 +97,7 @@ private extension UI.Layout.Composition.HSplitStack {
         if self.entities.isEmpty == false {
             var entityAvailableSize: Size
             let numberOfValid: Int
-            if available.height.isInfinite == false {
+            if available.width.isInfinite == false {
                 entityAvailableSize = self._availableSize(
                     available: available,
                     entities: self.entities.count

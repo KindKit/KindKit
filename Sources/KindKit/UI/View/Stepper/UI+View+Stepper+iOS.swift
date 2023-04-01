@@ -37,16 +37,17 @@ final class KKStepperView : UIView {
     
     weak var kkDelegate: KKStepperViewDelegate?
     
-    private var _stepper: UIStepper!
+    let kkStepper: UIStepper
     
     override init(frame: CGRect) {
+        self.kkStepper = UIStepper()
+        
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self._stepper = UIStepper()
-        self._stepper.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
-        self.addSubview(self._stepper)
+        self.kkStepper.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
+        self.addSubview(self.kkStepper)
     }
     
     required init(coder: NSCoder) {
@@ -57,8 +58,8 @@ final class KKStepperView : UIView {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        let switchSize = self._stepper.sizeThatFits(bounds.size)
-        self._stepper.frame = CGRect(
+        let switchSize = self.kkStepper.sizeThatFits(bounds.size)
+        self.kkStepper.frame = CGRect(
             x: bounds.midX - (switchSize.width / 2),
             y: bounds.midY - (switchSize.height / 2),
             width: switchSize.width,
@@ -94,19 +95,19 @@ extension KKStepperView {
     }
     
     func update(minValue: Double) {
-        self._stepper.minimumValue = Double(minValue)
+        self.kkStepper.minimumValue = Double(minValue)
     }
     
     func update(maxValue: Double) {
-        self._stepper.maximumValue = Double(maxValue)
+        self.kkStepper.maximumValue = Double(maxValue)
     }
     
     func update(stepValue: Double) {
-        self._stepper.stepValue = Double(stepValue)
+        self.kkStepper.stepValue = Double(stepValue)
     }
     
     func update(value: Double) {
-        self._stepper.value = Double(value)
+        self.kkStepper.value = Double(value)
     }
     
     func update(color: UI.Color?) {
@@ -118,15 +119,15 @@ extension KKStepperView {
     }
     
     func update(isAutorepeat: Bool) {
-        self._stepper.autorepeat = isAutorepeat
+        self.kkStepper.autorepeat = isAutorepeat
     }
     
     func update(isWraps: Bool) {
-        self._stepper.wraps = isWraps
+        self.kkStepper.wraps = isWraps
     }
     
     func update(locked: Bool) {
-        self._stepper.isEnabled = locked == false
+        self.kkStepper.isEnabled = locked == false
     }
     
     func cleanup() {
@@ -139,7 +140,7 @@ private extension KKStepperView {
     
     @objc
     func _changed(_ sender: Any) {
-        self.kkDelegate?.changed(self, value: Double(self._stepper.value))
+        self.kkDelegate?.changed(self, value: Double(self.kkStepper.value))
     }
     
 }

@@ -96,6 +96,7 @@ final class KKInputStringView : UITextField {
         super.init(frame: frame)
         
         self.kkAccessoryView.kkInput = self
+        
         self.delegate = self
     }
     
@@ -165,7 +166,6 @@ extension KKInputStringView {
                         frame: CGRect(x: 0, y: 0, width: size.width, height: 56),
                         collectionViewLayout: layout
                     )
-                    view.translatesAutoresizingMaskIntoConstraints = false
                     view.contentInsetAdjustmentBehavior = .never
                     view.showsHorizontalScrollIndicator = false
                     view.showsVerticalScrollIndicator = false
@@ -173,7 +173,6 @@ extension KKInputStringView {
                     view.backgroundColor = nil
                     view.register(KKSuggestionDataCell.self, forCellWithReuseIdentifier: Self.suggestionCellIdentifier)
                     view.register(KKSuggestionSeparatorCell.self, forCellWithReuseIdentifier: Self.separatorCellIdentifier)
-                    
                     self.kkSuggestionView = view
                 } else {
                     self.kkSuggestionView = nil
@@ -293,19 +292,17 @@ extension KKInputStringView.KKAccessoryView {
             
             super.init(frame: frame)
             
-            self.contentView.translatesAutoresizingMaskIntoConstraints = false
             self.contentView.addSubview(self.kkTitle)
+            self.contentView.addConstraints([
+                .init(item: self.kkTitle, attribute: .top, relatedBy: .equal, toItem: self.contentView, attribute: .top, multiplier: 1, constant: 8),
+                .init(item: self.kkTitle, attribute: .leading, relatedBy: .equal, toItem: self.contentView, attribute: .leading, multiplier: 1, constant: 0),
+                .init(item: self.contentView, attribute: .trailing, relatedBy: .equal, toItem: self.kkTitle, attribute: .trailing, multiplier: 1, constant: 0),
+                .init(item: self.contentView, attribute: .bottom, relatedBy: .equal, toItem: self.kkTitle, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
         }
         
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
-        }
-        
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            
-            let bounds = self.bounds
-            self.kkTitle.frame = bounds.inset(by: UIEdgeInsets(top: 8, left: 0, bottom: 0, right: 0))
         }
         
         static func kkSize(data: String, available: CGSize) -> CGSize {
@@ -360,29 +357,22 @@ extension KKInputStringView.KKAccessoryView {
             self.kkLine.translatesAutoresizingMaskIntoConstraints = false
             self.kkLine.backgroundColor = .systemGray
             self.kkLine.alpha = 0.4
+            self.kkLine.addConstraints([
+                .init(item: self.kkLine, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 1)
+            ])
             
             super.init(frame: frame)
             
-            self.contentView.translatesAutoresizingMaskIntoConstraints = false
             self.contentView.addSubview(self.kkLine)
+            self.contentView.addConstraints([
+                .init(item: self.kkLine, attribute: .height, relatedBy: .equal, toItem: self.contentView, attribute: .height, multiplier: 0.45, constant: 0),
+                .init(item: self.kkLine, attribute: .centerX, relatedBy: .equal, toItem: self.contentView, attribute: .centerX, multiplier: 1, constant: 0),
+                .init(item: self.kkLine, attribute: .centerY, relatedBy: .equal, toItem: self.contentView, attribute: .centerY, multiplier: 1, constant: 4)
+            ])
         }
         
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
-        }
-        
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            
-            let bounds = self.bounds.inset(by: UIEdgeInsets(top: 8, left: 0, bottom: 0, right: 0))
-            let width = 1.0
-            let height = bounds.height * 0.45
-            self.kkLine.frame = .init(
-                x: bounds.midX - (width / 2),
-                y: bounds.midY - (height / 2),
-                width: width,
-                height: height
-            )
         }
         
         static func kkSize(available: CGSize) -> CGSize {

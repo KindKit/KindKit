@@ -97,7 +97,7 @@ private extension UI.Layout.Composition.VSplitStack {
         if self.entities.isEmpty == false {
             var entityAvailableSize: KindKit.Size
             let numberOfValid: Int
-            if available.width.isInfinite == false {
+            if available.height.isInfinite == false {
                 entityAvailableSize = self._availableSize(
                     available: available,
                     entities: self.entities.count

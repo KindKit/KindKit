@@ -36,23 +36,22 @@ extension UI.View.Switch {
 final class KKSwitchView : NSView {
     
     weak var kkDelegate: KKSwitchViewDelegate?
-        
+    let kkSwitch: NSSwitch
+    
     override var isFlipped: Bool {
         return true
     }
     
-    private var _switch: NSSwitch
-    
     override init(frame: NSRect) {
-        self._switch = NSSwitch()
+        self.kkSwitch = NSSwitch()
         
         super.init(frame: frame)
         
         self.wantsLayer = true
         
-        self._switch.target = self
-        self._switch.action = #selector(self._changed(_:))
-        self.addSubview(self._switch)
+        self.kkSwitch.target = self
+        self.kkSwitch.action = #selector(self._changed(_:))
+        self.addSubview(self.kkSwitch)
     }
     
     required init(coder: NSCoder) {
@@ -63,8 +62,8 @@ final class KKSwitchView : NSView {
         super.layout()
         
         let bounds = self.bounds
-        let switchSize = self._switch.sizeThatFits(bounds.size)
-        self._switch.frame = CGRect(
+        let switchSize = self.kkSwitch.sizeThatFits(bounds.size)
+        self.kkSwitch.frame = CGRect(
             x: bounds.midX - (switchSize.width / 2),
             y: bounds.midY - (switchSize.height / 2),
             width: switchSize.width,
@@ -91,19 +90,19 @@ extension KKSwitchView {
     }
     
     func update(value: Bool) {
-        self._switch.state = value == true ? .on : .off
+        self.kkSwitch.state = value == true ? .on : .off
     }
     
     func update(thumbColor: UI.Color?) {
-        // self._switch.thumbTintColor = thumbColor?.native
+        // self.kkSwitch.thumbTintColor = thumbColor?.native
     }
     
     func update(offColor: UI.Color?) {
-        // self._switch.tintColor = offColor?.native
+        // self.kkSwitch.tintColor = offColor?.native
     }
     
     func update(onColor: UI.Color?) {
-        // self._switch.onTintColor = onColor?.native
+        // self.kkSwitch.onTintColor = onColor?.native
     }
     
     func update(color: UI.Color?) {
@@ -116,7 +115,7 @@ extension KKSwitchView {
     }
     
     func update(locked: Bool) {
-        self._switch.isEnabled = locked == false
+        self.kkSwitch.isEnabled = locked == false
     }
     
     func cleanup() {
@@ -128,7 +127,7 @@ private extension KKSwitchView {
     
     @objc
     func _changed(_ sender: Any) {
-        self.kkDelegate?.changed(self, value: self._switch.state == .on)
+        self.kkDelegate?.changed(self, value: self.kkSwitch.state == .on)
     }
     
 }

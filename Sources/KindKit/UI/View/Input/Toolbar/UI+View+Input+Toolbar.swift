@@ -167,8 +167,8 @@ extension UI.View.Input.Toolbar : KKInputToolbarViewDelegate {
 public extension IUIAccessoryView where Self == UI.View.Input.Toolbar {
     
     @inlinable
-    static func inputToolbar() -> Self {
-        return .init()
+    static func toolbar(_ items: [IUIViewInputToolbarItem]) -> Self {
+        return .init().items(items)
     }
     
 }

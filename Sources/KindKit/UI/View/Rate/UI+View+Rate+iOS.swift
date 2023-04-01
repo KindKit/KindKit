@@ -35,51 +35,51 @@ extension UI.View.Rate {
 
 final class KKRateView : UIView {
     
-    private var _itemSize: Size {
+    var kkItemSize: Size {
         didSet {
-            guard self._itemSize != oldValue else { return }
+            guard self.kkItemSize != oldValue else { return }
             self.setNeedsLayout()
         }
     }
-    private var _itemSpacing: Double {
+    var kkItemSpacing: Double {
         didSet {
-            guard self._itemSpacing != oldValue else { return }
+            guard self.kkItemSpacing != oldValue else { return }
             self.setNeedsLayout()
         }
     }
-    private var _rounding: UI.View.Rate.Rounding {
+    var kkRounding: UI.View.Rate.Rounding {
         didSet {
-            guard self._rounding != oldValue else { return }
+            guard self.kkRounding != oldValue else { return }
             self._update()
         }
     }
-    private var _numberOfItem: UInt {
+    var kkNumberOfItem: UInt {
         didSet {
-            guard self._numberOfItem != oldValue else { return }
+            guard self.kkNumberOfItem != oldValue else { return }
             self.setNeedsLayout()
         }
     }
-    private var _states: [UI.View.Rate.State] {
+    var kkStates: [UI.View.Rate.State] {
         didSet {
             self._update()
         }
     }
-    private var _rating: Double {
+    var kkRating: Double {
         didSet {
-            guard self._rating != oldValue else { return }
+            guard self.kkRating != oldValue else { return }
             self._update()
         }
     }
-    private var _layers: [CALayer]
+    var kkLayers: [CALayer]
     
     override init(frame: CGRect) {
-        self._itemSize = .zero
-        self._itemSpacing = 0
-        self._numberOfItem = 0
-        self._rounding = .down
-        self._states = []
-        self._rating = 0
-        self._layers = []
+        self.kkItemSize = .zero
+        self.kkItemSpacing = 0
+        self.kkNumberOfItem = 0
+        self.kkRounding = .down
+        self.kkStates = []
+        self.kkRating = 0
+        self.kkLayers = []
         
         super.init(frame: frame)
         
@@ -127,27 +127,27 @@ extension KKRateView {
     }
     
     func update(itemSize: Size) {
-        self._itemSize = itemSize
+        self.kkItemSize = itemSize
     }
     
     func update(itemSpacing: Double) {
-        self._itemSpacing = itemSpacing
+        self.kkItemSpacing = itemSpacing
     }
     
     func update(numberOfItem: UInt) {
-        self._numberOfItem = numberOfItem
+        self.kkNumberOfItem = numberOfItem
     }
     
     func update(rounding: UI.View.Rate.Rounding) {
-        self._rounding = rounding
+        self.kkRounding = rounding
     }
     
     func update(states: [UI.View.Rate.State]) {
-        self._states = states
+        self.kkStates = states
     }
     
     func update(rating: Double) {
-        self._rating = rating
+        self.kkRating = rating
     }
     
     func update(color: UI.Color?) {
@@ -166,36 +166,36 @@ extension KKRateView {
 private extension KKRateView {
     
     func _contentSize() -> Size {
-        if self._numberOfItem > 1 {
+        if self.kkNumberOfItem > 1 {
             return Size(
-                width: (self._itemSize.width * Double(self._numberOfItem)) + (self._itemSpacing * Double(self._numberOfItem - 1)),
-                height: self._itemSize.height
+                width: (self.kkItemSize.width * Double(self.kkNumberOfItem)) + (self.kkItemSpacing * Double(self.kkNumberOfItem - 1)),
+                height: self.kkItemSize.height
             )
-        } else if self._numberOfItem > 0 {
-            return self._itemSize
+        } else if self.kkNumberOfItem > 0 {
+            return self.kkItemSize
         }
         return .zero
     }
     
     func _state(appearedItem: UInt) -> UI.View.Rate.State? {
-        guard let firstState = self._states.first else { return nil }
-        guard let lastState = self._states.last else { return nil }
-        if self._rating <= Double(appearedItem) {
+        guard let firstState = self.kkStates.first else { return nil }
+        guard let lastState = self.kkStates.last else { return nil }
+        if self.kkRating <= Double(appearedItem) {
             return firstState
-        } else if self._rating >= Double(appearedItem + 1) {
+        } else if self.kkRating >= Double(appearedItem + 1) {
             return lastState
         }
-        let rate = self._rating - self._rating.rounded(.towardZero)
+        let rate = self.kkRating - self.kkRating.rounded(.towardZero)
         var nearestState: UI.View.Rate.State?
-        switch self._rounding {
+        switch self.kkRounding {
         case .up:
-            for state in self._states.reversed() {
+            for state in self.kkStates.reversed() {
                 if state.rate >= rate {
                     nearestState = state
                 }
             }
         case .down:
-            for state in self._states {
+            for state in self.kkStates {
                 if state.rate <= rate {
                     nearestState = state
                 }
@@ -206,23 +206,23 @@ private extension KKRateView {
     
     func _layout(rebuild: Bool = false) {
         if rebuild == true {
-            for layer in self._layers {
+            for layer in self.kkLayers {
                 layer.removeFromSuperlayer()
             }
-            self._layers.removeAll()
+            self.kkLayers.removeAll()
         }
-        let numberOfItem = Int(self._numberOfItem)
-        if self._layers.count > numberOfItem {
-            for index in (numberOfItem..<self._layers.count).reversed() {
-                let layer = self._layers[index]
-                self._layers.remove(at: index)
+        let numberOfItem = Int(self.kkNumberOfItem)
+        if self.kkLayers.count > numberOfItem {
+            for index in (numberOfItem..<self.kkLayers.count).reversed() {
+                let layer = self.kkLayers[index]
+                self.kkLayers.remove(at: index)
                 layer.removeFromSuperlayer()
             }
-        } else if self._layers.count < numberOfItem {
-            for _ in self._layers.count..<numberOfItem {
+        } else if self.kkLayers.count < numberOfItem {
+            for _ in self.kkLayers.count..<numberOfItem {
                 let layer = CALayer()
                 layer.contentsGravity = .resizeAspect
-                self._layers.append(layer)
+                self.kkLayers.append(layer)
                 self.layer.addSublayer(layer)
             }
         }
@@ -233,22 +233,22 @@ private extension KKRateView {
             x: boundsCenter.x - (contentSize.width / 2),
             y: boundsCenter.y - (contentSize.height / 2)
         )
-        for (index, layer) in self._layers.enumerated() {
+        for (index, layer) in self.kkLayers.enumerated() {
             layer.frame = CGRect(
                 x: CGFloat(origin.x),
                 y: CGFloat(origin.y),
-                width: CGFloat(self._itemSize.width),
-                height: CGFloat(self._itemSize.height)
+                width: CGFloat(self.kkItemSize.width),
+                height: CGFloat(self.kkItemSize.height)
             )
             if let state = self._state(appearedItem: UInt(index)) {
                 self._update(layer: layer, state: state)
             }
-            origin.x += self._itemSize.width + self._itemSpacing
+            origin.x += self.kkItemSize.width + self.kkItemSpacing
         }
     }
     
     func _update() {
-        for (index, layer) in self._layers.enumerated() {
+        for (index, layer) in self.kkLayers.enumerated() {
             if let state = self._state(appearedItem: UInt(index)) {
                 self._update(layer: layer, state: state)
             }

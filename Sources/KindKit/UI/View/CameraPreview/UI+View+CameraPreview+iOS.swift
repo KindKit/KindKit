@@ -36,13 +36,13 @@ extension UI.View.CameraPreview {
 
 final class KKCameraPreviewView : UIView {
     
-    private weak var _delegate: KKCameraPreviewViewDelegate?
-    private var _cameraSession: CameraSession? {
+    weak var kkDelegate: KKCameraPreviewViewDelegate?
+    var kkCameraSession: CameraSession? {
         didSet {
-            guard self._cameraSession !== oldValue else { return }
-            self._previewLayer.session = self._cameraSession?.session
-            self._videoDevice = self._cameraSession?.activeVideoDevice
-            if let cameraSession = self._cameraSession, let connection = self._previewLayer.connection {
+            guard self.kkCameraSession !== oldValue else { return }
+            self.kkPreviewLayer.session = self.kkCameraSession?.session
+            self.kkVideoDevice = self.kkCameraSession?.activeVideoDevice
+            if let cameraSession = self.kkCameraSession, let connection = self.kkPreviewLayer.connection {
                 if connection.isVideoOrientationSupported == true {
                     if let avOrientation = cameraSession.interfaceOrientation?.avOrientation {
                         connection.videoOrientation = avOrientation
@@ -56,28 +56,28 @@ final class KKCameraPreviewView : UIView {
             }
         }
     }
-    private var _videoDevice: CameraSession.Device.Video?
-    private var _previewLayer: AVCaptureVideoPreviewLayer {
+    var kkVideoDevice: CameraSession.Device.Video?
+    var kkPreviewLayer: AVCaptureVideoPreviewLayer {
         return self.layer as! AVCaptureVideoPreviewLayer
     }
-    private lazy var _focusGesture: UITapGestureRecognizer = {
+    lazy var kkFocusGesture: UITapGestureRecognizer = {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self._handleFocusGesture(_:)))
         gesture.delegate = self
         return gesture
     }()
-    private lazy var _zoomPanGesture: UIPanGestureRecognizer = {
+    lazy var kkZoomPanGesture: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: #selector(self._handleZoomGesture(pan:)))
         gesture.delegate = self
         return gesture
         
     }()
-    private lazy var _zoomPinchGesture: UIPinchGestureRecognizer = {
+    lazy var kkZoomPinchGesture: UIPinchGestureRecognizer = {
         let gesture = UIPinchGestureRecognizer(target: self, action: #selector(self._handleZoomGesture(pinch:)))
         gesture.delegate = self
         return gesture
     }()
-    private var _zoomPanTranslation: Double?
-    private var _zoomPinchBegin: Double?
+    var kkZoomPanTranslation: Double?
+    var kkZoomPinchBegin: Double?
     
     override class var layerClass : AnyClass {
         return AVCaptureVideoPreviewLayer.self
@@ -86,9 +86,9 @@ final class KKCameraPreviewView : UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.addGestureRecognizer(self._focusGesture)
-        self.addGestureRecognizer(self._zoomPanGesture)
-        self.addGestureRecognizer(self._zoomPinchGesture)
+        self.addGestureRecognizer(self.kkFocusGesture)
+        self.addGestureRecognizer(self.kkZoomPanGesture)
+        self.addGestureRecognizer(self.kkZoomPinchGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -107,7 +107,7 @@ extension KKCameraPreviewView {
         self.update(zoom: view.zoom)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
-        self._delegate = view
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -119,23 +119,23 @@ extension KKCameraPreviewView {
     }
     
     func update(cameraSession: CameraSession) {
-        self._cameraSession = cameraSession
+        self.kkCameraSession = cameraSession
     }
     
     func update(videoDevice: CameraSession.Device.Video?) {
-        self._videoDevice = videoDevice
+        self.kkVideoDevice = videoDevice
     }
     
     func update(mode: UI.View.CameraPreview.Mode) {
         switch mode {
-        case .origin: self._previewLayer.videoGravity = .resize
-        case .aspectFit: self._previewLayer.videoGravity = .resizeAspect
-        case .aspectFill: self._previewLayer.videoGravity = .resizeAspectFill
+        case .origin: self.kkPreviewLayer.videoGravity = .resize
+        case .aspectFit: self.kkPreviewLayer.videoGravity = .resizeAspect
+        case .aspectFill: self.kkPreviewLayer.videoGravity = .resizeAspectFill
         }
     }
     
     func update(zoom: Double) {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return
         }
         do {
@@ -147,7 +147,7 @@ extension KKCameraPreviewView {
     }
     
     func update(orientation: CameraSession.Orientation?) {
-        if let connection = self._previewLayer.connection {
+        if let connection = self.kkPreviewLayer.connection {
             if connection.isVideoOrientationSupported == true {
                 if let avOrientation = orientation?.avOrientation {
                     connection.videoOrientation = avOrientation
@@ -167,8 +167,8 @@ extension KKCameraPreviewView {
     }
     
     func cleanup() {
-        self._cameraSession = nil
-        self._delegate = nil
+        self.kkCameraSession = nil
+        self.kkDelegate = nil
     }
     
 }
@@ -177,11 +177,11 @@ private extension KKCameraPreviewView {
     
     @objc
     func _handleFocusGesture(_ gesture: UITapGestureRecognizer) {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return
         }
         let viewPoint = gesture.location(in: self)
-        let devicePoint = self._previewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
+        let devicePoint = self.kkPreviewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
         let focusPoint = Point(devicePoint)
         do {
             try videoDevice.configuration({
@@ -198,48 +198,48 @@ private extension KKCameraPreviewView {
                     }
                 }
             })
-            self._delegate?.focus(self, point: .init(viewPoint))
+            self.kkDelegate?.focus(self, point: .init(viewPoint))
         } catch {
         }
     }
     
     @objc
     func _handleZoomGesture(pan gesture: UIPanGestureRecognizer) {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return
         }
         let currentTranslation = Double(gesture.translation(in: self).y)
         switch gesture.state {
         case .began:
-            self._zoomPanTranslation = currentTranslation
-            self._delegate?.beginZooming(self)
+            self.kkZoomPanTranslation = currentTranslation
+            self.kkDelegate?.beginZooming(self)
         case .changed:
-            guard let previousTranslation = self._zoomPanTranslation else {
+            guard let previousTranslation = self.kkZoomPanTranslation else {
                 return
             }
             let delta = currentTranslation - previousTranslation
-            self._zoomPanTranslation = currentTranslation
+            self.kkZoomPanTranslation = currentTranslation
             do {
                 try videoDevice.configuration({
                     $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
                 })
-                self._delegate?.zooming(self, videoDevice.videoZoom())
+                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             } catch {
             }
         case .ended, .cancelled:
-            guard let previousTranslation = self._zoomPanTranslation else {
+            guard let previousTranslation = self.kkZoomPanTranslation else {
                 return
             }
             let delta = currentTranslation - previousTranslation
-            self._zoomPanTranslation = currentTranslation
+            self.kkZoomPanTranslation = currentTranslation
             do {
                 try videoDevice.configuration({
                     $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
                 })
-                self._delegate?.zooming(self, videoDevice.videoZoom())
+                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             } catch {
             }
-            self._delegate?.endZoom(self)
+            self.kkDelegate?.endZoom(self)
         default:
             break
         }
@@ -247,36 +247,36 @@ private extension KKCameraPreviewView {
     
     @objc
     func _handleZoomGesture(pinch gesture: UIPinchGestureRecognizer) {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return
         }
         switch gesture.state {
         case .began:
-            self._zoomPinchBegin = videoDevice.videoZoom()
-            self._delegate?.beginZooming(self)
+            self.kkZoomPinchBegin = videoDevice.videoZoom()
+            self.kkDelegate?.beginZooming(self)
         case .changed:
-            guard let zoomPinchBegin = self._zoomPinchBegin else {
+            guard let zoomPinchBegin = self.kkZoomPinchBegin else {
                 return
             }
             do {
                 try videoDevice.configuration({
                     $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
                 })
-                self._delegate?.zooming(self, videoDevice.videoZoom())
+                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             } catch {
             }
         case .ended, .cancelled:
-            guard let zoomPinchBegin = self._zoomPinchBegin else {
+            guard let zoomPinchBegin = self.kkZoomPinchBegin else {
                 return
             }
             do {
                 try videoDevice.configuration({
                     $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
                 })
-                self._delegate?.zooming(self, videoDevice.videoZoom())
+                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             } catch {
             }
-            self._delegate?.endZoom(self)
+            self.kkDelegate?.endZoom(self)
         default:
             break
         }
@@ -287,25 +287,25 @@ private extension KKCameraPreviewView {
 extension KKCameraPreviewView : UIGestureRecognizerDelegate {
     
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let cameraSession = self._cameraSession else {
+        guard let cameraSession = self.kkCameraSession else {
             return false
         }
         guard cameraSession.isStarted == true else {
             return false
         }
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return false
         }
-        if gestureRecognizer === self._focusGesture {
+        if gestureRecognizer === self.kkFocusGesture {
             if videoDevice.isFocusOfPointSupported() == false && videoDevice.isExposureOfPointSupported() == false {
                 return false
             }
-            return self._delegate?.shouldFocus(self) ?? false
-        } else if gestureRecognizer === self._zoomPanGesture || gestureRecognizer === self._zoomPinchGesture {
+            return self.kkDelegate?.shouldFocus(self) ?? false
+        } else if gestureRecognizer === self.kkZoomPanGesture || gestureRecognizer === self.kkZoomPinchGesture {
             let minZoom = videoDevice.minVideoZoom()
             let maxZoom = videoDevice.maxVideoZoom()
             if maxZoom - minZoom > .leastNonzeroMagnitude {
-                return self._delegate?.shouldZoom(self) ?? false
+                return self.kkDelegate?.shouldZoom(self) ?? false
             }
         }
         return false

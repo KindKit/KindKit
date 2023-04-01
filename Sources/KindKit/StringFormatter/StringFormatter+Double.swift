@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct Double< InputType : BinaryFloatingPoint > : IStringFormatter {
+    struct Double< InputType : BinaryFloatingPoint > : IStringFormatter, Equatable {
         
         public let formatter: NumberFormatter
         
@@ -35,6 +35,115 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.Double {
+    
+    @inlinable
+    var minIntegerDigits: Int {
+        return self.formatter.minimumIntegerDigits
+    }
+    
+    @inlinable
+    var maxIntegerDigits: Int {
+        return self.formatter.maximumIntegerDigits
+    }
+    
+    @inlinable
+    var minFractionDigits: Int {
+        return self.formatter.minimumFractionDigits
+    }
+    
+    @inlinable
+    var maxFractionDigits: Int {
+        return self.formatter.maximumFractionDigits
+    }
+    
+    @inlinable
+    var zero: String {
+        return self.formatter.zeroSymbol ?? ""
+    }
+    
+    @inlinable
+    var nan: String {
+        return self.formatter.notANumberSymbol
+    }
+    
+    @inlinable
+    var plusSign: String {
+        return self.formatter.plusSign
+    }
+    
+    @inlinable
+    var minusSign: String {
+        return self.formatter.minusSign
+    }
+    
+    @inlinable
+    var positivePrefix: String {
+        return self.formatter.positivePrefix
+    }
+    
+    @inlinable
+    var positiveSuffix: String {
+        return self.formatter.positiveSuffix
+    }
+    
+    @inlinable
+    var negativePrefix: String {
+        return self.formatter.negativePrefix
+    }
+    
+    @inlinable
+    var negativeSuffix: String {
+        return self.formatter.negativeSuffix
+    }
+    
+    @inlinable
+    var positiveInfinity: String {
+        return self.formatter.positiveInfinitySymbol
+    }
+    
+    @inlinable
+    var negativeInfinity: String {
+        return self.formatter.negativeInfinitySymbol
+    }
+    
+    @inlinable
+    var alwaysShowsDecimalSeparator: Bool {
+        return self.formatter.alwaysShowsDecimalSeparator
+    }
+    
+    @inlinable
+    var decimalSeparator: String {
+        return self.formatter.decimalSeparator
+    }
+    
+    @inlinable
+    var usesGroupingSeparator: Bool {
+        return self.formatter.usesGroupingSeparator
+    }
+    
+    @inlinable
+    var groupingSeparator: String {
+        self.formatter.groupingSeparator
+    }
+    
+    @inlinable
+    var groupingSize: Int {
+        return self.formatter.groupingSize
+    }
+    
+    @inlinable
+    var secondaryGroupingSize: Int {
+        return self.formatter.secondaryGroupingSize
+    }
+    
+    @inlinable
+    var locale: Locale {
+        return self.formatter.locale
+    }
+    
 }
 
 public extension StringFormatter.Double {

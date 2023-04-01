@@ -44,7 +44,6 @@ final class KKAttributedTextView : NSTextField {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.drawsBackground = true
         self.isBordered = false
         self.isBezeled = false

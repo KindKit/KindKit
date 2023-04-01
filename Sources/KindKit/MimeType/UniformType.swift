@@ -22,7 +22,7 @@ public struct MimeType {
 
 public extension MimeType {
     
-    @available(iOS 14.0, *)
+    @available(macOS 11.0, iOS 14.0, *)
     var uniformType: UTType? {
         return .init(mimeType: self.value)
     }

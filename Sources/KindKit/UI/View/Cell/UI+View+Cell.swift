@@ -45,8 +45,7 @@ public extension UI.View {
         
         public init() {
             self._layout = Layout()
-            self.body = UI.View.Custom()
-                .content(self._layout)
+            self.body = .custom(self._layout)
                 .gestures([ self.pressedGesture ])
                 .shouldHighlighting(true)
             self._setup()

@@ -36,39 +36,37 @@ extension UI.View.Text {
 final class KKTextView : NSTextView {
     
     weak var kkDelegate: KKControlViewDelegate?
+    let kkTextStorage: NSTextStorage
+    let kkTextContainer: NSTextContainer
+    let kkLayoutManager: NSLayoutManager
+    
+    override var isFlipped: Bool {
+        return true
+    }
     override var alignmentRectInsets: NSEdgeInsets {
         return .init()
     }
     override var textContainerOrigin: NSPoint {
         let bounds = self.bounds
-        let textSize = self._layoutManager.usedRect(for: self._textContainer)
+        let textSize = self.kkLayoutManager.usedRect(for: self.kkTextContainer)
         return .init(
             x: 0,
             y: (bounds.height / 2) - (textSize.height / 2)
         )
     }
-    override var isFlipped: Bool {
-        return true
-    }
-    
-    private let _textStorage: NSTextStorage
-    private let _textContainer: NSTextContainer
-    private let _layoutManager: NSLayoutManager
     
     override init(frame: CGRect) {
-        self._textStorage = NSTextStorage()
-        self._textContainer = NSTextContainer(containerSize: frame.size)
-        self._textContainer.lineFragmentPadding = 0
+        self.kkTextStorage = NSTextStorage()
+        self.kkTextContainer = NSTextContainer(containerSize: frame.size)
+        self.kkTextContainer.lineFragmentPadding = 0
         
-        self._layoutManager = NSLayoutManager()
-        self._layoutManager.addTextContainer(self._textContainer)
-        self._textStorage.addLayoutManager(self._layoutManager)
+        self.kkLayoutManager = NSLayoutManager()
+        self.kkLayoutManager.addTextContainer(self.kkTextContainer)
+        self.kkTextStorage.addLayoutManager(self.kkLayoutManager)
         
-        super.init(frame: frame, textContainer: self._textContainer)
+        super.init(frame: frame, textContainer: self.kkTextContainer)
         
         self.textContainerInset = .zero
-        
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.drawsBackground = true
         self.isEditable = false
         self.isSelectable = false
@@ -81,7 +79,7 @@ final class KKTextView : NSTextView {
     
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
-        self._textContainer.containerSize = newSize
+        self.kkTextContainer.containerSize = newSize
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -125,11 +123,11 @@ extension KKTextView {
     }
     
     func update(lineBreak: UI.Text.LineBreak) {
-        self._textContainer.lineBreakMode = lineBreak.nsLineBreakMode
+        self.kkTextContainer.lineBreakMode = lineBreak.nsLineBreakMode
     }
     
     func update(numberOfLines: UInt) {
-        self._textContainer.maximumNumberOfLines = Int(numberOfLines)
+        self.kkTextContainer.maximumNumberOfLines = Int(numberOfLines)
     }
     
     func update(color: UI.Color?) {

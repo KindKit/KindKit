@@ -37,17 +37,17 @@ final class KKSwitchView : UIView {
     
     weak var kkDelegate: KKSwitchViewDelegate?
 
-    private var _switch: UISwitch
+    let kkSwitch: UISwitch
     
     override init(frame: CGRect) {
-        self._switch = UISwitch()
+        self.kkSwitch = UISwitch()
         
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self._switch.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
-        self.addSubview(self._switch)
+        self.kkSwitch.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
+        self.addSubview(self.kkSwitch)
     }
     
     required init(coder: NSCoder) {
@@ -58,8 +58,8 @@ final class KKSwitchView : UIView {
         super.layoutSubviews()
         
         let bounds = self.bounds
-        let switchSize = self._switch.sizeThatFits(bounds.size)
-        self._switch.frame = CGRect(
+        let switchSize = self.kkSwitch.sizeThatFits(bounds.size)
+        self.kkSwitch.frame = CGRect(
             x: bounds.midX - (switchSize.width / 2),
             y: bounds.midY - (switchSize.height / 2),
             width: switchSize.width,
@@ -93,19 +93,19 @@ extension KKSwitchView {
     }
     
     func update(value: Bool) {
-        self._switch.isOn = value
+        self.kkSwitch.isOn = value
     }
     
     func update(thumbColor: UI.Color?) {
-        self._switch.thumbTintColor = thumbColor?.native
+        self.kkSwitch.thumbTintColor = thumbColor?.native
     }
     
     func update(offColor: UI.Color?) {
-        self._switch.tintColor = offColor?.native
+        self.kkSwitch.tintColor = offColor?.native
     }
     
     func update(onColor: UI.Color?) {
-        self._switch.onTintColor = onColor?.native
+        self.kkSwitch.onTintColor = onColor?.native
     }
     
     func update(color: UI.Color?) {
@@ -117,7 +117,7 @@ extension KKSwitchView {
     }
     
     func update(locked: Bool) {
-        self._switch.isEnabled = locked == false
+        self.kkSwitch.isEnabled = locked == false
     }
     
     func cleanup() {
@@ -130,7 +130,7 @@ private extension KKSwitchView {
     
     @objc
     func _changed(_ sender: Any) {
-        self.kkDelegate?.changed(self, value: self._switch.isOn)
+        self.kkDelegate?.changed(self, value: self.kkSwitch.isOn)
     }
     
 }

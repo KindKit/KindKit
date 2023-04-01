@@ -39,7 +39,7 @@ final class KKRectView : UIView {
         didSet {
             guard self.kkBorderWidth != oldValue else { return }
             CATransaction.kk_withoutActions({
-                self._shareLayer.lineWidth = self.kkBorderWidth
+                self.kkShareLayer.lineWidth = self.kkBorderWidth
             })
             self.setNeedsLayout()
         }
@@ -48,7 +48,7 @@ final class KKRectView : UIView {
         didSet {
             guard self.kkBorderColor != oldValue else { return }
             CATransaction.kk_withoutActions({
-                self._shareLayer.strokeColor = self.kkBorderColor
+                self.kkShareLayer.strokeColor = self.kkBorderColor
             })
             self.setNeedsLayout()
         }
@@ -59,19 +59,18 @@ final class KKRectView : UIView {
             self.setNeedsLayout()
         }
     }
-    
-    private var _shareLayer: CAShapeLayer
+    let kkShareLayer: CAShapeLayer
         
     override init(frame: CGRect) {
-        self._shareLayer = CAShapeLayer()
-        self._shareLayer.contentsScale = UIScreen.main.scale
+        self.kkShareLayer = CAShapeLayer()
+        self.kkShareLayer.contentsScale = UIScreen.main.scale
         
         super.init(frame: frame)
         
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
         
-        self.layer.addSublayer(self._shareLayer)
+        self.layer.addSublayer(self.kkShareLayer)
     }
     
     required init?(coder: NSCoder) {
@@ -82,7 +81,7 @@ final class KKRectView : UIView {
         super.layoutSubviews()
         
         CATransaction.kk_withoutActions({
-            self._shareLayer.path = CGPath.kk_roundRect(
+            self.kkShareLayer.path = CGPath.kk_roundRect(
                 rect: Rect(self.bounds),
                 border: self.kkBorderWidth,
                 corner: self.kkCornerRadius
@@ -114,7 +113,7 @@ extension KKRectView {
     
     func update(fill: UI.Color?) {
         CATransaction.kk_withoutActions({
-            self._shareLayer.fillColor = fill?.cgColor
+            self.kkShareLayer.fillColor = fill?.cgColor
         })
     }
     

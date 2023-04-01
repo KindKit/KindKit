@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct Integer< InputType : BinaryInteger > : IStringFormatter {
+    struct Integer< InputType : BinaryInteger > : IStringFormatter, Equatable {
         
         public let formatter: NumberFormatter
         
@@ -33,6 +33,80 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.Integer {
+    
+    @inlinable
+    var minIntegerDigits: Int {
+        return self.formatter.minimumIntegerDigits
+    }
+    
+    @inlinable
+    var maxIntegerDigits: Int {
+        return self.formatter.maximumIntegerDigits
+    }
+    
+    @inlinable
+    var zero: String {
+        return self.formatter.zeroSymbol ?? ""
+    }
+    
+    @inlinable
+    var plusSign: String {
+        return self.formatter.plusSign
+    }
+    
+    @inlinable
+    var minusSign: String {
+        return self.formatter.minusSign
+    }
+    
+    @inlinable
+    var positivePrefix: String {
+        return self.formatter.positivePrefix
+    }
+    
+    @inlinable
+    var positiveSuffix: String {
+        return self.formatter.positiveSuffix
+    }
+    
+    @inlinable
+    var negativePrefix: String {
+        return self.formatter.negativePrefix
+    }
+    
+    @inlinable
+    var negativeSuffix: String {
+        return self.formatter.negativeSuffix
+    }
+    
+    @inlinable
+    var usesGroupingSeparator: Bool {
+        return self.formatter.usesGroupingSeparator
+    }
+    
+    @inlinable
+    var groupingSeparator: String {
+        return self.formatter.groupingSeparator
+    }
+    
+    @inlinable
+    var groupingSize: Int {
+        return self.formatter.groupingSize
+    }
+    
+    @inlinable
+    var secondaryGroupingSize: Int {
+        return self.formatter.secondaryGroupingSize
+    }
+    
+    @inlinable
+    var locale: Locale {
+        return self.formatter.locale
+    }
+    
 }
 
 public extension StringFormatter.Integer {

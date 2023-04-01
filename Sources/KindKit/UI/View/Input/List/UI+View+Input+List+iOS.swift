@@ -89,8 +89,7 @@ final class KKInputListView : UITextField {
             self.setNeedsLayout()
         }
     }
-
-    private var kkPicker: UIPickerView
+    let kkPicker: UIPickerView
     
     override init(frame: CGRect) {
         self.kkAccessoryView = .init(
@@ -106,11 +105,11 @@ final class KKInputListView : UITextField {
         super.init(frame: frame)
         
         self.kkAccessoryView.kkInput = self
-        self.delegate = self
         
         self.kkPicker.dataSource = self
         self.kkPicker.delegate = self
         self.inputView = self.kkPicker
+        self.delegate = self
     }
     
     required init?(coder: NSCoder) {

@@ -4,6 +4,10 @@
 
 import Foundation
 
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
+
 public extension UI.View.Shape {
     
     struct Line : Equatable {
@@ -41,3 +45,5 @@ extension UI.View.Shape.Line : ILerpable {
     }
     
 }
+
+#endif

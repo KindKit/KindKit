@@ -34,10 +34,10 @@ extension UI.View.AnimatedImage {
 }
 
 final class KKAnimatedImageView : UIImageView {
-        
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
     }

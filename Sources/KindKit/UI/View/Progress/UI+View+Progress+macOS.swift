@@ -41,27 +41,27 @@ final class KKProgressView : NSView {
             self.needsLayout = true
         }
     }
+    let kkTrackLayer: CALayer
+    let kkProgressLayer: CALayer
+    
     override var isFlipped: Bool {
         return true
     }
     
-    private var _trackLayer: CALayer
-    private var _progressLayer: CALayer
-    
     override init(frame: NSRect) {
-        self._trackLayer = CAGradientLayer()
-        self._trackLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
-        self._trackLayer.masksToBounds = true
+        self.kkTrackLayer = CAGradientLayer()
+        self.kkTrackLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
+        self.kkTrackLayer.masksToBounds = true
         
-        self._progressLayer = CAGradientLayer()
-        self._progressLayer.frame = CGRect(x: 0, y: 0, width: 0, height: frame.height)
-        self._trackLayer.insertSublayer(self._progressLayer, at: 0)
+        self.kkProgressLayer = CAGradientLayer()
+        self.kkProgressLayer.frame = CGRect(x: 0, y: 0, width: 0, height: frame.height)
+        self.kkTrackLayer.insertSublayer(self.kkProgressLayer, at: 0)
         
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
-        self.layer?.insertSublayer(self._trackLayer, at: 0)
+        
+        self.layer?.insertSublayer(self.kkTrackLayer, at: 0)
     }
     
     required init?(coder: NSCoder) {
@@ -78,13 +78,13 @@ final class KKProgressView : NSView {
         let bounds = self.bounds
         
         let size = bounds.size
-        self._trackLayer.frame = bounds
+        self.kkTrackLayer.frame = bounds
         if size.width > 0 && size.height > 0 {
-            self._trackLayer.cornerRadius = ceil(min(size.width - 1, size.height - 1)) * 0.5
+            self.kkTrackLayer.cornerRadius = ceil(min(size.width - 1, size.height - 1)) * 0.5
         } else {
-            self._trackLayer.cornerRadius = 0
+            self.kkTrackLayer.cornerRadius = 0
         }
-        self._progressLayer.frame = CGRect(x: 0, y: 0, width: bounds.width * self.kkProgress, height: bounds.height)
+        self.kkProgressLayer.frame = CGRect(x: 0, y: 0, width: bounds.width * self.kkProgress, height: bounds.height)
     }
     
 }
@@ -105,11 +105,11 @@ extension KKProgressView {
     }
     
     func update(progressColor: UI.Color?) {
-        self._progressLayer.backgroundColor = progressColor?.cgColor
+        self.kkProgressLayer.backgroundColor = progressColor?.cgColor
     }
     
     func update(trackColor: UI.Color?) {
-        self._trackLayer.backgroundColor = trackColor?.cgColor
+        self.kkTrackLayer.backgroundColor = trackColor?.cgColor
     }
     
     func update(progress: Double) {

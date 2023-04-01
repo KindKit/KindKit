@@ -34,26 +34,28 @@ extension UI.View.Control {
 }
 
 final class KKControlView : UIControl {
-        
+    
     weak var kkDelegate: KKControlViewDelegate?
-    var contentSize: Size {
-        return self._layoutManager.size
+    var kkLayoutManager: UI.Layout.Manager!
+    var kkContentSize: Size {
+        return self.kkLayoutManager.size
     }
+    
     override var frame: CGRect {
         didSet {
             guard self.frame != oldValue else { return }
             if self.frame.size != oldValue.size {
                 if self.window != nil {
-                    self._layoutManager.invalidate()
+                    self.kkLayoutManager.invalidate()
                 }
             }
         }
     }
-
-    private var _layoutManager: UI.Layout.Manager!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        self.clipsToBounds = true
         
         self.addTarget(self, action: #selector(self._handleHighlighting(_:)), for: .touchDown)
         self.addTarget(self, action: #selector(self._handleHighlighting(_:)), for: .touchDragEnter)
@@ -61,9 +63,8 @@ final class KKControlView : UIControl {
         self.addTarget(self, action: #selector(self._handleUnhighlighting(_:)), for: .touchUpOutside)
         self.addTarget(self, action: #selector(self._handleUnhighlighting(_:)), for: .touchCancel)
         self.addTarget(self, action: #selector(self._handlePressed(_:)), for: .touchUpInside)
-        self.clipsToBounds = true
         
-        self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self.kkLayoutManager = UI.Layout.Manager(contentView: self, delegate: self)
     }
     
     required init?(coder: NSCoder) {
@@ -74,7 +75,7 @@ final class KKControlView : UIControl {
         super.willMove(toSuperview: superview)
         
         if superview == nil {
-            self._layoutManager.clear()
+            self.kkLayoutManager.clear()
         }
     }
     
@@ -82,8 +83,8 @@ final class KKControlView : UIControl {
         super.layoutSubviews()
         
         let bounds = Rect(self.bounds)
-        self._layoutManager.layout(bounds: bounds)
-        self._layoutManager.visible(bounds: bounds)
+        self.kkLayoutManager.layout(bounds: bounds)
+        self.kkLayoutManager.visible(bounds: bounds)
     }
     
 }
@@ -109,7 +110,7 @@ extension KKControlView {
     }
     
     func update(content: IUILayout?) {
-        self._layoutManager.layout = content
+        self.kkLayoutManager.layout = content
         self.setNeedsLayout()
     }
     
@@ -126,7 +127,7 @@ extension KKControlView {
     }
     
     func cleanup() {
-        self._layoutManager.layout = nil
+        self.kkLayoutManager.layout = nil
         self.kkDelegate = nil
     }
     

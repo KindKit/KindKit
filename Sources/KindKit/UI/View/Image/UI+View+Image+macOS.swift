@@ -36,6 +36,7 @@ extension UI.View.Image {
 final class KKImageView : NSImageView {
     
     weak var kkDelegate: KKControlViewDelegate?
+    
     override var isFlipped: Bool {
         return true
     }
@@ -43,7 +44,6 @@ final class KKImageView : NSImageView {
     override init(frame: NSRect) {
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.imageFrameStyle = .none
         self.imageAlignment = .alignCenter
         self.wantsLayer = true

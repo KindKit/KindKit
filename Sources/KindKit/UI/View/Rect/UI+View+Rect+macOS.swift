@@ -38,14 +38,14 @@ final class KKRectView : NSView {
     var kkBorderWidth: CGFloat = 0 {
         didSet {
             guard self.kkBorderWidth != oldValue else { return }
-            self._shareLayer.lineWidth = self.kkBorderWidth
+            self.kkShareLayer.lineWidth = self.kkBorderWidth
             self.needsLayout = true
         }
     }
     var kkBorderColor: CGColor? {
         didSet {
             guard self.kkBorderColor != oldValue else { return }
-            self._shareLayer.strokeColor = self.kkBorderColor
+            self.kkShareLayer.strokeColor = self.kkBorderColor
             self.needsLayout = true
         }
     }
@@ -55,21 +55,21 @@ final class KKRectView : NSView {
             self.needsLayout = true
         }
     }
+    let kkShareLayer: CAShapeLayer
+    
     override var isFlipped: Bool {
         return true
     }
     
-    private var _shareLayer: CAShapeLayer
-    
     override init(frame: CGRect) {
-        self._shareLayer = CAShapeLayer()
-        self._shareLayer.contentsScale = NSScreen.main!.backingScaleFactor
+        self.kkShareLayer = CAShapeLayer()
+        self.kkShareLayer.contentsScale = NSScreen.main!.backingScaleFactor
         
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
-        self.layer?.addSublayer(self._shareLayer)
+        
+        self.layer?.addSublayer(self.kkShareLayer)
     }
     
     required init?(coder: NSCoder) {
@@ -83,7 +83,7 @@ final class KKRectView : NSView {
     override func layout() {
         super.layout()
         
-        self._shareLayer.path = CGPath.kk_roundRect(
+        self.kkShareLayer.path = CGPath.kk_roundRect(
             rect: Rect(self.bounds),
             border: self.kkBorderWidth,
             corner: self.kkCornerRadius
@@ -113,7 +113,7 @@ extension KKRectView {
     }
     
     func update(fill: UI.Color?) {
-        self._shareLayer.fillColor = fill?.cgColor
+        self.kkShareLayer.fillColor = fill?.cgColor
     }
     
     func update(border: UI.Border) {

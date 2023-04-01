@@ -4,6 +4,10 @@
 
 import Foundation
 
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
+
 public extension UI.View {
 
     final class Shape {
@@ -282,3 +286,5 @@ public extension IUIView where Self == UI.View.Shape {
     }
     
 }
+
+#endif

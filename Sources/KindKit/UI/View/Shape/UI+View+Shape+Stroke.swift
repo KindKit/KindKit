@@ -4,6 +4,10 @@
 
 import Foundation
 
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
+
 public extension UI.View.Shape {
     
     struct Stroke : Equatable {
@@ -37,3 +41,5 @@ extension UI.View.Shape.Stroke : ILerpable {
     }
     
 }
+
+#endif

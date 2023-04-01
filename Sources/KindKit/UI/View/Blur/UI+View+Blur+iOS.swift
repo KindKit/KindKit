@@ -34,18 +34,18 @@ extension UI.View.Blur {
 }
   
 final class KKBlurView : UIVisualEffectView {
-        
-    private var _style: UIBlurEffect.Style {
+    
+    var kkStyle: UIBlurEffect.Style {
         didSet {
-            guard self._style != oldValue else { return }
-            self.effect = UIBlurEffect(style: self._style)
+            guard self.kkStyle != oldValue else { return }
+            self.effect = UIBlurEffect(style: self.kkStyle)
         }
     }
     
     init(style: UIBlurEffect.Style) {
-        self._style = style
+        self.kkStyle = style
         
-        super.init(effect: UIBlurEffect(style: self._style))
+        super.init(effect: UIBlurEffect(style: self.kkStyle))
         
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
@@ -75,7 +75,7 @@ extension KKBlurView {
     }
     
     func update(style: UIBlurEffect.Style) {
-        self._style = style
+        self.kkStyle = style
     }
     
     func update(alpha: Double) {

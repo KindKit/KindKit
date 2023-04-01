@@ -35,29 +35,30 @@ extension UI.View.Web {
 }
 
 final class KKWebView : WKWebView {
-        
-    unowned var kkDelegate: KKWebViewDelegate?
-    override var safeAreaInsets: UIEdgeInsets {
-        return self._contentInset
-    }
     
-    private var _contentInset: UIEdgeInsets = .zero {
+    unowned var kkDelegate: KKWebViewDelegate?
+    var kkContentInset: UIEdgeInsets = .zero {
         didSet {
-            guard self._contentInset != oldValue else { return }
+            guard self.kkContentInset != oldValue else { return }
             self.safeAreaInsetsDidChange()
         }
     }
-    private var _enablePinchGesture: Bool = true
-    private var _currentNavigation: WKNavigation?
+    var kkEnablePinchGesture: Bool = true
+    var kkCurrentNavigation: WKNavigation?
+    
+    override var safeAreaInsets: UIEdgeInsets {
+        return self.kkContentInset
+    }
     
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
         
-        self.scrollView.contentInsetAdjustmentBehavior = .always
-        self.scrollView.backgroundColor = nil
-        self.clipsToBounds = true
         self.navigationDelegate = self
         self.uiDelegate = self
+        self.clipsToBounds = true
+        
+        self.scrollView.contentInsetAdjustmentBehavior = .always
+        self.scrollView.backgroundColor = nil
     }
     
     required init?(coder: NSCoder) {
@@ -113,11 +114,11 @@ extension KKWebView {
     }
     
     func update(contentInset: Inset) {
-        self._contentInset = contentInset.uiEdgeInsets
+        self.kkContentInset = contentInset.uiEdgeInsets
     }
     
     func update(enablePinchGesture: Bool) {
-        self._enablePinchGesture = enablePinchGesture
+        self.kkEnablePinchGesture = enablePinchGesture
     }
     
     func update(color: UI.Color?) {
@@ -158,7 +159,7 @@ extension KKWebView {
 extension KKWebView : UIScrollViewDelegate {
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-        scrollView.pinchGestureRecognizer?.isEnabled = self._enablePinchGesture
+        scrollView.pinchGestureRecognizer?.isEnabled = self.kkEnablePinchGesture
     }
     
 }
@@ -183,25 +184,25 @@ extension KKWebView : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        self._currentNavigation = navigation
+        self.kkCurrentNavigation = navigation
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        guard self._currentNavigation === navigation else {
+        guard self.kkCurrentNavigation === navigation else {
             return
         }
         self.kkDelegate?.endLoading(self, error: nil)
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        guard self._currentNavigation === navigation else {
+        guard self.kkCurrentNavigation === navigation else {
             return
         }
         self.kkDelegate?.endLoading(self, error: error)
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        guard self._currentNavigation === navigation else {
+        guard self.kkCurrentNavigation === navigation else {
             return
         }
         self.kkDelegate?.endLoading(self, error: error)

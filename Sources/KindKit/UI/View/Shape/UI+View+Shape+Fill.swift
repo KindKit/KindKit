@@ -4,6 +4,10 @@
 
 import Foundation
 
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
+
 public extension UI.View.Shape {
     
     struct Fill : Equatable {
@@ -33,3 +37,5 @@ extension UI.View.Shape.Fill : ILerpable {
     }
     
 }
+
+#endif

@@ -32,7 +32,11 @@ extension UI.Layout.Composition.VFill : IUICompositionLayoutEntity {
     
     @discardableResult
     public func layout(bounds: Rect) -> KindKit.Size {
-        return self.entity.layout(bounds: bounds)
+        let size = self.entity.layout(bounds: bounds)
+        return .init(
+            width: size.width,
+            height: bounds.height
+        )
     }
     
     public func size(available: KindKit.Size) -> KindKit.Size {

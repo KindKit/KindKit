@@ -36,22 +36,17 @@ extension UI.View.CameraPreview {
 
 final class KKCameraPreviewView : NSView {
     
-    override var isFlipped: Bool {
-        return true
-    }
-    
-    private weak var _delegate: KKCameraPreviewViewDelegate?
-    
-    private var _cameraSession: CameraSession? {
+    weak var kkDelegate: KKCameraPreviewViewDelegate?
+    var kkCameraSession: CameraSession? {
         didSet {
-            guard self._cameraSession !== oldValue else { return }
-            self._previewLayer.session = self._cameraSession?.session
-            self._videoDevice = self._cameraSession?.activeVideoDevice
+            guard self.kkCameraSession !== oldValue else { return }
+            self.kkPreviewLayer.session = self.kkCameraSession?.session
+            self.kkVideoDevice = self.kkCameraSession?.activeVideoDevice
         }
     }
-    private var _videoDevice: CameraSession.Device.Video?
-    private var _previewLayer: AVCaptureVideoPreviewLayer
-    private lazy var _focusGesture: NSClickGestureRecognizer = {
+    var kkVideoDevice: CameraSession.Device.Video?
+    var kkPreviewLayer: AVCaptureVideoPreviewLayer
+    lazy var kkFocusGesture: NSClickGestureRecognizer = {
         let gesture = NSClickGestureRecognizer()
         gesture.delegate = self
         gesture.target = self
@@ -59,16 +54,19 @@ final class KKCameraPreviewView : NSView {
         return gesture
     }()
     
+    override var isFlipped: Bool {
+        return true
+    }
+    
     override init(frame: NSRect) {
-        self._previewLayer = AVCaptureVideoPreviewLayer()
+        self.kkPreviewLayer = AVCaptureVideoPreviewLayer()
         
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
-        self.layer = self._previewLayer
+        self.layer = self.kkPreviewLayer
         
-        self.addGestureRecognizer(self._focusGesture)
+        self.addGestureRecognizer(self.kkFocusGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -85,7 +83,7 @@ extension KKCameraPreviewView {
         self.update(mode: view.mode)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
-        self._delegate = view
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -93,23 +91,23 @@ extension KKCameraPreviewView {
     }
     
     func update(cameraSession: CameraSession) {
-        self._cameraSession = cameraSession
+        self.kkCameraSession = cameraSession
     }
     
     func update(videoDevice: CameraSession.Device.Video?) {
-        self._videoDevice = videoDevice
+        self.kkVideoDevice = videoDevice
     }
 
     func update(mode: UI.View.CameraPreview.Mode) {
         switch mode {
-        case .origin: self._previewLayer.videoGravity = .resize
-        case .aspectFit: self._previewLayer.videoGravity = .resizeAspect
-        case .aspectFill: self._previewLayer.videoGravity = .resizeAspectFill
+        case .origin: self.kkPreviewLayer.videoGravity = .resize
+        case .aspectFit: self.kkPreviewLayer.videoGravity = .resizeAspect
+        case .aspectFill: self.kkPreviewLayer.videoGravity = .resizeAspectFill
         }
     }
     
     func update(color: UI.Color?) {
-        self._previewLayer.backgroundColor = color?.native.cgColor
+        self.kkPreviewLayer.backgroundColor = color?.native.cgColor
     }
     
     func update(alpha: Double) {
@@ -117,8 +115,8 @@ extension KKCameraPreviewView {
     }
     
     func cleanup() {
-        self._cameraSession = nil
-        self._delegate = nil
+        self.kkCameraSession = nil
+        self.kkDelegate = nil
     }
     
 }
@@ -127,11 +125,11 @@ private extension KKCameraPreviewView {
     
     @objc
     func _handleFocusGesture(_ gesture: NSClickGestureRecognizer) {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return
         }
         let viewPoint = gesture.location(in: self)
-        let devicePoint = self._previewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
+        let devicePoint = self.kkPreviewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
         let focusPoint = Point(devicePoint)
         do {
             try videoDevice.configuration({
@@ -148,7 +146,7 @@ private extension KKCameraPreviewView {
                     }
                 }
             })
-            self._delegate?.focus(self, point: .init(viewPoint))
+            self.kkDelegate?.focus(self, point: .init(viewPoint))
         } catch {
         }
     }
@@ -158,14 +156,14 @@ private extension KKCameraPreviewView {
 extension KKCameraPreviewView : NSGestureRecognizerDelegate {
     
     func gestureRecognizerShouldBegin(_ gestureRecognizer: NSGestureRecognizer) -> Bool {
-        guard let videoDevice = self._videoDevice else {
+        guard let videoDevice = self.kkVideoDevice else {
             return false
         }
-        if gestureRecognizer === self._focusGesture {
+        if gestureRecognizer === self.kkFocusGesture {
             if videoDevice.isFocusOfPointSupported() == false && videoDevice.isExposureOfPointSupported() == false {
                 return false
             }
-            return self._delegate?.shouldFocus(self) ?? false
+            return self.kkDelegate?.shouldFocus(self) ?? false
         }
         return false
     }

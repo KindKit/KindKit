@@ -35,27 +35,20 @@ extension UI.View.Canvas {
 
 final class KKCanvasView : UIView {
     
-    private var _canvas: IGraphicsCanvas?
-    
-    private var _tapGestures: [Graphics.Gesture : UITapGestureRecognizer]
-    private var _longPressGestures: [Graphics.Gesture : UILongPressGestureRecognizer]
-    private var _panGestures: [Graphics.Gesture : UIPanGestureRecognizer]
-    private var _previousPanLocation: [Graphics.Gesture : CGPoint]
-    private var _pinchGesture: UIPinchGestureRecognizer!
-    private var _previousPinchLocation: CGPoint?
-    private var _previousPinchScale: CGFloat?
-    private var _rotationGesture: UIRotationGestureRecognizer!
-    private var _previousRotationLocation: CGPoint?
-    private var _previousRotationAngle: CGFloat?
-    private var _simultaneouslyGestures: [UIGestureRecognizer]
+    var kkCanvas: IGraphicsCanvas?
+    var kkTapGestures: [Graphics.Gesture : UITapGestureRecognizer] = [:]
+    var kkLongPressGestures: [Graphics.Gesture : UILongPressGestureRecognizer] = [:]
+    var kkPanGestures: [Graphics.Gesture : UIPanGestureRecognizer] = [:]
+    var kkPreviousPanLocation: [Graphics.Gesture : CGPoint] = [:]
+    var kkPinchGesture: UIPinchGestureRecognizer!
+    var kkPreviousPinchLocation: CGPoint?
+    var kkPreviousPinchScale: CGFloat?
+    var kkRotationGesture: UIRotationGestureRecognizer!
+    var kkPreviousRotationLocation: CGPoint?
+    var kkPreviousRotationAngle: CGFloat?
+    var kkSimultaneouslyGestures: [UIGestureRecognizer] = []
     
     override init(frame: CGRect) {
-        self._tapGestures = [:]
-        self._longPressGestures = [:]
-        self._panGestures = [:]
-        self._previousPanLocation = [:]
-        self._simultaneouslyGestures = []
-        
         super.init(frame: frame)
         
         self.clipsToBounds = true
@@ -65,32 +58,32 @@ final class KKCanvasView : UIView {
             do {
                 let gesture = UITapGestureRecognizer(target: self, action: #selector(self._handleTapGesture(_:)))
                 gesture.numberOfTouchesRequired = numberOfTouches
-                self._tapGestures[canvasGesture] = gesture
+                self.kkTapGestures[canvasGesture] = gesture
                 self.addGestureRecognizer(gesture)
             }
             do {
                 let gesture = UILongPressGestureRecognizer(target: self, action: #selector(self._handleLongPressGesture(_:)))
                 gesture.numberOfTouchesRequired = numberOfTouches
-                self._longPressGestures[canvasGesture] = gesture
+                self.kkLongPressGestures[canvasGesture] = gesture
                 self.addGestureRecognizer(gesture)
             }
             do {
                 let gesture = UIPanGestureRecognizer(target: self, action: #selector(self._handlePanGesture(_:)))
                 gesture.minimumNumberOfTouches = numberOfTouches
                 gesture.maximumNumberOfTouches = numberOfTouches
-                self._panGestures[canvasGesture] = gesture
+                self.kkPanGestures[canvasGesture] = gesture
                 self.addGestureRecognizer(gesture)
-                self._simultaneouslyGestures.append(gesture)
+                self.kkSimultaneouslyGestures.append(gesture)
             }
         }
         
-        self._pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(self._handlePinchGesture))
-        self.addGestureRecognizer(self._pinchGesture)
-        self._simultaneouslyGestures.append(self._pinchGesture)
+        self.kkPinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(self._handlePinchGesture))
+        self.addGestureRecognizer(self.kkPinchGesture)
+        self.kkSimultaneouslyGestures.append(self.kkPinchGesture)
         
-        self._rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self._handleRotationGesture))
-        self.addGestureRecognizer(self._rotationGesture)
-        self._simultaneouslyGestures.append(self._rotationGesture)
+        self.kkRotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(self._handleRotationGesture))
+        self.addGestureRecognizer(self.kkRotationGesture)
+        self.kkSimultaneouslyGestures.append(self.kkRotationGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -99,14 +92,14 @@ final class KKCanvasView : UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if let canvas = self._canvas {
+        if let canvas = self.kkCanvas {
             canvas.resize(Size(self.bounds.size))
         }
     }
     
     override func draw(_ rect: CGRect) {
         guard let cgContext = UIGraphicsGetCurrentContext() else { return }
-        if let canvas = self._canvas {
+        if let canvas = self.kkCanvas {
             canvas.draw(Graphics.Context(cgContext), bounds: Rect(self.bounds))
         }
     }
@@ -137,7 +130,7 @@ extension KKCanvasView {
     }
     
     func update(canvas: IGraphicsCanvas?) {
-        self._canvas = canvas
+        self.kkCanvas = canvas
         self.setNeedsDisplay()
     }
     
@@ -158,10 +151,10 @@ private extension KKCanvasView {
     
     @objc
     func _handleTapGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return
         }
-        guard let found = self._tapGestures.first(where: { $0.value === gesture }) else {
+        guard let found = self.kkTapGestures.first(where: { $0.value === gesture }) else {
             return
         }
         let location = found.value.location(in: self)
@@ -170,10 +163,10 @@ private extension KKCanvasView {
     
     @objc
     func _handleLongPressGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return
         }
-        guard let found = self._tapGestures.first(where: { $0.value === gesture }) else {
+        guard let found = self.kkTapGestures.first(where: { $0.value === gesture }) else {
             return
         }
         let location = found.value.location(in: self)
@@ -182,29 +175,29 @@ private extension KKCanvasView {
     
     @objc
     func _handlePanGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return
         }
-        guard let found = self._panGestures.first(where: { $0.value === gesture }) else {
+        guard let found = self.kkPanGestures.first(where: { $0.value === gesture }) else {
             return
         }
         switch found.value.state {
         case .possible: break
         case .began:
             let location = found.value.location(in: self)
-            self._previousPanLocation[found.key] = location
+            self.kkPreviousPanLocation[found.key] = location
             canvas.beginPanGesture(found.key, location: Point(location))
         case .changed:
             if found.value.numberOfTouches != found.value.minimumNumberOfTouches {
                 found.value.isEnabled = false
             } else {
                 let location = found.value.location(in: self)
-                self._previousPanLocation[found.key] = location
+                self.kkPreviousPanLocation[found.key] = location
                 canvas.changePanGesture(found.key, location: Point(location))
             }
         case .ended, .cancelled, .failed:
-            if let location = self._previousPanLocation[found.key] {
-                self._previousPanLocation[found.key] = nil
+            if let location = self.kkPreviousPanLocation[found.key] {
+                self.kkPreviousPanLocation[found.key] = nil
                 canvas.endPanGesture(found.key, location: Point(location))
             }
             found.value.isEnabled = true
@@ -214,68 +207,68 @@ private extension KKCanvasView {
     
     @objc
     func _handlePinchGesture() {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return
         }
-        switch self._pinchGesture.state {
+        switch self.kkPinchGesture.state {
         case .possible: break
         case .began:
-            let location = self._pinchGesture.location(in: self)
-            let scale = self._pinchGesture.scale
-            self._previousPinchLocation = location
-            self._previousPinchScale = scale
+            let location = self.kkPinchGesture.location(in: self)
+            let scale = self.kkPinchGesture.scale
+            self.kkPreviousPinchLocation = location
+            self.kkPreviousPinchScale = scale
             canvas.beginPinchGesture(location: Point(location), scale: Double(scale))
         case .changed:
-            if self._pinchGesture.numberOfTouches != 2 {
-                self._pinchGesture.isEnabled = false
+            if self.kkPinchGesture.numberOfTouches != 2 {
+                self.kkPinchGesture.isEnabled = false
             } else {
-                let location = self._pinchGesture.location(in: self)
-                let scale = self._pinchGesture.scale
-                self._previousPinchLocation = location
-                self._previousPinchScale = scale
+                let location = self.kkPinchGesture.location(in: self)
+                let scale = self.kkPinchGesture.scale
+                self.kkPreviousPinchLocation = location
+                self.kkPreviousPinchScale = scale
                 canvas.changePinchGesture(location: Point(location), scale: Double(scale))
             }
         case .ended, .cancelled, .failed:
-            if let location = self._previousPinchLocation, let scale = self._previousPinchScale {
-                self._previousPinchLocation = nil
-                self._previousPinchScale = nil
+            if let location = self.kkPreviousPinchLocation, let scale = self.kkPreviousPinchScale {
+                self.kkPreviousPinchLocation = nil
+                self.kkPreviousPinchScale = nil
                 canvas.endPinchGesture(location: Point(location), scale: Double(scale))
             }
-            self._pinchGesture.isEnabled = true
+            self.kkPinchGesture.isEnabled = true
         @unknown default: break
         }
     }
     
     @objc
     func _handleRotationGesture() {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return
         }
-        switch self._rotationGesture.state {
+        switch self.kkRotationGesture.state {
         case .possible: break
         case .began:
-            let location = self._rotationGesture.location(in: self)
-            let angle = self._rotationGesture.rotation
-            self._previousRotationLocation = location
-            self._previousRotationAngle = angle
+            let location = self.kkRotationGesture.location(in: self)
+            let angle = self.kkRotationGesture.rotation
+            self.kkPreviousRotationLocation = location
+            self.kkPreviousRotationAngle = angle
             canvas.beginRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
         case .changed:
-            if self._rotationGesture.numberOfTouches != 2 {
-                self._rotationGesture.isEnabled = false
+            if self.kkRotationGesture.numberOfTouches != 2 {
+                self.kkRotationGesture.isEnabled = false
             } else {
-                let location = self._rotationGesture.location(in: self)
-                let angle = self._rotationGesture.rotation
-                self._previousRotationLocation = location
-                self._previousRotationAngle = angle
+                let location = self.kkRotationGesture.location(in: self)
+                let angle = self.kkRotationGesture.rotation
+                self.kkPreviousRotationLocation = location
+                self.kkPreviousRotationAngle = angle
                 canvas.changeRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
             }
         case .ended, .cancelled, .failed:
-            if let location = self._previousRotationLocation, let angle = self._previousRotationAngle {
-                self._previousRotationLocation = nil
-                self._previousRotationAngle = nil
+            if let location = self.kkPreviousRotationLocation, let angle = self.kkPreviousRotationAngle {
+                self.kkPreviousRotationLocation = nil
+                self.kkPreviousRotationAngle = nil
                 canvas.endRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
             }
-            self._rotationGesture.isEnabled = true
+            self.kkRotationGesture.isEnabled = true
         @unknown default: break
         }
     }
@@ -285,32 +278,32 @@ private extension KKCanvasView {
 extension KKCanvasView : UIGestureRecognizerDelegate {
     
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let canvas = self._canvas else {
+        guard let canvas = self.kkCanvas else {
             return false
         }
-        if let found = self._tapGestures.first(where: { $0.value === gestureRecognizer }) {
+        if let found = self.kkTapGestures.first(where: { $0.value === gestureRecognizer }) {
             return canvas.shouldTapGesture(found.key)
-        } else if let found = self._longPressGestures.first(where: { $0.value === gestureRecognizer }) {
+        } else if let found = self.kkLongPressGestures.first(where: { $0.value === gestureRecognizer }) {
             return canvas.shouldLongTapGesture(found.key)
-        } else if let found = self._panGestures.first(where: { $0.value === gestureRecognizer }) {
+        } else if let found = self.kkPanGestures.first(where: { $0.value === gestureRecognizer }) {
             return canvas.shouldPanGesture(found.key)
-        } else if gestureRecognizer === self._pinchGesture {
+        } else if gestureRecognizer === self.kkPinchGesture {
             return canvas.shouldPinchGesture()
-        } else if gestureRecognizer === self._rotationGesture {
+        } else if gestureRecognizer === self.kkRotationGesture {
             return canvas.shouldRotationGesture()
         }
         return false
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard self._simultaneouslyGestures.contains(gestureRecognizer) == true else { return false }
-        guard self._simultaneouslyGestures.contains(otherGestureRecognizer) == true else { return false }
+        guard self.kkSimultaneouslyGestures.contains(gestureRecognizer) == true else { return false }
+        guard self.kkSimultaneouslyGestures.contains(otherGestureRecognizer) == true else { return false }
         return true
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if self._tapGestures.first(where: { $0.value === gestureRecognizer }) != nil {
-            if self._longPressGestures.first(where: { $0.value === otherGestureRecognizer }) != nil {
+        if self.kkTapGestures.first(where: { $0.value === gestureRecognizer }) != nil {
+            if self.kkLongPressGestures.first(where: { $0.value === otherGestureRecognizer }) != nil {
                 return true
             }
         }

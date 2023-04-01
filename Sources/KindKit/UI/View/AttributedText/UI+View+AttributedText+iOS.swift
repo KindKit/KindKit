@@ -34,10 +34,9 @@ extension UI.View.AttributedText {
 }
 
 final class KKAttributedTextView : UILabel {
-        
-    weak var kkDelegate: KKAttributedTextViewDelegate?
     
-    private var _tapGesture: UITapGestureRecognizer!
+    weak var kkDelegate: KKAttributedTextViewDelegate?
+    var kkTapGesture: UITapGestureRecognizer!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,8 +44,8 @@ final class KKAttributedTextView : UILabel {
         self.isUserInteractionEnabled = true
         self.clipsToBounds = true
         
-        self._tapGesture = UITapGestureRecognizer(target: self, action: #selector(self._tapHandle(_:)))
-        self.addGestureRecognizer(self._tapGesture)
+        self.kkTapGesture = UITapGestureRecognizer(target: self, action: #selector(self._tapHandle(_:)))
+        self.addGestureRecognizer(self.kkTapGesture)
     }
     
     required init?(coder: NSCoder) {
@@ -139,7 +138,7 @@ private extension KKAttributedTextView {
         let textStorage = NSTextStorage(attributedString: self.attributedText!)
         textStorage.addLayoutManager(layoutManager)
         
-        let location = self._tapGesture.location(in: self)
+        let location = self.kkTapGesture.location(in: self)
         let indexOfCharacter = layoutManager.characterIndex(for: location, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
         if indexOfCharacter >= textStorage.string.count {
             return nil

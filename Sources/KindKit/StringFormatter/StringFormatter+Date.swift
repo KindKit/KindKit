@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct Date : IStringFormatter {
+    struct Date : IStringFormatter, Equatable {
         
         public typealias InputType = Foundation.Date
         
@@ -22,6 +22,30 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.Date {
+    
+    @inlinable
+    var format: String {
+        return self.formatter.dateFormat
+    }
+    
+    @inlinable
+    var calendar: Calendar {
+        return self.formatter.calendar
+    }
+    
+    @inlinable
+    var locale: Locale {
+        return self.formatter.locale
+    }
+    
+    @inlinable
+    var timeZone: TimeZone {
+        return self.formatter.timeZone
+    }
+    
 }
 
 public extension StringFormatter.Date {

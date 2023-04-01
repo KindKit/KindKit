@@ -35,12 +35,12 @@ extension UI.View.External {
 
 final class KKExternalView : UIView {
     
-    var content: UIView? {
+    var kkContent: UIView? {
         willSet {
-            self.content?.removeFromSuperview()
+            self.kkContent?.removeFromSuperview()
         }
         didSet {
-            guard let content = self.content else { return }
+            guard let content = self.kkContent else { return }
             content.frame = self.bounds
             self.addSubview(content)
         }
@@ -59,7 +59,7 @@ final class KKExternalView : UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if let content = self.content {
+        if let content = self.kkContent {
             content.frame = self.bounds
         }
     }
@@ -83,11 +83,11 @@ extension KKExternalView {
     }
     
     func update(content: UIView?) {
-        self.content = content
+        self.kkContent = content
     }
     
     func cleanup() {
-        self.content = nil
+        self.kkContent = nil
     }
     
 }

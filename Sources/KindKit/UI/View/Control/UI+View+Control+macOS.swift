@@ -34,34 +34,33 @@ extension UI.View.Control {
 }
 
 final class KKControlView : NSControl {
-        
+    
     weak var kkDelegate: KKControlViewDelegate?
-    var contentSize: Size {
-        return self._layoutManager.size
+    var kkLayoutManager: UI.Layout.Manager!
+    var kkContentSize: Size {
+        return self.kkLayoutManager.size
+    }
+    
+    override var isFlipped: Bool {
+        return true
     }
     override var frame: CGRect {
         didSet {
             guard self.frame != oldValue else { return }
             if self.frame.size != oldValue.size {
                 if self.window != nil {
-                    self._layoutManager.invalidate()
+                    self.kkLayoutManager.invalidate()
                 }
             }
         }
     }
-    override var isFlipped: Bool {
-        return true
-    }
-    
-    private var _layoutManager: UI.Layout.Manager!
     
     override init(frame: NSRect) {
         super.init(frame: frame)
         
-        self.translatesAutoresizingMaskIntoConstraints = false
         self.wantsLayer = true
         
-        self._layoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self.kkLayoutManager = UI.Layout.Manager(contentView: self, delegate: self)
     }
     
     required init?(coder: NSCoder) {
@@ -72,7 +71,7 @@ final class KKControlView : NSControl {
         super.viewWillMove(toSuperview: newSuperview)
         
         if self.superview == nil {
-            self._layoutManager.clear()
+            self.kkLayoutManager.clear()
         }
     }
     
@@ -80,8 +79,8 @@ final class KKControlView : NSControl {
         super.layout()
         
         let bounds = Rect(self.bounds)
-        self._layoutManager.layout(bounds: bounds)
-        self._layoutManager.visible(bounds: bounds)
+        self.kkLayoutManager.layout(bounds: bounds)
+        self.kkLayoutManager.visible(bounds: bounds)
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -141,7 +140,7 @@ extension KKControlView {
     }
     
     func update(content: IUILayout?) {
-        self._layoutManager.layout = content
+        self.kkLayoutManager.layout = content
         self.needsLayout = true
     }
     
@@ -159,7 +158,7 @@ extension KKControlView {
     }
     
     func cleanup() {
-        self._layoutManager.layout = nil
+        self.kkLayoutManager.layout = nil
         self.kkDelegate = nil
     }
     

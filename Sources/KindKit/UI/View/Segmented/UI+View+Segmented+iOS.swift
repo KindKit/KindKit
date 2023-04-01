@@ -35,28 +35,28 @@ extension UI.View.Segmented {
 
 final class KKSegmentedView : UISegmentedControl {
     
-    fileprivate weak var _delegate: KKSegmentedViewDelegate?
-    fileprivate var _preset: UI.View.Segmented.Preset? {
+    weak var kkDelegate: KKSegmentedViewDelegate?
+    var kkPreset: UI.View.Segmented.Preset? {
         didSet {
-            self.setTitleTextAttributes(self._preset?.attributes, for: .normal)
+            self.setTitleTextAttributes(self.kkPreset?.attributes, for: .normal)
         }
     }
-    fileprivate var _selectedPreset: UI.View.Segmented.Preset? {
+    var kkSelectedPreset: UI.View.Segmented.Preset? {
         didSet {
-            self.setTitleTextAttributes(self._selectedPreset?.attributes, for: .selected)
+            self.setTitleTextAttributes(self.kkSelectedPreset?.attributes, for: .selected)
             if #available(iOS 13.0, *) {
-                self.selectedSegmentTintColor = self._selectedPreset?.color?.native
+                self.selectedSegmentTintColor = self.kkSelectedPreset?.color?.native
             } else {
-                self.tintColor = self._selectedPreset?.color?.native
+                self.tintColor = self.kkSelectedPreset?.color?.native
             }
         }
     }
-    fileprivate var _items: [UI.View.Segmented.Item] = [] {
+    var kkItems: [UI.View.Segmented.Item] = [] {
         willSet {
             self.removeAllSegments()
         }
         didSet {
-            for item in self._items {
+            for item in self.kkItems {
                 switch item {
                 case .string(let string): self.insertSegment(withTitle: string, at: self.numberOfSegments, animated: false)
                 case .image(let image): self.insertSegment(with: image.native, at: self.numberOfSegments, animated: false)
@@ -67,7 +67,7 @@ final class KKSegmentedView : UISegmentedControl {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
         self.clipsToBounds = true
         
         self.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
@@ -91,7 +91,7 @@ extension KKSegmentedView {
         self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
-        self._delegate = view
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -103,12 +103,12 @@ extension KKSegmentedView {
     }
     
     func update(items: [UI.View.Segmented.Item]) {
-        self._items = items
+        self.kkItems = items
     }
     
     func update(selected: UI.View.Segmented.Item?) {
         if let selected = selected {
-            if let index = self._items.firstIndex(of: selected) {
+            if let index = self.kkItems.firstIndex(of: selected) {
                 self._update(selected: index)
             } else {
                 self._update(selected: Self.noSegment)
@@ -119,11 +119,11 @@ extension KKSegmentedView {
     }
     
     func update(preset: UI.View.Segmented.Preset?) {
-        self._preset = preset
+        self.kkPreset = preset
     }
     
     func update(selectedPreset: UI.View.Segmented.Preset?) {
-        self._selectedPreset = selectedPreset
+        self.kkSelectedPreset = selectedPreset
     }
     
     func update(color: UI.Color?) {
@@ -139,7 +139,7 @@ extension KKSegmentedView {
     }
     
     func cleanup() {
-        self._delegate = nil
+        self.kkDelegate = nil
     }
     
 }
@@ -159,7 +159,7 @@ private extension KKSegmentedView {
     
     @objc
     func _changed(_ sender: Any) {
-        self._delegate?.selected(self, index: self.selectedSegmentIndex)
+        self.kkDelegate?.selected(self, index: self.selectedSegmentIndex)
     }
     
 }

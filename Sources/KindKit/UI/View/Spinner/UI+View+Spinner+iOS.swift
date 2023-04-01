@@ -35,23 +35,23 @@ extension UI.View.Spinner {
 
 final class KKSpinnerView : UIView {
     
-    private var _activityView: UIActivityIndicatorView
+    let kkActivityView: UIActivityIndicatorView
     
     override init(frame: CGRect) {
         if #available(iOS 13.0, *) {
-            self._activityView = UIActivityIndicatorView(style: .large)
+            self.kkActivityView = UIActivityIndicatorView(style: .large)
         } else {
-            self._activityView = UIActivityIndicatorView(style: .whiteLarge)
+            self.kkActivityView = UIActivityIndicatorView(style: .whiteLarge)
         }
-        self._activityView.hidesWhenStopped = true
-        self._activityView.color = .red
+        
+        self.kkActivityView.hidesWhenStopped = true
         
         super.init(frame: frame)
         
-        self.addSubview(self._activityView)
-
         self.isUserInteractionEnabled = false
         self.clipsToBounds = true
+        
+        self.addSubview(self.kkActivityView)
     }
     
     required init(coder: NSCoder) {
@@ -64,17 +64,17 @@ final class KKSpinnerView : UIView {
         let viewSize = self.bounds.size
         let viewMinSize = min(viewSize.width, viewSize.height)
         if viewMinSize > .leastNonzeroMagnitude {
-            let activitySize = self._activityView.intrinsicContentSize
+            let activitySize = self.kkActivityView.intrinsicContentSize
             let activityMinSize = min(activitySize.width, activitySize.height)
             if activityMinSize > .leastNonzeroMagnitude {
                 let scale = viewMinSize / activityMinSize
-                self._activityView.transform = CGAffineTransform(
+                self.kkActivityView.transform = CGAffineTransform(
                     scaleX: scale,
                     y: scale
                 )
             }
         }
-        self._activityView.center = CGPoint(
+        self.kkActivityView.center = CGPoint(
             x: viewSize.width / 2,
             y: viewSize.height / 2
         )
@@ -84,9 +84,9 @@ final class KKSpinnerView : UIView {
         super.didMoveToSuperview()
         
         if self.superview != nil {
-            self._activityView.startAnimating()
+            self.kkActivityView.startAnimating()
         } else {
-            self._activityView.stopAnimating()
+            self.kkActivityView.stopAnimating()
         }
     }
     
@@ -111,7 +111,7 @@ extension KKSpinnerView {
     }
     
     func update(activityColor: UI.Color?) {
-        self._activityView.color = activityColor?.native
+        self.kkActivityView.color = activityColor?.native
     }
     
     func update(color: UI.Color?) {

@@ -6,7 +6,7 @@ import Foundation
 
 public extension StringFormatter {
 
-    struct ByteCount : IStringFormatter {
+    struct ByteCount : IStringFormatter, Equatable {
         
         public typealias InputType = Int64
         
@@ -22,6 +22,20 @@ public extension StringFormatter {
         
     }
 
+}
+
+public extension StringFormatter.ByteCount {
+    
+    @inlinable
+    var units: ByteCountFormatter.Units {
+        return self.formatter.allowedUnits
+    }
+    
+    @inlinable
+    var style: ByteCountFormatter.CountStyle {
+        return self.formatter.countStyle
+    }
+    
 }
 
 public extension StringFormatter.ByteCount {
