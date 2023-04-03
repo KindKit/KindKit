@@ -284,7 +284,7 @@ public extension UI.Container {
         
         public func close(container: IUIContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
             if let container = container as? IUIModalContentContainer {
-                if self.dismiss(container: container, animated: true, completion: completion) == false {
+                if self.dismiss(container: container, animated: animated, completion: completion) == false {
                     return self.close(animated: animated, completion: completion)
                 }
             } else if let parent = self.parent {
