@@ -294,6 +294,7 @@ public extension UI.View.Scroll {
         guard self.isLoaded == true else {
             return nil
         }
+        self.layoutIfNeeded()
         guard let contentOffset = self._view.contentOffset(with: view, horizontal: horizontal, vertical: vertical) else {
             return nil
         }
@@ -355,7 +356,6 @@ public extension UI.View.Scroll {
         animated: Bool = true,
         completion: (() -> Void)? = nil
     ) {
-        let contentInset = self.contentInset
         let beginContentOffset = self.contentOffset
         let endContentOffset = to
         let deltaContentOffset = beginContentOffset.distance(endContentOffset).real.abs
@@ -379,7 +379,7 @@ public extension UI.View.Scroll {
                 )
             )
         } else {
-            self.contentOffset = Point(x: -contentInset.left, y: -contentInset.top)
+            self.contentOffset = to
             self._scrollToTop()
             completion?()
         }

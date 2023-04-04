@@ -73,6 +73,8 @@ public extension Api {
                 let build = try body.build()
                 urlRequest.httpBody = build.data
                 headers.append(contentsOf: build.headers)
+            } else {
+                headers.append(.contentLength(0))
             }
             if self.headers.isEmpty == false {
                 headers.append(contentsOf: self.headers)

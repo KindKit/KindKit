@@ -186,7 +186,7 @@ extension KKScrollView {
         let contentInset = self.contentInset
         let contentSize = self.contentSize
         let visibleSize = self.bounds.size
-        let viewFrame = Rect(self.convert(view.frame, from: view))
+        let viewFrame = Rect(view.convert(view.bounds, to: self))
         let x: CGFloat
         if contentSize.width > visibleSize.width {
             switch horizontal {
