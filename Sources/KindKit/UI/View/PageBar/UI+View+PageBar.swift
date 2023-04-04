@@ -126,6 +126,25 @@ public extension UI.View.PageBar {
     
     @inlinable
     @discardableResult
+    func size(_ value: Double?) -> Self {
+        self.size = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: () -> Double?) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Double?) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func leading(_ value: IUIView?) -> Self {
         self.leading = value
         return self

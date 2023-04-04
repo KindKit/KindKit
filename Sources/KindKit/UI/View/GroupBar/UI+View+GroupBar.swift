@@ -71,6 +71,25 @@ public extension UI.View.GroupBar {
     
     @inlinable
     @discardableResult
+    func size(_ value: Double?) -> Self {
+        self.size = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: () -> Double?) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Double?) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func items(_ value: [UI.View.GroupBar.Item]) -> Self {
         self.items = value
         return self

@@ -280,6 +280,25 @@ public extension UI.View.StackBar {
     
     @inlinable
     @discardableResult
+    func size(_ value: Double?) -> Self {
+        self.size = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: () -> Double?) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Double?) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func inset(_ value: Inset) -> Self {
         self.inset = value
         return self
