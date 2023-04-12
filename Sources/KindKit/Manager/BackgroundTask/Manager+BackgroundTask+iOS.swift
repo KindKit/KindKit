@@ -2,6 +2,8 @@
 //  DSCore
 //
 
+#if os(iOS)
+
 import UIKit
 
 public extension Manager.BackgroundTask {
@@ -69,3 +71,5 @@ public extension IBackgroundManager where Self == Manager.BackgroundTask.Real {
     }
     
 }
+
+#endif

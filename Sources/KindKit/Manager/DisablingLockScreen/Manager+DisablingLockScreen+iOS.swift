@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+#if os(iOS)
+
 import UIKit
 
 public extension Manager.DisablingLockScreen {
@@ -46,3 +48,5 @@ public extension IDisablingLockScreenManager where Self == Manager.DisablingLock
     }
     
 }
+
+#endif

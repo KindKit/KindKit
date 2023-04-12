@@ -4,6 +4,12 @@
 
 import Foundation
 
+public protocol IBackgroundManagerObserver : AnyObject {
+
+    func expiredSession(_ manager: IBackgroundManager)
+
+}
+
 public protocol IBackgroundManager : AnyObject {
     
     var observer: Observer< IBackgroundManagerObserver > { get }
@@ -25,10 +31,4 @@ public extension IBackgroundManager {
         self.observer.remove(observer)
     }
     
-}
-
-public protocol IBackgroundManagerObserver : AnyObject {
-
-    func expiredSession(_ manager: IBackgroundManager)
-
 }
