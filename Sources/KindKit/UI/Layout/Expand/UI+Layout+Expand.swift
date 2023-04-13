@@ -13,7 +13,7 @@ public extension UI.Layout {
         public var state: State {
             set {
                 guard self.state != newValue else { return }
-                switch self.state {
+                switch newValue {
                 case .collapsed: self._status = .collapsed
                 case .expanded: self._status = .expanded
                 }
