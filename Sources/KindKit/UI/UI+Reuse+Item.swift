@@ -9,9 +9,9 @@ public extension UI.Reuse {
     struct Item< Reusable : IUIReusable > {
         
         unowned let owner: Reusable.Owner
-        var unloadBehaviour: UI.Reuse.UnloadBehaviour
-        var cache: UI.Reuse.Cache?
-        var name: String?
+        public var unloadBehaviour: UI.Reuse.UnloadBehaviour
+        public var cache: UI.Reuse.Cache?
+        public var name: String?
         
         private var _content: Reusable.Content!
         
