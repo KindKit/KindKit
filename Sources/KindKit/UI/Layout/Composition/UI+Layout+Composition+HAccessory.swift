@@ -155,7 +155,7 @@ extension UI.Layout.Composition.HAccessory : IUICompositionLayoutEntity {
     public func size(available: KindKit.Size) -> KindKit.Size {
         let sizes = self._size(available: available)
         return .init(
-            width: sizes.leadingSize.width + sizes.centerSize.width + sizes.trailingSize.width,
+            width: sizes.leadingSize.width + sizes.leadingSpacing + sizes.centerSize.width + sizes.trailingSize.width + sizes.trailingSpacing,
             height: max(sizes.leadingSize.height, sizes.centerSize.height, sizes.trailingSize.height)
         )
     }

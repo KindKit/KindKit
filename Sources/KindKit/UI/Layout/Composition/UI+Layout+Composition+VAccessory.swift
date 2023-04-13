@@ -156,7 +156,7 @@ extension UI.Layout.Composition.VAccessory : IUICompositionLayoutEntity {
         let sizes = self._size(available: available)
         return .init(
             width: max(sizes.leadingSize.width, sizes.centerSize.width, sizes.trailingSize.width),
-            height: sizes.leadingSize.height + sizes.centerSize.height + sizes.trailingSize.height
+            height: sizes.leadingSize.height + sizes.leadingSpacing + sizes.centerSize.height + sizes.trailingSize.height + sizes.trailingSpacing
         )
     }
     
