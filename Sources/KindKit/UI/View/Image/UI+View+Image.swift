@@ -164,12 +164,32 @@ extension UI.View.Image : IUIView {
     }
     
     public func size(available: Size) -> Size {
-        guard let image = self.image else { return .zero }
         guard self.isHidden == false else { return .zero }
-        return self.size.apply(
-            available: available,
-            contentSize: image.size
-        )
+        guard let image = self.image else { return .zero }
+        switch self.mode {
+        case .origin:
+            return image.size
+        case .aspectFit, .aspectFill:
+            return self.size.apply(
+                available: available,
+                size: { available in
+                    if available.width.isInfinite == false {
+                        let aspectRatio = image.size.aspectRatio
+                        return .init(
+                            width: available.width,
+                            height: available.width / aspectRatio
+                        )
+                    } else if available.height.isInfinite == false {
+                        let aspectRatio = image.size.aspectRatio
+                        return .init(
+                            width: available.height * aspectRatio,
+                            height: available.height
+                        )
+                    }
+                    return image.size
+                }
+            )
+        }
     }
     
     public func appear(to layout: IUILayout) {

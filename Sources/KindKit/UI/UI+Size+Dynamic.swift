@@ -46,17 +46,6 @@ public extension UI.Size.Dynamic {
     @inlinable
     func apply(
         available: Size,
-        contentSize: Size
-    ) -> Size {
-        return self.apply(
-            available: available,
-            size: { _ in contentSize }
-        )
-    }
-    
-    @inlinable
-    func apply(
-        available: Size,
         size: (Size) -> Size
     ) -> Size {
         let rw, rh: Double
