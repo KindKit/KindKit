@@ -58,6 +58,25 @@ public extension Inset {
 public extension Inset {
     
     @inlinable
+    func trim(
+        top: Bool = false,
+        left: Bool = false,
+        right: Bool = false,
+        bottom: Bool = false
+    ) -> Self {
+        return .init(
+            top: top == true ? 0 : self.top,
+            left: left == true ? 0 : self.left,
+            right: right == true ? 0 : self.right,
+            bottom: bottom == true ? 0 : self.bottom
+        )
+    }
+    
+}
+
+public extension Inset {
+    
+    @inlinable
     static prefix func - (arg: Self) -> Self {
         return Inset(top: -arg.top, left: -arg.left, right: -arg.right, bottom: -arg.bottom)
     }

@@ -23,7 +23,10 @@ let package = Package(
         ),
         .testTarget(
             name: "KindKit-Tests",
-            dependencies: [ .target(name: "KindKit") ]
+            dependencies: [
+                .target(name: "KindKit"),
+                .target(name: "KindKitTest")
+            ]
         )
     ]
 )

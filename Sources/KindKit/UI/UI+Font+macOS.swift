@@ -12,13 +12,20 @@ public extension UI.Font {
         weight: Weight,
         size: Double = UI.Font.systemSize
     ) {
-        self.native = NSFont.systemFont(ofSize: CGFloat(size), weight: weight.nsFontWeight)
+        self.native = NSFont.systemFont(
+            ofSize: CGFloat(size),
+            weight: weight.nsFontWeight
+        )
     }
     
     init(
-        _ native: NSFont
+        descriptor: NSFontDescriptor,
+        size: Double = UI.Font.systemSize
     ) {
-        self.native = native
+        self.native = NSFont(
+            descriptor: descriptor,
+            size: size
+        )!
     }
     
 }

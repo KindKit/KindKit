@@ -10,6 +10,12 @@ public extension UI {
 
         public var native: NativeFont
         
+        public init(
+            _ native: NativeFont
+        ) {
+            self.native = native
+        }
+        
     }
     
 }

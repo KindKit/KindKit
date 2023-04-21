@@ -12,7 +12,7 @@ public extension UI.Layout.Composition {
         public var entity: IUICompositionLayoutEntity
         
         public init(
-            inset: Inset = .zero,
+            inset: Inset,
             entity: IUICompositionLayoutEntity
         ) {
             self.inset = inset

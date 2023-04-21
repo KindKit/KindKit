@@ -2,11 +2,11 @@
 //  KindKit
 //
 
-#if os(iOS)
+#if os(macOS)
 
-import UIKit
+import AppKit
 
-public extension UI.Text.Underline {
+public extension UI.Text.Strikethrough {
     
     var nsUnderlineStyle: NSUnderlineStyle {
         var rawValue: NSUnderlineStyle.RawValue = 0
@@ -40,28 +40,28 @@ public extension UI.Text.Underline {
     init(_ nsUnderlineStyle: NSUnderlineStyle) {
         var rawValue: RawValue = 0
         if nsUnderlineStyle.contains(.single) == true {
-            rawValue |= UI.Text.Underline.single.rawValue
+            rawValue |= UI.Text.Strikethrough.single.rawValue
         }
         if nsUnderlineStyle.contains(.thick) == true {
-            rawValue |= UI.Text.Underline.thick.rawValue
+            rawValue |= UI.Text.Strikethrough.thick.rawValue
         }
         if nsUnderlineStyle.contains(.double) == true {
-            rawValue |= UI.Text.Underline.double.rawValue
+            rawValue |= UI.Text.Strikethrough.double.rawValue
         }
         if nsUnderlineStyle.contains(.patternDot) == true {
-            rawValue |= UI.Text.Underline.patternDot.rawValue
+            rawValue |= UI.Text.Strikethrough.patternDot.rawValue
         }
         if nsUnderlineStyle.contains(.patternDash) == true {
-            rawValue |= UI.Text.Underline.patternDash.rawValue
+            rawValue |= UI.Text.Strikethrough.patternDash.rawValue
         }
         if nsUnderlineStyle.contains(.patternDashDot) == true {
-            rawValue |= UI.Text.Underline.patternDashDot.rawValue
+            rawValue |= UI.Text.Strikethrough.patternDashDot.rawValue
         }
         if nsUnderlineStyle.contains(.patternDashDotDot) == true {
-            rawValue |= UI.Text.Underline.patternDashDotDot.rawValue
+            rawValue |= UI.Text.Strikethrough.patternDashDotDot.rawValue
         }
         if nsUnderlineStyle.contains(.byWord) == true {
-            rawValue |= UI.Text.Underline.byWord.rawValue
+            rawValue |= UI.Text.Strikethrough.byWord.rawValue
         }
         self.init(rawValue: rawValue)
     }

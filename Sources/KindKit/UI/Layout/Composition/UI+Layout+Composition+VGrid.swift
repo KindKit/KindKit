@@ -8,16 +8,30 @@ public extension UI.Layout.Composition {
     
     final class VGrid {
         
-        public var columns: Int
+        public var columns: [Column]
         public var spacing: Point
         public var entities: [IUICompositionLayoutEntity]
+        
+        public init(
+            columns: [Column],
+            spacing: Point = .zero,
+            entities: [IUICompositionLayoutEntity]
+        ) {
+            if columns.isEmpty == true {
+                self.columns = [ .proportionately ]
+            } else {
+                self.columns = columns
+            }
+            self.spacing = spacing
+            self.entities = entities
+        }
         
         public init(
             columns: Int,
             spacing: Point = .zero,
             entities: [IUICompositionLayoutEntity]
         ) {
-            self.columns = max(1, columns)
+            self.columns = .init(repeating: .proportionately, count: max(1, columns))
             self.spacing = spacing
             self.entities = entities
         }
@@ -77,21 +91,69 @@ extension UI.Layout.Composition.VGrid : IUICompositionLayoutEntity {
 private extension UI.Layout.Composition.VGrid {
     
     @inline(__always)
-    func _width(available: KindKit.Size) -> Double {
-        if self.columns > 1 {
-            return (available.width - (self.spacing.x * Double(self.columns - 1))) / Double(self.columns)
-        }
-        return available.width
-    }
-    
-    @inline(__always)
     func _pass(available: KindKit.Size) -> Pass {
+        let widths: [Double]
+        if self.columns.count < 2 {
+            widths = .init(
+                repeating: available.width,
+                count: self.columns.count
+            )
+        } else {
+            var fitColumns = 0
+            var proportionatelyColumns = 0
+            for column in self.columns {
+                switch column {
+                case .fit: fitColumns += 1
+                case .proportionately: proportionatelyColumns += 1
+                }
+            }
+            let spacing = self.spacing.x * Double(self.columns.count - 1)
+            let width = (available.width - spacing) / Double(self.columns.count)
+            if fitColumns > 0 {
+                var accumulator: [Double] = .init(
+                    repeating: 0,
+                    count: self.columns.count
+                )
+                for index in self.entities.indices {
+                    let entity = self.entities[index]
+                    let columnIndex = index % self.columns.count
+                    let column = self.columns[columnIndex]
+                    switch column {
+                    case .fit:
+                        let size = entity.size(available: .init(
+                            width: width,
+                            height: available.height
+                        ))
+                        accumulator[columnIndex] = max(accumulator[columnIndex], size.width)
+                    case .proportionately:
+                        break
+                    }
+                }
+                let fitSpacing = self.spacing.x * Double(fitColumns)
+                let fitWidth = accumulator.reduce(0, { $0 + $1 })
+                let leftWidth = available.width - (fitWidth + fitSpacing)
+                let proportionatelySpacing = self.spacing.x * Double(proportionatelyColumns - 1)
+                let proportionatelyWidth = (leftWidth - proportionatelySpacing) / Double(proportionatelyColumns)
+                widths = self.columns.map({
+                    switch $0 {
+                    case .fit: return fitWidth
+                    case .proportionately: return proportionatelyWidth
+                    }
+                })
+            } else {
+                widths = .init(
+                    repeating: width,
+                    count: self.columns.count
+                )
+            }
+        }
         var pass = Pass(rows: [], bounding: .zero)
         var row = PassRow(items: [], size: 0)
-        let width = self._width(available: available)
-        for entity in self.entities {
+        for index in self.entities.indices {
+            let entity = self.entities[index]
+            let column = index % self.columns.count
             let size = entity.size(available: .init(
-                width: width,
+                width: widths[column],
                 height: available.height
             ))
             if size.height > 0 {
@@ -99,7 +161,7 @@ private extension UI.Layout.Composition.VGrid {
                 row.items.append(item)
                 row.size = max(row.size, size.height)
             }
-            if row.items.count >= self.columns {
+            if row.items.count >= self.columns.count {
                 pass.rows.append(row)
                 pass.bounding.height += row.size + self.spacing.y
                 row = PassRow(items: [], size: 0)
@@ -137,6 +199,19 @@ private extension UI.Layout.Composition.VGrid {
 }
 
 public extension IUICompositionLayoutEntity where Self == UI.Layout.Composition.VGrid {
+    
+    @inlinable
+    static func vGrid(
+        columns: [UI.Layout.Composition.VGrid.Column],
+        spacing: Point = .zero,
+        entities: [IUICompositionLayoutEntity]
+    ) -> Self {
+        return .init(
+            columns: columns,
+            spacing: spacing,
+            entities: entities
+        )
+    }
     
     @inlinable
     static func vGrid(
