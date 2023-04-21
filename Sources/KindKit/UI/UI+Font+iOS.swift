@@ -67,9 +67,32 @@ public extension UI.Font {
     }
     
     init(
-        _ native: UIFont
+        descriptor: UIFontDescriptor,
+        size: Double = UI.Font.systemSize
     ) {
-        self.native = native
+        self.native = UIFont(
+            descriptor: descriptor,
+            size: size
+        )
+    }
+    
+    init(
+        descriptor: UIFontDescriptor,
+        scaled: Double = UI.Font.systemSize,
+        lower: Double? = nil,
+        upper: Double? = nil
+    ) {
+        var size = Double(UIFontMetrics.default.scaledValue(for: CGFloat(scaled)))
+        if let lower = lower {
+            size = max(lower, size)
+        }
+        if let upper = upper {
+            size = min(size, upper)
+        }
+        self.native = UIFont(
+            descriptor: descriptor,
+            size: size
+        )
     }
     
 }
