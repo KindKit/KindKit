@@ -24,14 +24,14 @@ public extension DataSource.Sync {
         public let behaviour: Behaviour
         
         private let _provider: KindKit.Api.Provider
-        private let _request: () throws -> KindKit.Api.Request?
+        private let _request: () throws -> KindKit.Api.Request
         private let _response: () -> Response
         private var _task: ICancellable?
         
         public init(
             behaviour: Behaviour,
             provider: KindKit.Api.Provider,
-            request: @escaping () throws -> KindKit.Api.Request?,
+            request: @escaping () throws -> KindKit.Api.Request,
             response: @escaping () -> Response
         ) {
             self.behaviour = behaviour

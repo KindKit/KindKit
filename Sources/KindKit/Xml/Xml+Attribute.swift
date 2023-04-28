@@ -31,10 +31,9 @@ extension Xml.Attribute : CustomDebugStringConvertible {
 extension Xml.Attribute : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Xml.Attribute")
+        buff.append(header: indent, value: "Attribute")
             .append(inter: indent, key: "Name", value: self.name)
             .append(inter: indent, key: "Value", value: self.value)
-            .append(footer: indent, data: ">")
     }
     
 }

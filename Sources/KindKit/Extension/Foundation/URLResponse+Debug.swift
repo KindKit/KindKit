@@ -7,7 +7,6 @@ import Foundation
 extension URLResponse : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<URLResponse")
         if let url = self.url {
             buff.append(inter: indent, key: "URL", value: url)
         }
@@ -23,7 +22,6 @@ extension URLResponse : IDebug {
                 buff.append(inter: indent, key: "Headers", value: http.allHeaderFields)
             }
         }
-        buff.append(footer: indent, data: ">")
     }
     
 }

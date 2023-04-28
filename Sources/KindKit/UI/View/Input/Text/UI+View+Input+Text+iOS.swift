@@ -188,22 +188,7 @@ extension KKInputTextView {
                 if let view = self.kkToolbarView {
                     self.addSubview(view)
                 }
-                self.kkInput?.kkResizeAccessoryViews()
             }
-        }
-        var kkContentViews: [UIView] {
-            var views: [UIView] = []
-            if let view = self.kkToolbarView {
-                views.append(view)
-            }
-            return views
-        }
-        var kkHeight: CGFloat {
-            var result: CGFloat = 0
-            for subview in self.kkContentViews {
-                result += subview.frame.height
-            }
-            return result
         }
         
         init(frame: CGRect) {
@@ -219,37 +204,33 @@ extension KKInputTextView {
         override func layoutSubviews() {
             super.layoutSubviews()
             
-            let bounds = self.bounds
-            var offset: CGFloat = 0
-            for subview in self.kkContentViews {
-                let height = subview.frame.height
-                subview.frame = CGRect(
-                    x: bounds.origin.x,
-                    y: offset,
-                    width: bounds.size.width,
-                    height: height
-                )
-                offset += height
+            var height = CGFloat.zero
+            do {
+                let insets = self.safeAreaInsets
+                let baseBounds = self.bounds
+                let safeBounds = baseBounds.inset(by: insets)
+                if let view = self.kkToolbarView {
+                    let viewHeight = view.frame.height
+                    view.frame = CGRect(
+                        x: safeBounds.origin.x,
+                        y: safeBounds.origin.y + height,
+                        width: safeBounds.size.width,
+                        height: viewHeight
+                    )
+                    height += viewHeight
+                }
+                if height > .leastNormalMagnitude {
+                    height += insets.top + insets.bottom
+                }
+            }
+            let oldFrame = self.frame
+            let newFrame = CGRect(x: 0, y: 0, width: oldFrame.width, height: height)
+            if oldFrame != newFrame {
+                self.frame = newFrame
+                self.kkInput?.reloadInputViews()
             }
         }
         
-    }
-    
-}
-
-extension KKInputTextView.KKInputView {
-    
-    func kkResizeAccessoryViews() {
-        let width = UIScreen.main.bounds.width
-        let height = self.kkAccessoryView.kkHeight
-        let oldFrame = self.kkAccessoryView.frame
-        let newFrame = CGRect(x: 0, y: 0, width: width, height: height)
-        if oldFrame != newFrame {
-            self.kkAccessoryView.frame = newFrame
-            if self.inputAccessoryView != nil {
-                self.reloadInputViews()
-            }
-        }
     }
     
 }
@@ -342,6 +323,7 @@ extension KKInputTextView {
     }
     
     func cleanup() {
+        self.kkInput.kkAccessoryView.kkToolbarView = nil
         self.kkInputTextHeight = nil
         self.kkDelegate = nil
     }

@@ -8,12 +8,21 @@ public extension Json.Coder {
 
     struct Decimal : IJsonValueCoder {
         
-        public static func decode(_ value: IJsonValue) throws -> Foundation.Decimal {
-            return try Json.Coder.NSDecimalNumber.decode(value) as Foundation.Decimal
+        public typealias JsonDecoded = Foundation.Decimal
+        public typealias JsonEncoded = Foundation.Decimal
+        typealias InternalCoder = Json.Coder.NSDecimalNumber
+        
+        public static func decode(
+            _ value: IJsonValue,
+            path: Json.Path
+        ) throws -> JsonDecoded {
+            let decimal = try InternalCoder.decode(value, path: path)
+            return decimal as Foundation.Decimal
         }
         
-        public static func encode(_ value: Foundation.Decimal) throws -> IJsonValue {
-            return try Json.Coder.NSDecimalNumber.encode(Foundation.NSDecimalNumber(decimal: value))
+        public static func encode(_ value: JsonEncoded, path: Json.Path) throws -> IJsonValue {
+            let value = Foundation.NSDecimalNumber(decimal: value)
+            return try InternalCoder.encode(value, path: path)
         }
         
     }

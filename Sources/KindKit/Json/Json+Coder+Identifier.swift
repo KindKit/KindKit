@@ -13,16 +13,26 @@ public extension Json.Coder {
 
 extension Json.Coder.Identifier : IJsonValueDecoder where Coder : IJsonValueDecoder {
     
-    public static func decode(_ value: IJsonValue) throws -> KindKit.Identifier< Coder.JsonDecoded, Kind > {
-        return Identifier(try Coder.decode(value))
+    public typealias JsonDecoded = KindKit.Identifier< Coder.JsonDecoded, Kind >
+    
+    public static func decode(
+        _ value: IJsonValue,
+        path: Json.Path
+    ) throws -> JsonDecoded {
+        return Identifier(try Coder.decode(value, path: path))
     }
     
 }
 
 extension Json.Coder.Identifier : IJsonValueEncoder where Coder : IJsonValueEncoder {
     
-    public static func encode(_ value: KindKit.Identifier< Coder.JsonEncoded, Kind >) throws -> IJsonValue {
-        return try Coder.encode(value.raw)
+    public typealias JsonEncoded = KindKit.Identifier< Coder.JsonEncoded, Kind >
+    
+    public static func encode(
+        _ value: JsonEncoded,
+        path: Json.Path
+    ) throws -> IJsonValue {
+        return try Coder.encode(value.raw, path: path)
     }
     
 }

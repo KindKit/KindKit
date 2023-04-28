@@ -8,12 +8,18 @@ public extension Json.Coder {
 
     struct UInt32 : IJsonValueCoder {
         
-        public static func decode(_ value: IJsonValue) throws -> Swift.UInt32 {
-            return try Json.Coder.NSNumber.decode(value).uint32Value
+        public typealias JsonDecoded = Swift.UInt32
+        public typealias JsonEncoded = Swift.UInt32
+        typealias InternalCoder = Json.Coder.NSNumber
+        
+        public static func decode(_ value: IJsonValue, path: Json.Path) throws -> JsonDecoded {
+            let value = try InternalCoder.decode(value, path: path)
+            return value.uint32Value
         }
         
-        public static func encode(_ value: Swift.UInt32) throws -> IJsonValue {
-            return try Json.Coder.NSNumber.encode(Foundation.NSNumber(value: value))
+        public static func encode(_ value: JsonEncoded, path: Json.Path) throws -> IJsonValue {
+            let value = Foundation.NSNumber(value: value)
+            return try InternalCoder.encode(value, path: path)
         }
         
     }

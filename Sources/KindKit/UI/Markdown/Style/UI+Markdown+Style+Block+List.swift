@@ -8,13 +8,13 @@ public extension UI.Markdown.Style.Block {
     
     final class List {
         
-        public var markerInset = Inset(top: 12, left: 4, right: 4, bottom: 0) {
+        public var markerInset: Inset = .init(top: 12, left: 4, right: 4, bottom: 0) {
             didSet {
                 guard self.markerInset != oldValue else { return }
                 self._change()
             }
         }
-        public var contentInset = Inset(top: 12, left: 4, right: 4, bottom: 0) {
+        public var contentInset: Inset = .init(top: 12, left: 4, right: 4, bottom: 0) {
             didSet {
                 guard self.contentInset != oldValue else { return }
                 self._change()

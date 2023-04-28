@@ -23,7 +23,8 @@ extension Api.Query {
         let uploadProgress: Progress
         let onUpload: ProgressClosure?
         let onCompleted: CompleteClosure
-
+        
+        private var _queue = DispatchQueue(label: "KindKit.Api.Query.Task")
         private var _receivedMeta: Api.Response.Meta?
         private var _receivedData: Data?
         private var _canceled: Bool
@@ -62,100 +63,109 @@ extension Api.Query {
         }
         
         deinit {
-            self.cancel()
+            self._cancel()
         }
         
         func redirect(request: URLRequest) -> URLRequest? {
-            guard self._canceled == false else { return nil }
-            guard let original = self.task.originalRequest else { return nil }
-            guard self.request.redirect.contains(.enabled) == true else { return nil }
-            var copy = request
-            if self.request.redirect.contains(.authorization) == true {
-                if let authorization = original.value(forHTTPHeaderField: "Authorization") {
-                    copy.addValue(authorization, forHTTPHeaderField: "Authorization")
+            return self._queue.sync(execute: {
+                guard self._canceled == false else { return nil }
+                guard let original = self.task.originalRequest else { return nil }
+                guard self.request.redirect.contains(.enabled) == true else { return nil }
+                var copy = request
+                if self.request.redirect.contains(.method) == true {
+                    copy.httpMethod = original.httpMethod
                 }
-            }
-            if self.request.redirect.contains(.method) == true {
-                copy.httpMethod = original.httpMethod
-            }
-            return copy
+                if self.request.redirect.contains(.authorization) == true {
+                    if let authorization = original.value(forHTTPHeaderField: "Authorization") {
+                        copy.addValue(authorization, forHTTPHeaderField: "Authorization")
+                    }
+                }
+                return copy
+            })
         }
 
         func cancel() {
-            if self._canceled == false {
-                self.task.cancel()
-                self._receivedMeta = nil
-                self._receivedData = nil
-                self._canceled = true
-            }
+            self._queue.async(flags: .barrier, execute: {
+                self._cancel()
+            })
         }
 
         func upload(bytes: Int64, totalBytes: Int64) {
-            guard self._canceled == false else { return }
-            self.uploadProgress.totalUnitCount = totalBytes
-            self.uploadProgress.completedUnitCount = bytes
-            if let upload = self.onUpload {
-                self.queue.async {
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                self.uploadProgress.totalUnitCount = totalBytes
+                self.uploadProgress.completedUnitCount = bytes
+                if let upload = self.onUpload {
                     upload(self.uploadProgress)
                 }
-            }
+            })
         }
 
         func resumeDownload(bytes: Int64, totalBytes: Int64) {
-            guard self._canceled == false else { return }
-            self.downloadProgress.totalUnitCount = totalBytes
-            self.downloadProgress.completedUnitCount = bytes
-            if let download = self.onDownload {
-                self.queue.async {
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                self.downloadProgress.totalUnitCount = totalBytes
+                self.downloadProgress.completedUnitCount = bytes
+                if let download = self.onDownload {
                     download(self.downloadProgress)
                 }
-            }
+            })
         }
 
         func download(bytes: Int64, totalBytes: Int64) {
-            guard self._canceled == false else { return }
-            self.downloadProgress.totalUnitCount = totalBytes
-            self.downloadProgress.completedUnitCount = bytes
-            if let download = self.onDownload {
-                self.queue.async {
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                self.downloadProgress.totalUnitCount = totalBytes
+                self.downloadProgress.completedUnitCount = bytes
+                if let download = self.onDownload {
                     download(self.downloadProgress)
                 }
-            }
+            })
         }
 
         func receive(response: URLResponse) {
-            guard self._canceled == false else { return }
-            self._receivedMeta = Api.Response.Meta(response)
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                self._receivedMeta = Api.Response.Meta(response)
+            })
         }
 
         func become(task: URLSessionTask) {
-            guard self._canceled == false else { return }
-            self.task = task
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                self.task = task
+            })
         }
 
         func receive(data: Data) {
-            guard self._canceled == false else { return }
-            if self._receivedData != nil {
-                self._receivedData!.append(data)
-            } else {
-                self._receivedData = data
-            }
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                if self._receivedData != nil {
+                    self._receivedData!.append(data)
+                } else {
+                    self._receivedData = data
+                }
+            })
         }
 
         func download(url: URL) {
-            guard self._canceled == false else { return }
-            if let data = try? Data(contentsOf: url) {
-                self._receivedData = data
-            }
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                if let data = try? Data(contentsOf: url) {
+                    self._receivedData = data
+                }
+            })
         }
 
         func finish(error: Error?) {
-            guard self._canceled == false else { return }
-            if let error = error as NSError? {
-                self._parse(error: error)
-            } else {
-                self._parse()
-            }
+            self._queue.async(execute: {
+                guard self._canceled == false else { return }
+                if let error = error as NSError? {
+                    self._parse(error: error)
+                } else {
+                    self._parse()
+                }
+            })
         }
         
     }
@@ -163,6 +173,15 @@ extension Api.Query {
 }
 
 private extension Api.Query.Task {
+    
+    func _cancel() {
+        if self._canceled == false {
+            self.task.cancel()
+            self._receivedMeta = nil
+            self._receivedData = nil
+            self._canceled = true
+        }
+    }
 
     func _parse() {
         let result: Response.Result
@@ -180,7 +199,7 @@ private extension Api.Query.Task {
     }
 
     func _complete(_ result: Response.Result) {
-        switch self.provider.logging {
+        switch self.response.logging(provider: self.provider, result: result)  {
         case .never:
             break
         case .errorOnly(let category):
@@ -193,10 +212,11 @@ private extension Api.Query.Task {
         case .always(let category):
             Log.shared.log(level: .error, category: category, message: self.dump())
         }
-        self.queue.sync(flags: .barrier, execute: {
-            guard self._canceled == false else { return }
-            self.onCompleted(result)
-        })
+        if self._canceled == false {
+            self.queue.async(execute: {
+                self.onCompleted(result)
+            })
+        }
     }
 
 }
@@ -212,7 +232,6 @@ extension Api.Query.Task : CustomDebugStringConvertible {
 extension Api.Query.Task : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Api.Query.Task")
         buff.append(
             inter: indent,
             key: "CreateAt",
@@ -232,7 +251,7 @@ extension Api.Query.Task : IDebug {
         if let response = self.task.response {
             buff.append(inter: indent, key: "Response", value: response)
         }
-        if let error = self.task.error as? NSError {
+        if let error = self.task.error as? IDebug {
             buff.append(inter: indent, key: "Error", value: error)
         }
         if let data = self._receivedData {
@@ -266,7 +285,6 @@ extension Api.Query.Task : IDebug {
                 }
             }
         }
-        buff.append(footer: indent, data: ">")
     }
     
 }

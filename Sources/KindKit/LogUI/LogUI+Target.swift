@@ -6,8 +6,8 @@ import Foundation
 
 protocol ILogUITargetObserver : AnyObject {
     
-    func append(_ target: LogUI.Target, item: LogUI.Target.Item)
-    func remove(_ target: LogUI.Target, item: LogUI.Target.Item)
+    func append(_ target: LogUI.Target, message: Log.Message)
+    func remove(_ target: LogUI.Target, message: Log.Message)
 
 }
 
@@ -16,13 +16,13 @@ public extension LogUI {
     final class Target {
         
         public let limit: Int
-        var items: [Item] {
+        var messages: [Log.Message] {
             return self._queue.sync(flags: .barrier, execute: {
-                return self._items
+                return self._messages
             })
         }
 
-        private var _items: [Item]
+        private var _messages: [Log.Message]
         private let _queue: DispatchQueue
         private let _observer: Observer< ILogUITargetObserver >
         
@@ -30,7 +30,7 @@ public extension LogUI {
             limit: Int = 512
         ) {
             self.limit = limit
-            self._items = []
+            self._messages = []
             self._queue = .init(label: "KindKit.LogUI.Target")
             self._observer = Observer()
         }
@@ -57,11 +57,10 @@ extension LogUI.Target : ILogTarget {
         return []
     }
     
-    public func log(level: Log.Level, category: String, message: String) {
-        let item = Item(date: Date(), level: level, category: category, message: message)
+    public func log(message: Log.Message) {
         self._queue.async(execute: { [weak self] in
             guard let self = self else { return }
-            self._log(item: item)
+            self._log(message: message)
         })
         
     }
@@ -70,24 +69,24 @@ extension LogUI.Target : ILogTarget {
 
 private extension LogUI.Target {
     
-    func _log(item: Item) {
-        self._items.append(item)
-        let removeItem: Item?
-        if self._items.count > self.limit {
-            removeItem = self._items.removeFirst()
+    func _log(message: Log.Message) {
+        self._messages.append(message)
+        let removeMessage: Log.Message?
+        if self._messages.count > self.limit {
+            removeMessage = self._messages.removeFirst()
         } else {
-            removeItem = nil
+            removeMessage = nil
         }
         DispatchQueue.main.async(execute: {[weak self] in
             guard let self = self else { return }
-            self._didLog(append: item, remove: removeItem)
+            self._didLog(append: message, remove: removeMessage)
         })
     }
     
-    func _didLog(append: Item, remove: Item?) {
-        self._observer.notify({ $0.append(self, item: append) })
+    func _didLog(append: Log.Message, remove: Log.Message?) {
+        self._observer.notify({ $0.append(self, message: append) })
         if let remove = remove {
-            self._observer.notify({ $0.remove(self, item: remove) })
+            self._observer.notify({ $0.remove(self, message: remove) })
         }
     }
     

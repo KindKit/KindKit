@@ -21,8 +21,8 @@ extension Log.Target.OS : ILogTarget {
         return []
     }
     
-    public func log(level: Log.Level, category: String, message: String) {
-        NSLog("[\(category)]: \(message)")
+    public func log(message: Log.Message) {
+        NSLog("[\(message.category)]: \(message.message)")
     }
     
 }

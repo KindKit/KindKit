@@ -17,16 +17,18 @@ public extension Api.Request {
 
 public extension Api.Request.Path {
     
-    func urlComponents(provider: Api.Provider) throws -> URLComponents {
+    func urlComponents(
+        provider: Api.Provider
+    ) throws -> URLComponents {
         switch self {
         case .absolute(let url):
             guard let components = URLComponents(string: url.absoluteString) else {
-                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
+                throw Api.Error.Request.query(.decode(url.absoluteString))
             }
             return components
         case .relative(let path):
             guard var url = provider.url?.absoluteString else {
-                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
+                throw Api.Error.Request.query(.requireProviderUrl)
             }
             if url.hasSuffix("/") == true {
                 if path.hasPrefix("/") == true {
@@ -40,7 +42,7 @@ public extension Api.Request.Path {
                 url.append(contentsOf: "/\(path)")
             }
             guard let components = URLComponents(string: url) else {
-                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
+                throw Api.Error.Request.query(.decode(url))
             }
             return components
         }

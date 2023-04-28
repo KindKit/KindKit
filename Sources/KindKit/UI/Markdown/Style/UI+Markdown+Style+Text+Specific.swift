@@ -54,6 +54,16 @@ public extension UI.Markdown.Style.Text {
                 return self._fontSize ?? self.inherit?.fontSize
             }
         }
+        public var fontSizeMultiple: Double? {
+            set {
+                guard self._fontSizeMultiple != newValue else { return }
+                self._fontSizeMultiple = newValue
+                self._change()
+            }
+            get {
+                return self._fontSizeMultiple ?? self.inherit?.fontSizeMultiple
+            }
+        }
         public var fontColor: UI.Color? {
             set {
                 guard self._fontColor != newValue else { return }
@@ -154,16 +164,6 @@ public extension UI.Markdown.Style.Text {
                 return self._firstLineIndent ?? self.inherit?.firstLineIndent
             }
         }
-        public var baselineOffset: Double? {
-            set {
-                guard self._baselineOffset != newValue else { return }
-                self._baselineOffset = newValue
-                self._change()
-            }
-            get {
-                return self._baselineOffset ?? self.inherit?.baselineOffset
-            }
-        }
         public var lineSpacing: Double? {
             set {
                 guard self._lineSpacing != newValue else { return }
@@ -251,6 +251,7 @@ public extension UI.Markdown.Style.Text {
         private var _fontFamily: UI.Markdown.Style.Text.FontFamily? = nil
         private var _fontWeight: UI.Markdown.Style.Text.FontWeight? = nil
         private var _fontSize: Double? = nil
+        private var _fontSizeMultiple: Double? = nil
         private var _fontColor: UI.Color? = nil
         private var _strokeWidth: Double? = nil
         private var _strokeColor: UI.Color? = nil
@@ -261,7 +262,6 @@ public extension UI.Markdown.Style.Text {
         private var _ligatures: Bool? = nil
         private var _kerning: Double? = nil
         private var _firstLineIndent: Double? = nil
-        private var _baselineOffset: Double? = nil
         private var _lineSpacing: Double? = nil
         private var _minimumLineHeight: Double? = nil
         private var _maximumLineHeight: Double? = nil
@@ -327,6 +327,12 @@ public extension UI.Markdown.Style.Text.Specific {
         self.fontSize = value
         return self
     }
+    
+    @inlinable
+    func fontSizeMultiple(_ value: Double?) -> Self {
+        self.fontSizeMultiple = value
+        return self
+    }
                   
     @inlinable
     func fontColor(_ value: UI.Color?) -> Self {
@@ -385,12 +391,6 @@ public extension UI.Markdown.Style.Text.Specific {
     @inlinable
     func firstLineIndent(_ value: Double?) -> Self {
         self.firstLineIndent = value
-        return self
-    }
-             
-    @inlinable
-    func baselineOffset(_ value: Double?) -> Self {
-        self.baselineOffset = value
         return self
     }
                 
@@ -459,8 +459,9 @@ public extension UI.Markdown.Style.Text.Specific {
             typealias Font = UIFont
             typealias FontDescriptor = UIFontDescriptor
 #endif
+            let fontSizeMultiple = self.fontSizeMultiple ?? 1.0
             var fontAttributes: [FontDescriptor.AttributeName : Any] = [
-                .size : fontSize
+                .size : fontSize * fontSizeMultiple
             ]
             if let fontFamily = self.fontFamily {
                 switch fontFamily {
@@ -502,19 +503,20 @@ public extension UI.Markdown.Style.Text.Specific {
                 descriptor: FontDescriptor(
                     fontAttributes: fontAttributes
                 ),
-                size: fontSize
+                size: fontSize * fontSizeMultiple
             )
         }
-        if let fontColor = self.fontColor {
+        let fontColor = self.fontColor
+        if let fontColor = fontColor {
             attributes[.foregroundColor] = fontColor.native
         }
-        if let strokeWidth = self.strokeWidth, let strokeColor = self.strokeColor {
-            attributes[.strokeWidth] = strokeWidth
+        if let strokeColor = self.strokeColor {
+            attributes[.strokeWidth] = self.strokeWidth ?? 1
             attributes[.strokeColor] = strokeColor.native
         }
         if options.contains(.underline) == true {
             let underlineStyle = self.underlineStyle ?? .single
-            let underlineColor = self.underlineColor ?? self.fontColor
+            let underlineColor = self.underlineColor ?? fontColor
             if let underlineColor = underlineColor {
                 attributes[.underlineStyle] = underlineStyle.nsUnderlineStyle.rawValue
                 attributes[.underlineColor] = underlineColor.native
@@ -522,7 +524,7 @@ public extension UI.Markdown.Style.Text.Specific {
         }
         if options.contains(.strikethrough) == true {
             let strikethroughStyle = self.strikethroughStyle ?? .single
-            let strikethroughColor = self.strikethroughColor ?? self.fontColor
+            let strikethroughColor = self.strikethroughColor ?? fontColor
             if let strikethroughColor = strikethroughColor {
                 attributes[.strikethroughStyle] = strikethroughStyle.nsUnderlineStyle.rawValue
                 attributes[.strikethroughColor] = strikethroughColor.native

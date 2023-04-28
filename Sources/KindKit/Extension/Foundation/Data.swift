@@ -155,4 +155,8 @@ public extension Data {
         return false
     }
     
+    var kk_isImage: Bool {
+        return self.kk_isBmp == true || self.kk_isGif == true || self.kk_isJpeg == true || self.kk_isPng == true || self.kk_isTiff == true || self.kk_isWebp == true
+    }
+    
 }

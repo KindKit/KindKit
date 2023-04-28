@@ -50,56 +50,59 @@ public extension Api {
         }
         
         public func send< Response : IApiResponse >(
-            request: @autoclosure @escaping () throws -> Api.Request?,
+            request: @autoclosure @escaping () throws -> Api.Request,
             response: Response,
             queue: DispatchQueue,
             completed: @escaping (_ response: Result< Response.Success, Response.Failure >) -> Void
         ) -> ICancellable {
             do {
-                if let request = try request() {
-                    let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onCompleted: completed)
-                    self._sessionDelegate.append(query)
-                    return query
-                }
-            } catch {
+                let request = try request()
+                let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onCompleted: completed)
+                self._sessionDelegate.append(query)
+                return query
+            } catch let error as Api.Error.Request {
+                return Api.Query.Fail(provider: self, error: error, response: response, queue: queue, onCompleted: completed)
+            } catch let error {
+                return Api.Query.Fail(provider: self, error: .unhandle(error), response: response, queue: queue, onCompleted: completed)
             }
-            return Api.Query.Fail(provider: self, response: response, queue: queue, onCompleted: completed)
         }
         
         public func send< Response : IApiResponse >(
-            request: @autoclosure @escaping () throws -> Api.Request?,
+            request: @autoclosure @escaping () throws -> Api.Request,
             response: Response,
             queue: DispatchQueue,
             download: @escaping (_ progress: Progress) -> Void,
             completed: @escaping (_ response: Result< Response.Success, Response.Failure >) -> Void
         ) -> ICancellable {
             do {
-                if let request = try request() {
-                    let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onDownload: download, onCompleted: completed)
-                    self._sessionDelegate.append(query)
-                    return query
-                }
-            } catch {
+                let request = try request()
+                let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onDownload: download, onCompleted: completed)
+                self._sessionDelegate.append(query)
+                return query
+            } catch let error as Api.Error.Request {
+                return Api.Query.Fail(provider: self, error: error, response: response, queue: queue, onCompleted: completed)
+            } catch let error {
+                return Api.Query.Fail(provider: self, error: .unhandle(error), response: response, queue: queue, onCompleted: completed)
             }
-            return Api.Query.Fail(provider: self, response: response, queue: queue, onCompleted: completed)
         }
         
         public func send< Response : IApiResponse >(
-            request: @autoclosure @escaping () throws -> Api.Request?,
+            request: @autoclosure @escaping () throws -> Api.Request,
             response: Response,
             queue: DispatchQueue,
             upload: @escaping (_ progress: Progress) -> Void,
             completed: @escaping (_ response: Result< Response.Success, Response.Failure >) -> Void
         ) -> ICancellable {
             do {
-                if let request = try request() {
-                    let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onUpload: upload, onCompleted: completed)
-                    self._sessionDelegate.append(query)
-                    return query
-                }
-            } catch {
+                let request = try request()
+                let query = try Api.Query.Task(provider: self, session: self._session, request: request, response: response, queue: queue, onUpload: upload, onCompleted: completed)
+                self._sessionDelegate.append(query)
+                return query
+            } catch let error as Api.Error.Request {
+                return Api.Query.Fail(provider: self, error: error, response: response, queue: queue, onCompleted: completed)
+            } catch let error {
+                return Api.Query.Fail(provider: self, error: .unhandle(error), response: response, queue: queue, onCompleted: completed)
             }
-            return Api.Query.Fail(provider: self, response: response, queue: queue, onCompleted: completed)
         }
         
     }

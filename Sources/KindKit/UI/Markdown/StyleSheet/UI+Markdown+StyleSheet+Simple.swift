@@ -88,24 +88,108 @@ extension UI.Markdown.StyleSheet.Simple : IUIMarkdownStyleSheet {
 
 public extension IUIMarkdownStyleSheet where Self == UI.Markdown.StyleSheet.Simple {
     
+    @inlinable
     static func `default`(
-        fontFamily: UI.Markdown.Style.Text.FontFamily = .system,
-        fontSize: Double = UI.Font.systemSize,
-        fontColor: UI.Color = .black,
-        fontFirstLineIndent: Double? = nil,
-        fontLineSpacing: Double? = nil,
-        linkFontColor: UI.Color = .skyBlue
+        normalFontFamily: UI.Markdown.Style.Text.FontFamily = .system,
+        normalFontWeight: UI.Markdown.Style.Text.FontWeight? = nil,
+        normalFontSize: Double = UI.Font.systemSize,
+        normalFontColor: UI.Color = .black,
+        normalStrokeWidth: Double? = nil,
+        normalStrokeColor: UI.Color? = nil,
+        normalUnderlineStyle: UI.Text.Underline? = nil,
+        normalUnderlineColor: UI.Color? = nil,
+        normalStrikethroughStyle: UI.Text.Strikethrough? = nil,
+        normalStrikethroughColor: UI.Color? = nil,
+        normalLigatures: Bool? = nil,
+        normalKerning: Double? = nil,
+        normalFirstLineIndent: Double? = nil,
+        normalLineSpacing: Double? = nil,
+        normalMinimumLineHeight: Double? = nil,
+        normalMaximumLineHeight: Double? = nil,
+        normalLineHeightMultiple: Double? = nil,
+        normalAlignment: UI.Text.Alignment? = nil,
+        normalLineBreak: UI.Text.LineBreak? = nil,
+        normalBaseWritingDirection: UI.Text.WritingDirection? = nil,
+        normalHyphenationFactor: Float? = nil,
+        linkFontFamily: UI.Markdown.Style.Text.FontFamily? = nil,
+        linkFontWeight: UI.Markdown.Style.Text.FontWeight? = nil,
+        linkFontSize: Double? = nil,
+        linkFontColor: UI.Color = .skyBlue,
+        linkStrokeWidth: Double? = nil,
+        linkStrokeColor: UI.Color? = nil,
+        linkUnderlineStyle: UI.Text.Underline? = nil,
+        linkUnderlineColor: UI.Color? = nil,
+        linkStrikethroughStyle: UI.Text.Strikethrough? = nil,
+        linkStrikethroughColor: UI.Color? = nil,
+        linkLigatures: Bool? = nil,
+        linkKerning: Double? = nil,
+        linkFirstLineIndent: Double? = nil,
+        linkLineSpacing: Double? = nil,
+        linkMinimumLineHeight: Double? = nil,
+        linkMaximumLineHeight: Double? = nil,
+        linkLineHeightMultiple: Double? = nil,
+        linkAlignment: UI.Text.Alignment? = nil,
+        linkLineBreak: UI.Text.LineBreak? = nil,
+        linkBaseWritingDirection: UI.Text.WritingDirection? = nil,
+        linkHyphenationFactor: Float? = nil
     ) -> Self {
         let normalText = UI.Markdown.Style.Text.Specific()
-            .fontFamily(fontFamily)
-            .fontSize(fontSize)
-            .fontColor(fontColor)
-            .firstLineIndent(fontFirstLineIndent)
-            .lineSpacing(fontLineSpacing)
+            .fontFamily(normalFontFamily)
+            .fontWeight(normalFontWeight)
+            .fontSize(normalFontSize)
+            .fontColor(normalFontColor)
+            .strokeWidth(normalStrokeWidth)
+            .strokeColor(normalStrokeColor)
+            .underlineStyle(normalUnderlineStyle)
+            .underlineColor(normalUnderlineColor)
+            .strikethroughStyle(normalStrikethroughStyle)
+            .strikethroughColor(normalStrikethroughColor)
+            .ligatures(normalLigatures)
+            .kerning(normalKerning)
+            .firstLineIndent(normalFirstLineIndent)
+            .lineSpacing(normalLineSpacing)
+            .minimumLineHeight(normalMinimumLineHeight)
+            .maximumLineHeight(normalMaximumLineHeight)
+            .lineHeightMultiple(normalLineHeightMultiple)
+            .alignment(normalAlignment)
+            .lineBreak(normalLineBreak)
+            .baseWritingDirection(normalBaseWritingDirection)
+            .hyphenationFactor(normalHyphenationFactor)
         
         let linkText = UI.Markdown.Style.Text.Specific(inherit: normalText)
+            .fontFamily(linkFontFamily)
+            .fontWeight(linkFontWeight)
+            .fontSize(linkFontSize)
             .fontColor(linkFontColor)
+            .strokeWidth(linkStrokeWidth)
+            .strokeColor(linkStrokeColor)
+            .underlineStyle(linkUnderlineStyle)
+            .underlineColor(linkUnderlineColor)
+            .strikethroughStyle(linkStrikethroughStyle)
+            .strikethroughColor(linkStrikethroughColor)
+            .ligatures(linkLigatures)
+            .kerning(linkKerning)
+            .firstLineIndent(linkFirstLineIndent)
+            .lineSpacing(linkLineSpacing)
+            .minimumLineHeight(linkMinimumLineHeight)
+            .maximumLineHeight(linkMaximumLineHeight)
+            .lineHeightMultiple(linkLineHeightMultiple)
+            .alignment(linkAlignment)
+            .lineBreak(linkLineBreak)
+            .baseWritingDirection(linkBaseWritingDirection)
+            .hyphenationFactor(linkHyphenationFactor)
         
+        return Self.default(
+            normalText: normalText,
+            linkText: linkText
+        )
+    }
+    
+    @inlinable
+    static func `default`(
+        normalText: UI.Markdown.Style.Text.Specific,
+        linkText: UI.Markdown.Style.Text.Specific
+    ) -> Self {
         return .init(
             code: [
                 .init(
@@ -120,22 +204,22 @@ public extension IUIMarkdownStyleSheet where Self == UI.Markdown.StyleSheet.Simp
                 .init(
                     style: .init(),
                     content: .init(
-                        normal: .init(inherit: normalText).fontSize(fontSize * 2),
-                        link: .init(inherit: linkText).fontSize(fontSize * 2)
+                        normal: .init(inherit: normalText).fontSizeMultiple(2),
+                        link: .init(inherit: linkText).fontSizeMultiple(2)
                     )
                 ),
                 .init(
                     style: .init(),
                     content: .init(
-                        normal: .init(inherit: normalText).fontSize(fontSize * 1.75),
-                        link: .init(inherit: linkText).fontSize(fontSize * 1.75)
+                        normal: .init(inherit: normalText).fontSizeMultiple(1.75),
+                        link: .init(inherit: linkText).fontSizeMultiple(1.75)
                     )
                 ),
                 .init(
                     style: .init(),
                     content: .init(
-                        normal: .init(inherit: normalText).fontSize(fontSize * 1.5),
-                        link: .init(inherit: linkText).fontSize(fontSize * 1.5)
+                        normal: .init(inherit: normalText).fontSizeMultiple(1.5),
+                        link: .init(inherit: linkText).fontSizeMultiple(1.5)
                     )
                 )
             ],

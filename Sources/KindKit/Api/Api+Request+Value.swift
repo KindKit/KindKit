@@ -15,8 +15,17 @@ public extension Api.Request {
     
 }
 
+extension Api.Request.Value : ExpressibleByStringLiteral {
+    
+    public init(stringLiteral value: StringLiteralType) {
+        self = .raw(value)
+    }
+    
+}
+
 public extension Api.Request.Value {
     
+    @inlinable
     var string: String {
         switch self {
         case .raw(let string): return string
@@ -24,26 +33,17 @@ public extension Api.Request.Value {
         }
     }
     
-    var encoded: String {
-        get throws {
-            switch self {
-            case .raw(let string):
-                return string
-            case .string(let string):
-                guard let string = string.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
-                    throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
-                }
-                return string
+    @inlinable
+    var encoded: String? {
+        switch self {
+        case .raw(let string):
+            return string
+        case .string(let string):
+            guard let string = string.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+                return nil
             }
+            return string
         }
-    }
-    
-}
-
-extension Api.Request.Value : ExpressibleByStringLiteral {
-    
-    public init(stringLiteral value: StringLiteralType) {
-        self = .raw(value)
     }
     
 }

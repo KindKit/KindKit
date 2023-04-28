@@ -54,40 +54,24 @@ public extension StringBuilder {
     @discardableResult
     func append(
         header indent: Debug.Indent,
-        data: String
+        value: String
     ) -> Self {
         return self.append(header: indent)
-            .append(data)
+            .append(value)
             .newline()
     }
     
     @inlinable
     @discardableResult
-    func append< Data : IDebug >(
+    func append<
+        Value : IDebug
+    >(
         header indent: Debug.Indent,
-        data: Data
+        value: Value
     ) -> Self {
         return self.append(
             header: indent,
-            data: data.dump(indent.value)
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append(
-        header indent: Debug.Indent,
-        data: Any
-    ) -> Self {
-        if let data = data as? IDebug {
-            return self.append(
-                header: indent,
-                data: data
-            )
-        }
-        return self.append(
-            header: indent,
-            data: "\(data)"
+            value: value.dump(indent.value)
         )
     }
     
@@ -105,36 +89,23 @@ public extension StringBuilder {
     
     @inlinable
     @discardableResult
-    func append< Data : IDebug >(
+    func append<
+        Value : IDebug
+    >(
         inter indent: Debug.Indent,
-        data: Data
+        value: Value
     ) -> Self {
         return self.append(inter: indent)
-            .append(data.dump(indent.value))
+            .append(value.dump(indent.value))
             .newline()
     }
     
     @inlinable
     @discardableResult
-    func append(
-        inter indent: Debug.Indent,
-        data: Any
-    ) -> Self {
-        if let data = data as? IDebug {
-            return self.append(
-                inter: indent,
-                data: data
-            )
-        }
-        return self.append(
-            inter: indent,
-            data: "\(data)"
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append< Key : IDebug, Value : IDebug >(
+    func append<
+        Key : IDebug,
+        Value : IDebug
+    >(
         inter indent: Debug.Indent,
         key: Key,
         value: Value
@@ -148,82 +119,10 @@ public extension StringBuilder {
     
     @inlinable
     @discardableResult
-    func append< Value : IDebug >(
-        inter indent: Debug.Indent,
-        key: Any,
-        value: Value
-    ) -> Self {
-        if let key = key as? IDebug {
-            return self.append(
-                inter: indent,
-                key: key,
-                value: value
-            )
-        }
-        return self.append(
-            inter: indent,
-            key: "\(key)",
-            value: value
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append< Key : IDebug >(
-        inter indent: Debug.Indent,
-        key: Key,
-        value: Any
-    ) -> Self {
-        if let value = value as? IDebug {
-            return self.append(
-                inter: indent,
-                key: key,
-                value: value
-            )
-        }
-        return self.append(
-            inter: indent,
-            key: key,
-            value: "\(value)"
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append(
-        inter indent: Debug.Indent,
-        key: Any,
-        value: Any
-    ) -> Self {
-        if let key = key as? IDebug, let value = value as? IDebug {
-            return self.append(
-                inter: indent,
-                key: key,
-                value: value
-            )
-        } else if let key = key as? IDebug {
-            return self.append(
-                inter: indent,
-                key: key,
-                value: value
-            )
-        } else if let value = value as? IDebug {
-            return self.append(
-                inter: indent,
-                key: key,
-                value: value
-            )
-        }
-        return self.append(
-            inter: indent,
-            key: "\(key)",
-            value: "\(value)"
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append< Key : IDebug, ValueFormatter : IStringFormatter >(
+    func append<
+        Key : IDebug,
+        ValueFormatter : IStringFormatter
+    >(
         inter indent: Debug.Indent,
         key: Key,
         value: ValueFormatter.InputType,
@@ -252,39 +151,23 @@ public extension StringBuilder {
     @discardableResult
     func append(
         footer indent: Debug.Indent,
-        data: String
+        value: String
     ) -> Self {
         return self.append(footer: indent)
-            .append(data)
+            .append(value)
     }
     
     @inlinable
     @discardableResult
-    func append< Data : IDebug >(
+    func append<
+        Value : IDebug
+    >(
         footer indent: Debug.Indent,
-        data: Data
+        value: Value
     ) -> Self {
         return self.append(
             footer: indent,
-            data: data.dump(indent.value)
-        )
-    }
-    
-    @inlinable
-    @discardableResult
-    func append(
-        footer indent: Debug.Indent,
-        data: Any
-    ) -> Self {
-        if let data = data as? IDebug {
-            return self.append(
-                footer: indent,
-                data: data
-            )
-        }
-        return self.append(
-            footer: indent,
-            data: "\(data)"
+            value: value.dump(indent.value)
         )
     }
     

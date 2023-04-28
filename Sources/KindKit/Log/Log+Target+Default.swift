@@ -21,8 +21,8 @@ extension Log.Target.Default : ILogTarget {
         return []
     }
     
-    public func log(level: Log.Level, category: String, message: String) {
-        print("[\(category)]: \(message)")
+    public func log(message: Log.Message) {
+        print("[\(message.category)]: \(message.message)")
     }
     
 }

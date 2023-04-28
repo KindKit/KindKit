@@ -15,13 +15,8 @@ extension Json : CustomDebugStringConvertible {
 extension Json : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Json")
-        if let root = self.root as? NSArray {
-            buff.append(inter: indent, data: root)
-        } else if let root = self.root as? NSDictionary {
-            buff.append(inter: indent, data: root)
-        }
-        buff.append(footer: indent, data: ">")
+        guard let root = self.root as? IDebug else { return }
+        root.dump(buff, indent)
     }
 
 }

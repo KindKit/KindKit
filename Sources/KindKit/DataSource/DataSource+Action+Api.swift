@@ -22,13 +22,13 @@ public extension DataSource.Action {
         public let onFinish: Signal.Args< Void, Result > = .init()
         
         private let _provider: KindKit.Api.Provider
-        private let _request: (Params) throws -> KindKit.Api.Request?
+        private let _request: (Params) throws -> KindKit.Api.Request
         private let _response: (Params) -> Response
         private var _task: ICancellable?
         
         public init(
             provider: KindKit.Api.Provider,
-            request: @escaping (Params) throws -> KindKit.Api.Request?,
+            request: @escaping (Params) throws -> KindKit.Api.Request,
             response: @escaping (Params) -> Response
         ) {
             self._provider = provider

@@ -10,11 +10,11 @@ public extension Database.ValueDecoder {
         
         public static func decode(_ value: Database.Value) throws -> Decoder.JsonModelDecoded {
             let string = try Database.ValueDecoder.Text.decode(value)
-            guard let json = KindKit.Json(string: string) else {
-                throw Database.Error.decode
-            }
             do {
-                return try json.decode(Decoder.self)
+                return try KindKit.Json.parse(
+                    string: string,
+                    decode: { try $0.decode(Decoder.self) }
+                )
             } catch {
                 throw Database.Error.decode
             }

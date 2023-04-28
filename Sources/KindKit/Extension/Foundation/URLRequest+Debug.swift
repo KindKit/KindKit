@@ -7,7 +7,6 @@ import Foundation
 extension URLRequest : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<URLRequest")
         if let url = self.url {
             buff.append(inter: indent, key: "URL", value: url)
         }
@@ -66,7 +65,6 @@ extension URLRequest : IDebug {
                 }
             }
         }
-        buff.append(footer: indent, data: ">")
     }
     
 }

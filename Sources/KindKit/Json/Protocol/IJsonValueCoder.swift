@@ -10,7 +10,7 @@ public protocol IJsonValueDecoder {
     
     associatedtype JsonDecoded
     
-    static func decode(_ value: IJsonValue) throws -> JsonDecoded
+    static func decode(_ value: IJsonValue, path: Json.Path) throws -> JsonDecoded
     
 }
 
@@ -18,6 +18,6 @@ public protocol IJsonValueEncoder {
     
     associatedtype JsonEncoded
 
-    static func encode(_ value: JsonEncoded) throws -> IJsonValue
+    static func encode(_ value: JsonEncoded, path: Json.Path) throws -> IJsonValue
     
 }

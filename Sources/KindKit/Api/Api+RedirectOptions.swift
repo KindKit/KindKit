@@ -20,8 +20,8 @@ public extension Api {
 
 public extension Api.RedirectOption {
     
-    static var enabled = Api.RedirectOption(rawValue: 1 << 0)
-    static var method = Api.RedirectOption(rawValue: 1 << 1)
-    static var authorization = Api.RedirectOption(rawValue: 1 << 2)
+    static let enabled = Api.RedirectOption(rawValue: 1 << 0)
+    static let method = Api.RedirectOption(rawValue: 1 << 1)
+    static let authorization = Api.RedirectOption(rawValue: 1 << 2)
     
 }

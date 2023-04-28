@@ -20,7 +20,7 @@ public extension DataSource.Page {
         public let onFinish: Signal.Args< Void, Result > = .init()
         
         private let _provider: KindKit.Api.Provider
-        private let _request: (Cursor?) throws -> KindKit.Api.Request?
+        private let _request: (Cursor?) throws -> KindKit.Api.Request
         private let _response: (Cursor?) -> Response
         private let _elementsWithResponse: (Response.Success) -> Success
         private let _cursorWithResponse: (Cursor?, Response.Success) -> Cursor
@@ -30,7 +30,7 @@ public extension DataSource.Page {
         
         public init(
             provider: KindKit.Api.Provider,
-            request: @escaping (Cursor?) throws -> KindKit.Api.Request?,
+            request: @escaping (Cursor?) throws -> KindKit.Api.Request,
             response: @escaping (Cursor?) -> Response,
             elementsWithResponse: @escaping (Response.Success) -> Success,
             cursorWithResponse: @escaping (Cursor?, Response.Success) -> Cursor,

@@ -65,10 +65,13 @@ final class KKCustomView : NSView {
             if self.frame.size != oldValue.size {
                 if self.window != nil {
                     self.kkLayoutManager.invalidate()
+                    self._needLayout = true
                 }
             }
         }
     }
+    
+    private var _needLayout = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -93,9 +96,13 @@ final class KKCustomView : NSView {
     override func layout() {
         super.layout()
         
-        let bounds = Rect(self.bounds)
-        self.kkLayoutManager.layout(bounds: bounds)
-        self.kkLayoutManager.visible(bounds: bounds)
+        if self._needLayout == true {
+            self._needLayout = false
+            
+            let bounds = Rect(self.bounds)
+            self.kkLayoutManager.layout(bounds: bounds)
+            self.kkLayoutManager.visible(bounds: bounds)
+        }
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -158,6 +165,7 @@ extension KKCustomView {
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
         self.needsLayout = true
+        self._needLayout = true
     }
     
     func update(dragDestination: IUIDragAndDropDestination?) {
@@ -233,6 +241,7 @@ extension KKCustomView : IUILayoutDelegate {
     
     func setNeedUpdate(_ layout: IUILayout) -> Bool {
         self.needsLayout = true
+        self._needLayout = true
         return true
     }
     

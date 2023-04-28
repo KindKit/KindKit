@@ -17,7 +17,7 @@ extension UserDefaults.Coder.Json : IUserDefaultsValueDecoder where JsonModelCod
         guard let string = try? UserDefaults.Coder.String.decode(value) else {
             throw UserDefaults.Error.cast
         }
-        guard let json = Json(string: string) else {
+        guard let json = try? Json(path: .root, string: string) else {
             throw UserDefaults.Error.cast
         }
         do {
@@ -32,13 +32,13 @@ extension UserDefaults.Coder.Json : IUserDefaultsValueDecoder where JsonModelCod
 extension UserDefaults.Coder.Json : IUserDefaultsValueEncoder where JsonModelCoder : IJsonModelEncoder {
     
     public static func encode(_ value: JsonModelCoder.JsonModelEncoded) throws -> IUserDefaultsValue {
-        let json = Json()
+        let json = Json(path: .root)
         do {
             try json.encode(JsonModelCoder.self, value: value)
         } catch {
             throw UserDefaults.Error.cast
         }
-        guard let string = try json.saveAsString() else {
+        guard let string = try json.asString() else {
             throw UserDefaults.Error.cast
         }
         return try UserDefaults.Coder.String.encode(string)

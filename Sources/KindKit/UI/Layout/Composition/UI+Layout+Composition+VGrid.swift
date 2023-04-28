@@ -134,11 +134,15 @@ private extension UI.Layout.Composition.VGrid {
                 let leftWidth = available.width - (fitWidth + fitSpacing)
                 let proportionatelySpacing = self.spacing.x * Double(proportionatelyColumns - 1)
                 let proportionatelyWidth = (leftWidth - proportionatelySpacing) / Double(proportionatelyColumns)
-                widths = self.columns.map({
-                    switch $0 {
-                    case .fit: return fitWidth
-                    case .proportionately: return proportionatelyWidth
+                widths = .init(unsafeUninitializedCapacity: self.columns.count, initializingWith: { buffer, count in
+                    for index in self.columns.indices {
+                        let column = self.columns[index]
+                        switch column {
+                        case .fit: buffer[index] = accumulator[index]
+                        case .proportionately: buffer[index] = proportionatelyWidth
+                        }
                     }
+                    count = self.columns.count
                 })
             } else {
                 widths = .init(
@@ -152,12 +156,19 @@ private extension UI.Layout.Composition.VGrid {
         for index in self.entities.indices {
             let entity = self.entities[index]
             let column = index % self.columns.count
+            let width = widths[column]
             let size = entity.size(available: .init(
-                width: widths[column],
+                width: width,
                 height: available.height
             ))
             if size.height > 0 {
-                let item = PassItem(entity: entity, size: size)
+                let item = PassItem(
+                    entity: entity,
+                    size: .init(
+                        width: width,
+                        height: size.height
+                    )
+                )
                 row.items.append(item)
                 row.size = max(row.size, size.height)
             }

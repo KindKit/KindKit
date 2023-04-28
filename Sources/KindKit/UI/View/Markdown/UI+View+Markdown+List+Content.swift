@@ -30,6 +30,7 @@ extension UI.View.Markdown.List {
             self.content = .init(
                 style: styleSheet.listContent(block),
                 text: block.content,
+                width: .fill,
                 onOpenLink: onOpenLink
             )
             

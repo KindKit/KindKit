@@ -17,6 +17,7 @@ extension UI.View.Markdown {
         init(
             style: UI.Markdown.Style.Text,
             text: UI.Markdown.Text,
+            width: UI.Size.Dynamic.Dimension,
             onOpenLink: Signal.Args< Void, URL >
         ) {
             self.style = style
@@ -26,6 +27,7 @@ extension UI.View.Markdown {
             self.onOpenLink = onOpenLink
             
             self.view = .init()
+                .width(width)
                 .text(text.attributedString(style: style))
             
             self.entity = .init(self.view)

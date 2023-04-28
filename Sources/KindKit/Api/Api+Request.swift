@@ -8,20 +8,20 @@ public extension Api {
     
     struct Request {
 
-        public let method: Method
-        public let path: Path
-        public let queryParams: [Parameter]
-        public let headers: [Header]
-        public let body: Body?
+        public let method: Api.Request.Method
+        public let path: Api.Request.Path
+        public let queryParams: [Api.Request.Parameter]
+        public let headers: [Api.Request.Header]
+        public let body: Api.Request.Body?
         public let timeout: TimeInterval
         public let cachePolicy: URLRequest.CachePolicy
         public let redirect: Api.RedirectOption
 
         public init(
             method: Method,
-            path: Path,
-            queryParams: [Parameter] = [],
-            headers: [Header] = [],
+            path: Api.Request.Path,
+            queryParams: [Api.Request.Parameter] = [],
+            headers: [Api.Request.Header] = [],
             body: Body? = nil,
             timeout: TimeInterval = 30,
             cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
@@ -60,7 +60,7 @@ public extension Api {
                 }
             }
             guard let url = components.url else {
-                throw NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown)
+                throw Api.Error.Request.query(.encode(components))
             }
             var urlRequest = URLRequest(
                 url: url,

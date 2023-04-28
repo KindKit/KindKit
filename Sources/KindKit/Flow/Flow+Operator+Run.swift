@@ -91,7 +91,7 @@ public extension Flow.Chain.Builder {
     func run< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
     ) -> Flow.Chain.Builder< Head, Flow.Operator.Run< Pipeline > > where
-        Head.Output == Pipeline.Input
+        Tail.Output == Pipeline.Input
     {
         return .init(head: self.head, tail: self.tail.run(pipeline))
     }

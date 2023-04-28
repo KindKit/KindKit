@@ -4,7 +4,7 @@
 
 import Foundation
 
-extension Api {
+public extension Api {
     
     enum Query {
     }

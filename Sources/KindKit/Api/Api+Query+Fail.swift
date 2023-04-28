@@ -13,6 +13,7 @@ extension Api.Query {
         let provider: Api.Provider
         var createAt: Date
         
+        let error: Api.Error.Request
         let response: Response
         let queue: DispatchQueue
         let onCompleted: CompleteClosure
@@ -22,12 +23,14 @@ extension Api.Query {
         
         init(
             provider: Api.Provider,
+            error: Api.Error.Request,
             response: Response,
             queue: DispatchQueue,
             onCompleted: @escaping CompleteClosure
         ) {
             self.provider = provider
             self.createAt = Date()
+            self.error = error
             self.response = response
             self.queue = queue
             self.onCompleted = onCompleted
@@ -57,10 +60,44 @@ extension Api.Query {
 private extension Api.Query.Fail {
     
     func _perform() {
-        let result = self.response.parse(error: NSError(domain: NSURLErrorDomain, code: NSURLErrorUnknown))
+        let result = self.response.parse(error: self.error)
+        switch self.provider.logging {
+        case .never:
+            break
+        case .errorOnly(let category):
+            switch result {
+            case .failure:
+                Log.shared.log(level: .error, category: category, message: self.dump())
+            default:
+                break
+            }
+        case .always(let category):
+            Log.shared.log(level: .error, category: category, message: self.dump())
+        }
         self.queue.async(execute: {
             self.onCompleted(result)
         })
+    }
+    
+}
+
+extension Api.Query.Fail : IDebug {
+    
+    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
+        buff.append(
+            inter: indent,
+            key: "CreateAt",
+            value: self.createAt,
+            valueFormatter: .date()
+        )
+        buff.append(
+            inter: indent,
+            key: "Duration",
+            value: -self.createAt.timeIntervalSinceNow,
+            valueFormatter: .dateComponents()
+                .unitsStyle(.abbreviated)
+                .allowedUnits([ .second, .nanosecond ])
+        )
     }
     
 }

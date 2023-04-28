@@ -30,6 +30,7 @@ extension UI.View.Markdown {
             self.content = .init(
                 style: styleSheet.paragraphContent(block),
                 text: block.content,
+                width: .fill,
                 onOpenLink: onOpenLink
             )
             

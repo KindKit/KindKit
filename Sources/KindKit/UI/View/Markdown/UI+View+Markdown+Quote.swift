@@ -31,6 +31,7 @@ extension UI.View.Markdown {
             self.style = styleSheet.quoteBlock(block)
             
             self.panel = .init()
+                .width(.fixed(self.style.panelSize))
                 .cornerRadius(self.style.panelCornerRadius)
                 .border(self.style.panelBorder)
                 .fill(self.style.panelColor)
@@ -38,6 +39,7 @@ extension UI.View.Markdown {
             self.content = .init(
                 style: styleSheet.quoteContent(block),
                 text: block.content,
+                width: .fill,
                 onOpenLink: onOpenLink
             )
             
@@ -73,6 +75,7 @@ private extension UI.View.Markdown.Quote {
     }
     
     func _onChangedStyle() {
+        self.panel.width = .fixed(self.style.panelSize)
         self.panel.cornerRadius = self.style.panelCornerRadius
         self.panel.border = self.style.panelBorder
         self.panel.fill = self.style.panelColor

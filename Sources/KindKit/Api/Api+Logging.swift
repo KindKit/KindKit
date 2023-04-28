@@ -15,3 +15,6 @@ public extension Api {
     }
     
 }
+
+public extension Api.Logging {
+}

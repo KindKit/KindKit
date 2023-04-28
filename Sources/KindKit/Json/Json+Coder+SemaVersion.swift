@@ -8,12 +8,15 @@ public extension Json.Coder {
 
     struct SemaVersion : IJsonValueDecoder {
         
-        public static func decode(_ value: IJsonValue) throws -> KindKit.SemaVersion {
-            let string = try Json.Coder.String.decode(value)
-            guard let version = KindKit.SemaVersion(string) else {
-                throw Json.Error.cast
+        public typealias JsonDecoded = KindKit.SemaVersion
+        typealias InternalCoder = Json.Coder.String
+        
+        public static func decode(_ value: IJsonValue, path: Json.Path) throws -> JsonDecoded {
+            let value = try InternalCoder.decode(value, path: path)
+            guard let value = JsonDecoded(value) else {
+                throw Json.Error.Coding.cast(path)
             }
-            return version
+            return value
         }
         
     }

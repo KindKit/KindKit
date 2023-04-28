@@ -13,22 +13,24 @@ public extension Json.Coder {
 
 extension Json.Coder.RawRepresentable : IJsonValueDecoder where RawCoder : IJsonValueDecoder, Enum.RawValue == RawCoder.JsonDecoded {
     
-    public static func decode(_ value: IJsonValue) throws -> Enum {
-        guard let rawValue = try? RawCoder.decode(value) else {
-            throw Json.Error.cast
+    public typealias JsonDecoded = Enum
+    
+    public static func decode(_ value: IJsonValue, path: Json.Path) throws -> JsonDecoded {
+        let value = try RawCoder.decode(value, path: path)
+        guard let value = Enum(rawValue: value) else {
+            throw Json.Error.Coding.cast(path)
         }
-        guard let decoded = Enum(rawValue: rawValue) else {
-            throw Json.Error.cast
-        }
-        return decoded
+        return value
     }
 
 }
 
 extension Json.Coder.RawRepresentable : IJsonValueEncoder where RawCoder : IJsonValueEncoder, Enum.RawValue == RawCoder.JsonEncoded {
     
-    public static func encode(_ value: Enum) throws -> IJsonValue {
-        return try RawCoder.encode(value.rawValue)
+    public typealias JsonEncoded = Enum
+    
+    public static func encode(_ value: JsonEncoded, path: Json.Path) throws -> IJsonValue {
+        return try RawCoder.encode(value.rawValue, path: path)
     }
     
 }

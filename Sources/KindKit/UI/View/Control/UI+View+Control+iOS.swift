@@ -47,10 +47,13 @@ final class KKControlView : UIControl {
             if self.frame.size != oldValue.size {
                 if self.window != nil {
                     self.kkLayoutManager.invalidate()
+                    self._needLayout = true
                 }
             }
         }
     }
+    
+    private var _needLayout = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -82,9 +85,13 @@ final class KKControlView : UIControl {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let bounds = Rect(self.bounds)
-        self.kkLayoutManager.layout(bounds: bounds)
-        self.kkLayoutManager.visible(bounds: bounds)
+        if self._needLayout == true {
+            self._needLayout = false
+            
+            let bounds = Rect(self.bounds)
+            self.kkLayoutManager.layout(bounds: bounds)
+            self.kkLayoutManager.visible(bounds: bounds)
+        }
     }
     
 }
@@ -112,6 +119,7 @@ extension KKControlView {
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
         self.setNeedsLayout()
+        self._needLayout = true
     }
     
     func update(color: UI.Color?) {
@@ -165,6 +173,7 @@ extension KKControlView : IUILayoutDelegate {
     
     func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
         self.setNeedsLayout()
+        self._needLayout = true
         return true
     }
     

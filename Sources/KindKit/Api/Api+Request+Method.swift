@@ -20,6 +20,7 @@ public extension Api.Request {
 
 public extension Api.Request.Method {
     
+    @inlinable
     var value: String {
         switch self {
         case .get: return "GET"

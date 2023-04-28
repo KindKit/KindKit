@@ -55,11 +55,8 @@ extension Xml : CustomDebugStringConvertible {
 extension Xml : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Xml")
-        if self.nodes.count > 0 {
-            buff.append(inter: indent, data: self.nodes)
-        }
-        buff.append(footer: indent, data: ">")
+        guard self.nodes.count > 0 else { return }
+        buff.append(inter: indent, value: self.nodes)
     }
     
 }

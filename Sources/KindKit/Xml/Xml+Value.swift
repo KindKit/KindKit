@@ -70,9 +70,8 @@ extension Xml.Value : CustomDebugStringConvertible {
 extension Xml.Value : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Xml.Value")
-            .append(inter: indent, data: self.text)
-            .append(footer: indent, data: ">")
+        buff.append(header: indent, value: "Value")
+            .append(inter: indent, value: self.text)
     }
     
 }

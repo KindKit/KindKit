@@ -8,7 +8,10 @@ public extension Json.Coder {
 
     struct Bool : IJsonValueCoder {
         
-        public static func decode(_ value: IJsonValue) throws -> Swift.Bool {
+        public typealias JsonDecoded = Swift.Bool
+        public typealias JsonEncoded = Swift.Bool
+        
+        public static func decode(_ value: IJsonValue, path: Json.Path) throws -> JsonDecoded {
             if let number = value as? Foundation.NSNumber {
                 return number.boolValue
             } else if let string = value as? Foundation.NSString {
@@ -18,10 +21,10 @@ public extension Json.Coder {
                 default: break
                 }
             }
-            throw Json.Error.cast
+            throw Json.Error.Coding.cast(path)
         }
         
-        public static func encode(_ value: Swift.Bool) throws -> IJsonValue {
+        public static func encode(_ value: JsonEncoded, path: Json.Path) throws -> IJsonValue {
             return Foundation.NSNumber(value: value)
         }
         

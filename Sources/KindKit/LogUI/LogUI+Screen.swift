@@ -188,18 +188,18 @@ private extension LogUI.Screen {
 private extension LogUI.Screen {
     
     func _reload() {
-        self._entities = self._entities(self.target.items.filter({ self._filter($0) }))
+        self._entities = self._entities(self.target.messages.filter({ self._filter($0) }))
         self.layout.views = self._entities.map({ $0.cell })
         self.view.layoutIfNeeded()
         self._scrollToBottom()
     }
     
-    func _filter(_ item: LogUI.Target.Item) -> Bool {
+    func _filter(_ message: Log.Message) -> Bool {
         guard let search = self._search?.lowercased() else { return true }
         if search.count > 0 {
-            if item.category.lowercased().contains(search) == true {
+            if message.category.lowercased().contains(search) == true {
                 return true
-            } else if item.message.lowercased().contains(search) == true {
+            } else if message.message.lowercased().contains(search) == true {
                 return true
             } else {
                 return false
@@ -208,15 +208,15 @@ private extension LogUI.Screen {
         return true
     }
     
-    func _entities(_ items: [LogUI.Target.Item]) -> [Entity] {
-        return items.map({ self._entity($0) })
+    func _entities(_ messages: [Log.Message]) -> [Entity] {
+        return messages.map({ self._entity($0) })
     }
     
-    func _entity(_ item: LogUI.Target.Item) -> Entity {
-        return Entity(item: item, cell: self._cell(item))
+    func _entity(_ message: Log.Message) -> Entity {
+        return Entity(message: message, cell: self._cell(message))
     }
     
-    func _cell(_ item: LogUI.Target.Item) -> UI.View.Cell {
+    func _cell(_ message: Log.Message) -> UI.View.Cell {
         return UI.View.Cell()
             .background(
                 UI.View.Color()
@@ -231,7 +231,7 @@ private extension LogUI.Screen {
                                 UI.View.Rect()
                                     .width(.fixed(4))
                                     .cornerRadius(.auto)
-                                    .fill(self._color(item))
+                                    .fill(self._color(message))
                                     .color(.white)
                             ),
                             center: .margin(
@@ -243,13 +243,13 @@ private extension LogUI.Screen {
                                         .view(
                                             UI.View.Text()
                                                 .color(.white)
-                                                .text(item.category)
+                                                .text(message.category)
                                                 .textFont(.init(weight: .semibold, size: 16))
                                         ),
                                         .view(
                                             UI.View.Text()
                                                 .color(.white)
-                                                .text(item.message)
+                                                .text(message.message)
                                                 .textFont(.init(weight: .regular, size: 14))
                                         )
                                     ]
@@ -261,8 +261,8 @@ private extension LogUI.Screen {
             )
     }
     
-    func _color(_ item: LogUI.Target.Item) -> UI.Color {
-        switch item.level {
+    func _color(_ message: Log.Message) -> UI.Color {
+        switch message.level {
         case .debug: return .gray
         case .info: return .yellow
         case .error: return .red
@@ -273,10 +273,10 @@ private extension LogUI.Screen {
 
 extension LogUI.Screen : ILogUITargetObserver {
     
-    func append(_ target: LogUI.Target, item: LogUI.Target.Item) {
-        let entity = self._entity(item)
+    func append(_ target: LogUI.Target, message: Log.Message) {
+        let entity = self._entity(message)
         self._entities.append(entity)
-        if self._filter(entity.item) == true {
+        if self._filter(entity.message) == true {
             self.layout.insert(
                 index: self.layout.views.count,
                 views: [ entity.cell ]
@@ -286,8 +286,8 @@ extension LogUI.Screen : ILogUITargetObserver {
         }
     }
     
-    func remove(_ target: LogUI.Target, item: LogUI.Target.Item) {
-        guard let index = self._entities.firstIndex(where: { $0.item == item }) else { return }
+    func remove(_ target: LogUI.Target, message: Log.Message) {
+        guard let index = self._entities.firstIndex(where: { $0.message == message }) else { return }
         let entity = self._entities.remove(at: index)
         self.layout.delete(views: [ entity.cell ])
         self.view.layoutIfNeeded()

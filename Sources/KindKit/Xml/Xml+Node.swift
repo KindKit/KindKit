@@ -54,7 +54,7 @@ extension Xml.Node : CustomDebugStringConvertible {
 extension Xml.Node : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Xml.Node")
+        buff.append(header: indent, value: "Node")
         buff.append(inter: indent, key: "Name", value: self.name)
         if self.attributes.count > 0 {
             buff.append(inter: indent, key: "Attributes", value: self.attributes)
@@ -65,7 +65,6 @@ extension Xml.Node : IDebug {
         if let value = self.value {
             buff.append(inter: indent, key: "Attributes", value: value)
         }
-        buff.append(footer: indent, data: ">")
     }
     
 }

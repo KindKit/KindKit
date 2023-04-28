@@ -8,7 +8,7 @@ public extension UI.Markdown.Style.Block {
     
     final class Heading {
         
-        public var inset = Inset(top: 24, left: 0, right: 0, bottom: 0) {
+        public var inset: Inset = .init(top: 24, left: 0, right: 0, bottom: 0) {
             didSet {
                 guard self.inset != oldValue else { return }
                 self._change()

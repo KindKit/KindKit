@@ -12,6 +12,7 @@ public protocol IDebug {
 
 public extension IDebug {
     
+    @inlinable
     func dump(_ indent: Debug.Indent = .init()) -> String {
         let buff = StringBuilder()
         self.dump(buff, indent)
@@ -129,15 +130,14 @@ extension Optional : IDebug {
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
         buff.append(header: indent)
         switch self {
-        case .none:
-            buff.append("nil")
         case .some(let value):
             if let value = value as? IDebug {
                 value.dump(buff, indent.value)
             } else {
                 buff.append("\(value)")
             }
-            break
+        case .none:
+            buff.append("nil")
         }
     }
 
@@ -151,46 +151,10 @@ extension Bool : IDebug {
 
 }
 
-extension String : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent).append("\"\(self.kk_escape(.doubleQuote))\"")
-    }
-
-}
-
 extension NSString : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
         buff.append(header: indent).append("\"\((self as String).kk_escape(.doubleQuote))\"")
-    }
-
-}
-
-extension URL : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent).append("\"\(self.absoluteString)\"")
-    }
-
-}
-
-extension NSURL : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        if let url = self.absoluteString {
-            buff.append(header: indent).append("\"\(url)\"")
-        } else {
-            buff.append(header: indent).append("<Url>")
-        }
-    }
-
-}
-
-extension Data : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent).append("<Data \(self.count) bytes>")
     }
 
 }
@@ -206,23 +170,9 @@ extension NSData : IDebug {
 extension NSError : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "<Error")
-            .append(inter: indent, key: "Domain", value: self.domain)
+        buff.append(inter: indent, key: "Domain", value: self.domain)
             .append(inter: indent, key: "Code", value: self.code)
             .append(inter: indent, key: "UserInfo", value: self.userInfo)
-            .append(footer: indent, data: ">")
-    }
-
-}
-
-extension Array : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "[")
-        for item in self {
-            buff.append(inter: indent, data: item)
-        }
-        buff.append(footer: indent, data: "]")
     }
 
 }
@@ -230,23 +180,11 @@ extension Array : IDebug {
 extension NSArray : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "[")
+        buff.append(header: indent, value: "[")
         for item in self {
-            buff.append(inter: indent, data: item)
+            buff.append(inter: indent, value: item)
         }
-        buff.append(footer: indent, data: "]")
-    }
-
-}
-
-extension Dictionary : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "{")
-        for item in self {
-            buff.append(inter: indent, key: item.key, value: item.value)
-        }
-        buff.append(footer: indent, data: "}")
+        buff.append(footer: indent, value: "]")
     }
 
 }
@@ -254,11 +192,11 @@ extension Dictionary : IDebug {
 extension NSDictionary : IDebug {
     
     public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, data: "{")
+        buff.append(header: indent, value: "{")
         for item in self {
             buff.append(inter: indent, key: item.key, value: item.value)
         }
-        buff.append(footer: indent, data: "}")
+        buff.append(footer: indent, value: "}")
     }
 
 }

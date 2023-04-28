@@ -6,20 +6,50 @@ import Foundation
 
 public extension Json {
     
-    @inlinable
-    static func parse< Result >(data: Data, _ block: (Json) throws -> Result) throws -> Result {
-        guard let json = Json(data: data) else {
-            throw Json.Error.notJson
+    convenience init(
+        path: Json.Path = .root,
+        data: Data
+    ) throws {
+        guard let root = try? JSONSerialization.jsonObject(with: data, options: []) else {
+            throw Json.Error.Parse.notJson
         }
-        return try block(json)
+        self.init(path: path, root: root as! IJsonValue)
+    }
+    
+    convenience init(
+        path: Json.Path = .root,
+        string: String,
+        encoding: String.Encoding = .utf8
+    ) throws {
+        guard let data = string.data(using: encoding) else {
+            throw Json.Error.Parse.notJson
+        }
+        try self.init(path: path, data: data)
+    }
+    
+}
+
+public extension Json {
+    
+    @inlinable
+    static func parse< Result >(
+        path: Json.Path = .root,
+        data: Data,
+        decode: (Json) throws -> Result
+    ) throws -> Result {
+        let json = try Json(path: path, data: data)
+        return try decode(json)
     }
     
     @inlinable
-    static func parse< Result >(string: String, encoding: String.Encoding = String.Encoding.utf8, _ block: (Json) throws -> Result) throws -> Result {
-        guard let json = Json(string: string, encoding: encoding) else {
-            throw Json.Error.notJson
-        }
-        return try block(json)
+    static func parse< Result >(
+        path: Json.Path = .root,
+        string: String,
+        encoding: String.Encoding = .utf8,
+        decode: (Json) throws -> Result
+    ) throws -> Result {
+        let json = try Json(path: path, string: string, encoding: encoding)
+        return try decode(json)
     }
     
 }

@@ -7,23 +7,20 @@ import Foundation
 public final class Json {
 
     public internal(set) var root: IJsonValue?
+    public let path: Json.Path
 
-    public init() {
+    public init(
+        path: Json.Path = .root
+    ) {
+        self.path = path
     }
 
-    public init(root: IJsonValue) {
+    public init(
+        path: Json.Path = .root,
+        root: IJsonValue
+    ) {
         self.root = root
-    }
-
-    public init?(data: Data) {
-        guard let root = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
-        self.root = (root as! IJsonValue)
-    }
-
-    public init?(string: String, encoding: String.Encoding = String.Encoding.utf8) {
-        guard let data = string.data(using: String.Encoding.utf8) else { return nil }
-        guard let root = try? JSONSerialization.jsonObject(with: data, options: []) else { return nil }
-        self.root = (root as! IJsonValue)
+        self.path = path
     }
     
 }
@@ -38,74 +35,16 @@ public extension Json {
         return self.root is NSDictionary
     }
     
+    var dictionary: NSDictionary? {
+        return self.root as? NSDictionary
+    }
+    
     var isArray: Bool {
         return self.root is NSArray
     }
     
-    func dictionary() throws -> NSDictionary {
-        guard let dictionary = self.root as? NSDictionary else {
-            throw Json.Error.notJson
-        }
-        return dictionary
-    }
-    
-    func array() throws -> NSArray {
-        guard let array = self.root as? NSArray else {
-            throw Json.Error.notJson
-        }
-        return array
-    }
-    
-}
-
-public extension Json {
-    
-    func build(_ block: (_ json: Self) throws -> Void) rethrows -> Self {
-        try block(self)
-        return self
-    }
-    
-}
-
-public extension Json {
-
-    func saveAsData(options: JSONSerialization.WritingOptions = []) throws -> Data {
-        guard let root = self.root else {
-            throw Json.Error.notJson
-        }
-        return try JSONSerialization.data(withJSONObject: root, options: options)
-    }
-
-    func saveAsString(encoding: String.Encoding = String.Encoding.utf8, options: JSONSerialization.WritingOptions = []) throws -> String? {
-        return String(data: try self.saveAsData(options: options), encoding: encoding)
-    }
-    
-}
-
-public extension Json {
-    
-    func get() throws -> IJsonValue {
-        return try self._get(path: nil)
-    }
-    
-    func get(path: String) throws -> IJsonValue {
-        return try self._get(path: path)
-    }
-
-    func set(value: IJsonValue) throws {
-        try self._set(value: value, path: nil)
-    }
-    
-    func set(value: IJsonValue, path: String) throws {
-        try self._set(value: value, path: path)
-    }
-
-    func remove(path: String) throws {
-        try self._set(value: nil, path: path)
-    }
-    
-    func clean() {
-        self.root = nil
+    var array: NSArray? {
+        return self.root as? NSArray
     }
     
 }

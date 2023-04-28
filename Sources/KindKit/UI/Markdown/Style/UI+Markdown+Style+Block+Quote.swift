@@ -8,31 +8,37 @@ public extension UI.Markdown.Style.Block {
     
     final class Quote {
         
-        public var inset = Inset(top: 24, left: 0, right: 0, bottom: 0) {
+        public var inset: Inset = .init(top: 24, left: 0, right: 0, bottom: 0) {
             didSet {
                 guard self.inset != oldValue else { return }
                 self._change()
             }
         }
-        public var panelCornerRadius = UI.CornerRadius.manual(radius: 6) {
+        public var panelSize = 5.0 {
+            didSet {
+                guard self.panelSize != oldValue else { return }
+                self._change()
+            }
+        }
+        public var panelCornerRadius: UI.CornerRadius = .auto {
             didSet {
                 guard self.panelCornerRadius != oldValue else { return }
                 self._change()
             }
         }
-        public var panelBorder = UI.Border.none {
+        public var panelBorder: UI.Border = .none {
             didSet {
                 guard self.panelBorder != oldValue else { return }
                 self._change()
             }
         }
-        public var panelColor = UI.Color.lightGray {
+        public var panelColor = UI.Color.darkGray {
             didSet {
                 guard self.panelColor != oldValue else { return }
                 self._change()
             }
         }
-        public var contentInset = Inset(top: 0, left: 16, right: 0, bottom: 0) {
+        public var contentInset: Inset = .init(top: 0, left: 16, right: 0, bottom: 0) {
             didSet {
                 guard self.contentInset != oldValue else { return }
                 self._change()
@@ -61,6 +67,12 @@ public extension UI.Markdown.Style.Block.Quote {
     @inlinable
     func inset(_ value: Inset) -> Self {
         self.inset = value
+        return self
+    }
+    
+    @inlinable
+    func panelSize(_ value: Double) -> Self {
+        self.panelSize = value
         return self
     }
     
