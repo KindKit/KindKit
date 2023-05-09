@@ -276,3 +276,12 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
     }
     
 }
+
+public extension BinaryInteger {
+    
+    @inlinable
+    func kk_format(integer formatter: StringFormatter.Integer< Self >) -> String {
+        return formatter.format(self)
+    }
+    
+}

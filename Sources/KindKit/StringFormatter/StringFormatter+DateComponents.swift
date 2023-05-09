@@ -111,8 +111,18 @@ public extension StringFormatter.DateComponents {
 
 public extension IStringFormatter where Self == StringFormatter.DateComponents {
     
+    @inlinable
     static func dateComponents() -> Self {
         return .init()
+    }
+    
+}
+
+public extension TimeInterval {
+    
+    @inlinable
+    func kk_format(dateComponents formatter: StringFormatter.DateComponents) -> String {
+        return formatter.format(self)
     }
     
 }

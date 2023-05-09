@@ -13,11 +13,11 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Input
         
-        private let _closure: (Result< Input.Success, Input.Failure >) -> KindKit.Log.Message?
+        private let _closure: (Result< Input.Success, Input.Failure >) -> ILogMessage?
         private var _next: IFlowPipe!
         
         init(
-            _ closure: @escaping (Result< Input.Success, Input.Failure >) -> KindKit.Log.Message?
+            _ closure: @escaping (Result< Input.Success, Input.Failure >) -> ILogMessage?
         ) {
             self._closure = closure
         }
@@ -28,22 +28,14 @@ public extension Flow.Operator {
         
         public func receive(value: Input.Success) {
             if let message = self._closure(.success(value)) {
-                KindKit.Log.shared.log(
-                    level: message.level,
-                    category: message.category,
-                    message: message.message
-                )
+                KindKit.Log.shared.log(message: message)
             }
             self._next.send(value: value)
         }
         
         public func receive(error: Input.Failure) {
             if let message = self._closure(.failure(error)) {
-                KindKit.Log.shared.log(
-                    level: message.level,
-                    category: message.category,
-                    message: message.message
-                )
+                KindKit.Log.shared.log(message: message)
             }
             self._next.send(error: error)
         }
@@ -63,7 +55,7 @@ public extension Flow.Operator {
 extension IFlowOperator {
     
     func log(
-        _ closure: @escaping (Result< Output.Success, Output.Failure >) -> Optional< Log.Message >
+        _ closure: @escaping (Result< Output.Success, Output.Failure >) -> ILogMessage?
     ) -> Flow.Operator.Log< Output > {
         let next = Flow.Operator.Log< Output >(closure)
         self.subscribe(next: next)
@@ -75,7 +67,7 @@ extension IFlowOperator {
 public extension Flow.Builder {
     
     func log(
-        _ closure: @escaping (Result< Input.Success, Input.Failure >) -> Optional< Log.Message >
+        _ closure: @escaping (Result< Input.Success, Input.Failure >) -> ILogMessage?
     ) -> Flow.Head.Builder< Flow.Operator.Log< Input > > {
         return .init(head: .init(closure))
     }
@@ -85,7 +77,7 @@ public extension Flow.Builder {
 public extension Flow.Head.Builder {
     
     func log(
-        _ closure: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> Optional< Log.Message >
+        _ closure: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> ILogMessage?
     ) -> Flow.Chain.Builder< Head, Flow.Operator.Log< Head.Output > > {
         return .init(head: self.head, tail: self.head.log(closure))
     }
@@ -94,7 +86,7 @@ public extension Flow.Head.Builder {
 public extension Flow.Chain.Builder {
     
     func log(
-        _ closure: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Optional< Log.Message >
+        _ closure: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> ILogMessage?
     ) -> Flow.Chain.Builder< Head, Flow.Operator.Log< Tail.Output > > {
         return .init(head: self.head, tail: self.tail.log(closure))
     }

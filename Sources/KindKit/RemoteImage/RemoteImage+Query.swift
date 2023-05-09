@@ -54,33 +54,37 @@ public extension RemoteImage {
 
 private extension RemoteImage.Query {
     
-    struct Response : IApiResponse {
+    struct Response : IApiDataResponse {
         
         typealias Success = (Data, UI.Image)
         typealias Failure = RemoteImage.Error
+        typealias Result = Swift.Result< Success, Failure >
         
-        func parse(meta: Api.Response.Meta, data: Data?) -> Result< Success, Failure > {
-            guard let data = data else {
-                return .failure(.invalidResponse)
-            }
+        func parse(meta: Api.Response.Meta, data: Data) throws -> Result {
             guard let image = UI.Image(data: data) else {
-                return .failure(.invalidResponse)
+                return .failure(.parse(.init(statusCode: meta.statusCode, response: data)))
             }
             return .success((data, image))
         }
         
-        func parse(error: Error) -> Result< Success, Failure > {
-            let nsError = error as NSError
-            switch nsError.domain {
-            case NSURLErrorDomain:
-                switch nsError.code {
-                case NSURLErrorUnknown: return .failure(.invalidRequest)
-                case NSURLErrorNotConnectedToInternet, NSURLErrorDataNotAllowed: return .failure(.notConnectedToInternet)
-                case NSURLErrorTimedOut: return .failure(.timeout)
-                default: return .failure(.invalidResponse)
-                }
-            default: return .failure(.invalidResponse)
-            }
+        func failure(meta: Api.Response.Meta) -> Failure? {
+            return nil
+        }
+        
+        func failure(parse: Api.Error.Parse) -> Failure {
+            return .parse(parse)
+        }
+        
+        func failure(request: Api.Error.Request) -> Failure {
+            return .request(request)
+        }
+        
+        func failure(network: Api.Error.Network) -> Failure {
+            return .network(network)
+        }
+        
+        func failure(error: Swift.Error) -> Failure {
+            return .unknown
         }
         
     }

@@ -178,13 +178,18 @@ extension UI.ViewController {
         
         var kkContent: UIView? {
             willSet {
-                self.kkContent?.removeFromSuperview()
+                guard self.kkContent !== newValue else { return }
+                if let content = self.kkContent {
+                    content.removeFromSuperview()
+                }
             }
             didSet {
-                guard let content = self.kkContent else { return }
-                content.frame = self.bounds
-                self.addSubview(content)
-                self.layoutIfNeeded()
+                guard self.kkContent !== oldValue else { return }
+                if let content = self.kkContent {
+                    content.frame = self.bounds
+                    self.addSubview(content)
+                    self.layoutIfNeeded()
+                }
             }
         }
         

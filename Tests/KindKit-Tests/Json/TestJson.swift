@@ -32,10 +32,10 @@ class TestJson : XCTestCase {
             switch error {
             case .access(let path):
                 if path.string != "other.c" {
-                    XCTFail(path.dump())
+                    XCTFail(path.description)
                 }
             case .cast(let path):
-                XCTFail(path.dump())
+                XCTFail(path.description)
             }
         }
         do {
@@ -43,10 +43,10 @@ class TestJson : XCTestCase {
         } catch let error as Json.Error.Coding {
             switch error {
             case .access(let path):
-                XCTFail(path.dump())
+                XCTFail(path.description)
             case .cast(let path):
                 if path.string != "other.b" {
-                    XCTFail(path.dump())
+                    XCTFail(path.description)
                 }
             }
         }

@@ -4,7 +4,7 @@
 
 import Foundation
 
-extension UInt {
+public extension UInt {
     
     @inlinable
     static func kk_make(string: String, radix: UInt) -> Self? {

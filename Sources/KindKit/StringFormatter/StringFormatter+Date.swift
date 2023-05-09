@@ -83,3 +83,12 @@ public extension IStringFormatter where Self == StringFormatter.Date {
     }
     
 }
+
+public extension Date {
+    
+    @inlinable
+    func kk_format(date formatter: StringFormatter.Date) -> String {
+        return formatter.format(self)
+    }
+    
+}

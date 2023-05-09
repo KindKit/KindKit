@@ -8,7 +8,7 @@ extension LogUI.Screen {
     
     struct Entity {
         
-        let message: Log.Message
+        let message: ILogMessage
         let cell: UI.View.Cell
         
     }

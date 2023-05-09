@@ -114,23 +114,16 @@ public extension Json.Path {
     
 }
 
-extension Json.Path : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        return self.dump()
-    }
-    
-}
-
 extension Json.Path : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        for item in self.items {
-            switch item {
-            case .key(let key): buff.append(inter: indent, value: key)
-            case .index(let index): buff.append(inter: indent, value: index)
-            }
-        }
+    public func debugInfo() -> Debug.Info {
+        return .string(self.string)
     }
 
+}
+
+extension Json.Path : CustomStringConvertible {
+}
+
+extension Json.Path : CustomDebugStringConvertible {
 }

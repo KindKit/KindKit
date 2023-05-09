@@ -86,16 +86,6 @@ public extension Double {
     
 }
 
-extension Double : INearEqutable {
-    
-    @inlinable
-    public static func ~~ (lhs: Self, rhs: Self) -> Bool {
-        let d = lhs - rhs
-        return d.abs <= .ulpOfOne
-    }
-
-}
-
 extension Double : ILerpable {
     
     @inlinable

@@ -11,8 +11,8 @@ extension Api.Provider {
         public var authenticationChallenge: Api.AuthenticationChallenge
         public var localCertificateUrls: [URL]
         
-        private var _queue = DispatchQueue(label: "KindKit.Api.Provider")
-        private var _tasks: [Int : any IApiTaskQuery] = [:]
+        private var _lock = Lock()
+        private var _tasks: [Int : IApiTaskQuery] = [:]
         
         init(
             authenticationChallenge: Api.AuthenticationChallenge = [],
@@ -29,8 +29,8 @@ extension Api.Provider {
             }
         }
         
-        func append(_ taskQuery: any IApiTaskQuery) {
-            self._queue.sync(flags: .barrier, execute: {
+        func append(_ taskQuery: IApiTaskQuery) {
+            self._lock.perform({
                 self._tasks[taskQuery.task.taskIdentifier] = taskQuery
             })
         }
@@ -41,34 +41,27 @@ extension Api.Provider {
 
 private extension Api.Provider.SessionDelegate {
     
-    func _query(task: URLSessionTask) -> (any IApiTaskQuery)? {
-        var query: (any IApiTaskQuery)? = nil
-        self._queue.sync(execute: {
-            query = self._tasks[task.taskIdentifier]
+    func _query(task: URLSessionTask) -> IApiTaskQuery? {
+        return self._lock.perform({
+            return self._tasks[task.taskIdentifier]
         })
-        return query
     }
     
-    func _remove(task: URLSessionTask) -> (any IApiTaskQuery)? {
-        var query: (any IApiTaskQuery)? = nil
-        self._queue.sync(execute: {
-            let key = task.taskIdentifier
-            query = self._tasks[key]
-            self._tasks.removeValue(forKey: key)
+    func _remove(task: URLSessionTask) -> IApiTaskQuery? {
+        return self._lock.perform({
+            return self._tasks.removeValue(forKey: task.taskIdentifier)
         })
-        return query
     }
     
-    func _move(fromTask: URLSessionTask, toTask: URLSessionTask) -> (any IApiTaskQuery)? {
-        var query: (any IApiTaskQuery)? = nil
-        self._queue.sync(execute: {
-            query = self._tasks[fromTask.taskIdentifier]
+    func _move(fromTask: URLSessionTask, toTask: URLSessionTask) -> IApiTaskQuery? {
+        return self._lock.perform({
+            let query = self._tasks[fromTask.taskIdentifier]
             self._tasks.removeValue(forKey: fromTask.taskIdentifier)
             if let query = query {
                 self._tasks[toTask.taskIdentifier] = query
             }
+            return query
         })
-        return query
     }
     
     func _authentication(challenge: URLAuthenticationChallenge) -> (disposition: URLSession.AuthChallengeDisposition, credential: URLCredential?) {
@@ -130,9 +123,9 @@ extension Api.Provider.SessionDelegate : URLSessionDelegate {
         _ session: URLSession,
         didBecomeInvalidWithError error: Error?
     ) {
-        self._queue.sync {
+        self._lock.perform({
             self._tasks.removeAll()
-        }
+        })
     }
 
     public func urlSession(

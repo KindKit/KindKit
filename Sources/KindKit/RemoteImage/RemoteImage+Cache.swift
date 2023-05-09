@@ -15,7 +15,7 @@ public extension RemoteImage {
         private var _memory: [String: UI.Image] = [:]
         private let _appState = AppState()
         private var _fileManager = FileManager.default
-        private var _queue: DispatchQueue = DispatchQueue(label: "KindKit.RemoteImage.Cache")
+        private var _lock = Lock()
 
         public init(
             name: String,
@@ -64,7 +64,7 @@ public extension RemoteImage.Cache {
     }
     
     func isExist(key: String) -> Bool {
-        let memoryImage = self._queue.sync(execute: {
+        let memoryImage = self._lock.perform({
             return self._memory[key]
         })
         if memoryImage != nil {
@@ -89,7 +89,7 @@ public extension RemoteImage.Cache {
     }
 
     func image(key: String) -> UI.Image? {
-        let memoryImage = self._queue.sync(execute: {
+        let memoryImage = self._lock.perform({
             return self._memory[key]
         })
         if let image = memoryImage {
@@ -98,7 +98,7 @@ public extension RemoteImage.Cache {
         let url = self.url.appendingPathComponent(key)
         if let image = UI.Image(url: url) {
             if self._canStoreInMemory(image: image) == true {
-                self._queue.sync(flags: .barrier, execute: {
+                self._lock.perform({
                     self._memory[key] = image
                 })
             }
@@ -125,7 +125,7 @@ public extension RemoteImage.Cache {
         let url = self.url.appendingPathComponent(key)
         try data.write(to: url, options: .atomic)
         if self._canStoreInMemory(image: image) == true {
-            self._queue.sync(flags: .barrier, execute: {
+            self._lock.perform({
                 self._memory[key] = image
             })
         }
@@ -146,7 +146,7 @@ public extension RemoteImage.Cache {
     }
 
     func remove(key: String) throws {
-        self._queue.sync(flags: .barrier, execute: {
+        self._lock.perform({
             _ = self._memory.removeValue(forKey: key)
         })
         let url = self.url.appendingPathComponent(key)
@@ -168,7 +168,7 @@ public extension RemoteImage.Cache {
     }
 
     func cleanupMemory() {
-        self._queue.sync(flags: .barrier, execute: {
+        self._lock.perform({
             self._memory.removeAll()
         })
     }

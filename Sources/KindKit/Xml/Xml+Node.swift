@@ -43,28 +43,27 @@ public extension Xml.Node {
     
 }
 
-extension Xml.Node : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        return self.dump()
+extension Xml.Node : IDebug {
+    
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Node", sequence: { items in
+            items.append(.pair(string: "Name", cast: self.name))
+            if self.attributes.count > 0 {
+                items.append(.pair(string: "Attributes", cast: self.attributes))
+            }
+            if self.nodes.count > 0 {
+                items.append(.pair(string: "Nodes", cast: self.nodes))
+            }
+            if let value = self.value {
+                items.append(.pair(string: "Value", cast: value))
+            }
+        })
     }
     
 }
 
-extension Xml.Node : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Node")
-        buff.append(inter: indent, key: "Name", value: self.name)
-        if self.attributes.count > 0 {
-            buff.append(inter: indent, key: "Attributes", value: self.attributes)
-        }
-        if self.nodes.count > 0 {
-            buff.append(inter: indent, key: "Nodes", value: self.nodes)
-        }
-        if let value = self.value {
-            buff.append(inter: indent, key: "Attributes", value: value)
-        }
-    }
-    
+extension Xml.Node : CustomStringConvertible {
+}
+
+extension Xml.Node : CustomDebugStringConvertible {
 }

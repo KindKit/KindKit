@@ -307,3 +307,12 @@ public extension IStringFormatter where Self == StringFormatter.Double< Swift.Fl
     }
     
 }
+
+public extension BinaryFloatingPoint {
+    
+    @inlinable
+    func kk_format(floatingPoint formatter: StringFormatter.Double< Self >) -> String {
+        return formatter.format(self)
+    }
+    
+}

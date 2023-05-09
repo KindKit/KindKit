@@ -61,3 +61,12 @@ public extension IStringFormatter where Self == StringFormatter.ByteCount {
     }
     
 }
+
+public extension Int64 {
+    
+    @inlinable
+    func kk_format(byteCount formatter: StringFormatter.ByteCount) -> String {
+        return formatter.format(self)
+    }
+    
+}

@@ -8,6 +8,6 @@ public protocol ILogTarget : AnyObject {
     
     var files: [URL] { get }
     
-    func log(message: Log.Message)
+    func log(message: ILogMessage)
     
 }

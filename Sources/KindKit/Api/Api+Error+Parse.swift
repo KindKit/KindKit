@@ -25,42 +25,23 @@ public extension Api.Error {
 
 extension Api.Error.Parse : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Api.Error.Parse")
-        if let statusCode = self.statusCode {
-            buff.append(inter: indent, key: "StatusCode", value: statusCode)
-        }
-        if let response = self.response {
-            if response.isEmpty == false {
-                if let json = try? JSONSerialization.jsonObject(with: response) {
-                    if let root = json as? NSArray {
-                        buff.append(
-                            inter: indent,
-                            key: "Response",
-                            value: root
-                        )
-                    } else if let root = json as? NSDictionary {
-                        buff.append(
-                            inter: indent,
-                            key: "Response",
-                            value: root
-                        )
-                    }
-                } else if let string = String(data: response, encoding: .utf8) {
-                    buff.append(
-                        inter: indent,
-                        key: "Response",
-                        value: string.kk_escape([ .tab, .return, .newline ])
-                    )
-                } else {
-                    buff.append(
-                        inter: indent,
-                        key: "Response",
-                        value: response
-                    )
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Api.Error.Parse", sequence: { items in
+            if let value = self.statusCode {
+                items.append(.pair(string: "StatusCode", cast: value))
+            }
+            if let value = self.response {
+                if value.isEmpty == false {
+                    items.append(.pair(string: "Response", cast: value))
                 }
             }
-        }
+        })
     }
     
+}
+
+extension Api.Error.Parse : CustomStringConvertible {
+}
+
+extension Api.Error.Parse : CustomDebugStringConvertible {
 }

@@ -61,18 +61,26 @@ private extension Api.Query.Fail {
     
     func _perform() {
         let result = self.response.parse(error: self.error)
-        switch self.provider.logging {
+        switch self.response.logging(provider: self.provider, result: result) {
         case .never:
             break
         case .errorOnly(let category):
             switch result {
             case .failure:
-                Log.shared.log(level: .error, category: category, message: self.dump())
+                Log.shared.log(message: .debug(
+                    level: .error,
+                    category: category,
+                    info: self
+                ))
             default:
                 break
             }
         case .always(let category):
-            Log.shared.log(level: .error, category: category, message: self.dump())
+            Log.shared.log(message: .debug(
+                level: .error,
+                category: category,
+                info: self
+            ))
         }
         self.queue.async(execute: {
             self.onCompleted(result)
@@ -83,21 +91,30 @@ private extension Api.Query.Fail {
 
 extension Api.Query.Fail : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(
-            inter: indent,
-            key: "CreateAt",
-            value: self.createAt,
-            valueFormatter: .date()
-        )
-        buff.append(
-            inter: indent,
-            key: "Duration",
-            value: -self.createAt.timeIntervalSinceNow,
-            valueFormatter: .dateComponents()
-                .unitsStyle(.abbreviated)
-                .allowedUnits([ .second, .nanosecond ])
-        )
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Api.Query.Fail", sequence: { items in
+            items.append(.pair(
+                string: "CreateAt",
+                string: self.createAt.kk_format(
+                    date: .init()
+                        .format("yyyy-MM-dd'T'HH:mm:ssZ")
+                )
+            ))
+            items.append(.pair(
+                string: "Duration",
+                string: (-self.createAt.timeIntervalSinceNow).kk_format(
+                    dateComponents: .init()
+                        .unitsStyle(.abbreviated)
+                        .allowedUnits([ .second, .nanosecond ])
+                )
+            ))
+        })
     }
     
+}
+
+extension Api.Query.Fail : CustomStringConvertible {
+}
+
+extension Api.Query.Fail : CustomDebugStringConvertible {
 }

@@ -44,15 +44,22 @@ public extension Api.Error.Network {
 
 extension Api.Error.Network : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Api.Error.Network")
-        switch self {
-        case .notConnected: buff.append(inter: indent, value: "NotConnected")
-        case .lost: buff.append(inter: indent, value: "Lost")
-        case .untrusted: buff.append(inter: indent, value: "Untrusted")
-        case .cancelled: buff.append(inter: indent, value: "Cancelled")
-        case .timeout: buff.append(inter: indent, value: "Timeout")
-        }
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Api.Error.Network", info: {
+            switch self {
+            case .notConnected: return .string("NotConnected")
+            case .lost: return .string("Lost")
+            case .untrusted: return .string("Untrusted")
+            case .cancelled: return .string("Cancelled")
+            case .timeout: return .string("Timeout")
+            }
+        })
     }
     
+}
+
+extension Api.Error.Network : CustomStringConvertible {
+}
+
+extension Api.Error.Network : CustomDebugStringConvertible {
 }

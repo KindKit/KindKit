@@ -18,69 +18,66 @@ public extension Api.Error {
 
 extension Api.Error.Request : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Api.Error.Request")
-        switch self {
-        case .query(let query):
-            let indent = indent.next
-            buff.append(header: indent, value: "Query")
-            switch query {
-            case .requireProviderUrl: buff.append(inter: indent, value: "RequireProviderUrl")
-            case .decode(let components): buff.append(inter: indent, key: "Decode", value: components)
-            case .encode(let components): buff.append(inter: indent, key: "Encode", value: components)
-            }
-        case .body(let body):
-            buff.append(header: indent, value: "Body")
-            switch body {
-            case .unknown:
-                let indent = indent.next
-                buff.append(header: indent, value: "Body.File")
-                    .append(inter: indent, value: "Unknown")
-            case .file(let file):
-                let indent = indent.next
-                buff.append(header: indent, value: "Body.File")
-                switch file {
-                case .notFound(let url): buff.append(inter: indent, key: "NotFound", value: url)
-                case .other(let url): buff.append(inter: indent, key: "Other", value: url)
-                }
-            case .form(let form):
-                let indent = indent.next
-                buff.append(header: indent, value: "Body.Form")
-                switch form {
-                case .key(let param):
-                    buff.append(inter: indent, key: "Param", value: param)
-                case .pair(let param, let value):
-                    buff.append(inter: indent, key: "Param", value: param)
-                    buff.append(inter: indent, key: "Value", value: value)
-                }
-            case .json(let json):
-                let indent = indent.next
-                switch json {
-                case .coding(let error):
-                    buff.append(header: indent, value: "Body.Json.Coding")
-                    switch error {
-                    case .access(let path): buff.append(inter: indent, key: "Access", value: path.string)
-                    case .cast(let path): buff.append(inter: indent, key: "Cast", value: path.string)
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Api.Error.Request", sequence: { items in
+            switch self {
+            case .query(let query):
+                items.append(.object(name: "Query", sequence: { items in
+                    switch query {
+                    case .requireProviderUrl: items.append(.string("RequireProviderUrl"))
+                    case .decode(let components): items.append(.pair(string: "Decode", cast: components))
+                    case .encode(let components): items.append(.pair(string: "Encode", cast: components))
                     }
-                case .save(let error):
-                    buff.append(header: indent, value: "Body.Json.Save")
-                    switch error {
-                    case .empty: buff.append(inter: indent, value: "Empty")
-                    case .unknown: buff.append(inter: indent, value: "Unknown")
+                }))
+            case .body(let body):
+                items.append(.object(name: "Body", sequence: { items in
+                    switch body {
+                    case .unknown:
+                        items.append(.string("Unknown"))
+                    case .file(let file):
+                        items.append(.object(name: "File", sequence: { items in
+                            switch file {
+                            case .notFound(let url): items.append(.pair(string: "NotFound", cast: url))
+                            case .other(let url): items.append(.pair(string: "Other", cast: url))
+                            }
+                        }))
+                    case .form(let form):
+                        items.append(.object(name: "Form", sequence: { items in
+                            switch form {
+                            case .key(let param):
+                                items.append(.pair(string: "Param", cast: param))
+                            case .pair(let param, let value):
+                                items.append(.pair(string: "Param", cast: param))
+                                items.append(.pair(string: "Value", cast: value))
+                            }
+                        }))
+                    case .json(let json):
+                        switch json {
+                        case .coding(let error):
+                            items.append(.object(name: "Json.Coding", cast: error))
+                        case .save(let error):
+                            items.append(.object(name: "Json.Save", cast: error))
+                        }
+                    case .text(let text):
+                        items.append(.object(name: "Text", sequence: { items in
+                            switch text {
+                            case .encoding(let string, let encoding):
+                                items.append(.pair(string: "String", cast: string))
+                                items.append(.pair(string: "Encoding", cast: encoding.description))
+                            }
+                        }))
                     }
-                }
-            case .text(let text):
-                let indent = indent.next
-                buff.append(header: indent, value: "Body.Text")
-                switch text {
-                case .encoding(let string, let encoding):
-                    buff.append(inter: indent, key: "String", value: string)
-                    buff.append(inter: indent, key: "Encoding", value: encoding)
-                }
+                }))
+            case .unhandle(let error):
+                items.append(.pair(string: "Unhandle", cast: error))
             }
-        case .unhandle(let error):
-            buff.append(inter: indent, key: "Unhandle", value: error)
-        }
+        })
     }
     
+}
+
+extension Api.Error.Request : CustomStringConvertible {
+}
+
+extension Api.Error.Request : CustomDebugStringConvertible {
 }

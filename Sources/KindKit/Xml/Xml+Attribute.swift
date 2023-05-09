@@ -20,20 +20,20 @@ public extension Xml {
     
 }
 
-extension Xml.Attribute : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        return self.dump()
-    }
-    
-}
-
 extension Xml.Attribute : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Attribute")
-            .append(inter: indent, key: "Name", value: self.name)
-            .append(inter: indent, key: "Value", value: self.value)
+    public func debugInfo() -> Debug.Info {
+        return .sequence({ items in
+            items.append(.pair(string: "Name", cast: self.name))
+            items.append(.pair(string: "Value", cast: self.value))
+        })
     }
     
 }
+
+extension Xml.Attribute : CustomStringConvertible {
+}
+
+extension Xml.Attribute : CustomDebugStringConvertible {
+}
+

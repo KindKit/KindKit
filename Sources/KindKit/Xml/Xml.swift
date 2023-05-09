@@ -44,19 +44,17 @@ public extension Xml {
     
 }
 
-extension Xml : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        return self.dump()
-    }
-    
-}
-
 extension Xml : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        guard self.nodes.count > 0 else { return }
-        buff.append(inter: indent, value: self.nodes)
+    public func debugInfo() -> Debug.Info {
+        return .sequence(self.nodes.map({ $0.debugInfo() }))
     }
     
 }
+
+extension Xml : CustomStringConvertible {
+}
+
+extension Xml : CustomDebugStringConvertible {
+}
+

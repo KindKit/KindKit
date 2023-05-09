@@ -62,7 +62,7 @@ public extension Log {
 
 public extension Log {
     
-    func log(message: Log.Message) {
+    func log(message: ILogMessage) {
         for target in self._targets {
             target.log(message: message)
         }
@@ -70,28 +70,28 @@ public extension Log {
     
     @inlinable
     func log(level: Log.Level, category: String, message: String) {
-        self.log(message: .init(
+        self.log(message: .plain(
             level: level,
             category: category,
-            message: message
+            string: message
         ))
     }
     
     @inlinable
     func log< Sender : AnyObject >(level: Log.Level, object: Sender.Type, message: String) {
-        self.log(message: .init(
+        self.log(message: .plain(
             level: level,
             category: String(describing: object),
-            message: message
+            string: message
         ))
     }
     
     @inlinable
     func log< Sender : AnyObject >(level: Log.Level, object: Sender, message: String) {
-        self.log(message: .init(
+        self.log(message: .plain(
             level: level,
             category: String(describing: type(of: object)),
-            message: message
+            string: message
         ))
     }
     

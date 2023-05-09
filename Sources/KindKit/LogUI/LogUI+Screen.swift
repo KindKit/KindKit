@@ -194,12 +194,12 @@ private extension LogUI.Screen {
         self._scrollToBottom()
     }
     
-    func _filter(_ message: Log.Message) -> Bool {
+    func _filter(_ message: ILogMessage) -> Bool {
         guard let search = self._search?.lowercased() else { return true }
         if search.count > 0 {
             if message.category.lowercased().contains(search) == true {
                 return true
-            } else if message.message.lowercased().contains(search) == true {
+            } else if message.string(options: .pretty).lowercased().contains(search) == true {
                 return true
             } else {
                 return false
@@ -208,15 +208,15 @@ private extension LogUI.Screen {
         return true
     }
     
-    func _entities(_ messages: [Log.Message]) -> [Entity] {
+    func _entities(_ messages: [ILogMessage]) -> [Entity] {
         return messages.map({ self._entity($0) })
     }
     
-    func _entity(_ message: Log.Message) -> Entity {
+    func _entity(_ message: ILogMessage) -> Entity {
         return Entity(message: message, cell: self._cell(message))
     }
     
-    func _cell(_ message: Log.Message) -> UI.View.Cell {
+    func _cell(_ message: ILogMessage) -> UI.View.Cell {
         return UI.View.Cell()
             .background(
                 UI.View.Color()
@@ -249,7 +249,7 @@ private extension LogUI.Screen {
                                         .view(
                                             UI.View.Text()
                                                 .color(.white)
-                                                .text(message.message)
+                                                .text(message.string(options: .pretty))
                                                 .textFont(.init(weight: .regular, size: 14))
                                         )
                                     ]
@@ -261,7 +261,7 @@ private extension LogUI.Screen {
             )
     }
     
-    func _color(_ message: Log.Message) -> UI.Color {
+    func _color(_ message: ILogMessage) -> UI.Color {
         switch message.level {
         case .debug: return .gray
         case .info: return .yellow
@@ -273,7 +273,7 @@ private extension LogUI.Screen {
 
 extension LogUI.Screen : ILogUITargetObserver {
     
-    func append(_ target: LogUI.Target, message: Log.Message) {
+    func append(_ target: LogUI.Target, message: ILogMessage) {
         let entity = self._entity(message)
         self._entities.append(entity)
         if self._filter(entity.message) == true {
@@ -286,8 +286,8 @@ extension LogUI.Screen : ILogUITargetObserver {
         }
     }
     
-    func remove(_ target: LogUI.Target, message: Log.Message) {
-        guard let index = self._entities.firstIndex(where: { $0.message == message }) else { return }
+    func remove(_ target: LogUI.Target, message: ILogMessage) {
+        guard let index = self._entities.firstIndex(where: { $0.message.id == message.id }) else { return }
         let entity = self._entities.remove(at: index)
         self.layout.delete(views: [ entity.cell ])
         self.view.layoutIfNeeded()

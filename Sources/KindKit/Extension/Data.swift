@@ -6,7 +6,8 @@ import Foundation
 import CommonCrypto
 
 public extension DataProtocol {
-
+    
+    @inlinable
     var kk_hexString: String {
         var string = String()
         self.forEach({ string += String(format: "%02x", $0) })

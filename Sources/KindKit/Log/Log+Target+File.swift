@@ -55,13 +55,13 @@ extension Log.Target.File : ILogTarget {
         })
     }
     
-    public func log(message: Log.Message) {
+    public func log(message: ILogMessage) {
         self._queue.async(execute: { [weak self] in
             guard let self = self else {
                 return
             }
             let marker = self._dateFormatter.format(message.date)
-            let line = "[\(marker)]: [\(message.category)]: \(message.message)\r"
+            let line = "[\(marker)]: [\(message.category)]: \(message.string(options: .pretty))\r"
             guard let data = line.data(using: .utf8) else {
                 return
             }

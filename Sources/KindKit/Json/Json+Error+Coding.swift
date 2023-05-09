@@ -17,12 +17,19 @@ public extension Json.Error {
 
 extension Json.Error.Coding : IDebug {
     
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Json.Error.Coding")
-        switch self {
-        case .access(let path): buff.append(inter: indent, key: "Access", value: path.string)
-        case .cast(let path): buff.append(inter: indent, key: "Cast", value: path.string)
-        }
+    public func debugInfo() -> Debug.Info {
+        return .object(name: "Json.Error.Coding", sequence: { items in
+            switch self {
+            case .access(let path): items.append(.pair(string: "Access", cast: path))
+            case .cast(let path): items.append(.pair(string: "Cast", cast: path))
+            }
+        })
     }
     
+}
+
+extension Json.Error.Coding : CustomStringConvertible {
+}
+
+extension Json.Error.Coding : CustomDebugStringConvertible {
 }

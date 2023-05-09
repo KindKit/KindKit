@@ -59,19 +59,16 @@ public extension Xml.Value {
     
 }
 
-extension Xml.Value : CustomDebugStringConvertible {
-
-    public var debugDescription: String {
-        return self.dump()
+extension Xml.Value : IDebug {
+    
+    public func debugInfo() -> Debug.Info {
+        return self.text.debugInfo()
     }
     
 }
 
-extension Xml.Value : IDebug {
-    
-    public func dump(_ buff: StringBuilder, _ indent: Debug.Indent) {
-        buff.append(header: indent, value: "Value")
-            .append(inter: indent, value: self.text)
-    }
-    
+extension Xml.Value : CustomStringConvertible {
+}
+
+extension Xml.Value : CustomDebugStringConvertible {
 }

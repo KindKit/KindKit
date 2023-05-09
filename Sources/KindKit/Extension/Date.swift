@@ -66,6 +66,7 @@ public extension Date {
         return components.date
     }
     
+    @inlinable
     func kk_isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
         return calendar.isDate(self, equalTo: date, toGranularity: component)
     }

@@ -6,8 +6,8 @@ import Foundation
 
 protocol ILogUITargetObserver : AnyObject {
     
-    func append(_ target: LogUI.Target, message: Log.Message)
-    func remove(_ target: LogUI.Target, message: Log.Message)
+    func append(_ target: LogUI.Target, message: ILogMessage)
+    func remove(_ target: LogUI.Target, message: ILogMessage)
 
 }
 
@@ -16,13 +16,13 @@ public extension LogUI {
     final class Target {
         
         public let limit: Int
-        var messages: [Log.Message] {
+        var messages: [ILogMessage] {
             return self._queue.sync(flags: .barrier, execute: {
                 return self._messages
             })
         }
 
-        private var _messages: [Log.Message]
+        private var _messages: [ILogMessage]
         private let _queue: DispatchQueue
         private let _observer: Observer< ILogUITargetObserver >
         
@@ -57,7 +57,7 @@ extension LogUI.Target : ILogTarget {
         return []
     }
     
-    public func log(message: Log.Message) {
+    public func log(message: ILogMessage) {
         self._queue.async(execute: { [weak self] in
             guard let self = self else { return }
             self._log(message: message)
@@ -69,9 +69,9 @@ extension LogUI.Target : ILogTarget {
 
 private extension LogUI.Target {
     
-    func _log(message: Log.Message) {
+    func _log(message: ILogMessage) {
         self._messages.append(message)
-        let removeMessage: Log.Message?
+        let removeMessage: ILogMessage?
         if self._messages.count > self.limit {
             removeMessage = self._messages.removeFirst()
         } else {
@@ -83,7 +83,7 @@ private extension LogUI.Target {
         })
     }
     
-    func _didLog(append: Log.Message, remove: Log.Message?) {
+    func _didLog(append: ILogMessage, remove: ILogMessage?) {
         self._observer.notify({ $0.append(self, message: append) })
         if let remove = remove {
             self._observer.notify({ $0.remove(self, message: remove) })
