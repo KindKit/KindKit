@@ -88,6 +88,17 @@ extension IDatabaseExpressable where Self : DataProtocol {
 
 extension Data : IDatabaseExpressable {}
 
+// MARK: Json
+
+extension Json : IDatabaseExpressable {
+    
+    public var query: String {
+        guard let data = try? self.asData() else { return "x''" }
+        return data.query
+    }
+    
+}
+
 // MARK: Extented
 
 extension Identifier : IDatabaseExpressable where Raw : IDatabaseExpressable {

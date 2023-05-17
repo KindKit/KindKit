@@ -71,6 +71,14 @@ extension IDatabaseValue where Self : DataProtocol {
 
 extension Data : IDatabaseValue {}
 
+// MARK: Json
+
+extension Json : IDatabaseValue {
+    
+    public typealias TypeDeclaration = Database.TypeDeclaration.Blob
+    
+}
+
 // MARK: Extented
 
 extension Identifier : IDatabaseValue where Raw : IDatabaseValue {

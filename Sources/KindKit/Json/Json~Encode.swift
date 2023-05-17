@@ -6,6 +6,7 @@ import Foundation
 
 public extension Json {
     
+    @inlinable
     func encode<
         Encoder : IJsonValueEncoder
     >(
@@ -158,6 +159,7 @@ public extension Json {
 
 public extension Json {
     
+    @inlinable
     func encode<
         Encoder : IJsonValueEncoder
     >(
@@ -319,6 +321,7 @@ public extension Json {
 
 public extension Json {
     
+    @inlinable
     func encode<
         KeyEncoder : IJsonValueEncoder,
         ValueEncoder : IJsonValueEncoder
@@ -421,10 +424,36 @@ public extension Json {
 
 public extension Json {
     
-    func encode(_ dateFormat: String, value: Date, path: String) throws {
+    @inlinable
+    func encode(
+        _ dateFormat: String,
+        value: Date,
+        path: Json.Path = .root
+    ) throws {
         let formatter = DateFormatter()
         formatter.dateFormat = dateFormat
-        try self.encode(String.self, value: formatter.string(from: value))
+        try self.encode(
+            String.self,
+            value: formatter.string(from: value),
+            path: path
+        )
+    }
+    
+    @inlinable
+    func encode(
+        _ dateFormat: String,
+        value: Date?,
+        path: Json.Path = .root,
+        nullable: Bool = false
+    ) throws {
+        let formatter = DateFormatter()
+        formatter.dateFormat = dateFormat
+        try self.encode(
+            String.self,
+            value: value.flatMap({ formatter.string(from: $0) }),
+            path: path,
+            nullable: nullable
+        )
     }
     
 }

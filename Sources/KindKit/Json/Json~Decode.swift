@@ -486,6 +486,16 @@ public extension Json {
         )
     }
     
+    @inlinable
+    func decode(
+        _ dateFormat: String,
+        path: Json.Path = .root,
+        default: Date
+    ) throws -> Date {
+        guard let date = try? self.decode(dateFormat, path: path) else { return `default` }
+        return date
+    }
+    
 }
 
 public extension Json {

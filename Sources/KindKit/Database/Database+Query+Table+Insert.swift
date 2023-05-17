@@ -47,6 +47,22 @@ public extension Database.Query.Table.Insert {
         )
     }
     
+    func set< Encoder : IJsonModelEncoder >(
+        _ encoder: Encoder.Type,
+        model: Encoder.JsonModelEncoded,
+        `in` column: Database.Table.Column< Json >
+    ) -> Self {
+        let json: Json
+        do {
+            json = try Json.build({
+                try $0.encode(encoder, value: model)
+            })
+        } catch {
+            json = Json(root: NSDictionary())
+        }
+        return self.set(json, in: column)
+    }
+    
 }
 
 extension Database.Query.Table.Insert : IDatabaseInsertQuery {

@@ -114,18 +114,26 @@ public extension Database.Statement {
     }
     
     func keyPath<
-        Value : IDatabaseValue & IDatabaseValueDecoder
-    >(
-        column: Database.Table.Column< Value >
-    ) throws -> Database.CustomKeyPath< Value > {
-        return .init(try self.index(column: column))
-    }
-    
-    func keyPath<
         Value : IDatabaseValue & IDatabaseValueDecoderAlias
     >(
         column: Database.Table.Column< Value >
     ) throws -> Database.KeyPath< Value > {
+        return .init(try self.index(column: column))
+    }
+    
+    func keyPath<
+        JsonDecoder : IJsonModelDecoder
+    >(
+        column: Database.Table.Column< Json >
+    ) throws -> Database.JsonKeyPath< JsonDecoder > {
+        return .init(try self.index(column: column))
+    }
+    
+    func keyPath<
+        Value : IDatabaseValue & IDatabaseValueDecoder
+    >(
+        column: Database.Table.Column< Value >
+    ) throws -> Database.CustomKeyPath< Value > {
         return .init(try self.index(column: column))
     }
     

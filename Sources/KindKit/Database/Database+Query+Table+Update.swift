@@ -59,6 +59,22 @@ public extension Database.Query.Table.Update {
         )
     }
     
+    func set< Encoder : IJsonModelEncoder >(
+        _ encoder: Encoder.Type,
+        model: Encoder.JsonModelEncoded,
+        `in` column: Database.Table.Column< Json >
+    ) -> Self {
+        let json: Json
+        do {
+            json = try Json.build({
+                try $0.encode(encoder, value: model)
+            })
+        } catch {
+            json = Json(root: NSDictionary())
+        }
+        return self.set(json, in: column)
+    }
+    
     func `where`< Where : IDatabaseCondition >(
         _ condition: Where
     ) -> Self {

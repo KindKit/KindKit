@@ -6,9 +6,9 @@ import Foundation
 
 public extension Database {
     
-    struct KeyPath< ValueDecoderAlias : IDatabaseValueDecoderAlias > : IDatabaseKeyPath {
+    struct KeyPath< Input : IDatabaseValueDecoderAlias > : IDatabaseKeyPath {
         
-        public typealias ValueDecoder = ValueDecoderAlias.DatabaseValueDecoder
+        public typealias ValueDecoder = Input.DatabaseValueDecoder
         
         public let index: Database.Index
         
@@ -18,7 +18,21 @@ public extension Database {
         
     }
 
-    struct CustomKeyPath< ValueDecoder : IDatabaseValueDecoder > : IDatabaseKeyPath {
+    struct JsonKeyPath< Input : IJsonModelDecoder > : IDatabaseKeyPath {
+        
+        public typealias ValueDecoder = Database.ValueDecoder.Json< Input >
+        
+        public let index: Database.Index
+        
+        public init(_ index: Database.Index) {
+            self.index = index
+        }
+        
+    }
+    
+    struct CustomKeyPath< Input : IDatabaseValueDecoder > : IDatabaseKeyPath {
+        
+        public typealias ValueDecoder = Input
         
         public let index: Database.Index
         

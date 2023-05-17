@@ -20,8 +20,7 @@ public extension RemoteImage.Flow {
         private let _query: (Input.Success) -> Query
         private let _filter: ((Input.Success) -> IRemoteImageFilter)?
         private let _validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?
-        private let _success: (Input.Success, UI.Image) -> Success
-        private let _failure: (Input.Success, RemoteImage.Error) -> Failure
+        private let _map: (Input.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
         private var _state: State?
         private var _task: ICancellable? {
             willSet {
@@ -35,15 +34,30 @@ public extension RemoteImage.Flow {
             _ query: @escaping (Input.Success) -> Query,
             _ filter: ((Input.Success) -> IRemoteImageFilter)?,
             _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
-            _ success: @escaping (Input.Success, UI.Image) -> Success,
-            _ failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
+            _ map: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
         ) {
             self._loader = loader
             self._query = query
             self._filter = filter
             self._validation = validation
-            self._success = success
-            self._failure = failure
+            self._map = map
+        }
+        
+        convenience init(
+            _ loader: RemoteImage.Loader,
+            _ query: @escaping (Input.Success) -> Query,
+            _ filter: ((Input.Success) -> IRemoteImageFilter)?,
+            _ validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
+            _ success: @escaping (Input.Success, UI.Image) -> Success,
+            _ failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
+        ) {
+            self.init(loader, query, filter, validation, {
+                input, result -> Result< Success, Failure > in
+                switch result {
+                case .success(let value): return .success(success(input, value))
+                case .failure(let error): return .failure(failure(input, error))
+                }
+            })
         }
         
         convenience init(
@@ -158,12 +172,12 @@ private extension RemoteImage.Flow.Download {
             )
         case .done, .none:
             self._task = nil
-            switch output {
+            switch self._map(state.input, output) {
             case .success(let value):
-                self._next.send(value: self._success(state.input, value))
+                self._next.send(value: value)
                 self._next.completed()
             case .failure(let error):
-                self._next.send(error: self._failure(state.input, error))
+                self._next.send(error: error)
                 self._next.completed()
             }
         }
@@ -199,11 +213,25 @@ extension IFlowOperator {
         _ query: @escaping (Output.Success) -> Query,
         _ filter: ((Output.Success) -> IRemoteImageFilter)?,
         _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
+        _ map: @escaping (Output.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
+    ) -> RemoteImage.Flow.Download< Output, Success, Failure, Query > {
+        let next = RemoteImage.Flow.Download< Output, Success, Failure, Query >(loader, query, filter, validation, map)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func download<
+        Success,
+        Failure : Swift.Error,
+        Query : IRemoteImageQuery
+    >(
+        _ loader: RemoteImage.Loader,
+        _ query: @escaping (Output.Success) -> Query,
+        _ filter: ((Output.Success) -> IRemoteImageFilter)?,
+        _ validation: ((Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)?,
         _ success: @escaping (Output.Success, UI.Image) -> Success,
         _ failure: @escaping (Output.Success, RemoteImage.Error) -> Failure
-    ) -> RemoteImage.Flow.Download< Output, Success, Failure, Query > where
-        Output.Failure == Failure
-    {
+    ) -> RemoteImage.Flow.Download< Output, Success, Failure, Query > {
         let next = RemoteImage.Flow.Download< Output, Success, Failure, Query >(loader, query, filter, validation, success, failure)
         self.subscribe(next: next)
         return next
@@ -264,6 +292,21 @@ public extension Flow.Builder {
     
     func download<
         Success,
+        Failure : Swift.Error,
+        Query : IRemoteImageQuery
+    >(
+        loader: RemoteImage.Loader = .shared,
+        query: @escaping (Input.Success) -> Query,
+        filter: ((Input.Success) -> IRemoteImageFilter)? = nil,
+        validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
+        map: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
+    ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, Success, Failure, Query > > {
+        return .init(head: .init(loader, query, filter, validation, map))
+    }
+    
+    func download<
+        Success,
+        Failure : Swift.Error,
         Query : IRemoteImageQuery
     >(
         loader: RemoteImage.Loader = .shared,
@@ -272,7 +315,7 @@ public extension Flow.Builder {
         validation: ((Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Input.Success, UI.Image) -> Success,
         failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
-    ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, Success, Input.Failure, Query > > {
+    ) -> Flow.Head.Builder< RemoteImage.Flow.Download< Input, Success, Failure, Query > > {
         return .init(head: .init(loader, query, filter, validation, success, failure))
     }
     
@@ -329,11 +372,23 @@ public extension Flow.Head.Builder {
         query: @escaping (Head.Output.Success) -> Query,
         filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
         validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
+        map: @escaping (Head.Output.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
+    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, Success, Failure, Query > > {
+        return .init(head: self.head, tail: self.head.download(loader, query, filter, validation, map))
+    }
+    
+    func download<
+        Success,
+        Failure : Swift.Error,
+        Query : IRemoteImageQuery
+    >(
+        loader: RemoteImage.Loader = .shared,
+        query: @escaping (Head.Output.Success) -> Query,
+        filter: ((Head.Output.Success) -> IRemoteImageFilter)? = nil,
+        validation: ((Head.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Head.Output.Success, UI.Image) -> Success,
         failure: @escaping (Head.Output.Success, RemoteImage.Error) -> Failure
-    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, Success, Failure, Query > > where
-        Head.Output.Failure == Failure
-    {
+    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Head.Output, Success, Failure, Query > > {
         return .init(head: self.head, tail: self.head.download(loader, query, filter, validation, success, failure))
     }
     
@@ -390,11 +445,23 @@ public extension Flow.Chain.Builder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
         validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
+        map: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
+    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > {
+        return .init(head: self.head, tail: self.tail.download(loader, query, filter, validation, map))
+    }
+    
+    func download<
+        Success,
+        Failure : Swift.Error,
+        Query : IRemoteImageQuery
+    >(
+        loader: RemoteImage.Loader = .shared,
+        query: @escaping (Tail.Output.Success) -> Query,
+        filter: ((Tail.Output.Success) -> IRemoteImageFilter)? = nil,
+        validation: ((Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation)? = nil,
         success: @escaping (Tail.Output.Success, UI.Image) -> Success,
         failure: @escaping (Tail.Output.Success, RemoteImage.Error) -> Failure
-    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > where
-        Tail.Output.Failure == Failure
-    {
+    ) -> Flow.Chain.Builder< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > {
         return .init(head: self.head, tail: self.tail.download(loader, query, filter, validation, success, failure))
     }
     
