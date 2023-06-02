@@ -51,8 +51,7 @@ public extension RemoteImage.Flow {
             _ success: @escaping (Input.Success, UI.Image) -> Success,
             _ failure: @escaping (Input.Success, RemoteImage.Error) -> Failure
         ) {
-            self.init(loader, query, filter, validation, {
-                input, result -> Result< Success, Failure > in
+            self.init(loader, query, filter, validation, { input, result -> Result< Success, Failure > in
                 switch result {
                 case .success(let value): return .success(success(input, value))
                 case .failure(let error): return .failure(failure(input, error))

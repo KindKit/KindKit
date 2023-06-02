@@ -32,25 +32,29 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            self._queue.async(flags: .barrier, execute: {
+            self._queue.async(flags: .barrier, execute: { [weak self] in
+                guard let self = self else { return }
                 self._next.send(value: value)
             })
         }
         
         public func receive(error: Input.Failure) {
-            self._queue.async(flags: .barrier, execute: {
+            self._queue.async(flags: .barrier, execute: { [weak self] in
+                guard let self = self else { return }
                 self._next.send(error: error)
             })
         }
         
         public func completed() {
-            self._queue.async(flags: .barrier, execute: {
+            self._queue.async(flags: .barrier, execute: { [weak self] in
+                guard let self = self else { return }
                 self._next.completed()
             })
         }
         
         public func cancel() {
-            self._queue.async(flags: .barrier, execute: {
+            self._queue.async(flags: .barrier, execute: { [weak self] in
+                guard let self = self else { return }
                 self._next.cancel()
             })
         }

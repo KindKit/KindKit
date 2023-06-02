@@ -55,6 +55,17 @@ public extension IFlowPipeline {
     
     @inlinable
     @discardableResult
+    func perform(_ input: Result< Input.Success, Input.Failure >) -> Self {
+        switch input {
+        case .success(let value): self.send(value: value)
+        case .failure(let error): self.send(error: error)
+        }
+        self.completed()
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
     func perform(_ input: Input.Success) -> Self {
         self.send(value: input)
         self.completed()

@@ -68,7 +68,6 @@ public extension Flow.Operator.Condition {
                     self._else.send(error: error)
                 }
             case .none:
-                self._then.send(error: error)
                 self._else.send(error: error)
             }
         }

@@ -13,7 +13,7 @@ extension UI.View.Mask {
         var content: IUIView? {
             didSet {
                 guard self.content !== oldValue else { return }
-                self.setNeedUpdate()
+                self.setNeedForceUpdate()
             }
         }
         

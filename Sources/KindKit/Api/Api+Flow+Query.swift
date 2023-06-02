@@ -21,8 +21,7 @@ public extension Api.Flow {
         private let _request: (Input.Success) throws -> Api.Request
         private let _response: (Input.Success) -> Response
         private let _validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?
-        private let _success: (Input.Success, Response.Success) -> Success
-        private let _failure: (Input.Success, Response.Failure) -> Failure
+        private let _map: (Input.Success, Response.Result) -> Result< Success, Failure >
         private var _task: ICancellable? {
             willSet {
                 self._task?.cancel()
@@ -36,16 +35,31 @@ public extension Api.Flow {
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
-            _ success: @escaping (Input.Success, Response.Success) -> Success,
-            _ failure: @escaping (Input.Success, Response.Failure) -> Failure
+            _ map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
         ) {
             self._provider = provider
             self._queue = dispatch.queue
             self._request = request
             self._response = response
             self._validation = validation
-            self._success = success
-            self._failure = failure
+            self._map = map
+        }
+        
+        convenience init(
+            _ provider: Api.Provider,
+            _ dispatch: Flow.Operator.DispatchMode,
+            _ request: @escaping (Input.Success) throws -> Api.Request,
+            _ response: @escaping (Input.Success) -> Response,
+            _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
+            _ success: @escaping (Input.Success, Response.Success) -> Success,
+            _ failure: @escaping (Input.Success, Response.Failure) -> Failure
+        ) {
+            self.init(provider, dispatch, request, response, validation, { input, result -> Result< Success, Failure > in
+                switch result {
+                case .success(let value): return .success(success(input, value))
+                case .failure(let error): return .failure(failure(input, error))
+                }
+            })
         }
         
         convenience init(
@@ -153,12 +167,12 @@ private extension Api.Flow.Query {
                 }
             )
         case .done, .none:
-            switch output {
+            switch self._map(input, output) {
             case .success(let value):
-                self._next.send(value: self._success(input, value))
+                self._next.send(value: value)
                 self._next.completed()
             case .failure(let error):
-                self._next.send(error: self._failure(input, error))
+                self._next.send(error: error)
                 self._next.completed()
             }
         }
@@ -178,11 +192,26 @@ extension IFlowOperator {
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        _ map: @escaping (Output.Success, Response.Result) -> Result< Success, Failure >
+    ) -> Api.Flow.Query< Output, Success, Failure, Response > {
+        let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, dispatch, request, response, validation, map)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func apiQuery<
+        Success,
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        _ provider: Api.Provider,
+        _ dispatch: Flow.Operator.DispatchMode,
+        _ request: @escaping (Output.Success) throws -> Api.Request,
+        _ response: @escaping (Output.Success) -> Response,
+        _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ success: @escaping (Output.Success, Response.Success) -> Success,
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
-    ) -> Api.Flow.Query< Output, Success, Failure, Response > where
-        Output.Failure == Failure
-    {
+    ) -> Api.Flow.Query< Output, Success, Failure, Response > {
         let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, dispatch, request, response, validation, success, failure)
         self.subscribe(next: next)
         return next
@@ -216,9 +245,7 @@ extension IFlowOperator {
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
-    ) -> Api.Flow.Query< Output, Response.Success, Failure, Response > where
-        Output.Failure == Failure
-    {
+    ) -> Api.Flow.Query< Output, Response.Success, Failure, Response > {
         let next = Api.Flow.Query< Output, Response.Success, Failure, Response >(provider, dispatch, request, response, validation, failure)
         self.subscribe(next: next)
         return next
@@ -246,6 +273,22 @@ public extension Flow.Builder {
     
     func apiQuery<
         Success,
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        provider: Api.Provider,
+        dispatch: Flow.Operator.DispatchMode,
+        request: @escaping (Input.Success) throws -> Api.Request,
+        response: @escaping (Input.Success) -> Response,
+        validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
+    ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Failure, Response > > {
+        return .init(head: .init(provider, dispatch, request, response, validation, map))
+    }
+    
+    func apiQuery<
+        Success,
+        Failure : Swift.Error,
         Response : IApiResponse
     >(
         provider: Api.Provider,
@@ -254,8 +297,8 @@ public extension Flow.Builder {
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Input.Success, Response.Success) -> Success,
-        failure: @escaping (Input.Success, Response.Failure) -> Input.Failure
-    ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Input.Failure, Response > > {
+        failure: @escaping (Input.Success, Response.Failure) -> Failure
+    ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Failure, Response > > {
         return .init(head: .init(provider, dispatch, request, response, validation, success, failure))
     }
     
@@ -276,6 +319,7 @@ public extension Flow.Builder {
     }
     
     func apiQuery<
+        Failure : Swift.Error,
         Response : IApiResponse
     >(
         provider: Api.Provider,
@@ -283,8 +327,8 @@ public extension Flow.Builder {
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        failure: @escaping (Input.Success, Response.Failure) -> Input.Failure
-    ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Input.Failure, Response > > {
+        failure: @escaping (Input.Success, Response.Failure) -> Failure
+    ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Failure, Response > > {
         return .init(head: .init(provider, dispatch, request, response, validation, failure))
     }
     
@@ -316,11 +360,24 @@ public extension Flow.Head.Builder {
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        map: @escaping (Head.Output.Success, Response.Result) -> Result< Success, Failure >
+    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > {
+        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, map))
+    }
+    
+    func apiQuery<
+        Success,
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        provider: Api.Provider,
+        dispatch: Flow.Operator.DispatchMode,
+        request: @escaping (Head.Output.Success) throws -> Api.Request,
+        response: @escaping (Head.Output.Success) -> Response,
+        validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Head.Output.Success, Response.Success) -> Success,
         failure: @escaping (Head.Output.Success, Response.Failure) -> Failure
-    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > where
-        Head.Output.Failure == Failure
-    {
+    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > {
         return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, success, failure))
     }
     
@@ -341,6 +398,7 @@ public extension Flow.Head.Builder {
     }
     
     func apiQuery<
+        Failure : Swift.Error,
         Response : IApiResponse
     >(
         provider: Api.Provider,
@@ -348,8 +406,8 @@ public extension Flow.Head.Builder {
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        failure: @escaping (Head.Output.Success, Response.Failure) -> Head.Output.Failure
-    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Head.Output.Failure, Response > > {
+        failure: @escaping (Head.Output.Success, Response.Failure) -> Failure
+    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Failure, Response > > {
         return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, failure))
     }
     
@@ -381,11 +439,24 @@ public extension Flow.Chain.Builder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
+    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, map))
+    }
+    
+    func apiQuery<
+        Success,
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        provider: Api.Provider,
+        dispatch: Flow.Operator.DispatchMode,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
-    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > where
-        Tail.Output.Failure == Failure
-    {
+    ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
         return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, success, failure))
     }
     
