@@ -426,7 +426,7 @@ public extension Json {
     
     @inlinable
     func encode(
-        _ dateFormat: String,
+        dateFormat: String,
         value: Date,
         path: Json.Path = .root
     ) throws {
@@ -441,7 +441,7 @@ public extension Json {
     
     @inlinable
     func encode(
-        _ dateFormat: String,
+        dateFormat: String,
         value: Date?,
         path: Json.Path = .root,
         nullable: Bool = false
@@ -451,6 +451,36 @@ public extension Json {
         try self.encode(
             String.self,
             value: value.flatMap({ formatter.string(from: $0) }),
+            path: path,
+            nullable: nullable
+        )
+    }
+    
+}
+
+public extension Json {
+    
+    @inlinable
+    func encode< UnitType : Dimension >(
+        value: Measurement< UnitType >,
+        path: Json.Path = .root
+    ) throws {
+        try self.encode(
+            Double.self,
+            value: value.value,
+            path: path
+        )
+    }
+    
+    @inlinable
+    func encode< UnitType : Unit >(
+        value: Measurement< UnitType >?,
+        path: Json.Path = .root,
+        nullable: Bool = false
+    ) throws {
+        try self.encode(
+            Double.self,
+            value: value?.value,
             path: path,
             nullable: nullable
         )

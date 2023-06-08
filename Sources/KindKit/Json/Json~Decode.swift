@@ -469,7 +469,7 @@ public extension Json {
 public extension Json {
     
     func decode(
-        _ dateFormat: String,
+        dateFormat: String,
         path: Json.Path = .root
     ) throws -> Date {
         return try self.get(
@@ -488,12 +488,36 @@ public extension Json {
     
     @inlinable
     func decode(
-        _ dateFormat: String,
+        dateFormat: String,
         path: Json.Path = .root,
         default: Date
     ) throws -> Date {
-        guard let date = try? self.decode(dateFormat, path: path) else { return `default` }
-        return date
+        guard let result = try? self.decode(dateFormat: dateFormat, path: path) else { return `default` }
+        return result
+    }
+    
+}
+
+public extension Json {
+    
+    func decode< UnitType : Unit >(
+        unit: UnitType,
+        path: Json.Path = .root
+    ) throws -> Measurement< UnitType > {
+        return Measurement(
+            value: try self.decode(Double.self, path: path),
+            unit: unit
+        )
+    }
+    
+    @inlinable
+    func decode< UnitType : Unit >(
+        unit: UnitType,
+        path: Json.Path = .root,
+        default: Measurement< UnitType >
+    ) throws -> Measurement< UnitType > {
+        guard let result = try? self.decode(unit: unit, path: path) else { return `default` }
+        return result
     }
     
 }
