@@ -192,7 +192,7 @@ extension KKInputSecureView {
     func update(view: UI.View.Input.Secure) {
         self.update(frame: view.frame)
         self.update(transform: view.transform)
-        self.update(text: view.text)
+        self.update(value: view.value)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -215,8 +215,8 @@ extension KKInputSecureView {
         self.layer.setAffineTransform(transform.matrix.cgAffineTransform)
     }
     
-    func update(text: Swift.String) {
-        self.text = text
+    func update(value: Swift.String) {
+        self.text = value
     }
     
     func update(textFont: UI.Font) {
@@ -306,7 +306,7 @@ extension KKInputSecureView : UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let sourceText = (textField.text ?? "") as NSString
         let newText = sourceText.replacingCharacters(in: range, with: string)
-        self.kkDelegate?.editing(self, text: newText)
+        self.kkDelegate?.editing(self, value: newText)
         return true
     }
     

@@ -113,6 +113,16 @@ public extension Array {
     }
     
     @inlinable
+    func kk_replacing(
+        at index: Self.Index,
+        to element: Element
+    ) -> Self {
+        var result = self
+        result[index] = element
+        return result
+    }
+    
+    @inlinable
     func kk_reorder(
         `where` block: (_ lhs: Element, _ rhs: Element) throws -> [Element]
     ) rethrows -> Self {

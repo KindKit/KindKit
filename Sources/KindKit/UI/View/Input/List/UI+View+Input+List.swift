@@ -11,7 +11,7 @@ import Foundation
 protocol KKInputListViewDelegate : AnyObject {
     
     func beginEditing(_ view: KKInputListView)
-    func select(_ view: KKInputListView, item: IInputListItem)
+    func editing(_ view: KKInputListView, value: IInputListItem)
     func endEditing(_ view: KKInputListView)
     
 }
@@ -52,15 +52,23 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var selected: IInputListItem? {
-            set {
-                guard self._selected !== newValue else { return }
-                self._selected = newValue
+        public var `default`: IInputListItem? {
+            didSet {
+                guard self.default !== oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(selected: self._selected, userInteraction: false)
+                    self._view.update(default: self.default)
                 }
             }
-            get { self._selected }
+        }
+        public var value: IInputListItem? {
+            set {
+                guard self._value !== newValue else { return }
+                self._value = newValue
+                if self.isLoaded == true {
+                    self._view.update(value: self._value)
+                }
+            }
+            get { self._value }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -154,7 +162,7 @@ public extension UI.View.Input {
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
-        private var _selected: IInputListItem?
+        private var _value: IInputListItem?
         
         public init() {
         }
@@ -190,21 +198,40 @@ public extension UI.View.Input.List {
     
     @inlinable
     @discardableResult
-    func selected(_ value: IInputListItem?) -> Self {
-        self.selected = value
+    func `default`(_ value: IInputListItem?) -> Self {
+        self.default = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func selected(_ value: () -> IInputListItem?) -> Self {
-        return self.selected(value())
+    func `default`(_ value: () -> IInputListItem?) -> Self {
+        return self.default(value())
     }
 
     @inlinable
     @discardableResult
-    func selected(_ value: (Self) -> IInputListItem?) -> Self {
-        return self.selected(value(self))
+    func `default`(_ value: (Self) -> IInputListItem?) -> Self {
+        return self.default(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: IInputListItem?) -> Self {
+        self.value = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: () -> IInputListItem?) -> Self {
+        return self.value(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func value(_ value: (Self) -> IInputListItem?) -> Self {
+        return self.value(value(self))
     }
     
     @inlinable
@@ -399,7 +426,61 @@ public extension UI.View.Input.List {
         return self.toolbar(value(self))
     }
     
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: () -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value())
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value(self))
+        return self
+    }
+    
 #endif
+    
+}
+
+public extension UI.View.Input.List {
+    
+    @inlinable
+    @available(*, deprecated, renamed: "UI.View.Input.List.value")
+    var selected: IInputListItem? {
+        set { self.value = newValue }
+        get { self.value }
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.List.value(_:)")
+    func selected(_ value: IInputListItem?) -> Self {
+        self.value = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.List.value(_:)")
+    func selected(_ value: () -> IInputListItem?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.List.value(_:)")
+    func selected(_ value: (Self) -> IInputListItem?) -> Self {
+        return self.selected(value(self))
+    }
     
 }
 
@@ -516,9 +597,8 @@ extension UI.View.Input.List : KKInputListViewDelegate {
         self.onBeginEditing.emit()
     }
     
-    func select(_ view: KKInputListView, item: IInputListItem) {
-        self._selected = item
-        self._view.update(selected: item, userInteraction: true)
+    func editing(_ view: KKInputListView, value: IInputListItem) {
+        self._value = value
         self.onEditing.emit()
     }
     

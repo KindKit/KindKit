@@ -11,7 +11,7 @@ import Foundation
 protocol KKInputDateViewDelegate : AnyObject {
     
     func beginEditing(_ view: KKInputDateView)
-    func select(_ view: KKInputDateView, date: Foundation.Date)
+    func editing(_ view: KKInputDateView, value: Foundation.Date)
     func endEditing(_ view: KKInputDateView)
     
 }
@@ -77,15 +77,23 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var selected: Foundation.Date? {
-            set {
-                guard self._selected != newValue else { return }
-                self._selected = newValue
+        public var `default`: Foundation.Date? {
+            didSet {
+                guard self.default != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(selected: self._selected)
+                    self._view.update(default: self.default)
                 }
             }
-            get { self._selected }
+        }
+        public var value: Foundation.Date? {
+            set {
+                guard self._value != newValue else { return }
+                self._value = newValue
+                if self.isLoaded == true {
+                    self._view.update(value: self._value)
+                }
+            }
+            get { self._value }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -179,7 +187,7 @@ public extension UI.View.Input {
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
-        private var _selected: Foundation.Date?
+        private var _value: Foundation.Date?
         
         public init() {
         }
@@ -272,21 +280,40 @@ public extension UI.View.Input.Date {
     
     @inlinable
     @discardableResult
-    func selected(_ value: Foundation.Date?) -> Self {
-        self.selected = value
+    func `default`(_ value: Foundation.Date?) -> Self {
+        self.default = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func selected(_ value: () -> Foundation.Date?) -> Self {
-        return self.selected(value())
+    func `default`(_ value: () -> Foundation.Date?) -> Self {
+        return self.default(value())
     }
 
     @inlinable
     @discardableResult
-    func selected(_ value: (Self) -> Foundation.Date?) -> Self {
-        return self.selected(value(self))
+    func `default`(_ value: (Self) -> Foundation.Date?) -> Self {
+        return self.default(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: Foundation.Date?) -> Self {
+        self.value = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: () -> Foundation.Date?) -> Self {
+        return self.value(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func value(_ value: (Self) -> Foundation.Date?) -> Self {
+        return self.value(value(self))
     }
     
     @inlinable
@@ -481,7 +508,61 @@ public extension UI.View.Input.Date {
         return self.toolbar(value(self))
     }
     
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: () -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value())
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value(self))
+        return self
+    }
+    
 #endif
+    
+}
+
+public extension UI.View.Input.Date {
+    
+    @inlinable
+    @available(*, deprecated, renamed: "UI.View.Input.Date.value")
+    var selected: Foundation.Date? {
+        set { self.value = newValue }
+        get { self.value }
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.Date.value(_:)")
+    func selected(_ value: Foundation.Date?) -> Self {
+        self.value = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.Date.value(_:)")
+    func selected(_ value: () -> Foundation.Date?) -> Self {
+        return self.selected(value())
+    }
+
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.Date.value(_:)")
+    func selected(_ value: (Self) -> Foundation.Date?) -> Self {
+        return self.selected(value(self))
+    }
     
 }
 
@@ -598,8 +679,8 @@ extension UI.View.Input.Date : KKInputDateViewDelegate {
         self.onBeginEditing.emit()
     }
     
-    func select(_ view: KKInputDateView, date: Foundation.Date) {
-        self._selected = date
+    func editing(_ view: KKInputDateView, value: Foundation.Date) {
+        self._value = value
         self.onEditing.emit()
     }
     

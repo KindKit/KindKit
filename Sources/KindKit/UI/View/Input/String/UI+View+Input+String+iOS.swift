@@ -409,7 +409,7 @@ extension KKInputStringView {
     func update(view: UI.View.Input.String) {
         self.update(frame: view.frame)
         self.update(transform: view.transform)
-        self.update(text: view.text)
+        self.update(value: view.value)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -432,8 +432,8 @@ extension KKInputStringView {
         self.layer.setAffineTransform(transform.matrix.cgAffineTransform)
     }
     
-    func update(text: Swift.String) {
-        self.text = text
+    func update(value: Swift.String) {
+        self.text = value
     }
     
     func update(textFont: UI.Font) {
@@ -566,7 +566,7 @@ extension KKInputStringView : UITextFieldDelegate {
         }
         self.kkRefreshSuggestionVariants(newText)
         if newText == modidfyText {
-            self.kkDelegate?.editing(self, text: newText)
+            self.kkDelegate?.editing(self, value: newText)
             return true
         }
         textField.text = modidfyText
@@ -583,7 +583,7 @@ extension KKInputStringView : UITextFieldDelegate {
                 textField.selectedTextRange = textField.textRange(from: selectionLower, to: selectionUpper)
             }
         }
-        self.kkDelegate?.editing(self, text: modidfyText)
+        self.kkDelegate?.editing(self, value: modidfyText)
         return false
     }
     
