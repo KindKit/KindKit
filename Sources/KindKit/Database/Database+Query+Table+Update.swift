@@ -83,7 +83,15 @@ public extension Database.Query.Table.Update {
         guard let model = model else {
             return self.set(nil, in: column)
         }
-        return self.set(encoder, model: model, in: column)
+        let json: Json
+        do {
+            json = try Json.build({
+                try $0.encode(encoder, value: model)
+            })
+        } catch {
+            json = Json(root: NSDictionary())
+        }
+        return self.set(json, in: column)
     }
     
     func `where`< Where : IDatabaseCondition >(
