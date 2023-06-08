@@ -13,7 +13,7 @@ protocol KKInputStringViewDelegate : AnyObject {
     func shouldReplace(_ view: KKInputStringView, info: UI.View.Input.String.ShouldReplace) -> Bool
     
     func beginEditing(_ view: KKInputStringView)
-    func editing(_ view: KKInputStringView, text: String)
+    func editing(_ view: KKInputStringView, value: String)
     func endEditing(_ view: KKInputStringView)
     func pressedReturn(_ view: KKInputStringView)
     func pressed(_ view: KKInputStringView, suggestion: String)
@@ -49,15 +49,15 @@ public extension UI.View.Input {
                 self.setNeedForceLayout()
             }
         }
-        public var text: Swift.String {
+        public var value: Swift.String {
             set {
-                guard self.text != newValue else { return }
-                self._text = newValue
+                guard self.value != newValue else { return }
+                self._value = newValue
                 if self.isLoaded == true {
-                    self._view.update(text: self._text)
+                    self._view.update(value: self._value)
                 }
             }
-            get { self._text }
+            get { self._value }
         }
         public var textFont: UI.Font = .init(weight: .regular) {
             didSet {
@@ -178,7 +178,7 @@ public extension UI.View.Input {
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
-        private var _text: Swift.String = ""
+        private var _value: Swift.String = ""
         
         public init() {
         }
@@ -195,21 +195,21 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func text(_ value: Swift.String) -> Self {
-        self.text = value
+    func value(_ value: Swift.String) -> Self {
+        self.value = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func text(_ value: () -> Swift.String) -> Self {
-        return self.text(value())
+    func value(_ value: () -> Swift.String) -> Self {
+        return self.value(value())
     }
 
     @inlinable
     @discardableResult
-    func text(_ value: (Self) -> Swift.String) -> Self {
-        return self.text(value(self))
+    func value(_ value: (Self) -> Swift.String) -> Self {
+        return self.value(value(self))
     }
     
     @inlinable
@@ -424,6 +424,27 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
+    func toolbar(_ value: [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: () -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value())
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func toolbar(_ value: (Self) -> [IUIViewInputToolbarItem]) -> Self {
+        self.toolbar = .toolbar(value(self))
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
     func keyboard(_ value: UI.View.Input.Keyboard?) -> Self {
         self.keyboard = value
         return self
@@ -527,6 +548,39 @@ public extension UI.View.Input.String {
     func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Swift.String) -> Void) -> Self {
         self.onSuggestion.link(sender, closure)
         return self
+    }
+    
+}
+
+public extension UI.View.Input.String {
+    
+    @inlinable
+    @available(*, deprecated, renamed: "UI.View.Input.String.value")
+    var text: Swift.String {
+        set { self.value = newValue }
+        get { self.value }
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.String.value(_:)")
+    func text(_ value: Swift.String) -> Self {
+        self.value = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.String.value(_:)")
+    func text(_ value: () -> Swift.String) -> Self {
+        return self.text(value())
+    }
+
+    @inlinable
+    @discardableResult
+    @available(*, deprecated, renamed: "UI.View.Input.String.value(_:)")
+    func text(_ value: (Self) -> Swift.String) -> Self {
+        return self.text(value(self))
     }
     
 }
@@ -648,9 +702,9 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
         self.onBeginEditing.emit()
     }
     
-    func editing(_ view: KKInputStringView, text: Swift.String) {
-        if self._text != text {
-            self._text = text
+    func editing(_ view: KKInputStringView, value: Swift.String) {
+        if self._value != value {
+            self._value = value
             self.onEditing.emit()
         }
     }
@@ -664,8 +718,8 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
     }
     
     func pressed(_ view: KKInputStringView, suggestion: String) {
-        if self._text != suggestion {
-            self._text = suggestion
+        if self._value != suggestion {
+            self._value = suggestion
             self.onEditing.emit()
         }
         self.onSuggestion.emit(suggestion)

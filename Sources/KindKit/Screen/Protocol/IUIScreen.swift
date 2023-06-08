@@ -94,6 +94,11 @@ public extension IScreen {
     
 #if os(iOS)
     
+    func endEditing() {
+        guard let viewController = self.uiViewController else { return }
+        viewController.view.endEditing(false)
+    }
+    
     func snake() -> Bool {
         return false
     }

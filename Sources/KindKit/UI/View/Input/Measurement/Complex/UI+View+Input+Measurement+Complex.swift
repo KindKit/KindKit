@@ -8,18 +8,17 @@ import Foundation
 #warning("Require support macOS")
 #elseif os(iOS)
 
-protocol KKInputSecureViewDelegate : AnyObject {
+protocol KKInputMeasurementComplexViewDelegate : AnyObject {
     
-    func beginEditing(_ view: KKInputSecureView)
-    func editing(_ view: KKInputSecureView, value: String)
-    func endEditing(_ view: KKInputSecureView)
-    func pressedReturn(_ view: KKInputSecureView)
+    func beginEditing(_ view: KKInputMeasurementComplexView)
+    func editing(_ view: KKInputMeasurementComplexView, value: NSMeasurement?)
+    func endEditing(_ view: KKInputMeasurementComplexView)
     
 }
 
-public extension UI.View.Input {
+public extension UI.View.Input.Measurement {
     
-    final class Secure {
+    final class Complex< UnitType : Dimension > {
         
         public private(set) weak var appearedLayout: IUILayout?
         public var frame: KindKit.Rect = .zero {
@@ -46,12 +45,29 @@ public extension UI.View.Input {
                 self.setNeedForceLayout()
             }
         }
-        public var value: Swift.String {
+        public let unit: UnitType
+        public var parts: [Part] = [] {
+            didSet {
+                guard self.parts != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(parts: self.parts)
+                }
+            }
+        }
+        public var `default`: Foundation.Measurement< UnitType >? {
+            didSet {
+                guard self.default != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(default: self.default, value: self._value)
+                }
+            }
+        }
+        public var value: Foundation.Measurement< UnitType >? {
             set {
-                guard self._value != newValue else { return }
+                guard self.value != newValue else { return }
                 self._value = newValue
                 if self.isLoaded == true {
-                    self._view.update(value: self._value)
+                    self._view.update(default: self.default, value: self._value)
                 }
             }
             get { self._value }
@@ -77,14 +93,6 @@ public extension UI.View.Input {
                 guard self.textInset != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(textInset: self.textInset)
-                }
-            }
-        }
-        public var editingColor: UI.Color? {
-            didSet {
-                guard self.editingColor != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(editingColor: self.editingColor)
                 }
             }
         }
@@ -137,14 +145,6 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var keyboard: UI.View.Input.Keyboard? {
-            didSet {
-                guard self.keyboard != oldValue else { return }
-                if self.isLoaded == true {
-                    self._view.update(keyboard: self.keyboard)
-                }
-            }
-        }
 #endif
         public var isHidden: Bool = false {
             didSet {
@@ -161,13 +161,13 @@ public extension UI.View.Input {
         public let onBeginEditing: Signal.Empty< Void > = .init()
         public let onEditing: Signal.Empty< Void > = .init()
         public let onEndEditing: Signal.Empty< Void > = .init()
-        public let onPressedReturn: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
-        private var _value: Swift.String = ""
+        private var _value: Foundation.Measurement< UnitType >?
         
-        public init() {
+        public init(unit: UnitType) {
+            self.unit = unit
         }
         
         deinit {
@@ -178,24 +178,62 @@ public extension UI.View.Input {
     
 }
 
-public extension UI.View.Input.Secure {
+public extension UI.View.Input.Measurement.Complex {
     
     @inlinable
     @discardableResult
-    func value(_ value: Swift.String) -> Self {
+    func parts(_ value: [Part]) -> Self {
+        self.parts = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func parts(_ value: () -> [Part]) -> Self {
+        return self.parts(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func parts(_ value: (Self) -> [Part]) -> Self {
+        return self.parts(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func `default`(_ value: Foundation.Measurement< UnitType >) -> Self {
+        self.default = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func `default`(_ value: () -> Foundation.Measurement< UnitType >) -> Self {
+        return self.default(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func `default`(_ value: (Self) -> Foundation.Measurement< UnitType >) -> Self {
+        return self.default(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func value(_ value: Foundation.Measurement< UnitType >) -> Self {
         self.value = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func value(_ value: () -> Swift.String) -> Self {
+    func value(_ value: () -> Foundation.Measurement< UnitType >) -> Self {
         return self.value(value())
     }
 
     @inlinable
     @discardableResult
-    func value(_ value: (Self) -> Swift.String) -> Self {
+    func value(_ value: (Self) -> Foundation.Measurement< UnitType >) -> Self {
         return self.value(value(self))
     }
     
@@ -237,7 +275,6 @@ public extension UI.View.Input.Secure {
         return self.textColor(value(self))
     }
     
-    @inlinable
     @discardableResult
     func textInset(_ value: Inset) -> Self {
         self.textInset = value
@@ -412,88 +449,44 @@ public extension UI.View.Input.Secure {
         return self
     }
     
-    @inlinable
-    @discardableResult
-    func keyboard(_ value: UI.View.Input.Keyboard?) -> Self {
-        self.keyboard = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func keyboard(_ value: () -> UI.View.Input.Keyboard?) -> Self {
-        return self.keyboard(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func keyboard(_ value: (Self) -> UI.View.Input.Keyboard?) -> Self {
-        return self.keyboard(value(self))
-    }
-    
 #endif
     
 }
 
-public extension UI.View.Input.Secure {
+public extension UI.View.Input.Measurement.Complex {
     
     @inlinable
-    @discardableResult
-    func onPressedReturn(_ closure: (() -> Void)?) -> Self {
-        self.onPressedReturn.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onPressedReturn(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onPressedReturn.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onPressedReturn< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onPressedReturn.link(sender, closure)
-        return self
-    }
-    
-}
-
-public extension UI.View.Input.Secure {
-    
-    @inlinable
-    @available(*, deprecated, renamed: "UI.View.Input.Secure.value")
-    var text: Swift.String {
+    @available(*, deprecated, renamed: "UI.View.Input.Measurement.Complex.value")
+    var measurement: Foundation.Measurement< UnitType >? {
         set { self.value = newValue }
         get { self.value }
     }
     
     @inlinable
     @discardableResult
-    @available(*, deprecated, renamed: "UI.View.Input.Secure.value(_:)")
-    func text(_ value: Swift.String) -> Self {
+    @available(*, deprecated, renamed: "UI.View.Input.Measurement.Complex.value(_:)")
+    func measurement(_ value: Foundation.Measurement< UnitType >) -> Self {
         self.value = value
         return self
     }
     
     @inlinable
     @discardableResult
-    @available(*, deprecated, renamed: "UI.View.Input.Secure.value(_:)")
-    func text(_ value: () -> Swift.String) -> Self {
-        return self.text(value())
+    @available(*, deprecated, renamed: "UI.View.Input.Measurement.Complex.value(_:)")
+    func measurement(_ value: () -> Foundation.Measurement< UnitType >) -> Self {
+        return self.measurement(value())
     }
 
     @inlinable
     @discardableResult
-    @available(*, deprecated, renamed: "UI.View.Input.Secure.value(_:)")
-    func text(_ value: (Self) -> Swift.String) -> Self {
-        return self.text(value(self))
+    @available(*, deprecated, renamed: "UI.View.Input.Measurement.Complex.value(_:)")
+    func measurement(_ value: (Self) -> Foundation.Measurement< UnitType >) -> Self {
+        return self.measurement(value(self))
     }
     
 }
 
-extension UI.View.Input.Secure : IUIView {
+extension UI.View.Input.Measurement.Complex : IUIView {
     
     public var native: NativeView {
         self._view
@@ -550,7 +543,7 @@ extension UI.View.Input.Secure : IUIView {
     
 }
 
-extension UI.View.Input.Secure : IUIViewReusable {
+extension UI.View.Input.Measurement.Complex : IUIViewReusable {
     
     public var reuseUnloadBehaviour: UI.Reuse.UnloadBehaviour {
         set { self._reuse.unloadBehaviour = newValue }
@@ -571,15 +564,15 @@ extension UI.View.Input.Secure : IUIViewReusable {
 
 #if os(iOS)
 
-extension UI.View.Input.Secure : IUIViewTransformable {
+extension UI.View.Input.Measurement.Complex : IUIViewTransformable {
 }
 
 #endif
 
-extension UI.View.Input.Secure : IUIViewStaticSizeable {
+extension UI.View.Input.Measurement.Complex : IUIViewStaticSizeable {
 }
 
-extension UI.View.Input.Secure : IUIViewInputable {
+extension UI.View.Input.Measurement.Complex : IUIViewInputable {
     
     public var isEditing: Bool {
         guard self.isLoaded == true else { return false }
@@ -600,34 +593,134 @@ extension UI.View.Input.Secure : IUIViewInputable {
     
 }
 
-extension UI.View.Input.Secure : KKInputSecureViewDelegate {
+extension UI.View.Input.Measurement.Complex : KKInputMeasurementComplexViewDelegate {
     
-    func beginEditing(_ view: KKInputSecureView) {
+    func beginEditing(_ view: KKInputMeasurementComplexView) {
         self.onBeginEditing.emit()
     }
     
-    func editing(_ view: KKInputSecureView, value: Swift.String) {
+    func editing(_ view: KKInputMeasurementComplexView, value: NSMeasurement?) {
+        guard let value = value as? Measurement< UnitType > else {
+            return
+        }
         if self._value != value {
             self._value = value
             self.onEditing.emit()
         }
     }
     
-    func endEditing(_ view: KKInputSecureView) {
+    func endEditing(_ view: KKInputMeasurementComplexView) {
         self.onEndEditing.emit()
-    }
-    
-    func pressedReturn(_ view: KKInputSecureView) {
-        self.onPressedReturn.emit()
     }
     
 }
 
-public extension IUIView where Self == UI.View.Input.Secure {
+public extension IUIView {
     
     @inlinable
-    static func inputSecure() -> Self {
-        return .init()
+    static func input(acceleration: UnitAcceleration) -> Self where Self == UI.View.Input.Measurement.Complex< UnitAcceleration > {
+        return .init(unit: acceleration)
+    }
+    
+    @inlinable
+    static func input(angle: UnitAngle) -> Self where Self == UI.View.Input.Measurement.Complex< UnitAngle > {
+        return .init(unit: angle)
+    }
+    
+    @inlinable
+    static func input(area: UnitArea) -> Self where Self == UI.View.Input.Measurement.Complex< UnitArea > {
+        return .init(unit: area)
+    }
+    
+    @inlinable
+    static func input(concentrationMass: UnitConcentrationMass) -> Self where Self == UI.View.Input.Measurement.Complex< UnitConcentrationMass > {
+        return .init(unit: concentrationMass)
+    }
+    
+    @inlinable
+    static func input(dispersion: UnitDispersion) -> Self where Self == UI.View.Input.Measurement.Complex< UnitDispersion > {
+        return .init(unit: dispersion)
+    }
+    
+    @inlinable
+    static func input(duration: UnitDuration) -> Self where Self == UI.View.Input.Measurement.Complex< UnitDuration > {
+        return .init(unit: duration)
+    }
+    
+    @inlinable
+    static func input(electricCharge: UnitElectricCharge) -> Self where Self == UI.View.Input.Measurement.Complex< UnitElectricCharge > {
+        return .init(unit: electricCharge)
+    }
+    
+    @inlinable
+    static func input(electricCurrent: UnitElectricCurrent) -> Self where Self == UI.View.Input.Measurement.Complex< UnitElectricCurrent > {
+        return .init(unit: electricCurrent)
+    }
+    
+    @inlinable
+    static func input(electricPotentialDifference: UnitElectricPotentialDifference) -> Self where Self == UI.View.Input.Measurement.Complex< UnitElectricPotentialDifference > {
+        return .init(unit: electricPotentialDifference)
+    }
+    
+    @inlinable
+    static func input(electricResistance: UnitElectricResistance) -> Self where Self == UI.View.Input.Measurement.Complex< UnitElectricResistance > {
+        return .init(unit: electricResistance)
+    }
+    
+    @inlinable
+    static func input(energy: UnitEnergy) -> Self where Self == UI.View.Input.Measurement.Complex< UnitEnergy > {
+        return .init(unit: energy)
+    }
+    
+    @inlinable
+    static func input(frequency: UnitFrequency) -> Self where Self == UI.View.Input.Measurement.Complex< UnitFrequency > {
+        return .init(unit: frequency)
+    }
+    
+    @inlinable
+    static func input(fuelEfficiency: UnitFuelEfficiency) -> Self where Self == UI.View.Input.Measurement.Complex< UnitFuelEfficiency > {
+        return .init(unit: fuelEfficiency)
+    }
+    
+    @inlinable
+    static func input(illuminance: UnitIlluminance) -> Self where Self == UI.View.Input.Measurement.Complex< UnitIlluminance > {
+        return .init(unit: illuminance)
+    }
+    
+    @inlinable
+    @available(iOS 13.0, *)
+    static func input(informationStorage: UnitInformationStorage) -> Self where Self == UI.View.Input.Measurement.Complex< UnitInformationStorage > {
+        return .init(unit: informationStorage)
+    }
+    
+    @inlinable
+    static func input(lenght: UnitLength) -> Self where Self == UI.View.Input.Measurement.Complex< UnitLength > {
+        return .init(unit: lenght)
+    }
+    
+    @inlinable
+    static func input(mass: UnitMass) -> Self where Self == UI.View.Input.Measurement.Complex< UnitMass > {
+        return .init(unit: mass)
+    }
+    
+    @inlinable
+    static func input(pressure: UnitPressure) -> Self where Self == UI.View.Input.Measurement.Complex< UnitPressure > {
+        return .init(unit: pressure)
+    }
+    
+    @inlinable
+    static func input(speed: UnitSpeed) -> Self where Self == UI.View.Input.Measurement.Complex< UnitSpeed > {
+        return .init(unit: speed)
+    }
+    
+    @inlinable
+    static func input(temperature: UnitTemperature) -> Self where Self == UI.View.Input.Measurement.Complex< UnitTemperature > {
+        return .init(unit: temperature)
+    }
+    
+    @inlinable
+    static func input(volume: UnitVolume) -> Self where Self == UI.View.Input.Measurement.Complex< UnitVolume > {
+        return .init(unit: volume)
     }
     
 }

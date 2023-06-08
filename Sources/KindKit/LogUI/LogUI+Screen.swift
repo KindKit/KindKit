@@ -117,7 +117,7 @@ extension LogUI {
 #if os(iOS)
             self._searchInput.onPressedReturn(self, {
                 $0._searchInput.endEditing()
-                $0._search = $0._searchInput.text
+                $0._search = $0._searchInput.value
                 $0._reload()
             })
 #endif
