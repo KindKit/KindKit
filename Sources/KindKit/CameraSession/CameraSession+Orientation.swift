@@ -23,18 +23,8 @@ extension CameraSession.Orientation {
         switch self {
         case .portrait: return .portrait
         case .portraitUpsideDown: return .portraitUpsideDown
-        case .landscapeRight: return .landscapeLeft
-        case .landscapeLeft: return .landscapeRight
-        }
-    }
-    
-    init?(_ avOrientation: AVCaptureVideoOrientation) {
-        switch avOrientation {
-        case .portrait: self = .portrait
-        case .portraitUpsideDown: self = .portraitUpsideDown
-        case .landscapeRight: self = .landscapeLeft
-        case .landscapeLeft: self = .landscapeRight
-        @unknown default: return nil
+        case .landscapeRight: return .landscapeRight
+        case .landscapeLeft: return .landscapeLeft
         }
     }
     
