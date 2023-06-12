@@ -8,18 +8,18 @@ public extension CameraSession.Recorder {
     
     final class Photo : ICameraSessionRecorder {
         
-        public var deviceOrientation: CameraSession.Orientation? {
+        public var deviceOrientation: CameraSession.Orientation?
+        public var interfaceOrientation: CameraSession.Orientation? {
             didSet {
-                guard self.deviceOrientation != oldValue else { return }
+                guard self.interfaceOrientation != oldValue else { return }
                 guard let connection = self._output.connection(with: .video) else { return }
-                if let videoOrientation = self.deviceOrientation?.avOrientation {
+                if let videoOrientation = self.interfaceOrientation?.avOrientation {
                     connection.videoOrientation = videoOrientation
                 } else {
                     connection.videoOrientation = .portrait
                 }
             }
         }
-        public var interfaceOrientation: CameraSession.Orientation?
         public var output: AVCaptureOutput {
             return self._output
         }
