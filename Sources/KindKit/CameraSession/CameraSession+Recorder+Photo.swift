@@ -91,6 +91,40 @@ private extension CameraSession.Recorder.Photo {
         }
     }
     
+#if os(iOS)
+    
+    func _image(_ data: Data) -> UIImage? {
+        guard let uiImage = UIImage(data: data) else {
+            return nil
+        }
+        guard let cgImage = uiImage.cgImage else {
+            return nil
+        }
+        let oldOrientation = uiImage.imageOrientation
+        let isMirrored: Bool
+        switch oldOrientation {
+        case .rightMirrored, .leftMirrored, .upMirrored, .downMirrored:
+            isMirrored = true
+        default:
+            isMirrored = false
+        }
+        let newOrientation: UIImage.Orientation
+        switch self.deviceOrientation {
+        case .landscapeLeft:
+            newOrientation = isMirrored == true ? .upMirrored : .up
+        case .landscapeRight:
+            newOrientation = isMirrored == true ? .downMirrored : .down
+        default:
+            newOrientation = isMirrored == true ? .leftMirrored : .right
+        }
+        if oldOrientation != newOrientation {
+            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: newOrientation)
+        }
+        return uiImage
+    }
+    
+#endif
+    
 }
 
 extension CameraSession.Recorder.Photo {
@@ -111,14 +145,15 @@ extension CameraSession.Recorder.Photo {
             return
         }
         let image = UI.Image(nsImage)
-        context.onSuccess(UI.Image(nsImage))
+        context.onSuccess(image)
 #elseif os(iOS)
-        guard let uiImage = UIImage(data: data) else {
+        guard let uiImage = self._image(data) else {
             context.onFailure(.imageRepresentation)
             return
         }
-        let image = UI.Image(uiImage)
-        context.onSuccess(image.unrotate())
+        let originImage = UI.Image(uiImage)
+        let unrotateImage = originImage.unrotate()
+        context.onSuccess(unrotateImage)
 #else
         context.onFailure(.imageRepresentation)
 #endif
