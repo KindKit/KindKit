@@ -4,11 +4,13 @@
 
 import Foundation
 
-public extension Database.ValueDecoder {
+public extension Database.ValueCoder {
     
-    struct Real< Value : BinaryFloatingPoint > : IDatabaseValueDecoder {
+    struct Real< Value : BinaryFloatingPoint > : IDatabaseValueCoder {
         
-        public static func decode(_ value: Database.Value) throws -> Value {
+        public typealias DatabaseCoded = Value
+        
+        public static func decode(_ value: Database.Value) throws -> DatabaseCoded {
             switch value {
             case .null:
                 throw Database.Error.decode
@@ -26,18 +28,19 @@ public extension Database.ValueDecoder {
             }
         }
         
+        public static func encode(_ value: DatabaseCoded) throws -> Database.Value {
+            return .real(Double(value))
+        }
+        
     }
     
 }
 
-extension Float : IDatabaseValueDecoderAlias {
+extension IDatabaseValueAlias where Self : BinaryFloatingPoint {
     
-    public typealias DatabaseValueDecoder = Database.ValueDecoder.Real< Self >
+    public typealias DatabaseValueCoder = Database.ValueCoder.Real< Self >
     
 }
 
-extension Double : IDatabaseValueDecoderAlias {
-    
-    public typealias DatabaseValueDecoder = Database.ValueDecoder.Real< Self >
-    
-}
+extension Float : IDatabaseValueAlias {}
+extension Double : IDatabaseValueAlias {}

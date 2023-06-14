@@ -131,11 +131,11 @@ public extension Database {
     
     func run<
         Query : IDatabaseSelectQuery,
-        Decoder: IDatabaseValueDecoder
+        Decoder: IDatabaseValueCoder
     >(
         query: Query,
         decoder: Decoder.Type
-    ) throws -> Decoder.DatabaseDecoded? {
+    ) throws -> Decoder.DatabaseCoded? {
         let statement = try self._connection.statement(query: query.query)
         let result = try statement.perform(self._connection, {
             try decoder.decode($0.get(at: 0))
@@ -145,12 +145,12 @@ public extension Database {
     
     func run<
         Query : IDatabaseSelectQuery,
-        Alias: IDatabaseValueDecoderAlias
+        Alias: IDatabaseValueAlias
     >(
         query: Query,
         decoder: Alias.Type
-    ) throws -> Alias.DatabaseValueDecoder.DatabaseDecoded? {
-        return try self.run(query: query, decoder: Alias.DatabaseValueDecoder.self)
+    ) throws -> Alias.DatabaseValueCoder.DatabaseCoded? {
+        return try self.run(query: query, decoder: Alias.DatabaseValueCoder.self)
     }
 
 }

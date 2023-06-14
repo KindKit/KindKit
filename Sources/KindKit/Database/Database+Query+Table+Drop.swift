@@ -8,15 +8,13 @@ public extension Database.Query.Table {
     
     struct Drop {
         
-        private let _table: Database.Table
-        private let _ifExists: Bool
+        let table: String
+        var ifExists: Bool = false
         
         init(
-            table: Database.Table,
-            ifExists: Bool = false
+            table: String
         ) {
-            self._table = table
-            self._ifExists = ifExists
+            self.table = table
         }
         
     }
@@ -28,10 +26,9 @@ public extension Database.Query.Table.Drop {
     func ifExists(
         _ value: Bool = true
     ) -> Self {
-        return .init(
-            table: self._table,
-            ifExists: value
-        )
+        var copy = self
+        copy.ifExists = value
+        return copy
     }
     
 }
@@ -40,11 +37,11 @@ extension Database.Query.Table.Drop : IDatabaseQuery {
     
     public var query: String {
         let builder = StringBuilder("DROP TABLE")
-        if self._ifExists == true {
+        if self.ifExists == true {
             builder.append(" IF EXISTS")
         }
         builder.append(" ")
-        builder.append(self._table.name)
+        builder.append(self.table)
         return builder.string
     }
     
@@ -53,7 +50,9 @@ extension Database.Query.Table.Drop : IDatabaseQuery {
 public extension IDatabaseEntity {
     
     func drop() -> Database.Query.Table.Drop {
-        return .init(table: self.table)
+        return .init(
+            table: self.table.name
+        )
     }
     
 }

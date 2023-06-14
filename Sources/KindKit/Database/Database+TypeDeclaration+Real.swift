@@ -19,3 +19,12 @@ public extension Database.TypeDeclaration {
     }
     
 }
+
+extension IDatabaseTypeAlias where Self : BinaryFloatingPoint {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Real
+    
+}
+
+extension Float : IDatabaseTypeAlias {}
+extension Double : IDatabaseTypeAlias {}

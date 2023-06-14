@@ -70,5 +70,36 @@ public extension Date {
     func kk_isEqual(calendar: Calendar, date: Date, component: Calendar.Component) -> Bool {
         return calendar.isDate(self, equalTo: date, toGranularity: component)
     }
+    
+}
+
+public extension Date {
+    
+    @inlinable
+    static func kk_date(unixTime: Int) -> Self {
+        return .init(timeIntervalSince1970: TimeInterval(unixTime))
+    }
+    
+    @inlinable
+    var kk_unixTime: Int {
+        return Int(self.timeIntervalSince1970)
+    }
+    
+}
+
+public extension Date {
+    
+    static let kk_julianDayOfZeroUnixTime: Double = 2440587.5
+    static let kk_julianSecondsPerDay: Double = 86400
+    
+    @inlinable
+    static func kk_date(julianDays: Double) -> Self {
+        return .init(timeIntervalSince1970: (julianDays - Self.kk_julianDayOfZeroUnixTime) * Self.kk_julianSecondsPerDay)
+    }
+    
+    @inlinable
+    var kk_julianDays: Double {
+        return Self.kk_julianDayOfZeroUnixTime + self.timeIntervalSince1970 / Self.kk_julianSecondsPerDay
+    }
 
 }

@@ -103,9 +103,9 @@ extension Database.Statement {
 public extension Database.Statement {
     
     func index<
-        Value : IDatabaseValue
+        Column : IDatabaseTableColumn
     >(
-        column: Database.Table.Column< Value >
+        column: Column
     ) throws -> Database.Index {
         guard let index = self.columns.firstIndex(of: column.name) else {
             throw Database.Error.columnNotFound(column.name)
@@ -113,61 +113,37 @@ public extension Database.Statement {
         return index
     }
     
+}
+
+public extension Database.Statement {
+    
     func keyPath<
-        Value : IDatabaseValue & IDatabaseValueDecoderAlias
+        Column : IDatabaseTableColumn
     >(
-        column: Database.Table.Column< Value >
-    ) throws -> Database.KeyPath< Value > {
+        column: Column
+    ) throws -> Database.KeyPath< Column > {
         return .init(try self.index(column: column))
     }
     
-    func keyPath<
-        JsonDecoder : IJsonModelDecoder
-    >(
-        column: Database.Table.Column< Json >
-    ) throws -> Database.JsonKeyPath< JsonDecoder > {
-        return .init(try self.index(column: column))
-    }
-    
-    func keyPath<
-        JsonDecoder : IJsonModelDecoder
-    >(
-        column: Database.Table.Column< Json? >
-    ) throws -> Database.JsonKeyPath< JsonDecoder > {
-        return .init(try self.index(column: column))
-    }
-    
-    func keyPath<
-        Value : IDatabaseValue & IDatabaseValueDecoder
-    >(
-        column: Database.Table.Column< Value >
-    ) throws -> Database.CustomKeyPath< Value > {
-        return .init(try self.index(column: column))
-    }
+}
+
+public extension Database.Statement {
     
     func decode<
-        Decoder : IDatabaseValueDecoder
+        Coder : IDatabaseValueCoder
     >(
-        _ decoder: Decoder.Type,
+        _ decoder: Coder.Type,
         at index: Database.Index
-    ) throws -> Decoder.DatabaseDecoded {
-        return try Decoder.decode(self.get(at: index))
-    }
-    
-    func decode<
-        Alias : IDatabaseValueDecoderAlias
-    >(
-        _ alias: Alias.Type, at index: Database.Index
-    ) throws -> Alias.DatabaseValueDecoder.DatabaseDecoded {
-        return try self.decode(Alias.DatabaseValueDecoder.self, at: index)
+    ) throws -> Coder.DatabaseCoded {
+        return try Coder.decode(self.get(at: index))
     }
     
     func decode<
         KeyPath : IDatabaseKeyPath
     >(
         _ keyPath: KeyPath
-    ) throws -> KeyPath.ValueDecoder.DatabaseDecoded {
-        return try self.decode(KeyPath.ValueDecoder.self, at: keyPath.index)
+    ) throws -> KeyPath.DatabaseTableColumn.DatabaseValueCoder.DatabaseCoded {
+        return try self.decode(KeyPath.DatabaseTableColumn.DatabaseValueCoder.self, at: keyPath.index)
     }
         
 }

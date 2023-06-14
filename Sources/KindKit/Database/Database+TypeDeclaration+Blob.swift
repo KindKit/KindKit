@@ -19,3 +19,9 @@ public extension Database.TypeDeclaration {
     }
     
 }
+
+extension Data : IDatabaseTypeAlias {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Blob
+    
+}

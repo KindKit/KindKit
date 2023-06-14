@@ -4,11 +4,13 @@
 
 import Foundation
 
-public extension Database.ValueDecoder {
+public extension Database.ValueCoder {
     
-    struct Text : IDatabaseValueDecoder {
+    struct Text : IDatabaseValueCoder {
         
-        public static func decode(_ value: Database.Value) throws -> Swift.String {
+        public typealias DatabaseCoded = Swift.String
+        
+        public static func decode(_ value: Database.Value) throws -> DatabaseCoded {
             switch value {
             case .null:
                 throw Database.Error.decode
@@ -26,12 +28,16 @@ public extension Database.ValueDecoder {
             }
         }
         
+        public static func encode(_ value: DatabaseCoded) throws -> Database.Value {
+            return .text(value)
+        }
+        
     }
     
 }
 
-extension String : IDatabaseValueDecoderAlias {
+extension String : IDatabaseValueAlias {
     
-    public typealias DatabaseValueDecoder = Database.ValueDecoder.Text
+    public typealias DatabaseValueCoder = Database.ValueCoder.Text
     
 }

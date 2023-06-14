@@ -6,17 +6,25 @@ import Foundation
 
 public extension Database.Query {
     
-    struct Column< Value : IDatabaseValue > {
+    struct Column {
         
-        let _column: Database.Table.Column< Value >
-        let _autoIncrement: Bool
+        let columnName: String
+        let columnType: String
+        var autoIncrement: Bool = false
         
         init(
-            column: Database.Table.Column< Value >,
-            autoIncrement: Bool = false
+            columnName: String,
+            columnType: String
         ) {
-            self._column = column
-            self._autoIncrement = autoIncrement
+            self.columnName = columnName
+            self.columnType = columnType
+        }
+        
+        init< Column : IDatabaseTableColumn >(_ column: Column) {
+            self.init(
+                columnName: column.name,
+                columnType: Column.DatabaseTypeDeclaration.typeDeclaration
+            )
         }
         
     }
@@ -26,10 +34,9 @@ public extension Database.Query {
 public extension Database.Query.Column {
     
     func autoIncrement(_ value: Bool = true) -> Self {
-        return .init(
-            column: self._column,
-            autoIncrement: value
-        )
+        var copy = self
+        copy.autoIncrement = value
+        return copy
     }
     
 }
@@ -37,10 +44,10 @@ public extension Database.Query.Column {
 extension Database.Query.Column : IDatabaseExpressable {
     
     public var query: String {
-        let builder = StringBuilder(self._column.name)
+        let builder = StringBuilder(self.columnName)
         builder.append(" ")
-        builder.append(Value.TypeDeclaration.typeDeclaration)
-        if self._autoIncrement == true {
+        builder.append(self.columnType)
+        if self.autoIncrement == true {
             builder.append(" AUTOINCREMENT")
         }
         return builder.string

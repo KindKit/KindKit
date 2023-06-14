@@ -6,7 +6,7 @@ import Foundation
 
 public protocol IDatabaseKeyPath {
     
-    associatedtype ValueDecoder : IDatabaseValueDecoder
+    associatedtype DatabaseTableColumn : IDatabaseTableColumn
 
     var index: Database.Index { get }
     

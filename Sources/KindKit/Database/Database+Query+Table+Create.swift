@@ -8,21 +8,15 @@ public extension Database.Query.Table {
     
     struct Create {
         
-        private let _table: Database.Table
-        private let _ifNotExists: Bool
-        private let _columns: [String]
-        private let _withoutRowId: Bool
+        let table: String
+        var ifNotExists: Bool = false
+        var columns: [IDatabaseExpressable] = []
+        var withoutRowId: Bool = false
         
         init(
-            table: Database.Table,
-            ifNotExists: Bool = false,
-            columns: [String] = [],
-            withoutRowId: Bool = false
+            table: String
         ) {
-            self._table = table
-            self._ifNotExists = ifNotExists
-            self._columns = columns
-            self._withoutRowId = withoutRowId
+            self.table = table
         }
         
     }
@@ -34,48 +28,36 @@ public extension Database.Query.Table.Create {
     func ifNotExists(
         _ value: Bool = true
     ) -> Self {
-        return .init(
-            table: self._table,
-            ifNotExists: value,
-            columns: self._columns,
-            withoutRowId: self._withoutRowId
-        )
+        var copy = self
+        copy.ifNotExists = value
+        return copy
     }
     
-    func column< Value : IDatabaseValue >(
-        _ column: Database.Table.Column< Value >
+    func column< Column : IDatabaseTableColumn >(
+        _ column: Column
     ) -> Self {
-        let column = Database.Query.Column(column: column)
-        return .init(
-            table: self._table,
-            ifNotExists: self._ifNotExists,
-            columns: self._columns.kk_appending(column.query),
-            withoutRowId: self._withoutRowId
-        )
+        let column = Database.Query.Column(column)
+        var copy = self
+        copy.columns = self.columns.kk_appending(column)
+        return copy
     }
     
-    func column< Value : IDatabaseValue >(
-        _ column: Database.Table.Column< Value >,
-        on: (Database.Query.Column< Value >) -> Database.Query.Column< Value >
+    func column< Column : IDatabaseTableColumn >(
+        _ column: Column,
+        on: (Database.Query.Column) -> Database.Query.Column
     ) -> Self {
-        let column = on(Database.Query.Column(column: column))
-        return .init(
-            table: self._table,
-            ifNotExists: self._ifNotExists,
-            columns: self._columns.kk_appending(column.query),
-            withoutRowId: self._withoutRowId
-        )
+        let column = on(Database.Query.Column(column))
+        var copy = self
+        copy.columns = self.columns.kk_appending(column)
+        return copy
     }
     
     func withoutRowId(
         _ value: Bool = true
     ) -> Self {
-        return .init(
-            table: self._table,
-            ifNotExists: self._ifNotExists,
-            columns: self._columns,
-            withoutRowId: value
-        )
+        var copy = self
+        copy.withoutRowId = value
+        return copy
     }
     
 }
@@ -84,17 +66,17 @@ extension Database.Query.Table.Create : IDatabaseQuery {
     
     public var query: String {
         let builder = StringBuilder("CREATE TABLE")
-        if self._ifNotExists == true {
+        if self.ifNotExists == true {
             builder.append(" IF NOT EXISTS")
         }
         builder.append(" ")
-        builder.append(self._table.name)
-        if self._columns.isEmpty == false {
+        builder.append(self.table)
+        if self.columns.isEmpty == false {
             builder.append(" (")
-            builder.append(self._columns, separator: ", ")
+            builder.append(self.columns.map({ $0.query }), separator: ", ")
             builder.append(")")
         }
-        if self._withoutRowId == true {
+        if self.withoutRowId == true {
             builder.append(" WITHOUT ROWID")
         }
         return builder.string
@@ -105,7 +87,9 @@ extension Database.Query.Table.Create : IDatabaseQuery {
 public extension IDatabaseEntity {
     
     func create() -> Database.Query.Table.Create {
-        return .init(table: self.table)
+        return .init(
+            table: self.table.name
+        )
     }
     
 }

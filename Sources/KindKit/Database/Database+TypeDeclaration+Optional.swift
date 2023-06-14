@@ -19,3 +19,9 @@ public extension Database.TypeDeclaration {
     }
     
 }
+
+extension Optional : IDatabaseTypeAlias where Wrapped : IDatabaseTypeAlias {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Optional< Wrapped.DatabaseTypeDeclaration >
+    
+}

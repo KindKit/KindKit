@@ -8,21 +8,15 @@ public extension Database.Query.Table {
     
     struct Delete {
         
-        private let _table: Database.Table
-        private let _where: String?
-        private let _orderBy: [String]
-        private let _limit: String?
+        private let table: String
+        private var `where`: IDatabaseExpressable? = nil
+        private var orderBy: [IDatabaseExpressable] = []
+        private var limit: IDatabaseExpressable? = nil
         
         init(
-            table: Database.Table,
-            `where`: String? = nil,
-            orderBy: [String] = [],
-            limit: String? = nil
+            table: String
         ) {
-            self._table = table
-            self._where = `where`
-            self._orderBy = orderBy
-            self._limit = limit
+            self.table = table
         }
         
     }
@@ -34,58 +28,48 @@ public extension Database.Query.Table.Delete {
     func `where`< Where : IDatabaseCondition >(
         _ condition: Where
     ) -> Self {
-        return .init(
-            table: self._table,
-            where: condition.query,
-            orderBy: self._orderBy,
-            limit: self._limit
-        )
+        var copy = self
+        copy.where = condition
+        return copy
     }
     
-    func orderBy< Value : IDatabaseValue >(
-        _ column: Database.Table.Column< Value >,
+    func orderBy< Column : IDatabaseTableColumn >(
+        _ column: Column,
         mode: Database.Query.OrderBy.Mode
     ) -> Self {
         let orderBy = Database.Query.OrderBy(column: column.name, mode: mode)
-        return .init(
-            table: self._table,
-            where: self._where,
-            orderBy: self._orderBy.kk_appending(orderBy.query),
-            limit: self._limit
-        )
+        var copy = self
+        copy.orderBy = self.orderBy.kk_appending(orderBy)
+        return copy
     }
     
     func limit(
         _ limit: Database.Count,
         offset: Database.Count? = nil
     ) -> Self {
-        return .init(
-            table: self._table,
-            where: self._where,
-            orderBy: self._orderBy,
-            limit: Database.Query.Limit(limit: limit, offset: offset).query
-        )
+        var copy = self
+        copy.limit = Database.Query.Limit(limit: limit, offset: offset)
+        return copy
     }
     
 }
-
 
 extension Database.Query.Table.Delete : IDatabaseUpdateQuery {
     
     public var query: String {
         let builder = StringBuilder("DELETE FROM ")
-        builder.append(self._table.name)
-        if let condition = self._where {
+        builder.append(self.table)
+        if let condition = self.where {
             builder.append(" WHERE ")
-            builder.append(condition)
+            builder.append(condition.query)
         }
-        if self._orderBy.isEmpty == false {
+        if self.orderBy.isEmpty == false {
             builder.append(" ORDER BY ")
-            builder.append(self._orderBy, separator: ", ")
+            builder.append(self.orderBy.map({ $0.query }), separator: ", ")
         }
-        if let limit = self._limit {
+        if let limit = self.limit {
             builder.append(" ")
-            builder.append(limit)
+            builder.append(limit.query)
         }
         return builder.string
     }
@@ -95,7 +79,7 @@ extension Database.Query.Table.Delete : IDatabaseUpdateQuery {
 public extension IDatabaseEntity {
     
     func delete() -> Database.Query.Table.Delete {
-        return .init(table: self.table)
+        return .init(table: self.table.name)
     }
     
 }

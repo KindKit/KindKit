@@ -8,18 +8,14 @@ public extension Database.Query.Table {
     
     struct Insert {
         
-        private let _table: Database.Table
-        private let _columns: [String]
-        private let _values: [String]
+        let table: String
+        var columns: [String] = []
+        var values: [IDatabaseExpressable] = []
         
         init(
-            table: Database.Table,
-            columns: [String] = [],
-            values: [String] = []
+            table: String
         ) {
-            self._table = table
-            self._columns = columns
-            self._values = values
+            self.table = table
         }
         
     }
@@ -28,58 +24,23 @@ public extension Database.Query.Table {
 
 public extension Database.Query.Table.Insert {
     
-    func set< Value : IDatabaseValue >(
-        _ value: Value,
-        `in` column: Database.Table.Column< Value >
-    ) -> Self {
-        var columns = self._columns
-        var values = self._values
+    func set< Column : IDatabaseTableColumn >(
+        _ value: Column.DatabaseValueCoder.DatabaseCoded,
+        `in` column: Column
+    ) throws -> Self {
+        var columns = self.columns
+        var values = self.values
+        let value = try Column.DatabaseValueCoder.encode(value)
         if let index = columns.firstIndex(of: column.name) {
-            values[index] = value.query
+            values[index] = value
         } else {
             columns.append(column.name)
-            values.append(value.query)
+            values.append(value)
         }
-        return .init(
-            table: self._table,
-            columns: columns,
-            values: values
-        )
-    }
-    
-    func set< Encoder : IJsonModelEncoder >(
-        _ encoder: Encoder.Type,
-        model: Encoder.JsonModelEncoded,
-        `in` column: Database.Table.Column< Json >
-    ) -> Self {
-        let json: Json
-        do {
-            json = try Json.build({
-                try $0.encode(encoder, value: model)
-            })
-        } catch {
-            json = Json(root: NSDictionary())
-        }
-        return self.set(json, in: column)
-    }
-    
-    func set< Encoder : IJsonModelEncoder >(
-        _ encoder: Encoder.Type,
-        model: Encoder.JsonModelEncoded?,
-        `in` column: Database.Table.Column< Json? >
-    ) -> Self {
-        guard let model = model else {
-            return self.set(nil, in: column)
-        }
-        let json: Json
-        do {
-            json = try Json.build({
-                try $0.encode(encoder, value: model)
-            })
-        } catch {
-            json = Json(root: NSDictionary())
-        }
-        return self.set(json, in: column)
+        var copy = self
+        copy.columns = columns
+        copy.values = values
+        return copy
     }
     
 }
@@ -88,11 +49,11 @@ extension Database.Query.Table.Insert : IDatabaseInsertQuery {
     
     public var query: String {
         let builder = StringBuilder("INSERT INTO ")
-        builder.append(self._table.name)
+        builder.append(self.table)
         builder.append(" (")
-        builder.append(self._columns, separator: ", ")
+        builder.append(self.columns, separator: ", ")
         builder.append(") VALUES (")
-        builder.append(self._values, separator: ", ")
+        builder.append(self.values.map({ $0.query }), separator: ", ")
         builder.append(")")
         return builder.string
     }
@@ -102,7 +63,9 @@ extension Database.Query.Table.Insert : IDatabaseInsertQuery {
 public extension IDatabaseEntity {
     
     func insert() -> Database.Query.Table.Insert {
-        return .init(table: table)
+        return .init(
+            table: self.table.name
+        )
     }
     
 }

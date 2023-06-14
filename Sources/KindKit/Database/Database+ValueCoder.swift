@@ -6,7 +6,7 @@ import Foundation
 
 public extension Database {
     
-    enum ValueDecoder {
+    enum ValueCoder {
     }
     
 }

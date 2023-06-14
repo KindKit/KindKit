@@ -8,16 +8,8 @@ public extension Database.Query.Table {
     
     struct AddColumn {
         
-        private let _table: Database.Table
-        private let _column: String
-        
-        init(
-            table: Database.Table,
-            column: String
-        ) {
-            self._table = table
-            self._column = column
-        }
+        let table: String
+        let column: IDatabaseExpressable
         
     }
     
@@ -27,9 +19,9 @@ extension Database.Query.Table.AddColumn : IDatabaseQuery {
     
     public var query: String {
         let builder = StringBuilder("ALTER TABLE ")
-        builder.append(self._table.name)
+        builder.append(self.table)
         builder.append(" ADD ")
-        builder.append(self._column)
+        builder.append(self.column.query)
         return builder.string
     }
     
@@ -37,8 +29,15 @@ extension Database.Query.Table.AddColumn : IDatabaseQuery {
 
 public extension IDatabaseEntity {
     
-    func add< Value : IDatabaseValue >(column: Database.Table.Column< Value >) -> Database.Query.Table.AddColumn {
-        return .init(table: self.table, column: Database.Query.Column(column: column).query)
+    func add<
+        Column : IDatabaseTableColumn
+    >(
+        column: Column
+    ) -> Database.Query.Table.AddColumn {
+        return .init(
+            table: self.table.name,
+            column: Database.Query.Column(column)
+        )
     }
     
 }

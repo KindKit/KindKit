@@ -6,7 +6,7 @@ import Foundation
 
 public extension Database {
     
-    class Table {
+    final class Table : IDatabaseTable {
         
         public let name: String
         
@@ -20,11 +20,29 @@ public extension Database {
 
 public extension Database.Table {
     
-    func column< Value : IDatabaseValue >(name: String) -> Database.Table.Column< Value > {
+    func column<
+        Alias : IDatabaseValueAlias
+    >(
+        name: String
+    ) -> Database.Table.Column.Alias< Alias > {
         return .init(table: self, name: name)
     }
     
-    func column< Value : IDatabaseValue >(name: String, type: Value.Type) -> Database.Table.Column< Value > {
+    func column<
+        TypeDeclaration : IDatabaseTypeDeclaration,
+        ValueCoder : IDatabaseValueCoder
+    >(
+        name: String
+    ) -> Database.Table.Column.Custom< TypeDeclaration, ValueCoder > {
+        return .init(table: self, name: name)
+    }
+    
+    func column<
+        TypeAlias : IDatabaseTypeAlias,
+        Coder : IJsonModelCoder
+    >(
+        name: String
+    ) -> Database.Table.Column.Json< TypeAlias, Coder > {
         return .init(table: self, name: name)
     }
     

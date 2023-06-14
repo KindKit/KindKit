@@ -19,3 +19,21 @@ public extension Database.TypeDeclaration {
     }
     
 }
+
+extension String : IDatabaseTypeAlias {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Text
+    
+}
+
+extension SemaVersion : IDatabaseTypeAlias {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Text
+    
+}
+
+extension URL : IDatabaseTypeAlias {
+    
+    public typealias DatabaseTypeDeclaration = Database.TypeDeclaration.Text
+    
+}

@@ -8,27 +8,17 @@ public extension Database.Query.Table {
     
     struct Update {
         
-        private let _table: Database.Table
-        private let _columns: [String]
-        private let _values: [String]
-        private let _where: String?
-        private let _orderBy: [String]
-        private let _limit: String?
+        let table: String
+        var columns: [String] = []
+        var values: [IDatabaseExpressable] = []
+        var `where`: IDatabaseExpressable? = nil
+        var orderBy: [IDatabaseExpressable] = []
+        var limit: IDatabaseExpressable? = nil
         
         init(
-            table: Database.Table,
-            columns: [String] = [],
-            values: [String] = [],
-            `where`: String? = nil,
-            orderBy: [String] = [],
-            limit: String? = nil
+            table: String
         ) {
-            self._table = table
-            self._columns = columns
-            self._values = values
-            self._where = `where`
-            self._orderBy = orderBy
-            self._limit = limit
+            self.table = table
         }
         
     }
@@ -37,103 +27,50 @@ public extension Database.Query.Table {
 
 public extension Database.Query.Table.Update {
     
-    func set< Value : IDatabaseValue >(
-        _ value: Value,
-        `in` column: Database.Table.Column< Value >
-    ) -> Self {
-        var columns = self._columns
-        var values = self._values
+    func set< Column : IDatabaseTableColumn >(
+        _ value: Column.DatabaseValueCoder.DatabaseCoded,
+        `in` column: Column
+    ) throws -> Self {
+        var columns = self.columns
+        var values = self.values
+        let value = try Column.DatabaseValueCoder.encode(value)
         if let index = columns.firstIndex(of: column.name) {
-            values[index] = value.query
+            values[index] = value
         } else {
             columns.append(column.name)
-            values.append(value.query)
+            values.append(value)
         }
-        return .init(
-            table: self._table,
-            columns: columns,
-            values: values,
-            where: self._where,
-            orderBy: self._orderBy,
-            limit: self._limit
-        )
-    }
-    
-    func set< Encoder : IJsonModelEncoder >(
-        _ encoder: Encoder.Type,
-        model: Encoder.JsonModelEncoded,
-        `in` column: Database.Table.Column< Json >
-    ) -> Self {
-        let json: Json
-        do {
-            json = try Json.build({
-                try $0.encode(encoder, value: model)
-            })
-        } catch {
-            json = Json(root: NSDictionary())
-        }
-        return self.set(json, in: column)
-    }
-    
-    func set< Encoder : IJsonModelEncoder >(
-        _ encoder: Encoder.Type,
-        model: Encoder.JsonModelEncoded?,
-        `in` column: Database.Table.Column< Json? >
-    ) -> Self {
-        guard let model = model else {
-            return self.set(nil, in: column)
-        }
-        let json: Json
-        do {
-            json = try Json.build({
-                try $0.encode(encoder, value: model)
-            })
-        } catch {
-            json = Json(root: NSDictionary())
-        }
-        return self.set(json, in: column)
+        var copy = self
+        copy.columns = columns
+        copy.values = values
+        return copy
     }
     
     func `where`< Where : IDatabaseCondition >(
         _ condition: Where
     ) -> Self {
-        return .init(
-            table: self._table,
-            columns: self._columns,
-            values: self._values,
-            where: condition.query,
-            orderBy: self._orderBy,
-            limit: self._limit
-        )
+        var copy = self
+        copy.where = condition
+        return copy
     }
     
-    func orderBy< Value : IDatabaseValue >(
-        _ column: Database.Table.Column< Value >,
+    func orderBy< Column : IDatabaseTableColumn >(
+        _ column: Column,
         mode: Database.Query.OrderBy.Mode
     ) -> Self {
         let orderBy = Database.Query.OrderBy(column: column.name, mode: mode)
-        return .init(
-            table: self._table,
-            columns: self._columns,
-            values: self._values,
-            where: self._where,
-            orderBy: self._orderBy.kk_appending(orderBy.query),
-            limit: self._limit
-        )
+        var copy = self
+        copy.orderBy = self.orderBy.kk_appending(orderBy)
+        return copy
     }
     
     func limit(
         _ limit: Database.Count,
         offset: Database.Count? = nil
     ) -> Self {
-        return .init(
-            table: self._table,
-            columns: self._columns,
-            values: self._values,
-            where: self._where,
-            orderBy: self._orderBy,
-            limit: Database.Query.Limit(limit: limit, offset: offset).query
-        )
+        var copy = self
+        copy.limit = Database.Query.Limit(limit: limit, offset: offset)
+        return copy
     }
     
 }
@@ -142,22 +79,22 @@ extension Database.Query.Table.Update : IDatabaseUpdateQuery {
     
     public var query: String {
         let builder = StringBuilder("UPDATE ")
-        builder.append(self._table.name)
-        if self._columns.isEmpty == false {
+        builder.append(self.table)
+        if self.columns.isEmpty == false {
             builder.append(" SET ")
-            builder.append(self._columns.enumerated(), map: { "\($0.element) = \(self._values[$0.offset])" }, separator: ", ")
+            builder.append(self.columns.enumerated(), map: { "\($0.element) = \(self.values[$0.offset].query)" }, separator: ", ")
         }
-        if let condition = self._where {
+        if let condition = self.where {
             builder.append(" WHERE ")
-            builder.append(condition)
+            builder.append(condition.query)
         }
-        if self._orderBy.isEmpty == false {
+        if self.orderBy.isEmpty == false {
             builder.append(" ORDER BY ")
-            builder.append(self._orderBy, separator: ", ")
+            builder.append(self.orderBy.map({ $0.query }), separator: ", ")
         }
-        if let limit = self._limit {
+        if let limit = self.limit {
             builder.append(" ")
-            builder.append(limit)
+            builder.append(limit.query)
         }
         return builder.string
     }
@@ -167,7 +104,9 @@ extension Database.Query.Table.Update : IDatabaseUpdateQuery {
 public extension IDatabaseEntity {
     
     func update() -> Database.Query.Table.Update {
-        return .init(table: self.table)
+        return .init(
+            table: self.table.name
+        )
     }
     
 }
