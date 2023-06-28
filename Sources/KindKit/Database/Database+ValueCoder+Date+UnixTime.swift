@@ -6,7 +6,7 @@ import Foundation
 
 public extension Database.ValueCoder.Date {
     
-    struct UnitTime : IDatabaseValueCoder {
+    struct UnixTime : IDatabaseValueCoder {
         
         public typealias DatabaseDecoded = Foundation.Date
         
