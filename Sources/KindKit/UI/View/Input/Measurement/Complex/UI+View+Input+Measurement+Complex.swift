@@ -201,39 +201,39 @@ public extension UI.View.Input.Measurement.Complex {
     
     @inlinable
     @discardableResult
-    func `default`(_ value: Foundation.Measurement< UnitType >) -> Self {
+    func `default`(_ value: Foundation.Measurement< UnitType >?) -> Self {
         self.default = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func `default`(_ value: () -> Foundation.Measurement< UnitType >) -> Self {
+    func `default`(_ value: () -> Foundation.Measurement< UnitType >?) -> Self {
         return self.default(value())
     }
 
     @inlinable
     @discardableResult
-    func `default`(_ value: (Self) -> Foundation.Measurement< UnitType >) -> Self {
+    func `default`(_ value: (Self) -> Foundation.Measurement< UnitType >?) -> Self {
         return self.default(value(self))
     }
     
     @inlinable
     @discardableResult
-    func value(_ value: Foundation.Measurement< UnitType >) -> Self {
+    func value(_ value: Foundation.Measurement< UnitType >?) -> Self {
         self.value = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func value(_ value: () -> Foundation.Measurement< UnitType >) -> Self {
+    func value(_ value: () -> Foundation.Measurement< UnitType >?) -> Self {
         return self.value(value())
     }
 
     @inlinable
     @discardableResult
-    func value(_ value: (Self) -> Foundation.Measurement< UnitType >) -> Self {
+    func value(_ value: (Self) -> Foundation.Measurement< UnitType >?) -> Self {
         return self.value(value(self))
     }
     

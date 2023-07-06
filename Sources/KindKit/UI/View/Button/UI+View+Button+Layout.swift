@@ -31,16 +31,13 @@ extension UI.View.Button {
         var primary: IUIView? {
             didSet { self.setNeedForceUpdate(self.primary) }
         }
-        var primaryInset: Inset = Inset(horizontal: 4, vertical: 4) {
-            didSet { self.setNeedForceUpdate() }
-        }
         var secondary: IUIView? {
             didSet { self.setNeedForceUpdate(self.secondary) }
         }
         var secondaryPosition: UI.View.Button.SecondaryPosition = .left {
             didSet { self.setNeedForceUpdate() }
         }
-        var secondaryInset: Inset = Inset(horizontal: 4, vertical: 4) {
+        var secondarySpacing: Double = 4 {
             didSet { self.setNeedForceUpdate() }
         }
         private var _cacheSpinnerSize: Size?
@@ -83,11 +80,10 @@ extension UI.View.Button {
                             let frames = self._frame(
                                 bounds: availableBounds,
                                 alignment: self.alignment,
+                                primarySize: primarySize,
                                 secondaryPosition: self.secondaryPosition,
-                                secondaryInset: self.secondaryInset,
-                                secondarySize: spinnerSize,
-                                primaryInset: self.primaryInset,
-                                primarySize: primarySize
+                                secondarySpacing: self.secondarySpacing,
+                                secondarySize: spinnerSize
                             )
                             spinner.frame = frames.secondary
                             primary.frame = frames.primary
@@ -104,11 +100,10 @@ extension UI.View.Button {
                 let frames = self._frame(
                     bounds: availableBounds,
                     alignment: self.alignment,
+                    primarySize: primarySize,
                     secondaryPosition: self.secondaryPosition,
-                    secondaryInset: self.secondaryInset,
-                    secondarySize: secondarySize,
-                    primaryInset: self.primaryInset,
-                    primarySize: primarySize
+                    secondarySpacing: self.secondarySpacing,
+                    secondarySize: secondarySize
                 )
                 secondary.frame = frames.secondary
                 primary.frame = frames.primary
@@ -125,8 +120,8 @@ extension UI.View.Button {
         func size(available: Size) -> Size {
             var size = Size(width: 0, height: 0)
             let spinnerSize = self.spinner.flatMap({ return $0.size(available: available) })
-            let primarySize = self.primary.flatMap({ return $0.size(available: available).inset(-self.primaryInset) })
-            let secondarySize = self.secondary.flatMap({ return $0.size(available: available).inset(-self.secondaryInset) })
+            let primarySize = self.primary.flatMap({ return $0.size(available: available) })
+            let secondarySize = self.secondary.flatMap({ return $0.size(available: available) })
             if self.spinnerAnimating == true, let spinnerSize = spinnerSize {
                 switch self.spinnerPosition {
                 case .fill:
@@ -137,9 +132,9 @@ extension UI.View.Button {
                             switch self.secondaryPosition {
                             case .top, .bottom:
                                 size.width = max(primarySize.width, spinnerSize.width)
-                                size.height = primarySize.height + spinnerSize.height
+                                size.height = primarySize.height + self.secondarySpacing + spinnerSize.height
                             case .left, .right:
-                                size.width += primarySize.width + spinnerSize.width
+                                size.width += primarySize.width + self.secondarySpacing + spinnerSize.width
                                 size.height = max(primarySize.height, spinnerSize.height)
                             }
                         } else {
@@ -153,9 +148,9 @@ extension UI.View.Button {
                 switch self.secondaryPosition {
                 case .top, .bottom:
                     size.width = max(primarySize.width, secondarySize.width)
-                    size.height = primarySize.height + secondarySize.height
+                    size.height = primarySize.height + self.secondarySpacing + secondarySize.height
                 case .left, .right:
-                    size.width = primarySize.width + secondarySize.width
+                    size.width = primarySize.width + self.secondarySpacing + secondarySize.width
                     size.height = max(primarySize.height, secondarySize.height)
                 }
             } else if let primarySize = primarySize {
@@ -217,21 +212,20 @@ private extension UI.View.Button.Layout {
     func _frame(
         bounds: Rect,
         alignment: UI.View.Button.Alignment,
+        primarySize: Size,
         secondaryPosition: UI.View.Button.SecondaryPosition,
-        secondaryInset: Inset,
-        secondarySize: Size,
-        primaryInset: Inset,
-        primarySize: Size
+        secondarySpacing: Double,
+        secondarySize: Size
     ) -> (secondary: Rect, primary: Rect) {
         switch alignment {
         case .fill:
             switch secondaryPosition {
             case .top:
                 let splited = bounds.split(
-                    bottom: primarySize.height + primaryInset.vertical
+                    bottom: primarySize.height
                 )
-                let primary = splited.bottom.inset(primaryInset)
-                let secondary = splited.top.inset(secondaryInset)
+                let primary = splited.bottom
+                let secondary = splited.top
                 return (
                     secondary: Rect(
                         center: secondary.center,
@@ -246,10 +240,10 @@ private extension UI.View.Button.Layout {
                 )
             case .left:
                 let splited = bounds.split(
-                    right: primarySize.width + primaryInset.horizontal
+                    right: primarySize.width
                 )
-                let primary = splited.right.inset(primaryInset)
-                let secondary = splited.left.inset(secondaryInset)
+                let primary = splited.right
+                let secondary = splited.left
                 return (
                     secondary: Rect(
                         center: secondary.center,
@@ -264,10 +258,10 @@ private extension UI.View.Button.Layout {
                 )
             case .right:
                 let splited = bounds.split(
-                    left: primarySize.width + primaryInset.horizontal
+                    left: primarySize.width
                 )
-                let primary = splited.left.inset(primaryInset)
-                let secondary = splited.right.inset(secondaryInset)
+                let primary = splited.left
+                let secondary = splited.right
                 return (
                     secondary: Rect(
                         center: secondary.center,
@@ -282,10 +276,10 @@ private extension UI.View.Button.Layout {
                 )
             case .bottom:
                 let splited = bounds.split(
-                    top: primarySize.height + primaryInset.vertical
+                    top: primarySize.height
                 )
-                let primary = splited.top.inset(primaryInset)
-                let secondary = splited.bottom.inset(secondaryInset)
+                let primary = splited.top
+                let secondary = splited.bottom
                 return (
                     secondary: Rect(
                         center: secondary.center,
@@ -310,38 +304,38 @@ private extension UI.View.Button.Layout {
             case .top:
                 secondary = Rect(
                     x: (baseline.x - (secondarySize.width / 2)),
-                    y: secondaryInset.top,
+                    y: 0,
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
                 primary = Rect(
                     x: (baseline.x - (primarySize.width / 2)),
-                    y: primaryInset.top + secondarySize.height + secondaryInset.vertical,
+                    y: secondarySize.height + secondarySpacing,
                     width: primarySize.width,
                     height: primarySize.height
                 )
             case .left:
                 secondary = Rect(
-                    x: secondaryInset.left,
+                    x: 0,
                     y: (baseline.y - (secondarySize.height / 2)),
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
                 primary = Rect(
-                    x: primaryInset.left + secondarySize.width + secondaryInset.horizontal,
+                    x: secondarySize.width + secondarySpacing,
                     y: (baseline.y - (primarySize.height / 2)),
                     width: primarySize.width,
                     height: primarySize.height
                 )
             case .right:
                 primary = Rect(
-                    x: primaryInset.left,
+                    x: 0,
                     y: (baseline.y - (primarySize.height / 2)),
                     width: primarySize.width,
                     height: primarySize.height
                 )
                 secondary = Rect(
-                    x: secondaryInset.left + primarySize.width + primaryInset.horizontal,
+                    x: primarySize.width + secondarySpacing,
                     y: (baseline.y - (secondarySize.height / 2)),
                     width: secondarySize.width,
                     height: secondarySize.height
@@ -349,13 +343,13 @@ private extension UI.View.Button.Layout {
             case .bottom:
                 primary = Rect(
                     x: (baseline.x - (primarySize.width / 2)),
-                    y: primaryInset.top,
+                    y: 0,
                     width: primarySize.width,
                     height: primarySize.height
                 )
                 secondary = Rect(
                     x: (baseline.x - (secondarySize.width / 2)),
-                    y: secondaryInset.top + primarySize.height + primaryInset.vertical,
+                    y: primarySize.height + secondarySpacing,
                     width: secondarySize.width,
                     height: secondarySize.height
                 )

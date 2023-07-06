@@ -19,9 +19,11 @@ public extension UI.Container {
                 if let parent = self.parent {
                     if parent.isPresented == true {
                         self.refreshParentInset()
+                        self.orientation = parent.orientation
                     }
                 } else {
                     self.refreshParentInset()
+                    self.orientation = .unknown
                 }
             }
         }
@@ -52,6 +54,15 @@ public extension UI.Container {
                 return self.content?.supportedOrientations ?? .all
             }
             return current.container.supportedOrientations
+        }
+        public var orientation: UIInterfaceOrientation = .unknown {
+            didSet {
+                guard self.orientation != oldValue else { return }
+                for item in self._items {
+                    item.container.didChange(orientation: self.orientation)
+                }
+                self.content?.didChange(orientation: self.orientation)
+            }
         }
 #endif
         public private(set) var isPresented: Bool
@@ -244,6 +255,14 @@ public extension UI.Container {
                 content.didChangeAppearance()
             }
         }
+        
+#if os(iOS)
+        
+        public func didChange(orientation: UIInterfaceOrientation) {
+            self.orientation = orientation
+        }
+        
+#endif
         
         public func prepareShow(interactive: Bool) {
             self.content?.prepareShow(interactive: interactive)

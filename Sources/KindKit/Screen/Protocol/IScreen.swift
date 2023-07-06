@@ -30,6 +30,9 @@ public protocol IScreen : AnyObject {
 #endif
     
     func didChangeAppearance()
+#if os(iOS)
+    func didChange(orientation: UIInterfaceOrientation)
+#endif
 
     func prepareShow(interactive: Bool)
     func finishShow(interactive: Bool)
@@ -73,6 +76,11 @@ public extension IScreen {
         return .all
     }
     
+    
+    var orientation: UIInterfaceOrientation {
+        return self.container?.orientation ?? .unknown
+    }
+    
 #endif
     
     var inset: UI.Container.AccumulateInset {
@@ -107,6 +115,13 @@ public extension IScreen {
     
     func didChangeAppearance() {
     }
+    
+#if os(iOS)
+    
+    func didChange(orientation: UIInterfaceOrientation) {
+    }
+    
+#endif
     
     func prepareShow(interactive: Bool) {
     }

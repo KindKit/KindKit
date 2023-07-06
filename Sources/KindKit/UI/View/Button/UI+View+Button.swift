@@ -36,10 +36,6 @@ public extension UI.View {
         public var primary: IUIView? {
             didSet { self._layout.primary = self.primary }
         }
-        public var primaryInset: Inset {
-            set { self._layout.primaryInset = newValue }
-            get { self._layout.primaryInset }
-        }
         public var secondary: IUIView? {
             didSet { self._layout.secondary = self.secondary }
         }
@@ -47,9 +43,9 @@ public extension UI.View {
             set { self._layout.secondaryPosition = newValue }
             get { self._layout.secondaryPosition }
         }
-        public var secondaryInset: Inset {
-            set { self._layout.secondaryInset = newValue }
-            get { self._layout.secondaryInset }
+        public var secondarySpacing: Double {
+            set { self._layout.secondarySpacing = newValue }
+            get { self._layout.secondarySpacing }
         }
         public var isAnimating: Bool {
             set { self._layout.spinnerAnimating = newValue }
@@ -205,25 +201,6 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
-    func primaryInset(_ value: Inset) -> Self {
-        self.primaryInset = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func primaryInset(_ value: () -> Inset) -> Self {
-        return self.primaryInset(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func primaryInset(_ value: (Self) -> Inset) -> Self {
-        return self.primaryInset(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
     func secondary(_ value: IUIView?) -> Self {
         self.secondary = value
         return self
@@ -262,21 +239,21 @@ public extension UI.View.Button {
     
     @inlinable
     @discardableResult
-    func secondaryInset(_ value: Inset) -> Self {
-        self.secondaryInset = value
+    func secondarySpacing(_ value: Double) -> Self {
+        self.secondarySpacing = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func secondaryInset(_ value: () -> Inset) -> Self {
-        return self.secondaryInset(value())
+    func secondarySpacing(_ value: () -> Double) -> Self {
+        return self.secondarySpacing(value())
     }
 
     @inlinable
     @discardableResult
-    func secondaryInset(_ value: (Self) -> Inset) -> Self {
-        return self.secondaryInset(value(self))
+    func secondarySpacing(_ value: (Self) -> Double) -> Self {
+        return self.secondarySpacing(value(self))
     }
     
 }

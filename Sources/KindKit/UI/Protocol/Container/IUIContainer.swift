@@ -19,6 +19,7 @@ public protocol IUIContainer : AnyObject {
     var statusBarAnimation: UIStatusBarAnimation { get }
     var statusBarHidden: Bool { get }
     var supportedOrientations: UIInterfaceOrientationMask { get }
+    var orientation: UIInterfaceOrientation { get }
     var uiViewController: UIViewController? { get }
 #endif
     var isPresented: Bool { get }
@@ -43,6 +44,9 @@ public protocol IUIContainer : AnyObject {
 #endif
     
     func didChangeAppearance()
+#if os(iOS)
+    func didChange(orientation: UIInterfaceOrientation)
+#endif
     
     func prepareShow(interactive: Bool)
     func finishShow(interactive: Bool)

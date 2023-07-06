@@ -19,6 +19,34 @@ public extension Array {
     }
     
     @inlinable
+    func kk_uniqued() -> Self where Element : Hashable {
+        var exist = Set< Element >()
+        var result = Array()
+        for element in self {
+            if exist.contains(element) == false {
+                result.append(element)
+                exist.insert(element)
+            }
+        }
+        return result
+    }
+    
+    @inlinable
+    func kk_uniqued(
+        `where`: (Element, Element) -> Bool
+    ) -> Self {
+        var exist: [Element] = []
+        var result = Array()
+        for element in self {
+            if exist.contains(where: { `where`(element, $0) }) == false {
+                result.append(element)
+                exist.append(element)
+            }
+        }
+        return result
+    }
+    
+    @inlinable
     func kk_previous(
         `where`: (Element) -> Bool
     ) -> Element? {
@@ -150,6 +178,13 @@ public extension Array {
             return try firstResult(self[0])
         }
         return try emptyResult()
+    }
+    
+    @inlinable
+    func kk_count(
+        _ element: Element
+    ) -> Int where Element : Equatable {
+        return self.kk_count(where: { $0 == element })
     }
     
     @inlinable

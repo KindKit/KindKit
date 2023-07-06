@@ -32,8 +32,14 @@ extension UI.View.Cell {
         func size(available: Size) -> Size {
             guard let content = self.content else { return .zero }
             let contentSize = content.size(available: available.inset(self.contentInset))
+            let width: Double
+            if available.width.isInfinite == true {
+                width = contentSize.width + self.contentInset.horizontal
+            } else {
+                width = available.width
+            }
             return Size(
-                width: available.width + self.contentInset.horizontal,
+                width: width,
                 height: contentSize.height + self.contentInset.vertical
             )
         }

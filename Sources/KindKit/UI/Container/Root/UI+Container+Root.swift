@@ -56,6 +56,12 @@ public extension UI.Container {
         public var uiViewController: UIViewController? {
             return self.delegate?.viewController()
         }
+        public var orientation: UIInterfaceOrientation = .unknown {
+            didSet {
+                guard self.orientation != oldValue else { return }
+                self.content.didChange(orientation: self.orientation)
+            }
+        }
 #endif
         public private(set) var isPresented: Bool {
             didSet {
@@ -182,6 +188,14 @@ public extension UI.Container {
         public func didChangeAppearance() {
             self.content.didChangeAppearance()
         }
+        
+#if os(iOS)
+        
+        public func didChange(orientation: UIInterfaceOrientation) {
+            self.orientation = orientation
+        }
+        
+#endif
         
         public func prepareShow(interactive: Bool) {
             self.content.prepareShow(interactive: interactive)

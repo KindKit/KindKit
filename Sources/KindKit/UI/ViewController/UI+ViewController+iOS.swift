@@ -32,6 +32,12 @@ public extension UI {
         var kkRootView: KKRootView! {
             didSet { self.view = self.kkRootView }
         }
+        var kkOrientation: UIInterfaceOrientation = .unknown {
+            didSet {
+                guard self.kkOrientation != oldValue else { return }
+                self.container.didChange(orientation: self.kkOrientation)
+            }
+        }
         
         private init(
             owner: AnyObject? = nil,
@@ -42,13 +48,7 @@ public extension UI {
             
             super.init(nibName: nil, bundle: nil)
             
-            self.container.delegate = self
-            UI.Container.BarController.shared.add(observer: self)
-            
-            if #available(iOS 13, *) {
-            } else {
-                NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
-            }
+            self._setup()
         }
         
         public convenience init(
@@ -110,10 +110,9 @@ public extension UI {
         
         public override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
-            self.container.safeArea = self._safeArea()
-            if let substrate = self.container.statusBarSubstrate {
-                substrate.height = .fixed(self._statusBarHeight())
-            }
+            self._updateSafeArea()
+            self._updateStatusBarHeight()
+            self._updateOrientation()
             self.kkRootView.kkContent = self.container.view.native
             if self.container.isPresented == false {
                 self.container.prepareShow(interactive: false)
@@ -124,6 +123,7 @@ public extension UI {
         public override func viewDidAppear(_ animated: Bool) {
             super.viewDidAppear(animated)
             self._updateStatusBarHeight()
+            self._updateOrientation()
         }
         
         public override func viewDidDisappear(_ animated: Bool) {
@@ -137,17 +137,13 @@ public extension UI {
         
         public override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
-            if self.container.isPresented == true {
-                self.container.safeArea = self._safeArea()
-            }
+            self._updateSafeArea()
         }
         
         @available(iOS 11.0, *)
         public override func viewSafeAreaInsetsDidChange() {
             super.viewSafeAreaInsetsDidChange()
-            if self.container.isPresented == true {
-                self.container.safeArea = self._safeArea()
-            }
+            self._updateSafeArea()
         }
         
         public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -158,6 +154,7 @@ public extension UI {
         public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
             super.viewWillTransition(to: size, with: coordinator)
             self._updateStatusBarHeight()
+            self._updateOrientation()
         }
         
         public override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
@@ -252,75 +249,19 @@ extension UI.ViewController : IRootContainerDelegate {
     }
     
     public func updateOrientations() {
-        let supportedOrientations = self.supportedInterfaceOrientations
         if #available(iOS 16.0, *) {
             self.setNeedsUpdateOfSupportedInterfaceOrientations()
         } else {
-            let interfaceOrientation: UIInterfaceOrientation
-            let currentDeviceOrientation = UIDevice.current.orientation
-            switch currentDeviceOrientation {
-            case .unknown, .portrait, .faceUp, .faceDown:
-                if supportedOrientations.contains(.portrait) == true {
-                    interfaceOrientation = .portrait
-                } else if supportedOrientations.contains(.portraitUpsideDown) == true {
-                    interfaceOrientation = .portraitUpsideDown
-                } else if supportedOrientations.contains(.landscapeLeft) == true {
-                    interfaceOrientation = .landscapeLeft
-                } else if supportedOrientations.contains(.landscapeRight) == true {
-                    interfaceOrientation = .landscapeRight
-                } else {
-                    interfaceOrientation = .unknown
-                }
-            case .portraitUpsideDown:
-                if supportedOrientations.contains(.portraitUpsideDown) == true {
-                    interfaceOrientation = .portraitUpsideDown
-                } else if supportedOrientations.contains(.portrait) == true {
-                    interfaceOrientation = .portrait
-                } else if supportedOrientations.contains(.landscapeLeft) == true {
-                    interfaceOrientation = .landscapeLeft
-                } else if supportedOrientations.contains(.landscapeRight) == true {
-                    interfaceOrientation = .landscapeRight
-                } else {
-                    interfaceOrientation = .unknown
-                }
-            case .landscapeLeft:
-                if supportedOrientations.contains(.landscapeLeft) == true {
-                    interfaceOrientation = .landscapeLeft
-                } else if supportedOrientations.contains(.landscapeRight) == true {
-                    interfaceOrientation = .landscapeRight
-                } else if supportedOrientations.contains(.portrait) == true {
-                    interfaceOrientation = .portrait
-                } else if supportedOrientations.contains(.portraitUpsideDown) == true {
-                    interfaceOrientation = .portraitUpsideDown
-                } else {
-                    interfaceOrientation = .unknown
-                }
-            case .landscapeRight:
-                if supportedOrientations.contains(.landscapeRight) == true {
-                    interfaceOrientation = .landscapeRight
-                } else if supportedOrientations.contains(.landscapeLeft) == true {
-                    interfaceOrientation = .landscapeLeft
-                } else if supportedOrientations.contains(.portrait) == true {
-                    interfaceOrientation = .portrait
-                } else if supportedOrientations.contains(.portraitUpsideDown) == true {
-                    interfaceOrientation = .portraitUpsideDown
-                } else {
-                    interfaceOrientation = .unknown
-                }
-            @unknown default:
-                interfaceOrientation = .unknown
-            }
-            var deviceOrientation = currentDeviceOrientation
-            switch interfaceOrientation {
-            case .portrait: deviceOrientation = UIDeviceOrientation.portrait
-            case .portraitUpsideDown: deviceOrientation = UIDeviceOrientation.portraitUpsideDown
-            case .landscapeLeft: deviceOrientation = UIDeviceOrientation.landscapeLeft
-            case .landscapeRight: deviceOrientation = UIDeviceOrientation.landscapeRight
-            case .unknown: break
-            @unknown default: break
-            }
-            if deviceOrientation != currentDeviceOrientation {
-                UIDevice.current.setValue(deviceOrientation.rawValue, forKey: "orientation")
+            let device = UIDevice.current
+            let interfaceOrientation = device.kk_interfaceOrientation(
+                supported: self.supportedInterfaceOrientations
+            )
+            let oldDeviceOrientation = device.orientation
+            let newDeviceOrientation = device.kk_deviceOrientation(
+                interfaceOrientation: interfaceOrientation
+            )
+            if newDeviceOrientation != oldDeviceOrientation {
+                UIDevice.current.setValue(newDeviceOrientation.rawValue, forKey: "orientation")
             }
         }
     }
@@ -341,6 +282,16 @@ extension UI.ViewController : IContainerBarControllerObserver {
 }
 
 private extension UI.ViewController {
+    
+    func _setup() {
+        self.container.delegate = self
+        UI.Container.BarController.shared.add(observer: self)
+        
+        if #available(iOS 13, *) {
+        } else {
+            NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
+        }
+    }
     
     func _free() {
         UI.Container.BarController.shared.remove(observer: self)
@@ -369,6 +320,12 @@ private extension UI.ViewController {
         return height
     }
     
+    func _updateSafeArea() {
+        if self.container.isPresented == true {
+            self.container.safeArea = self._safeArea()
+        }
+    }
+    
     func _safeArea() -> Inset {
         if #available(iOS 11.0, *) {
             return Inset(self.view.safeAreaInsets) + Inset(self.additionalSafeAreaInsets)
@@ -379,6 +336,19 @@ private extension UI.ViewController {
                 right: 0,
                 bottom: Double(self.bottomLayoutGuide.length)
             )
+        }
+    }
+    
+    func _updateOrientation() {
+        let application = UIApplication.shared
+        if #available(iOS 13.0, *) {
+            if let windowScene = self.view.window?.windowScene {
+                self.kkOrientation = windowScene.interfaceOrientation
+            } else if let windowScene = application.kk_windowScenes.first {
+                self.kkOrientation = windowScene.interfaceOrientation
+            }
+        } else {
+            self.kkOrientation = application.statusBarOrientation
         }
     }
     

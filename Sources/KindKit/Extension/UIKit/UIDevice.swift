@@ -55,6 +55,78 @@ public extension UIDevice {
         return self.kk_totalMemorySpace - usedMemorySpace
     }
     
+    func kk_deviceOrientation(
+        interfaceOrientation: UIInterfaceOrientation
+    ) -> UIDeviceOrientation {
+        switch interfaceOrientation {
+        case .unknown: return self.orientation
+        case .portrait: return .portrait
+        case .portraitUpsideDown: return .portraitUpsideDown
+        case .landscapeLeft: return .landscapeLeft
+        case .landscapeRight: return .landscapeRight
+        @unknown default: return self.orientation
+        }
+    }
+    
+    func kk_interfaceOrientation(
+        supported: UIInterfaceOrientationMask
+    ) -> UIInterfaceOrientation {
+        switch self.orientation {
+        case .unknown:
+            return .unknown
+        case .portrait, .faceUp, .faceDown:
+            if supported.contains(.portrait) == true {
+                return .portrait
+            } else if supported.contains(.portraitUpsideDown) == true {
+                return .portraitUpsideDown
+            } else if supported.contains(.landscapeLeft) == true {
+                return .landscapeLeft
+            } else if supported.contains(.landscapeRight) == true {
+                return .landscapeRight
+            } else {
+                return .unknown
+            }
+        case .portraitUpsideDown:
+            if supported.contains(.portraitUpsideDown) == true {
+                return .portraitUpsideDown
+            } else if supported.contains(.portrait) == true {
+                return .portrait
+            } else if supported.contains(.landscapeLeft) == true {
+                return .landscapeLeft
+            } else if supported.contains(.landscapeRight) == true {
+                return .landscapeRight
+            } else {
+                return .unknown
+            }
+        case .landscapeLeft:
+            if supported.contains(.landscapeLeft) == true {
+                return .landscapeLeft
+            } else if supported.contains(.landscapeRight) == true {
+                return .landscapeRight
+            } else if supported.contains(.portrait) == true {
+                return .portrait
+            } else if supported.contains(.portraitUpsideDown) == true {
+                return .portraitUpsideDown
+            } else {
+                return .unknown
+            }
+        case .landscapeRight:
+            if supported.contains(.landscapeRight) == true {
+                return .landscapeRight
+            } else if supported.contains(.landscapeLeft) == true {
+                return .landscapeLeft
+            } else if supported.contains(.portrait) == true {
+                return .portrait
+            } else if supported.contains(.portraitUpsideDown) == true {
+                return .portraitUpsideDown
+            } else {
+                return .unknown
+            }
+        @unknown default:
+            return .unknown
+        }
+    }
+    
 }
 
 #endif

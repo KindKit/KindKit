@@ -93,8 +93,8 @@ public extension UI.View {
                 }
                 let oldContentOffset = self.contentOffset
                 let newContentOffset = Point(
-                    x: min(-self.contentInset.left, oldContentOffset.x),
-                    y: min(-self.contentInset.top, oldContentOffset.y)
+                    x: oldContentOffset.x - self.contentInset.left,
+                    y: oldContentOffset.y - self.contentInset.top
                 )
                 if oldContentOffset != newContentOffset {
                     self._contentOffset = newContentOffset

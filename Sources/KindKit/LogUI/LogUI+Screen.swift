@@ -8,6 +8,7 @@ extension LogUI {
     
     final class Screen : IScreen, IScreenStackable, IScreenViewable {
         
+        
         let target: LogUI.Target
         
         var container: IUIContainer?
