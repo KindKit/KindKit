@@ -376,77 +376,87 @@ private extension KKInputMeasurementComplexView {
     }
     
     func _items(from measurement: NSMeasurement?) -> [KKItem] {
+        guard let measurement = measurement else {
+            return self.kkParts.map({ $0.items.first! })
+        }
+        let lower = self._items(from: measurement, rounding: .down)
+        let upper = self._items(from: measurement, rounding: .up)
+        let lowerValue = self._value(unit: measurement.unit, items: lower).doubleValue
+        let upperValue = self._value(unit: measurement.unit, items: upper).doubleValue
+        let lowerDelta = abs(lowerValue - measurement.doubleValue)
+        let upperDelta = abs(upperValue - measurement.doubleValue)
+        if lowerDelta < upperDelta {
+            return lower
+        }
+        return upper
+    }
+    
+    func _items(from measurement: NSMeasurement, rounding: FloatingPointRoundingRule) -> [KKItem] {
         var result: [KKItem] = []
-        if let measurement = measurement {
-            var accumulator: NSMeasurement?
-            for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
-                let part = self.kkParts[partIndex]
-                let converted: NSMeasurement
-                if let accumulator = accumulator {
-                    let lhs = measurement.converting(to: part.unit)
-                    let rhs = accumulator.converting(to: part.unit)
-                    converted = (lhs - rhs) as NSMeasurement
-                } else {
-                    converted = NSMeasurement(
-                        doubleValue: floor(measurement.converting(to: part.unit).value),
-                        unit: part.unit
-                    )
-                }
-                let convertedValue = converted.doubleValue
-                var nearest: KKItem? = nil
-                if partIndex < self.kkParts.endIndex {
-                    for item in part.items {
-                        let itemValue = item.value.converting(to: part.unit).value
-                        if convertedValue >= itemValue {
-                            nearest = item
-                        } else if itemValue >= convertedValue {
-                            break
-                        }
+        var accumulator: NSMeasurement?
+        for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
+            let part = self.kkParts[partIndex]
+            let converted: NSMeasurement
+            if let accumulator = accumulator {
+                let lhs = measurement.converting(to: part.unit)
+                let rhs = accumulator.converting(to: part.unit)
+                converted = (lhs - rhs) as NSMeasurement
+            } else {
+                converted = NSMeasurement(
+                    doubleValue: measurement.converting(to: part.unit).value.rounded(rounding),
+                    unit: part.unit
+                )
+            }
+            let convertedValue = converted.doubleValue
+            var nearest: KKItem? = nil
+            if partIndex < self.kkParts.endIndex - 1 {
+                for item in part.items {
+                    let itemValue = item.value.converting(to: part.unit).value
+                    if convertedValue >= itemValue {
+                        nearest = item
+                    } else if itemValue >= convertedValue {
+                        break
                     }
-                } else {
-                    var lower: KKItem? = nil
-                    var upper: KKItem? = nil
-                    for item in part.items {
-                        let itemValue = item.value.converting(to: part.unit).value
-                        if convertedValue >= itemValue {
+                }
+            } else {
+                var lower: KKItem? = nil
+                var upper: KKItem? = nil
+                for item in part.items {
+                    let itemValue = item.value.converting(to: part.unit).value
+                    if convertedValue >= itemValue {
+                        lower = item
+                    } else if itemValue >= convertedValue {
+                        if lower == nil {
                             lower = item
-                        } else if itemValue >= convertedValue {
-                            if lower == nil {
-                                lower = item
-                            } else {
-                                upper = item
-                            }
-                            break
-                        }
-                    }
-                    if let lower = lower, let upper = upper {
-                        let lowerValue = lower.value.converting(to: part.unit).value
-                        let upperValue = upper.value.converting(to: part.unit).value
-                        let lowerDelta = abs(lowerValue - convertedValue)
-                        let upperDelta = abs(upperValue - convertedValue)
-                        if lowerDelta < upperDelta {
-                            nearest = lower
                         } else {
-                            nearest = upper
+                            upper = item
                         }
-                    } else {
-                        nearest = lower
+                        break
                     }
                 }
-                if let nearest = nearest {
-                    let offset = nearest.value.converting(to: part.unit)
-                    if let t = accumulator {
-                        accumulator = t.adding(offset) as NSMeasurement
+                if let lower = lower, let upper = upper {
+                    let lowerValue = lower.value.converting(to: part.unit).value
+                    let upperValue = upper.value.converting(to: part.unit).value
+                    let lowerDelta = abs(lowerValue - convertedValue)
+                    let upperDelta = abs(upperValue - convertedValue)
+                    if lowerDelta < upperDelta {
+                        nearest = lower
                     } else {
-                        accumulator = offset as NSMeasurement
+                        nearest = upper
                     }
-                    result.append(nearest)
                 } else {
-                    result.append(part.items.first!)
+                    nearest = lower
                 }
             }
-        } else {
-            for part in self.kkParts {
+            if let nearest = nearest {
+                let offset = nearest.value.converting(to: part.unit)
+                if let t = accumulator {
+                    accumulator = t.adding(offset) as NSMeasurement
+                } else {
+                    accumulator = offset as NSMeasurement
+                }
+                result.append(nearest)
+            } else {
                 result.append(part.items.first!)
             }
         }
@@ -460,14 +470,24 @@ private extension KKInputMeasurementComplexView {
         guard let selected = self.kkSelected else {
             return nil
         }
-        let values: [Double] = selected.compactMap({
+        return self._value(
+            unit: unit,
+            items: selected
+        )
+    }
+    
+    func _value(unit: Unit, items: [KKItem]) -> NSMeasurement {
+        let values: [Double] = items.compactMap({
             guard $0.value.canBeConverted(to: unit) == true else {
                 return nil
             }
             return $0.value.converting(to: unit).value
         })
         guard values.isEmpty == false else {
-            return nil
+            return NSMeasurement(
+                doubleValue: 0,
+                unit: unit
+            )
         }
         return NSMeasurement(
             doubleValue: values.reduce(0, { $0 + $1 }),
