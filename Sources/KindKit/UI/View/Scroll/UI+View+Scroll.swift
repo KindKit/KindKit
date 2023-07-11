@@ -91,15 +91,16 @@ public extension UI.View {
                 if self.isLoaded == true {
                     self._view.update(contentInset: self.contentInset)
                 }
+                let deltaContentInset = self.contentInset - oldValue
                 let oldContentOffset = self.contentOffset
                 let newContentOffset = Point(
-                    x: oldContentOffset.x - self.contentInset.left,
-                    y: oldContentOffset.y - self.contentInset.top
+                    x: oldContentOffset.x - deltaContentInset.left,
+                    y: oldContentOffset.y - deltaContentInset.top
                 )
                 if oldContentOffset != newContentOffset {
                     self._contentOffset = newContentOffset
                     if self.isLoaded == true {
-                        self._view.update(contentOffset: newContentOffset, normalized: true)
+                        self._view.update(contentOffset: newContentOffset)
                     }
                 }
                 if self.size.isStatic == false {
@@ -112,7 +113,7 @@ public extension UI.View {
                 guard self._contentOffset != newValue else { return }
                 self._contentOffset = newValue
                 if self.isLoaded == true {
-                    self._view.update(contentOffset: newValue, normalized: false)
+                    self._view.update(contentOffset: newValue)
                 }
             }
             get { self._contentOffset }
@@ -390,14 +391,8 @@ public extension UI.View.Scroll {
 public extension UI.View.Scroll {
     
     @discardableResult
-    func contentOffset(_ value: Point, normalized: Bool = false) -> Self {
-        guard self.contentOffset != value else {
-            return self
-        }
-        self._contentOffset = value
-        if self.isLoaded == true {
-            self._view.update(contentOffset: value, normalized: normalized)
-        }
+    func contentOffset(_ value: Point) -> Self {
+        self.contentOffset = value
         return self
     }
     

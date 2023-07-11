@@ -230,7 +230,7 @@ extension KKScrollView {
         self.update(visibleInset: view.visibleInset)
         self.update(contentInset: view.contentInset)
         self.update(contentSize: view.contentSize)
-        self.update(contentOffset: view.contentOffset, normalized: true)
+        self.update(contentOffset: view.contentOffset)
         self.update(content: view.content)
         self.update(refreshColor: view.refreshColor)
         self.update(isRefreshing: view.isRefreshing)
@@ -285,20 +285,8 @@ extension KKScrollView {
         self.contentSize = contentSize.cgSize
     }
     
-    func update(contentOffset: Point, normalized: Bool) {
-        let validContentOffset: CGPoint
-        if normalized == true {
-            let contentInset = self.contentInset
-            let contentSize = self.contentSize
-            let visibleSize = self.bounds.size
-            validContentOffset = CGPoint(
-                x: max(-contentInset.left, min(-contentInset.left + CGFloat(contentOffset.x), contentSize.width - visibleSize.width + contentInset.right)),
-                y: max(-contentInset.top, min(-contentInset.top + CGFloat(contentOffset.y), contentSize.height - visibleSize.height + contentInset.bottom))
-            )
-        } else {
-            validContentOffset = contentOffset.cgPoint
-        }
-        self.setContentOffset(validContentOffset, animated: false)
+    func update(contentOffset: Point) {
+        self.setContentOffset(contentOffset.cgPoint, animated: false)
     }
     
     func update(refreshColor: UI.Color?) {

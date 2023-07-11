@@ -62,7 +62,7 @@ public extension UI.View {
                 if let selectedView = self._selected {
                     selectedView.select(true)
                     if let contentOffset = self._contentView.contentOffset(with: selectedView, horizontal: .center, vertical: .center) {
-                        self._contentView.contentOffset(contentOffset, normalized: true)
+                        self._contentView.contentOffset = contentOffset
                     }
                     self._contentLayout.indicatorState = .alias(current: selectedView)
                 } else {
@@ -99,7 +99,7 @@ public extension UI.View {
         public func transition(to view: UI.View.PageBar.Item, progress: Percent) {
             if let currentContentOffset = self._transitionContentOffset {
                 if let targetContentOffset = self._contentView.contentOffset(with: view, horizontal: .center, vertical: .center) {
-                    self._contentView.contentOffset(currentContentOffset.lerp(targetContentOffset, progress: progress), normalized: true)
+                    self._contentView.contentOffset = currentContentOffset.lerp(targetContentOffset, progress: progress)
                 }
             }
             if let current = self._transitionSelectedView {
