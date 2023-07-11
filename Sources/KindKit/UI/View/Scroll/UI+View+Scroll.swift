@@ -94,8 +94,8 @@ public extension UI.View {
                 let deltaContentInset = self.contentInset - oldValue
                 let oldContentOffset = self.contentOffset
                 let newContentOffset = Point(
-                    x: oldContentOffset.x - deltaContentInset.left,
-                    y: oldContentOffset.y - deltaContentInset.top
+                    x: max(-self.contentInset.left, oldContentOffset.x - deltaContentInset.left),
+                    y: max(-self.contentInset.top, oldContentOffset.y - deltaContentInset.top)
                 )
                 if oldContentOffset != newContentOffset {
                     self._contentOffset = newContentOffset
