@@ -216,7 +216,7 @@ private extension UI.View.Button.Layout {
         secondaryPosition: UI.View.Button.SecondaryPosition,
         secondarySpacing: Double,
         secondarySize: Size
-    ) -> (secondary: Rect, primary: Rect) {
+    ) -> (primary: Rect, secondary: Rect) {
         switch alignment {
         case .fill:
             switch secondaryPosition {
@@ -225,17 +225,22 @@ private extension UI.View.Button.Layout {
                     bottom: primarySize.height
                 )
                 let primary = splited.bottom
-                let secondary = splited.top
+                let secondary = splited.top.inset(.init(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: secondarySpacing
+                ))
                 return (
-                    secondary: Rect(
-                        center: secondary.center,
-                        width: secondarySize.width,
-                        height: secondary.height
-                    ),
                     primary: Rect(
                         center: primary.center,
                         width: primarySize.width,
                         height: primary.height
+                    ),
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondarySize.width,
+                        height: secondary.height
                     )
                 )
             case .left:
@@ -243,17 +248,22 @@ private extension UI.View.Button.Layout {
                     right: primarySize.width
                 )
                 let primary = splited.right
-                let secondary = splited.left
+                let secondary = splited.left.inset(.init(
+                    top: 0,
+                    left: 0,
+                    right: secondarySpacing,
+                    bottom: 0
+                ))
                 return (
-                    secondary: Rect(
-                        center: secondary.center,
-                        width: secondary.width,
-                        height: secondarySize.height
-                    ),
                     primary: Rect(
                         center: primary.center,
                         width: primary.width,
                         height: primarySize.height
+                    ),
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondary.width,
+                        height: secondarySize.height
                     )
                 )
             case .right:
@@ -261,17 +271,22 @@ private extension UI.View.Button.Layout {
                     left: primarySize.width
                 )
                 let primary = splited.left
-                let secondary = splited.right
+                let secondary = splited.right.inset(.init(
+                    top: 0,
+                    left: secondarySpacing,
+                    right: 0,
+                    bottom: 0
+                ))
                 return (
-                    secondary: Rect(
-                        center: secondary.center,
-                        width: secondary.width,
-                        height: secondarySize.height
-                    ),
                     primary: Rect(
                         center: primary.center,
                         width: primary.width,
                         height: primarySize.height
+                    ),
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondary.width,
+                        height: secondarySize.height
                     )
                 )
             case .bottom:
@@ -279,17 +294,22 @@ private extension UI.View.Button.Layout {
                     top: primarySize.height
                 )
                 let primary = splited.top
-                let secondary = splited.bottom
+                let secondary = splited.bottom.inset(.init(
+                    top: secondarySpacing,
+                    left: 0,
+                    right: 0,
+                    bottom: 0
+                ))
                 return (
-                    secondary: Rect(
-                        center: secondary.center,
-                        width: secondarySize.width,
-                        height: secondary.height
-                    ),
                     primary: Rect(
                         center: primary.center,
                         width: primarySize.width,
                         height: primary.height
+                    ),
+                    secondary: Rect(
+                        center: secondary.center,
+                        width: secondarySize.width,
+                        height: secondary.height
                     )
                 )
             }
@@ -302,30 +322,30 @@ private extension UI.View.Button.Layout {
             )
             switch secondaryPosition {
             case .top:
-                secondary = Rect(
-                    x: (baseline.x - (secondarySize.width / 2)),
-                    y: 0,
-                    width: secondarySize.width,
-                    height: secondarySize.height
-                )
                 primary = Rect(
                     x: (baseline.x - (primarySize.width / 2)),
                     y: secondarySize.height + secondarySpacing,
                     width: primarySize.width,
                     height: primarySize.height
                 )
-            case .left:
                 secondary = Rect(
-                    x: 0,
-                    y: (baseline.y - (secondarySize.height / 2)),
+                    x: (baseline.x - (secondarySize.width / 2)),
+                    y: 0,
                     width: secondarySize.width,
                     height: secondarySize.height
                 )
+            case .left:
                 primary = Rect(
                     x: secondarySize.width + secondarySpacing,
                     y: (baseline.y - (primarySize.height / 2)),
                     width: primarySize.width,
                     height: primarySize.height
+                )
+                secondary = Rect(
+                    x: 0,
+                    y: (baseline.y - (secondarySize.height / 2)),
+                    width: secondarySize.width,
+                    height: secondarySize.height
                 )
             case .right:
                 primary = Rect(
@@ -361,8 +381,8 @@ private extension UI.View.Button.Layout {
                 y: center.y - (union.height / 2)
             )
             return (
-                secondary: Rect(center: secondary.center + offset, size: secondary.size),
-                primary: Rect(center: primary.center + offset, size: primary.size)
+                primary: Rect(center: primary.center + offset, size: primary.size),
+                secondary: Rect(center: secondary.center + offset, size: secondary.size)
             )
         }
     }
