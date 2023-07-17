@@ -109,6 +109,8 @@ final class KKInputListView : UITextField {
         
         self.kkPickerView.dataSource = self
         self.kkPickerView.delegate = self
+        self.inputAssistantItem.leadingBarButtonGroups = []
+        self.inputAssistantItem.trailingBarButtonGroups = []
         self.inputView = self.kkPickerView
         self.delegate = self
     }

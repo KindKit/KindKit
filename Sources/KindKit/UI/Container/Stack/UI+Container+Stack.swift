@@ -19,11 +19,15 @@ public extension UI.Container {
                 if let parent = self.parent {
                     if parent.isPresented == true {
                         self.refreshParentInset()
+#if os(iOS)
                         self.orientation = parent.orientation
+#endif
                     }
                 } else {
                     self.refreshParentInset()
+#if os(iOS)
                     self.orientation = .unknown
+#endif
                 }
             }
         }

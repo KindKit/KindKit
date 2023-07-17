@@ -18,9 +18,6 @@ public protocol IUILayout : AnyObject {
     var delegate: IUILayoutDelegate? { set get }
     var appearedView: IUIView? { set get }
     
-    func setNeedUpdate()
-    func updateIfNeeded()
-    
     func invalidate()
     func invalidate(_ view: IUIView)
 

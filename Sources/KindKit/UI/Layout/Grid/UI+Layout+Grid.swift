@@ -76,10 +76,6 @@ public extension UI.Layout {
             self._cache = Array< Size? >(repeating: nil, count: views.count)
         }
         
-        deinit {
-            self._destroy()
-        }
-        
         public func invalidate() {
             for index in self._cache.startIndex ..< self._cache.endIndex {
                 self._cache[index] = nil
@@ -191,9 +187,6 @@ public extension UI.Layout.Grid {
 }
 
 private extension UI.Layout.Grid {
-    
-    func _destroy() {
-    }
     
     func _makePass(_ available: Size) -> Pass {
         return Self.pass(

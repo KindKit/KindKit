@@ -123,6 +123,7 @@ final class KKCustomView : UIView {
         
         if superview == nil {
             self.kkLayoutManager.clear()
+            self._needLayout = true
         }
     }
     

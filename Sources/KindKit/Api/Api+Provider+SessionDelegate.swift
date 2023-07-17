@@ -91,27 +91,44 @@ private extension Api.Provider.SessionDelegate {
             return (disposition: .cancelAuthenticationChallenge, credential: nil)
         }
         var trustResult: SecTrustResultType = .otherError
+#if os(macOS)
+        var trustError: CFError? = nil
+        SecTrustSetAnchorCertificates(trust, [localCertificate] as CFArray)
+        if SecTrustEvaluateWithError(trust, &trustError) == false {
+            return (disposition: .cancelAuthenticationChallenge, credential: nil)
+        }
+        _ = SecTrustGetTrustResult(trust, &trustResult)
+        if trustResult == SecTrustResultType.recoverableTrustFailure {
+            SecTrustSetExceptions(trust, SecTrustCopyExceptions(trust))
+            if SecTrustEvaluateWithError(trust, &trustError) == false {
+                return (disposition: .cancelAuthenticationChallenge, credential: nil)
+            } else {
+                _ = SecTrustGetTrustResult(trust, &trustResult)
+            }
+        }
+#elseif os(iOS)
         SecTrustSetAnchorCertificates(trust, [localCertificate] as CFArray)
         SecTrustEvaluate(trust, &trustResult)
         if trustResult == SecTrustResultType.recoverableTrustFailure {
             SecTrustSetExceptions(trust, SecTrustCopyExceptions(trust))
             SecTrustEvaluate(trust, &trustResult)
         }
-        switch trustResult {
-        case .unspecified, .proceed:
-            let localCertificateData: Data = SecCertificateCopyData(localCertificate) as Data
-            let serverCertificateData: Data?
-            if let serverCertificate = SecTrustGetCertificateAtIndex(trust, 0) {
-                serverCertificateData = SecCertificateCopyData(serverCertificate) as Data
-            } else {
-                serverCertificateData = nil
-            }
-            if serverCertificateData == localCertificateData {
-                return (disposition: .useCredential, credential: URLCredential(trust: trust))
-            }
-        default:
-            break
+#endif
+    switch trustResult {
+    case .unspecified, .proceed:
+        let localCertificateData: Data = SecCertificateCopyData(localCertificate) as Data
+        let serverCertificateData: Data?
+        if let serverCertificate = SecTrustGetCertificateAtIndex(trust, 0) {
+            serverCertificateData = SecCertificateCopyData(serverCertificate) as Data
+        } else {
+            serverCertificateData = nil
         }
+        if serverCertificateData == localCertificateData {
+            return (disposition: .useCredential, credential: URLCredential(trust: trust))
+        }
+    default:
+        break
+    }
         return (disposition: .cancelAuthenticationChallenge, credential: nil)
     }
     

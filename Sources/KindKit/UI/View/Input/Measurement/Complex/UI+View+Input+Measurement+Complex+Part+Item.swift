@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+#if os(iOS)
+
 import Foundation
 
 public extension UI.View.Input.Measurement.Complex.Part {
@@ -22,3 +24,5 @@ public extension UI.View.Input.Measurement.Complex.Part {
     }
         
 }
+
+#endif

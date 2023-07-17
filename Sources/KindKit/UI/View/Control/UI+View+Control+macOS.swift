@@ -75,6 +75,7 @@ final class KKControlView : NSControl {
         
         if self.superview == nil {
             self.kkLayoutManager.clear()
+            self._needLayout = true
         }
     }
     

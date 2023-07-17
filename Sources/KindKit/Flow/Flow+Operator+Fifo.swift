@@ -17,7 +17,7 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Result< [Pipeline.Output.Success], Pipeline.Output.Failure >
         
-        private var _queue: [Input.Success]
+        private var _queue: [Result< Input.Success, Input.Failure >]
         private var _value: [Pipeline.Output.Success]
         private var _error: Pipeline.Output.Failure?
         private let _pipeline: Pipeline
@@ -43,11 +43,11 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            self._queue.append(value)
+            self._queue.append(.success(value))
         }
         
         public func receive(error: Input.Failure) {
-            self._next.send(error: error)
+            self._queue.append(.failure(error))
         }
         
         public func completed() {
@@ -77,8 +77,12 @@ private extension Flow.Operator.Fifo {
     
     func _completed() {
         if self._queue.isEmpty == false {
-            let value = self._queue.removeFirst()
-            self._pipeline.send(value: value)
+            switch self._queue.removeFirst() {
+            case .success(let value):
+                self._pipeline.send(value: value)
+            case .failure(let error):
+                self._pipeline.send(error: error)
+            }
             self._pipeline.completed()
         } else if let error = self._error {
             self._next.send(error: error)

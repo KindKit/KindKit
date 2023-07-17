@@ -130,6 +130,7 @@ extension UI.Layout {
                 self._disappear(view: view)
             }
             self.views.removeAll()
+            self.invalidate()
         }
         
     }

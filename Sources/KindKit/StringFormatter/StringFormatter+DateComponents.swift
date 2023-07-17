@@ -66,42 +66,49 @@ public extension StringFormatter.DateComponents {
 public extension StringFormatter.DateComponents {
     
     @inlinable
+    @discardableResult
     func unitsStyle(_ value: DateComponentsFormatter.UnitsStyle) -> Self {
         self.formatter.unitsStyle = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func allowedUnits(_ value: NSCalendar.Unit) -> Self {
         self.formatter.allowedUnits = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func zeroBehavior(_ value: DateComponentsFormatter.ZeroFormattingBehavior) -> Self {
         self.formatter.zeroFormattingBehavior = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func calendar(_ value: Calendar) -> Self {
         self.formatter.calendar = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func maximumUnitCount(_ value: Int) -> Self {
         self.formatter.maximumUnitCount = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func collapsesLargestUnit(_ value: Bool) -> Self {
         self.formatter.collapsesLargestUnit = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func includesApproximationPhrase(_ value: Bool) -> Self {
         self.formatter.includesApproximationPhrase = value
         return self

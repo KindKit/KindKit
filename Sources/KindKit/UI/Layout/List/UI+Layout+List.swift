@@ -10,26 +10,26 @@ public extension UI.Layout {
         
         public weak var delegate: IUILayoutDelegate?
         public weak var appearedView: IUIView?
-        public var direction: Direction {
+        public var direction: Direction = .vertical {
             didSet {
                 guard self.direction != oldValue else { return }
                 self._firstVisible = nil
                 self.setNeedForceUpdate()
             }
         }
-        public var alignment: Alignment {
+        public var alignment: Alignment = .fill {
             didSet {
                 guard self.alignment != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
-        public var inset: Inset {
+        public var inset: Inset = .zero {
             didSet {
                 guard self.inset != oldValue else { return }
                 self.setNeedForceUpdate()
             }
         }
-        public var spacing: Double {
+        public var spacing: Double = 0 {
             didSet {
                 guard self.spacing != oldValue else { return }
                 self.setNeedForceUpdate()
@@ -46,7 +46,7 @@ public extension UI.Layout {
         }
         public private(set) var isAnimating: Bool = false
         
-        private var _views: [IUIView]
+        private var _views: [IUIView] = []
         private var _animations: [AnimationContext] = []
         private var _operations: [Helper.Operation] = []
         private var _cache: [Size?] = []
@@ -55,20 +55,7 @@ public extension UI.Layout {
             willSet { self._animation?.cancel() }
         }
 
-        public init(
-            direction: Direction,
-            alignment: Alignment = .fill,
-            inset: Inset = .zero,
-            spacing: Double = 0,
-            views: [IUIView] = []
-        ) {
-            self.direction = direction
-            self.alignment = alignment
-            self.inset = inset
-            self.spacing = spacing
-            self._views = views
-            self._cache = Array< Size? >(repeating: nil, count: views.count)
-        }
+        public init() {}
         
         deinit {
             self._destroy()
@@ -132,6 +119,105 @@ public extension UI.Layout {
             return result
         }
         
+    }
+    
+}
+
+public extension UI.Layout.List {
+    
+    @inlinable
+    @discardableResult
+    func direction(_ value: Direction) -> Self {
+        self.direction = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func direction(_ value: () -> Direction) -> Self {
+        return self.direction(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func direction(_ value: (Self) -> Direction) -> Self {
+        return self.direction(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: Alignment) -> Self {
+        self.alignment = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func alignment(_ value: () -> Alignment) -> Self {
+        return self.alignment(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func alignment(_ value: (Self) -> Alignment) -> Self {
+        return self.alignment(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: Inset) -> Self {
+        self.inset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: () -> Inset) -> Self {
+        return self.inset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func inset(_ value: (Self) -> Inset) -> Self {
+        return self.inset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func spacing(_ value: Double) -> Self {
+        self.spacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func spacing(_ value: () -> Double) -> Self {
+        return self.spacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func spacing(_ value: (Self) -> Double) -> Self {
+        return self.spacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func views(_ value: [IUIView]) -> Self {
+        self.views = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func views(_ value: () -> [IUIView]) -> Self {
+        return self.views(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func views(_ value: (Self) -> [IUIView]) -> Self {
+        return self.views(value(self))
     }
     
 }
@@ -365,20 +451,13 @@ private extension UI.Layout.List {
 public extension IUILayout where Self == UI.Layout.List {
     
     @inlinable
-    static func list(
-        direction: UI.Layout.List.Direction,
-        alignment: UI.Layout.List.Alignment = .fill,
-        inset: Inset = .zero,
-        spacing: Double = 0,
-        views: [IUIView] = []
-    ) -> UI.Layout.List {
-        return .init(
-            direction: direction,
-            alignment: alignment,
-            inset: inset,
-            spacing: spacing,
-            views: views
-        )
+    static func vList() -> UI.Layout.List {
+        return .init()
+    }
+    
+    @inlinable
+    static func hList() -> UI.Layout.List {
+        return .init().direction(.horizontal)
     }
     
 }

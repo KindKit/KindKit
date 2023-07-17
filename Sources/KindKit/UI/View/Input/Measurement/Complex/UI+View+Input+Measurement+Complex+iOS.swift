@@ -106,6 +106,8 @@ final class KKInputMeasurementComplexView : UITextField {
         
         self.kkPicker.dataSource = self
         self.kkPicker.delegate = self
+        self.inputAssistantItem.leadingBarButtonGroups = []
+        self.inputAssistantItem.trailingBarButtonGroups = []
         self.inputView = self.kkPicker
         self.delegate = self
     }
