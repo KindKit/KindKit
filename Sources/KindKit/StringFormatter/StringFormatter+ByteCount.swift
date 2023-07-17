@@ -41,12 +41,14 @@ public extension StringFormatter.ByteCount {
 public extension StringFormatter.ByteCount {
     
     @inlinable
+    @discardableResult
     func units(_ value: ByteCountFormatter.Units) -> Self {
         self.formatter.allowedUnits = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func style(_ value: ByteCountFormatter.CountStyle) -> Self {
         self.formatter.countStyle = value
         return self

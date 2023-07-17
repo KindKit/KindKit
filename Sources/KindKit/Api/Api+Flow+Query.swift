@@ -31,14 +31,14 @@ public extension Api.Flow {
         
         init(
             _ provider: Api.Provider,
-            _ dispatch: Flow.Operator.DispatchMode,
+            _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
             _ map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
         ) {
             self._provider = provider
-            self._queue = dispatch.queue
+            self._queue = queue
             self._request = request
             self._response = response
             self._validation = validation
@@ -47,14 +47,14 @@ public extension Api.Flow {
         
         convenience init(
             _ provider: Api.Provider,
-            _ dispatch: Flow.Operator.DispatchMode,
+            _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
             _ success: @escaping (Input.Success, Response.Success) -> Success,
             _ failure: @escaping (Input.Success, Response.Failure) -> Failure
         ) {
-            self.init(provider, dispatch, request, response, validation, { input, result -> Result< Success, Failure > in
+            self.init(provider, queue, request, response, validation, { input, result -> Result< Success, Failure > in
                 switch result {
                 case .success(let value): return .success(success(input, value))
                 case .failure(let error): return .failure(failure(input, error))
@@ -64,7 +64,7 @@ public extension Api.Flow {
         
         convenience init(
             _ provider: Api.Provider,
-            _ dispatch: Flow.Operator.DispatchMode,
+            _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
@@ -72,12 +72,12 @@ public extension Api.Flow {
         ) where
             Failure == Response.Failure
         {
-            self.init(provider, dispatch, request, response, validation, success, { _, error in error })
+            self.init(provider, queue, request, response, validation, success, { _, error in error })
         }
         
         convenience init(
             _ provider: Api.Provider,
-            _ dispatch: Flow.Operator.DispatchMode,
+            _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?,
@@ -85,12 +85,12 @@ public extension Api.Flow {
         ) where
             Success == Response.Success
         {
-            self.init(provider, dispatch, request, response, validation, { _, value in value }, failure)
+            self.init(provider, queue, request, response, validation, { _, value in value }, failure)
         }
         
         convenience init(
             _ provider: Api.Provider,
-            _ dispatch: Flow.Operator.DispatchMode,
+            _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: ((Input.Success, Response.Result, TimeInterval) -> Flow.Validation)?
@@ -98,7 +98,7 @@ public extension Api.Flow {
             Success == Response.Success,
             Failure == Response.Failure
         {
-            self.init(provider, dispatch, request, response, validation, { _, value in value }, { _, error in error })
+            self.init(provider, queue, request, response, validation, { _, value in value }, { _, error in error })
         }
         
         deinit {
@@ -188,13 +188,13 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         _ provider: Api.Provider,
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ map: @escaping (Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Api.Flow.Query< Output, Success, Failure, Response > {
-        let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, dispatch, request, response, validation, map)
+        let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, queue, request, response, validation, map)
         self.subscribe(next: next)
         return next
     }
@@ -205,14 +205,14 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         _ provider: Api.Provider,
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ success: @escaping (Output.Success, Response.Success) -> Success,
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
     ) -> Api.Flow.Query< Output, Success, Failure, Response > {
-        let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, dispatch, request, response, validation, success, failure)
+        let next = Api.Flow.Query< Output, Success, Failure, Response >(provider, queue, request, response, validation, success, failure)
         self.subscribe(next: next)
         return next
     }
@@ -222,7 +222,7 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         _ provider: Api.Provider,
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
@@ -230,7 +230,7 @@ extension IFlowOperator {
     ) -> Api.Flow.Query< Output, Success, Response.Failure, Response > where
         Output.Failure == Response.Failure
     {
-        let next = Api.Flow.Query< Output, Success, Response.Failure, Response >(provider, dispatch, request, response, validation, success)
+        let next = Api.Flow.Query< Output, Success, Response.Failure, Response >(provider, queue, request, response, validation, success)
         self.subscribe(next: next)
         return next
     }
@@ -240,13 +240,13 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         _ provider: Api.Provider,
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         _ failure: @escaping (Output.Success, Response.Failure) -> Failure
     ) -> Api.Flow.Query< Output, Response.Success, Failure, Response > {
-        let next = Api.Flow.Query< Output, Response.Success, Failure, Response >(provider, dispatch, request, response, validation, failure)
+        let next = Api.Flow.Query< Output, Response.Success, Failure, Response >(provider, queue, request, response, validation, failure)
         self.subscribe(next: next)
         return next
     }
@@ -255,14 +255,14 @@ extension IFlowOperator {
         Response : IApiResponse
     >(
         _ provider: Api.Provider,
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ request: @escaping (Output.Success) throws -> Api.Request,
         _ response: @escaping (Output.Success) -> Response,
         _ validation: @escaping (Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Api.Flow.Query< Output, Response.Success, Response.Failure, Response > where
         Output.Failure == Response.Failure
     {
-        let next = Api.Flow.Query< Output, Response.Success, Response.Failure, Response >(provider, dispatch, request, response, validation)
+        let next = Api.Flow.Query< Output, Response.Success, Response.Failure, Response >(provider, queue, request, response, validation)
         self.subscribe(next: next)
         return next
     }
@@ -277,13 +277,13 @@ public extension Flow.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Failure, Response > > {
-        return .init(head: .init(provider, dispatch, request, response, validation, map))
+        return .init(head: .init(provider, queue, request, response, validation, map))
     }
     
     func apiQuery<
@@ -292,14 +292,14 @@ public extension Flow.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Input.Success, Response.Success) -> Success,
         failure: @escaping (Input.Success, Response.Failure) -> Failure
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Failure, Response > > {
-        return .init(head: .init(provider, dispatch, request, response, validation, success, failure))
+        return .init(head: .init(provider, queue, request, response, validation, success, failure))
     }
     
     func apiQuery<
@@ -307,7 +307,7 @@ public extension Flow.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
@@ -315,7 +315,7 @@ public extension Flow.Builder {
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Success, Response.Failure, Response > > where
         Input.Failure == Response.Failure
     {
-        return .init(head: .init(provider, dispatch, request, response, validation, success))
+        return .init(head: .init(provider, queue, request, response, validation, success))
     }
     
     func apiQuery<
@@ -323,27 +323,27 @@ public extension Flow.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Input.Success, Response.Failure) -> Failure
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Failure, Response > > {
-        return .init(head: .init(provider, dispatch, request, response, validation, failure))
+        return .init(head: .init(provider, queue, request, response, validation, failure))
     }
     
     func apiQuery<
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Input.Success) throws -> Api.Request,
         response: @escaping (Input.Success) -> Response,
         validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Head.Builder< Api.Flow.Query< Input, Response.Success, Response.Failure, Response > > where
         Input.Failure == Response.Failure
     {
-        return .init(head: .init(provider, dispatch, request, response, validation))
+        return .init(head: .init(provider, queue, request, response, validation))
     }
     
 }
@@ -356,13 +356,13 @@ public extension Flow.Head.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         map: @escaping (Head.Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > {
-        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, map))
+        return .init(head: self.head, tail: self.head.apiQuery(provider, queue, request, response, validation, map))
     }
     
     func apiQuery<
@@ -371,14 +371,14 @@ public extension Flow.Head.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Head.Output.Success, Response.Success) -> Success,
         failure: @escaping (Head.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Failure, Response > > {
-        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, success, failure))
+        return .init(head: self.head, tail: self.head.apiQuery(provider, queue, request, response, validation, success, failure))
     }
     
     func apiQuery<
@@ -386,7 +386,7 @@ public extension Flow.Head.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
@@ -394,7 +394,7 @@ public extension Flow.Head.Builder {
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Success, Response.Failure, Response > > where
         Head.Output.Failure == Response.Failure
     {
-        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, success))
+        return .init(head: self.head, tail: self.head.apiQuery(provider, queue, request, response, validation, success))
     }
     
     func apiQuery<
@@ -402,27 +402,27 @@ public extension Flow.Head.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Head.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Failure, Response > > {
-        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation, failure))
+        return .init(head: self.head, tail: self.head.apiQuery(provider, queue, request, response, validation, failure))
     }
     
     func apiQuery<
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Head.Output.Success) throws -> Api.Request,
         response: @escaping (Head.Output.Success) -> Response,
         validation: @escaping (Head.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Head.Output, Response.Success, Response.Failure, Response > > where
         Head.Output.Failure == Response.Failure
     {
-        return .init(head: self.head, tail: self.head.apiQuery(provider, dispatch, request, response, validation))
+        return .init(head: self.head, tail: self.head.apiQuery(provider, queue, request, response, validation))
     }
     
 }
@@ -435,13 +435,13 @@ public extension Flow.Chain.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
-        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, map))
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, queue, request, response, validation, map))
     }
     
     func apiQuery<
@@ -450,14 +450,14 @@ public extension Flow.Chain.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
-        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, success, failure))
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, queue, request, response, validation, success, failure))
     }
     
     func apiQuery<
@@ -465,7 +465,7 @@ public extension Flow.Chain.Builder {
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
@@ -473,34 +473,34 @@ public extension Flow.Chain.Builder {
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
-        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, success))
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, queue, request, response, validation, success))
     }
     
     func apiQuery<
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Tail.Output.Failure
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Response.Success, Tail.Output.Failure, Response > > {
-        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation, failure))
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, queue, request, response, validation, failure))
     }
     
     func apiQuery<
         Response : IApiResponse
     >(
         provider: Api.Provider,
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done }
     ) -> Flow.Chain.Builder< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
-        return .init(head: self.head, tail: self.tail.apiQuery(provider, dispatch, request, response, validation))
+        return .init(head: self.head, tail: self.tail.apiQuery(provider, queue, request, response, validation))
     }
     
 }

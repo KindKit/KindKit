@@ -110,6 +110,8 @@ final class KKInputDateView : UITextField {
         
         self.kkPickerView.addTarget(self, action: #selector(self._changed(_:)), for: .valueChanged)
         
+        self.inputAssistantItem.leadingBarButtonGroups = []
+        self.inputAssistantItem.trailingBarButtonGroups = []
         self.inputView = self.kkPickerView
         self.delegate = self
     }

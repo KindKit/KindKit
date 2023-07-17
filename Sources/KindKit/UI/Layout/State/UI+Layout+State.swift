@@ -31,7 +31,7 @@ public extension UI.Layout {
                 }
             }
         }
-        public private(set) var data: [State : Data]
+        public private(set) var data: [State : Data] = [:]
         
         private var _internalState: InternalState {
             didSet {
@@ -43,12 +43,8 @@ public extension UI.Layout {
             willSet { self._animation?.cancel() }
         }
 
-        public init(
-            state: State,
-            data: [State : Data] = [:]
-        ) {
+        public init(_ state: State) {
             self._internalState = .idle(state: state)
-            self.data = data
         }
         
         deinit {
@@ -107,49 +103,103 @@ public extension UI.Layout {
 
 public extension UI.Layout.State {
     
-    func set(state: State, inset: Inset) {
+    @inlinable
+    @discardableResult
+    func state(_ value: State) -> Self {
+        self.state = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func state(_ value: () -> State) -> Self {
+        return self.state(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func state(_ value: (Self) -> State) -> Self {
+        return self.state(value(self))
+    }
+    
+    @discardableResult
+    func data(_ value: [State : Data]) -> Self {
+        self.data = value
+        self.setNeedForceUpdate()
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func data(_ value: () -> [State : Data]) -> Self {
+        return self.data(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func data(_ value: (Self) -> [State : Data]) -> Self {
+        return self.data(value(self))
+    }
+    
+}
+
+public extension UI.Layout.State {
+    
+    @discardableResult
+    func set(state: State, inset: Inset) -> Self {
         self._data(state: state, update: { $0.inset = inset })
         if self._internalState.contains(state: state) == true {
             self.setNeedForceUpdate()
         }
+        return self
     }
     
     func inset(state: State) -> Inset? {
         return self.data[state]?.inset
     }
     
-    func set(state: State, alignment: Alignment) {
+    @discardableResult
+    func set(state: State, alignment: Alignment) -> Self {
         self._data(state: state, update: { $0.alignment = alignment })
         if self._internalState.contains(state: state) == true {
             self.setNeedForceUpdate()
         }
+        return self
     }
     
     func alignment(state: State) -> Alignment? {
         return self.data[state]?.alignment
     }
     
-    func set(state: State, view: IUIView?) {
+    @discardableResult
+    func set(state: State, view: IUIView?) -> Self {
         self._data(state: state, update: { $0.view = view })
         if self._internalState.contains(state: state) == true {
             self.setNeedForceUpdate()
         }
+        return self
     }
     
     func view(state: State) -> IUIView? {
         return self.data[state]?.view
     }
     
-    func set(state: State, data: Data?) {
+    @discardableResult
+    func set(state: State, data: Data?) -> Self {
         self.data[state] = data
         if self._internalState.contains(state: state) == true {
             self.setNeedForceUpdate()
         }
+        return self
     }
     
     func data(state: State) -> Data? {
         return self.data[state]
     }
+    
+}
+
+public extension UI.Layout.State {
     
     func reset() {
         self.data = [:]
@@ -336,14 +386,8 @@ private extension UI.Layout.State {
 public extension IUILayout {
     
     @inlinable
-    static func state< State : Equatable & Hashable >(
-        state: State,
-        data: [State : UI.Layout.State< State >.Data] = [:]
-    ) -> UI.Layout.State< State > {
-        return .init(
-            state: state,
-            data: data
-        )
+    static func state< State : Equatable & Hashable >(_ state: State) -> UI.Layout.State< State > {
+        return .init(state)
     }
     
 }

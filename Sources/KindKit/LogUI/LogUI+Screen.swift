@@ -36,7 +36,7 @@ extension LogUI {
             .trailingsSpacing(4)
             .color(.white)
         
-        private(set) lazy var layout = UI.Layout.List(direction: .vertical)
+        private(set) lazy var layout = UI.Layout.List()
         
         private(set) lazy var view = UI.View.Scroll()
             .content(self.layout)

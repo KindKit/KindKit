@@ -90,6 +90,7 @@ final class KKCustomView : NSView {
         
         if superview == nil {
             self.kkLayoutManager.clear()
+            self._needLayout = true
         }
     }
     

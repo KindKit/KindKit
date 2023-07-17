@@ -10,7 +10,7 @@ public extension UI.Layout {
         
         public weak var delegate: IUILayoutDelegate?
         public weak var appearedView: IUIView?
-        public var direction: Direction {
+        public var direction: Direction = .horizontal {
             didSet {
                 guard self.direction != oldValue else { return }
                 self.setNeedForceUpdate()
@@ -24,14 +24,9 @@ public extension UI.Layout {
             get { self._views }
         }
         
-        private var _views: [IUIView]
+        private var _views: [IUIView] = []
 
-        public init(
-            direction: Direction,
-            views: [IUIView] = []
-        ) {
-            self.direction = direction
-            self._views = views
+        public init() {
         }
         
         public func layout(bounds: Rect) -> Size {
@@ -114,6 +109,48 @@ public extension UI.Layout {
 public extension UI.Layout.Paging {
     
     @inlinable
+    @discardableResult
+    func direction(_ value: Direction) -> Self {
+        self.direction = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func direction(_ value: () -> Direction) -> Self {
+        return self.direction(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func direction(_ value: (Self) -> Direction) -> Self {
+        return self.direction(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func views(_ value: [IUIView]) -> Self {
+        self.views = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func views(_ value: () -> [IUIView]) -> Self {
+        return self.views(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func views(_ value: (Self) -> [IUIView]) -> Self {
+        return self.views(value(self))
+    }
+    
+}
+
+public extension UI.Layout.Paging {
+    
+    @inlinable
     func contains(view: IUIView) -> Bool {
         return self.views.contains(where: { $0 === view })
     }
@@ -128,14 +165,13 @@ public extension UI.Layout.Paging {
 public extension IUILayout where Self == UI.Layout.Paging {
     
     @inlinable
-    static func paging(
-        direction: UI.Layout.Paging.Direction,
-        views: [IUIView] = []
-    ) -> UI.Layout.Paging {
-        return .init(
-            direction: direction,
-            views: views
-        )
+    static func vPaging() -> UI.Layout.Paging {
+        return .init().direction(.vertical)
+    }
+    
+    @inlinable
+    static func hPaging() -> UI.Layout.Paging {
+        return .init()
     }
     
 }

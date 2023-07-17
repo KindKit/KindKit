@@ -133,7 +133,7 @@ extension UI.ViewController {
                 if let content = self.kkContent {
                     content.frame = self.bounds
                     self.addSubview(content)
-                    self.layoutIfNeeded()
+                    self.layoutSubtreeIfNeeded()
                 }
             }
         }

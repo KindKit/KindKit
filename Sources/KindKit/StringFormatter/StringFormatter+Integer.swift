@@ -112,84 +112,98 @@ public extension StringFormatter.Integer {
 public extension StringFormatter.Integer {
     
     @inlinable
+    @discardableResult
     func minIntegerDigits(_ value: Int) -> Self {
         self.formatter.minimumIntegerDigits = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func maxIntegerDigits(_ value: Int) -> Self {
         self.formatter.maximumIntegerDigits = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func zero(_ value: String) -> Self {
         self.formatter.zeroSymbol = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func plusSign(_ value: String) -> Self {
         self.formatter.plusSign = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func minusSign(_ value: String) -> Self {
         self.formatter.minusSign = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func positivePrefix(_ value: String) -> Self {
         self.formatter.positivePrefix = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func positiveSuffix(_ value: String) -> Self {
         self.formatter.positiveSuffix = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func negativePrefix(_ value: String) -> Self {
         self.formatter.negativePrefix = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func negativeSuffix(_ value: String) -> Self {
         self.formatter.negativeSuffix = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func usesGroupingSeparator(_ value: Bool) -> Self {
         self.formatter.usesGroupingSeparator = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func groupingSeparator(_ value: String) -> Self {
         self.formatter.groupingSeparator = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func groupingSize(_ value: Int) -> Self {
         self.formatter.groupingSize = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func secondaryGroupingSize(_ value: Int) -> Self {
         self.formatter.secondaryGroupingSize = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func locale(_ value: Locale) -> Self {
         self.formatter.locale = value
         return self

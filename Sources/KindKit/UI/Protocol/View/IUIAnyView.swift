@@ -73,4 +73,10 @@ public extension IUIAnyView {
         return self.native.kk_isChild(of: view.native, recursive: recursive)
     }
     
+    
+    @inlinable
+    func size(available: Size, inset: Inset) -> Size {
+        return self.size(available: available.inset(inset)).inset(-inset)
+    }
+    
 }

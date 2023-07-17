@@ -110,8 +110,8 @@ public extension UI {
         
         public override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(animated)
-            self._updateSafeArea()
             self._updateStatusBarHeight()
+            self._updateSafeArea()
             self._updateOrientation()
             self.kkRootView.kkContent = self.container.view.native
             if self.container.isPresented == false {
@@ -321,9 +321,7 @@ private extension UI.ViewController {
     }
     
     func _updateSafeArea() {
-        if self.container.isPresented == true {
-            self.container.safeArea = self._safeArea()
-        }
+        self.container.safeArea = self._safeArea()
     }
     
     func _safeArea() -> Inset {

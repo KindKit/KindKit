@@ -51,24 +51,28 @@ public extension StringFormatter.Date {
 public extension StringFormatter.Date {
     
     @inlinable
+    @discardableResult
     func format(_ value: String) -> Self {
         self.formatter.dateFormat = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func calendar(_ value: Calendar) -> Self {
         self.formatter.calendar = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func locale(_ value: Locale) -> Self {
         self.formatter.locale = value
         return self
     }
     
     @inlinable
+    @discardableResult
     func timeZone(_ value: TimeZone) -> Self {
         self.formatter.timeZone = value
         return self

@@ -31,25 +31,34 @@ public extension UI.Layout {
                 }
             }
         }
-        public var contentInset: Inset {
-            didSet { self.setNeedForceUpdate() }
-        }
-        public var contentView: IUIView {
+        public var inset: Inset = .zero {
             didSet {
-                guard self.contentView !== oldValue else { return }
-                self.setNeedForceUpdate(self.contentView)
-            }
-        }
-        public var detailInset: Inset {
-            didSet {
-                guard self.detailInset != oldValue else { return }
+                guard self.inset != oldValue else { return }
+                self._contentSize = nil
+                self._detailSize = nil
                 self.setNeedForceUpdate()
             }
         }
-        public var detailView: IUIView {
+        public var content: IUIView? {
             didSet {
-                guard self.detailView !== oldValue else { return }
-                self.setNeedForceUpdate(self.detailView)
+                guard self.content !== oldValue else { return }
+                self._contentSize = nil
+                self.setNeedForceUpdate()
+            }
+        }
+        public var detailSpacing: Double = 0 {
+            didSet {
+                guard self.detailSpacing != oldValue else { return }
+                self._contentSize = nil
+                self._detailSize = nil
+                self.setNeedForceUpdate()
+            }
+        }
+        public var detail: IUIView? {
+            didSet {
+                guard self.detail !== oldValue else { return }
+                self._detailSize = nil
+                self.setNeedForceUpdate()
             }
         }
         public var isAnimating: Bool {
@@ -58,7 +67,7 @@ public extension UI.Layout {
         
         private var _contentSize: Size?
         private var _detailSize: Size?
-        private var _status: Status {
+        private var _status: Status = .collapsed {
             didSet {
                 guard self._status != oldValue else { return }
                 self.setNeedForceUpdate()
@@ -68,25 +77,11 @@ public extension UI.Layout {
             willSet { self._animation?.cancel() }
         }
         
-        public init(
-            state: State = .collapsed,
-            contentInset: Inset = .zero,
-            contentView: IUIView,
-            detailInset: Inset = .zero,
-            detailView: IUIView
-        ) {
-            switch state {
-            case .collapsed: self._status = .collapsed
-            case .expanded: self._status = .expanded
-            }
-            self.contentInset = contentInset
-            self.contentView = contentView
-            self.detailInset = detailInset
-            self.detailView = detailView
+        public init() {
         }
         
         deinit {
-            self._destroy()
+            self._animation?.cancel()
         }
         
         public func invalidate() {
@@ -95,112 +90,254 @@ public extension UI.Layout {
         }
         
         public func invalidate(_ view: IUIView) {
-            if self.contentView === view {
+            if self.content === view {
                 self._contentSize = nil
-            } else if self.detailView === view {
+            } else if self.detail === view {
                 self._detailSize = nil
             }
         }
         
         public func layout(bounds: Rect) -> Size {
-            let contentSize: Size
-            if let size = self._contentSize {
-                contentSize = size
-            } else {
-                contentSize = self.contentView.size(available: bounds.size.inset(self.contentInset))
-                self._contentSize = contentSize
-            }
-            let detailSize: Size
-            if let size = self._detailSize {
-                detailSize = size
-            } else {
-                detailSize = self.detailView.size(available: bounds.size.inset(self.detailInset))
-                self._detailSize = detailSize
-            }
+            let available = bounds.size.inset(self.inset)
             switch self._status {
             case .collapsed:
-                self.contentView.frame = Rect(
-                    x: self.contentInset.left,
-                    y: self.contentInset.top,
+                guard let content = self.content else { return .zero }
+                let contentSize: Size
+                if let size = self._contentSize {
+                    contentSize = size
+                } else {
+                    contentSize = content.size(available: available)
+                    self._contentSize = contentSize
+                }
+                content.frame = Rect(
+                    x: self.inset.left,
+                    y: self.inset.top,
                     width: contentSize.width,
                     height: contentSize.height
                 )
                 return Size(
-                    width: contentSize.width + self.contentInset.vertical,
-                    height: contentSize.height + self.contentInset.horizontal
+                    width: contentSize.width + self.inset.vertical,
+                    height: contentSize.height + self.inset.horizontal
                 )
             case .expanded:
-                self.contentView.frame = Rect(
-                    x: self.contentInset.left,
-                    y: self.contentInset.top,
+                guard let content = self.content, let detail = self.detail else { return .zero }
+                let contentSize: Size
+                if let size = self._contentSize {
+                    contentSize = size
+                } else {
+                    contentSize = content.size(available: available)
+                    self._contentSize = contentSize
+                }
+                let detailSize: Size
+                if let size = self._detailSize {
+                    detailSize = size
+                } else {
+                    detailSize = detail.size(available: available)
+                    self._detailSize = detailSize
+                }
+                content.frame = Rect(
+                    x: self.inset.left,
+                    y: self.inset.top,
                     width: contentSize.width,
                     height: contentSize.height
                 )
-                self.detailView.frame = Rect(
-                    x: self.detailInset.left,
-                    y: self.detailInset.top + (self.contentInset.top + contentSize.height + self.contentInset.horizontal),
+                detail.frame = Rect(
+                    x: self.inset.left,
+                    y: self.inset.top + contentSize.height + self.detailSpacing,
                     width: detailSize.width,
                     height: detailSize.height
                 )
                 return Size(
-                    width: max(contentSize.width + self.contentInset.vertical, detailSize.width + self.detailInset.vertical),
-                    height: (contentSize.height + self.contentInset.horizontal) + (detailSize.height + self.detailInset.horizontal)
+                    width: max(contentSize.width, detailSize.width) + self.inset.vertical,
+                    height: (contentSize.height + self.detailSpacing + detailSize.height) + self.inset.horizontal
                 )
             case .changing(let progress):
-                self.contentView.frame = Rect(
-                    x: self.contentInset.left,
-                    y: self.contentInset.top,
+                guard let content = self.content, let detail = self.detail else { return .zero }
+                let contentSize: Size
+                if let size = self._contentSize {
+                    contentSize = size
+                } else {
+                    contentSize = content.size(available: available)
+                    self._contentSize = contentSize
+                }
+                let detailSize: Size
+                if let size = self._detailSize {
+                    detailSize = size
+                } else {
+                    detailSize = detail.size(available: available)
+                    self._detailSize = detailSize
+                }
+                let collapseDetailSpacing: Double = 0
+                let expandDetailSpacing = self.detailSpacing
+                let detailSpacing = collapseDetailSpacing.lerp(expandDetailSpacing, progress: progress)
+                content.frame = Rect(
+                    x: self.inset.left,
+                    y: self.inset.top,
                     width: contentSize.width,
                     height: contentSize.height
                 )
-                self.detailView.frame = Rect(
-                    x: self.detailInset.left,
-                    y: self.detailInset.top + (self.contentInset.top + contentSize.height + self.contentInset.horizontal),
+                detail.frame = Rect(
+                    x: self.inset.left,
+                    y: self.inset.top + contentSize.height + detailSpacing,
                     width: detailSize.width,
                     height: detailSize.height
                 )
                 let collapseDetailHeight: Double = 0
-                let expandDetailHeight = (detailSize.height + self.detailInset.horizontal)
+                let expandDetailHeight = detailSize.height
                 let detailHeight = collapseDetailHeight.lerp(expandDetailHeight, progress: progress)
                 return Size(
-                    width: max(contentSize.width + self.contentInset.vertical, detailSize.width + self.detailInset.vertical),
-                    height: (contentSize.height + self.contentInset.horizontal) + detailHeight
+                    width: max(contentSize.width, detailSize.width) + self.inset.vertical,
+                    height: (contentSize.height + detailSpacing + detailHeight) + self.inset.horizontal
                 )
             }
         }
         
         public func size(available: Size) -> Size {
+            let available = available.inset(self.inset)
             switch self._status {
             case .collapsed:
-                let contentSize = self.contentView.size(available: available.inset(self.contentInset)).inset(-self.contentInset)
+                guard let content = self.content else { return .zero }
+                let contentSize = content.size(available: available)
                 return contentSize
             case .expanded:
-                let contentSize = self.contentView.size(available: available.inset(self.contentInset)).inset(-self.contentInset)
-                let detailSize = self.detailView.size(available: available.inset(self.detailInset)).inset(-self.detailInset)
+                guard let content = self.content, let detail = self.detail else { return .zero }
+                let contentSize = content.size(available: available)
+                let detailSize = detail.size(available: available)
                 return Size(
-                    width: max(contentSize.width, detailSize.width),
-                    height: contentSize.height + detailSize.height
+                    width: max(contentSize.width, detailSize.width) + self.inset.vertical,
+                    height: (contentSize.height + self.detailSpacing + detailSize.height) + self.inset.horizontal
                 )
             case .changing(let progress):
-                let contentSize = self.contentView.size(available: available.inset(self.contentInset)).inset(-self.contentInset)
-                let expandDetailSize = self.detailView.size(available: available.inset(self.detailInset)).inset(-self.detailInset)
-                let collapseDetailSize = Size(width: expandDetailSize.width, height: 0)
-                let detailSize = collapseDetailSize.lerp(expandDetailSize, progress: progress)
+                guard let content = self.content, let detail = self.detail else { return .zero }
+                let contentSize = content.size(available: available)
+                let detailSize = detail.size(available: available)
+                let collapseDetailSpacing: Double = 0
+                let expandDetailSpacing = self.detailSpacing
+                let detailSpacing = collapseDetailSpacing.lerp(expandDetailSpacing, progress: progress)
+                let collapseDetailHeight: Double = 0
+                let expandDetailHeight = detailSize.height
+                let detailHeight = collapseDetailHeight.lerp(expandDetailHeight, progress: progress)
                 return Size(
-                    width: max(contentSize.width, detailSize.width),
-                    height: contentSize.height + detailSize.height
+                    width: max(contentSize.width, detailSize.width) + self.inset.vertical,
+                    height: (contentSize.height + detailSpacing + detailHeight) + self.inset.horizontal
                 )
             }
         }
         
         public func views(bounds: Rect) -> [IUIView] {
+            guard let content = self.content else {
+                return []
+            }
             switch self._status {
-            case .collapsed: return [ self.contentView ]
-            case .expanded: return [ self.contentView, self.detailView ]
-            case .changing: return [ self.contentView, self.detailView ]
+            case .collapsed:
+                return [ content ]
+            case .expanded, .changing:
+                guard let detail = self.detail else {
+                    return [ content ]
+                }
+                return [ content, detail ]
             }
         }
         
+    }
+    
+}
+
+public extension UI.Layout.Expand {
+    
+    @inlinable
+    @discardableResult
+    func state(_ value: State) -> Self {
+        self.state = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func state(_ value: () -> State) -> Self {
+        return self.state(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func state(_ value: (Self) -> State) -> Self {
+        return self.state(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: Inset) -> Self {
+        self.inset = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func inset(_ value: () -> Inset) -> Self {
+        return self.inset(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func inset(_ value: (Self) -> Inset) -> Self {
+        return self.inset(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func content(_ value: IUIView?) -> Self {
+        self.content = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func content(_ value: () -> IUIView?) -> Self {
+        return self.content(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func content(_ value: (Self) -> IUIView?) -> Self {
+        return self.content(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func detailSpacing(_ value: Double) -> Self {
+        self.detailSpacing = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func detailSpacing(_ value: () -> Double) -> Self {
+        return self.detailSpacing(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func detailSpacing(_ value: (Self) -> Double) -> Self {
+        return self.detailSpacing(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func detail(_ value: IUIView?) -> Self {
+        self.detail = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func detail(_ value: () -> IUIView?) -> Self {
+        return self.detail(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func detail(_ value: (Self) -> IUIView?) -> Self {
+        return self.detail(value(self))
     }
     
 }
@@ -260,29 +397,11 @@ public extension UI.Layout.Expand {
     
 }
 
-private extension UI.Layout.Expand {
-    
-    func _destroy() {
-        self._animation = nil
-    }
-    
-}
-
 public extension IUILayout where Self == UI.Layout.Expand {
     
     @inlinable
-    static func expand(
-        contentInset: Inset,
-        contentView: IUIView,
-        detailInset: Inset,
-        detailView: IUIView
-    ) -> UI.Layout.Expand {
-        return .init(
-            contentInset: contentInset,
-            contentView: contentView,
-            detailInset: detailInset,
-            detailView: detailView
-        )
+    static func expand() -> UI.Layout.Expand {
+        return .init()
     }
     
 }

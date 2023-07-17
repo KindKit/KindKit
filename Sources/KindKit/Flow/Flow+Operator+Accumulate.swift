@@ -11,11 +11,12 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Result< [Input.Success], Input.Failure >
         
-        private var _accumulator: [Input.Success]
+        private var _value: [Input.Success]
+        private var _error: Input.Failure?
         private var _next: IFlowPipe!
         
         init() {
-            self._accumulator = []
+            self._value = []
         }
         
         public func subscribe(next: IFlowPipe) {
@@ -23,19 +24,25 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            self._accumulator.append(value)
+            self._value.append(value)
         }
         
         public func receive(error: Input.Failure) {
-            self._next.send(error: error)
+            self._error = error
         }
         
         public func completed() {
-            self._next.send(value: self._accumulator)
+            if let error = self._error {
+                self._next.send(error: error)
+            } else {
+                self._next.send(value: self._value)
+            }
             self._next.completed()
         }
         
         public func cancel() {
+            self._value.removeAll()
+            self._error = nil
             self._next.cancel()
         }
         

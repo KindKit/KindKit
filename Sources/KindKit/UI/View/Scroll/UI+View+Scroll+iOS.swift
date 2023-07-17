@@ -110,6 +110,7 @@ final class KKScrollView : UIScrollView {
         
         if superview == nil {
             self.kkLayoutManager.clear()
+            self.kkNeedLayoutContent = true
         }
     }
     

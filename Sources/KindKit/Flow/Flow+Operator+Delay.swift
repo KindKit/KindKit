@@ -17,10 +17,10 @@ public extension Flow.Operator {
         private var _next: IFlowPipe!
         
         init(
-            _ mode: DispatchMode,
+            _ queue: DispatchQueue,
             _ timeout: @escaping (Result< Value.Success, Value.Failure >) -> TimeInterval
         ) {
-            self._queue = mode.queue
+            self._queue = queue
             self._timeout = timeout
         }
         
@@ -76,10 +76,10 @@ public extension Flow.Operator {
 extension IFlowOperator {
     
     func delay(
-        _ dispatch: Flow.Operator.DispatchMode,
+        _ queue: DispatchQueue,
         _ timeout: @escaping (Result< Output.Success, Output.Failure >) -> TimeInterval
     ) -> Flow.Operator.Delay< Output > {
-        let next = Flow.Operator.Delay< Output >(dispatch, timeout)
+        let next = Flow.Operator.Delay< Output >(queue, timeout)
         self.subscribe(next: next)
         return next
     }
@@ -89,10 +89,10 @@ extension IFlowOperator {
 public extension Flow.Builder {
     
     func delay(
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         timeout: @escaping (Result< Input.Success, Input.Failure >) -> TimeInterval
     ) -> Flow.Head.Builder< Flow.Operator.Delay< Input > > {
-        return .init(head: .init(dispatch, timeout))
+        return .init(head: .init(queue, timeout))
     }
     
 }
@@ -100,10 +100,10 @@ public extension Flow.Builder {
 public extension Flow.Head.Builder {
     
     func delay(
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         timeout: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> TimeInterval
     ) -> Flow.Chain.Builder< Head, Flow.Operator.Delay< Head.Output > > {
-        return .init(head: self.head, tail: self.head.delay(dispatch, timeout))
+        return .init(head: self.head, tail: self.head.delay(queue, timeout))
     }
     
 }
@@ -111,10 +111,10 @@ public extension Flow.Head.Builder {
 public extension Flow.Chain.Builder {
     
     func delay(
-        dispatch: Flow.Operator.DispatchMode,
+        queue: DispatchQueue,
         timeout: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> TimeInterval
     ) -> Flow.Chain.Builder< Head, Flow.Operator.Delay< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.delay(dispatch, timeout))
+        return .init(head: self.head, tail: self.tail.delay(queue, timeout))
     }
     
 }
