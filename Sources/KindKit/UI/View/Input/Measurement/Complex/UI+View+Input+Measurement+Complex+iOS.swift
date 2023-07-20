@@ -236,11 +236,13 @@ extension KKInputMeasurementComplexView {
                     height += insets.top + insets.bottom
                 }
             }
-            let oldFrame = self.frame
-            let newFrame = CGRect(x: 0, y: 0, width: oldFrame.width, height: height)
-            if oldFrame != newFrame {
-                self.frame = newFrame
-                self.kkInputView?.reloadInputViews()
+            if height > .leastNormalMagnitude {
+                let oldFrame = self.frame
+                let newFrame = CGRect(x: 0, y: 0, width: oldFrame.width, height: height)
+                if oldFrame != newFrame {
+                    self.frame = newFrame
+                    self.kkInputView?.reloadInputViews()
+                }
             }
         }
         
