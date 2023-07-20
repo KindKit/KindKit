@@ -116,6 +116,10 @@ final class KKInputMeasurementComplexView : UITextField {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func caretRect(for position: UITextPosition) -> CGRect {
+        return .zero
+    }
+    
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         return bounds.inset(by: self.kkTextInset)
     }
