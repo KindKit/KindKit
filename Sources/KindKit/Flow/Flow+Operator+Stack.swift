@@ -6,7 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Fifo<
+    final class Stack<
         Input : IFlowResult,
         Pipeline : IFlowPipeline
     > : IFlowOperator where
@@ -17,19 +17,19 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Result< [Pipeline.Output.Success], Pipeline.Output.Failure >
         
-        private var _queue: [Result< Input.Success, Input.Failure >]
-        private var _value: [Pipeline.Output.Success]
+        private let _mode: Mode
+        private var _queue: [Result< Input.Success, Input.Failure >] = []
+        private var _value: [Pipeline.Output.Success] = []
         private var _error: Pipeline.Output.Failure?
         private let _pipeline: Pipeline
         private var _subscription: IFlowSubscription!
         private var _next: IFlowPipe!
         
         init(
+            _ mode: Mode,
             _ pipeline: Pipeline
         ) {
-            self._queue = []
-            self._value = []
-            self._error = nil
+            self._mode = mode
             self._pipeline = pipeline
             self._subscription = pipeline.subscribe(
                 onReceiveValue: { [weak self] in self?._receive(value: $0) },
@@ -63,7 +63,18 @@ public extension Flow.Operator {
     
 }
 
-private extension Flow.Operator.Fifo {
+public extension Flow.Operator.Stack {
+    
+    enum Mode {
+        
+        case fifo
+        case lifo
+        
+    }
+    
+}
+
+private extension Flow.Operator.Stack {
     
     func _receive(value: Pipeline.Output.Success) {
         self._value.append(value)
@@ -77,7 +88,7 @@ private extension Flow.Operator.Fifo {
     
     func _completed() {
         if self._queue.isEmpty == false {
-            switch self._queue.removeFirst() {
+            switch self._item() {
             case .success(let value):
                 self._pipeline.send(value: value)
             case .failure(let error):
@@ -93,17 +104,35 @@ private extension Flow.Operator.Fifo {
         }
     }
     
+    func _item() -> Result< Input.Success, Input.Failure > {
+        switch self._mode {
+        case .fifo: return self._queue.removeFirst()
+        case .lifo: return self._queue.removeLast()
+        }
+    }
+    
 }
 
 extension IFlowOperator {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Operator.Fifo< Output, Pipeline > where
+    ) -> Flow.Operator.Stack< Output, Pipeline > where
         Output.Success == Pipeline.Input.Success,
         Output.Failure == Pipeline.Input.Failure
     {
-        let next = Flow.Operator.Fifo< Output, Pipeline >(pipeline)
+        let next = Flow.Operator.Stack< Output, Pipeline >(.fifo, pipeline)
+        self.subscribe(next: next)
+        return next
+    }
+    
+    func lifo< Pipeline : IFlowPipeline >(
+        pipeline: Pipeline
+    ) -> Flow.Operator.Stack< Output, Pipeline > where
+        Output.Success == Pipeline.Input.Success,
+        Output.Failure == Pipeline.Input.Failure
+    {
+        let next = Flow.Operator.Stack< Output, Pipeline >(.lifo, pipeline)
         self.subscribe(next: next)
         return next
     }
@@ -114,11 +143,20 @@ public extension Flow.Builder {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Head.Builder< Flow.Operator.Fifo< Input, Pipeline > > where
+    ) -> Flow.Head.Builder< Flow.Operator.Stack< Input, Pipeline > > where
         Input.Success == Pipeline.Input.Success,
         Input.Failure == Pipeline.Input.Failure
     {
-        return .init(head: .init(pipeline))
+        return .init(head: .init(.fifo, pipeline))
+    }
+    
+    func lifo< Pipeline : IFlowPipeline >(
+        pipeline: Pipeline
+    ) -> Flow.Head.Builder< Flow.Operator.Stack< Input, Pipeline > > where
+        Input.Success == Pipeline.Input.Success,
+        Input.Failure == Pipeline.Input.Failure
+    {
+        return .init(head: .init(.lifo, pipeline))
     }
     
 }
@@ -127,7 +165,7 @@ public extension Flow.Head.Builder {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Fifo< Head.Output, Pipeline > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Head.Output, Pipeline > > where
         Head.Output.Success == Pipeline.Input.Success,
         Head.Output.Failure == Pipeline.Input.Failure
     {
@@ -135,17 +173,40 @@ public extension Flow.Head.Builder {
             pipeline: pipeline
         ))
     }
+    
+    func lifo< Pipeline : IFlowPipeline >(
+        pipeline: Pipeline
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Head.Output, Pipeline > > where
+        Head.Output.Success == Pipeline.Input.Success,
+        Head.Output.Failure == Pipeline.Input.Failure
+    {
+        return .init(head: self.head, tail: self.head.lifo(
+            pipeline: pipeline
+        ))
+    }
+    
 }
 
 public extension Flow.Chain.Builder {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Fifo< Tail.Output, Pipeline > > where
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
         Tail.Output.Success == Pipeline.Input.Success,
         Tail.Output.Failure == Pipeline.Input.Failure
     {
         return .init(head: self.head, tail: self.tail.fifo(
+            pipeline: pipeline
+        ))
+    }
+    
+    func lifo< Pipeline : IFlowPipeline >(
+        pipeline: Pipeline
+    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
+        Tail.Output.Success == Pipeline.Input.Success,
+        Tail.Output.Failure == Pipeline.Input.Failure
+    {
+        return .init(head: self.head, tail: self.tail.lifo(
             pipeline: pipeline
         ))
     }

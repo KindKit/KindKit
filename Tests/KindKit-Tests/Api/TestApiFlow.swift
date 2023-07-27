@@ -24,7 +24,7 @@ class TestApiFlow : XCTestCase {
             })
             .apiQuery(
                 provider: provider,
-                dispatch: .main,
+                queue: .main,
                 request: {
                     return .init(
                         method: .get,

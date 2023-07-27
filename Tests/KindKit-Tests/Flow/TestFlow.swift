@@ -19,7 +19,7 @@ class TestFlow : XCTestCase {
         let pipeline = Flow.Builder< Int, Never >()
             .mapValue({ String($0) })
             .delay(
-                dispatch: .main,
+                queue: .main,
                 timeout: {
                     switch $0 {
                     case .success: return 3
@@ -43,7 +43,7 @@ class TestFlow : XCTestCase {
         let pipeline = Flow.Builder< Int, Never >()
             .run(
                 pipeline: Flow.Builder< Int, Never >()
-                    .dispatch(.background)
+                    .dispatch(global: .utility)
                     .accumulate()
                     .pipeline()
             )

@@ -38,7 +38,7 @@ extension RemoteImage.Loader {
             syncQueue: DispatchQueue,
             cache: RemoteImage.Cache,
             query: IRemoteImageQuery,
-            target: IRemoteImageTarget
+            targets: [IRemoteImageTarget]
         ) {
             self.delegate = delegate
             self.lockQueue = lockQueue
@@ -46,7 +46,7 @@ extension RemoteImage.Loader {
             self.syncQueue = syncQueue
             self.cache = cache
             self.query = query
-            self._targets = [ target ]
+            self._targets = targets
         }
         
         deinit {

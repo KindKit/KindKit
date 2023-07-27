@@ -17,7 +17,7 @@ extension RemoteImage.Loader {
             provider: Api.Provider,
             cache: RemoteImage.Cache,
             query: IRemoteImageQuery,
-            target: IRemoteImageTarget
+            targets: [IRemoteImageTarget]
         ) {
             self.provider = provider
             super.init(
@@ -27,9 +27,48 @@ extension RemoteImage.Loader {
                 syncQueue: syncQueue,
                 cache: cache,
                 query: query,
-                target: target
+                targets: targets
             )
             self._perform()
+        }
+        
+        convenience init(
+            delegate: IRemoteImageLoaderTaskDelegate,
+            workQueue: DispatchQueue,
+            syncQueue: DispatchQueue,
+            provider: Api.Provider,
+            cache: RemoteImage.Cache,
+            query: IRemoteImageQuery
+        ) {
+            self.init(
+                delegate: delegate,
+                workQueue: workQueue,
+                syncQueue: syncQueue,
+                provider: provider,
+                cache: cache,
+                query: query,
+                targets: []
+            )
+        }
+        
+        convenience init(
+            delegate: IRemoteImageLoaderTaskDelegate,
+            workQueue: DispatchQueue,
+            syncQueue: DispatchQueue,
+            provider: Api.Provider,
+            cache: RemoteImage.Cache,
+            query: IRemoteImageQuery,
+            target: IRemoteImageTarget
+        ) {
+            self.init(
+                delegate: delegate,
+                workQueue: workQueue,
+                syncQueue: syncQueue,
+                provider: provider,
+                cache: cache,
+                query: query,
+                targets: [ target ]
+            )
         }
         
     }

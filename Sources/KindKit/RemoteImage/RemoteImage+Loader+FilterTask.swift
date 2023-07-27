@@ -27,7 +27,7 @@ extension RemoteImage.Loader {
                 syncQueue: syncQueue,
                 cache: cache,
                 query: query,
-                target: target
+                targets: [ target ]
             )
         }
         

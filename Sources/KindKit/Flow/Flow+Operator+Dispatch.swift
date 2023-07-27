@@ -11,7 +11,10 @@ public extension Flow.Operator {
         public typealias Input = Value
         public typealias Output = Value
         
+        private let _lock = Lock()
         private let _queue: DispatchQueue
+        private var _stack: [Item] = []
+        private var _task: ICancellable?
         private var _next: IFlowPipe!
         
         init(
@@ -31,33 +34,72 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            self._queue.async(execute: { [weak self] in
-                guard let self = self else { return }
-                self._next.send(value: value)
-            })
+            self._push(.value(value))
         }
         
         public func receive(error: Input.Failure) {
-            self._queue.async(execute: { [weak self] in
-                guard let self = self else { return }
-                self._next.send(error: error)
-            })
+            self._push(.error(error))
         }
         
         public func completed() {
-            self._queue.async(flags: .barrier, execute: { [weak self] in
-                guard let self = self else { return }
-                self._next.completed()
-            })
+            self._push(.completed)
         }
         
         public func cancel() {
-            self._queue.async(flags: .barrier, execute: { [weak self] in
-                guard let self = self else { return }
-                self._next.cancel()
-            })
+            self._push(.cancel)
         }
         
+    }
+    
+}
+
+private extension Flow.Operator.Dispatch {
+    
+    enum Item {
+        
+        case value(Input.Success)
+        case error(Input.Failure)
+        case completed
+        case cancel
+        
+    }
+    
+}
+
+private extension Flow.Operator.Dispatch {
+    
+    func _push(_ item: Item) {
+        self._lock.perform({
+            self._stack.append(item)
+            self._start()
+        })
+    }
+    
+    func _start() {
+        guard self._task == nil else { return }
+        self._task = DispatchWorkItem.kk_async(
+            queue: self._queue,
+            block: { [weak self] in self?._handle() }
+        )
+    }
+    
+    func _handle() {
+        self._lock.perform({
+            for item in self._stack {
+                switch item {
+                case .value(let value):
+                    self._next.send(value: value)
+                case .error(let error):
+                    self._next.send(error: error)
+                case .completed:
+                    self._next.completed()
+                case .cancel:
+                    self._next.cancel()
+                }
+            }
+            self._stack.removeAll(keepingCapacity: true)
+            self._task = nil
+        })
     }
     
 }

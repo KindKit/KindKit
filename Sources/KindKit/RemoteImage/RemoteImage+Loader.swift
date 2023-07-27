@@ -20,9 +20,9 @@ public extension RemoteImage {
 
         public init(
             provider: Api.Provider,
-            cache: RemoteImage.Cache = RemoteImage.Cache.shared,
-            workQueue: DispatchQueue = DispatchQueue.global(qos: .userInitiated),
-            syncQueue: DispatchQueue = DispatchQueue.main
+            cache: RemoteImage.Cache = .shared,
+            workQueue: DispatchQueue = .global(qos: .userInitiated),
+            syncQueue: DispatchQueue = .main
         ) {
             self.provider = provider
             self.cache = cache
@@ -48,18 +48,14 @@ public extension RemoteImage {
 
 public extension RemoteImage.Loader {
     
-    static let shared: RemoteImage.Loader = {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 30
-        
-        return RemoteImage.Loader(
-            provider: Api.Provider(
-                authenticationChallenge: .allowUntrusted,
-                configuration: configuration
-            )
-        )
-    }()
+    static let shared = RemoteImage.Loader(
+        provider: .default()
+    )
+    
+    static let background = RemoteImage.Loader(
+        provider: .default(),
+        syncQueue: .global(qos: .utility)
+    )
     
     func download(target: IRemoteImageTarget, query: IRemoteImageQuery, filter: IRemoteImageFilter? = nil) {
         if let filter = filter {
@@ -91,8 +87,7 @@ public extension RemoteImage.Loader {
                         syncQueue: self.syncQueue,
                         provider: self.provider,
                         cache: self.cache,
-                        query: query,
-                        target: target
+                        query: query
                     )
                     let filterTask = FilterTask(
                         delegate: self,
@@ -164,6 +159,21 @@ extension RemoteImage.Loader : IRemoteImageLoaderTaskDelegate {
                 self._filterTasks.remove(at: index)
             }
         })
+    }
+    
+}
+
+fileprivate extension Api.Provider {
+    
+    static func `default`() -> Self {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForResource = 30
+        
+        return .init(
+            authenticationChallenge: .allowUntrusted,
+            configuration: configuration
+        )
     }
     
 }

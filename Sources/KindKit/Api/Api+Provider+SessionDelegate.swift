@@ -11,7 +11,7 @@ extension Api.Provider {
         public var authenticationChallenge: Api.AuthenticationChallenge
         public var localCertificateUrls: [URL]
         
-        private var _lock = Lock()
+        private let _lock = Lock()
         private var _tasks: [Int : IApiTaskQuery] = [:]
         
         init(
