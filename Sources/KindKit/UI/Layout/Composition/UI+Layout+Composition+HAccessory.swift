@@ -213,10 +213,18 @@ private extension UI.Layout.Composition.HAccessory {
             trailingSize = .zero
             trailingSpacing = 0
         }
-        let centerSize = self.center.size(available: .init(
-            width: available.width - ((leadingSize.width + leadingSpacing) + (trailingSize.width + trailingSpacing)),
-            height: max(leadingSize.height, available.height, trailingSize.height)
-        ))
+        let centerSize: Size
+        if self.filling == true {
+            centerSize = self.center.size(available: .init(
+                width: available.width - ((leadingSize.width + leadingSpacing) + (trailingSize.width + trailingSpacing)),
+                height: max(leadingSize.height, available.height, trailingSize.height)
+            ))
+        } else {
+            centerSize = self.center.size(available: .init(
+                width: available.width - (max(leadingSize.width + leadingSpacing, trailingSize.width + trailingSpacing) * 2),
+                height: max(leadingSize.height, available.height, trailingSize.height)
+            ))
+        }
         return (
             leadingSize: leadingSize,
             leadingSpacing: leadingSpacing,

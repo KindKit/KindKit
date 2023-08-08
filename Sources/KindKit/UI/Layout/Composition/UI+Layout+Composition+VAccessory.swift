@@ -213,10 +213,18 @@ private extension UI.Layout.Composition.VAccessory {
             trailingSize = .zero
             trailingSpacing = 0
         }
-        let centerSize = self.center.size(available: Size(
-            width: max(leadingSize.width, available.width, trailingSize.width),
-            height: available.height - ((leadingSize.height + leadingSpacing) + (trailingSize.height + trailingSpacing))
-        ))
+        let centerSize: Size
+        if self.filling == true {
+            centerSize = self.center.size(available: Size(
+                width: max(leadingSize.width, available.width, trailingSize.width),
+                height: available.height - ((leadingSize.height + leadingSpacing) + (trailingSize.height + trailingSpacing))
+            ))
+        } else {
+            centerSize = self.center.size(available: .init(
+                width: max(leadingSize.width, available.width, trailingSize.width),
+                height: available.height - (max(leadingSize.height + leadingSpacing, trailingSize.height + trailingSpacing) * 2)
+            ))
+        }
         return (
             leadingSize: leadingSize,
             leadingSpacing: leadingSpacing,
