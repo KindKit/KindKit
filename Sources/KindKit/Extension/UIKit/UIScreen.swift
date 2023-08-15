@@ -8,15 +8,10 @@ import UIKit
 
 public extension UIScreen {
     
-    static let kk_diagonalInInches: Double = {
-        let bounds = UIScreen.main.nativeBounds
-        let diagonal = Double(sqrt((bounds.width * bounds.width) + (bounds.height * bounds.height)))
-        let ppi = Double(UIScreen.kk_pixelPerInch)
-        return diagonal / ppi
-    }()
-    
     static let kk_animationVelocity: Double = {
-        let bounds = UIScreen.main.bounds
+        let device = UIDevice.current
+        let screen = UIScreen.main
+        let bounds = screen.bounds
         let size = Double(max(bounds.width, bounds.height))
         switch UIDevice.current.userInterfaceIdiom {
         case .phone: return size * 1.75
@@ -25,27 +20,40 @@ public extension UIScreen {
         }
     }()
     
+    static let kk_diagonalInInches: Double = {
+        return UIScreen.main.kk_diagonalInInches(UIDevice.current)
+    }()
+    
     static let kk_pixelPerInch: Double = {
-        let device = UIDevice.current
-        let screen = UIScreen.main
+        return UIScreen.main.kk_pixelPerInch(UIDevice.current)
+    }()
+    
+    func kk_diagonalInInches(_ device: UIDevice) -> Double {
+        let bounds = self.nativeBounds
+        let diagonal = Double(sqrt((bounds.width * bounds.width) + (bounds.height * bounds.height)))
+        let ppi = self.kk_pixelPerInch(device)
+        return diagonal / ppi
+    }
+    
+    func kk_pixelPerInch(_ device: UIDevice) -> Double {
         switch device.userInterfaceIdiom {
         case .phone:
-            if let ppi = UIScreen._iPhonePpi(machine: UIDevice.kk_identifier) {
+            if let ppi = Self._iPhonePpi(machine: UIDevice.kk_identifier) {
                 return ppi
             }
-            return screen.scale == 2 ? 264 : 132
+            return self.scale == 2 ? 264 : 132
         case .pad:
-            if let ppi = UIScreen._iPadPpi(machine: UIDevice.kk_identifier) {
+            if let ppi = Self._iPadPpi(machine: UIDevice.kk_identifier) {
                 return ppi
             }
-            if screen.scale == 3 {
-                return screen.nativeScale == 3 ? 458 : 401
+            if self.scale == 3 {
+                return self.nativeScale == 3 ? 458 : 401
             }
             return 326
         default:
-            return 160 * Double(screen.scale)
+            return 160 * Double(self.scale)
         }
-    }()
+    }
     
 }
 

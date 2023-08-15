@@ -55,6 +55,7 @@ public extension UIDevice {
         return self.kk_totalMemorySpace - usedMemorySpace
     }
     
+    @inlinable
     func kk_deviceOrientation(
         interfaceOrientation: UIInterfaceOrientation
     ) -> UIDeviceOrientation {
@@ -68,6 +69,7 @@ public extension UIDevice {
         }
     }
     
+    @inlinable
     func kk_interfaceOrientation(
         supported: UIInterfaceOrientationMask
     ) -> UIInterfaceOrientation {
