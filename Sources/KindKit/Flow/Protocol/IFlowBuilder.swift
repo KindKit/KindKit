@@ -4,30 +4,18 @@
 
 import Foundation
 
-public extension Flow.Chain {
-
-    struct Builder< Head : IFlowOperator, Tail : IFlowOperator > {
-        
-        public let head: Head
-        public let tail: Tail
-        
-        public init(
-            head: Head,
-            tail: Tail
-        ) {
-            self.head = head
-            self.tail = tail
-        }
-        
-    }
+public protocol IFlowBuilder {
+    
+    associatedtype Head : IFlowOperator
+    associatedtype Tail : IFlowOperator
+    
+    func pipeline() -> Flow.Pipeline< Head.Input, Tail.Output >
+    
+    func append< Operator : IFlowOperator >(_ `operator`: @autoclosure () -> Operator) -> Flow.Chain< Head, Operator >
     
 }
 
-public extension Flow.Chain.Builder {
-    
-    func pipeline() -> Flow.Pipeline< Head.Input, Tail.Output > {
-        return Flow.Pipeline(head: self.head, tail: self.tail)
-    }
+public extension IFlowBuilder {
     
     func pipeline(
         onReceive: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Void,

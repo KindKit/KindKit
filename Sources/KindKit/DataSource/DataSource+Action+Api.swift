@@ -62,8 +62,8 @@ public extension DataSource.Action {
 private extension DataSource.Action.Api {
     
     func _completed(_ result: Result) {
-        self._task = nil
         self.result = result
+        self._task = nil
         self.onFinish.emit(result)
     }
     

@@ -40,35 +40,10 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
-    func none() -> Flow.Operator.None< Output > {
-        let next = Flow.Operator.None< Output >()
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func none() -> Flow.Head.Builder< Flow.Operator.None< Input > > {
-        return .init(head: .init())
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func none() -> Flow.Chain.Builder< Head, Flow.Operator.None< Head.Output > > {
-        return .init(head: self.head, tail: self.head.none())
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
-    func none() -> Flow.Chain.Builder< Head, Flow.Operator.None< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.none())
+    func none() -> Flow.Chain< Head, Flow.Operator.None< Tail.Output > > {
+        return self.append(.init())
     }
     
 }

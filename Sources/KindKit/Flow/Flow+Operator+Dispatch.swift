@@ -104,70 +104,18 @@ private extension Flow.Operator.Dispatch {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
     func dispatch(
         _ queue: DispatchQueue
-    ) -> Flow.Operator.Dispatch< Output > {
-        let next = Flow.Operator.Dispatch< Output >(queue)
-        self.subscribe(next: next)
-        return next
-    }
-    
-    func dispatch(
-        _ global: DispatchQoS.QoSClass
-    ) -> Flow.Operator.Dispatch< Output > {
-        let next = Flow.Operator.Dispatch< Output >(global)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func dispatch(
-        _ queue: DispatchQueue
-    ) -> Flow.Head.Builder< Flow.Operator.Dispatch< Input > > {
-        return .init(head: .init(queue))
+    ) -> Flow.Chain< Head, Flow.Operator.Dispatch< Tail.Output > > {
+        return self.append(.init(queue))
     }
     
     func dispatch(
         global: DispatchQoS.QoSClass
-    ) -> Flow.Head.Builder< Flow.Operator.Dispatch< Input > > {
-        return .init(head: .init(global))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func dispatch(
-        _ queue: DispatchQueue
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Head.Output > > {
-        return .init(head: self.head, tail: self.head.dispatch(queue))
-    }
-    
-    func dispatch(
-        global: DispatchQoS.QoSClass
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Head.Output > > {
-        return .init(head: self.head, tail: self.head.dispatch(global))
-    }
-    
-}
-
-public extension Flow.Chain.Builder {
-    
-    func dispatch(
-        _ queue: DispatchQueue
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.dispatch(queue))
-    }
-    
-    func dispatch(
-        global: DispatchQoS.QoSClass
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Dispatch< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.dispatch(global))
+    ) -> Flow.Chain< Head, Flow.Operator.Dispatch< Tail.Output > > {
+        return self.append(.init(global))
     }
     
 }

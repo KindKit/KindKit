@@ -6,7 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Run3<
+    final class Fork3<
         Pipeline1 : IFlowPipeline,
         Pipeline2 : IFlowPipeline,
         Pipeline3 : IFlowPipeline
@@ -24,9 +24,9 @@ public extension Flow.Operator {
         private let _pipeline1: Pipeline1
         private let _pipeline2: Pipeline2
         private let _pipeline3: Pipeline3
-        private var _received1: [Result< Pipeline1.Output.Success, Pipeline1.Output.Failure >] = []
-        private var _received2: [Result< Pipeline2.Output.Success, Pipeline2.Output.Failure >] = []
-        private var _received3: [Result< Pipeline3.Output.Success, Pipeline3.Output.Failure >] = []
+        private var _accumulator1: [Result< Pipeline1.Output.Success, Pipeline1.Output.Failure >] = []
+        private var _accumulator2: [Result< Pipeline2.Output.Success, Pipeline2.Output.Failure >] = []
+        private var _accumulator3: [Result< Pipeline3.Output.Success, Pipeline3.Output.Failure >] = []
         private var _subscription1: IFlowSubscription!
         private var _subscription2: IFlowSubscription!
         private var _subscription3: IFlowSubscription!
@@ -90,40 +90,40 @@ public extension Flow.Operator {
     
 }
 
-private extension Flow.Operator.Run3 {
+private extension Flow.Operator.Fork3 {
     
     func _receive1(value: Pipeline1.Output.Success) {
-        self._received1.append(.success(value))
+        self._accumulator1.append(.success(value))
     }
     
     func _receive2(value: Pipeline2.Output.Success) {
-        self._received2.append(.success(value))
+        self._accumulator2.append(.success(value))
     }
     
     func _receive3(value: Pipeline3.Output.Success) {
-        self._received3.append(.success(value))
+        self._accumulator3.append(.success(value))
     }
     
     func _receive1(error: Pipeline1.Output.Failure) {
-        self._received1.append(.failure(error))
+        self._accumulator1.append(.failure(error))
     }
     
     func _receive2(error: Pipeline2.Output.Failure) {
-        self._received2.append(.failure(error))
+        self._accumulator2.append(.failure(error))
     }
     
     func _receive3(error: Pipeline3.Output.Failure) {
-        self._received3.append(.failure(error))
+        self._accumulator3.append(.failure(error))
     }
     
     func _completed() {
-        guard self._received1.isEmpty == false else { return }
-        guard self._received1.count == self._received2.count else { return }
-        guard self._received2.count == self._received3.count else { return }
-        let received1 = self._received1.removeFirst()
-        let received2 = self._received2.removeFirst()
-        let received3 = self._received3.removeFirst()
-        switch (received1, received2, received3) {
+        guard self._accumulator1.isEmpty == false else { return }
+        guard self._accumulator1.count == self._accumulator2.count else { return }
+        guard self._accumulator2.count == self._accumulator3.count else { return }
+        let accumulator1 = self._accumulator1.removeFirst()
+        let accumulator2 = self._accumulator2.removeFirst()
+        let accumulator3 = self._accumulator3.removeFirst()
+        switch (accumulator1, accumulator2, accumulator3) {
         case (.success(let result1), .success(let result2), .success(let result3)):
             self._next.send(value: (result1, result2, result3))
         case (.failure(let error), _, _):
@@ -138,32 +138,9 @@ private extension Flow.Operator.Run3 {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
-    func run3<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline,
-        Pipeline3 : IFlowPipeline
-    >(
-        _ pipeline1: Pipeline1,
-        _ pipeline2: Pipeline2,
-        _ pipeline3: Pipeline3
-    ) -> Flow.Operator.Run3< Pipeline1, Pipeline2, Pipeline3 > where
-        Pipeline1.Input == Pipeline2.Input,
-        Pipeline2.Input == Pipeline3.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure,
-        Pipeline2.Output.Failure == Pipeline3.Output.Failure
-    {
-        let next = Flow.Operator.Run3(pipeline1, pipeline2, pipeline3)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func run3<
+    func fork<
         Pipeline1 : IFlowPipeline,
         Pipeline2 : IFlowPipeline,
         Pipeline3 : IFlowPipeline
@@ -171,57 +148,14 @@ public extension Flow.Builder {
         pipeline1: Pipeline1,
         pipeline2: Pipeline2,
         pipeline3: Pipeline3
-    ) -> Flow.Head.Builder< Flow.Operator.Run3< Pipeline1, Pipeline2, Pipeline3 > > where
-        Input == Pipeline1.Input,
-        Input == Pipeline2.Input,
-        Input == Pipeline3.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure,
-        Pipeline1.Output.Failure == Pipeline3.Output.Failure
-    {
-        return .init(head: .init(pipeline1, pipeline2, pipeline3))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func run3<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline,
-        Pipeline3 : IFlowPipeline
-    >(
-        pipeline1: Pipeline1,
-        pipeline2: Pipeline2,
-        pipeline3: Pipeline3
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run3< Pipeline1, Pipeline2, Pipeline3 > > where
-        Head.Output == Pipeline1.Input,
-        Head.Output == Pipeline2.Input,
-        Head.Output == Pipeline3.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure,
-        Pipeline1.Output.Failure == Pipeline3.Output.Failure
-    {
-        return .init(head: self.head, tail: self.head.run3(pipeline1, pipeline2, pipeline3))
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
-    func run3<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline,
-        Pipeline3 : IFlowPipeline
-    >(
-        pipeline1: Pipeline1,
-        pipeline2: Pipeline2,
-        pipeline3: Pipeline3
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run3< Pipeline1, Pipeline2, Pipeline3 > > where
+    ) -> Flow.Chain< Head, Flow.Operator.Fork3< Pipeline1, Pipeline2, Pipeline3 > > where
         Tail.Output == Pipeline1.Input,
         Tail.Output == Pipeline2.Input,
         Tail.Output == Pipeline3.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure,
         Pipeline1.Output.Failure == Pipeline3.Output.Failure
     {
-        return .init(head: self.head, tail: self.tail.run3(pipeline1, pipeline2, pipeline3))
+        return self.append(.init(pipeline1, pipeline2, pipeline3))
     }
     
 }

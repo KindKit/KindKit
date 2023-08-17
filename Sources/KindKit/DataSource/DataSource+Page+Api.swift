@@ -77,7 +77,6 @@ public extension DataSource.Page {
 private extension DataSource.Page.Api {
 
     func _completed(_ cursor: Cursor?, _ response: Swift.Result< Response.Success, Response.Failure >) {
-        self._task = nil
         switch response {
         case .success(let responseSuccess):
             let responseElements = self._elementsWithResponse(responseSuccess)
@@ -93,9 +92,11 @@ private extension DataSource.Page.Api {
             }
             self._cursor = self._cursorWithResponse(cursor, responseSuccess)
             self.canMore = self._canMoreWithResponse(cursor, responseSuccess)
+            self._task = nil
             self.onFinish.emit(.success(responseElements))
         case .failure(let responseError):
             self.result = .failure(responseError)
+            self._task = nil
             self.onFinish.emit(.failure(responseError))
         }
     }

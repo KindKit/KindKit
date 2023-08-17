@@ -73,7 +73,6 @@ public extension DataSource.Sync {
 private extension DataSource.Sync.Api {
 
     func _completed(_ result: Result) {
-        self._task = nil
         switch result {
         case .success:
             self.result = result
@@ -81,6 +80,7 @@ private extension DataSource.Sync.Api {
         case .failure:
             self.result = result
         }
+        self._task = nil
         self.onFinish.emit(result)
     }
     

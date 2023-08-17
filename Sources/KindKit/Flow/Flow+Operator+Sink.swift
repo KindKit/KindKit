@@ -11,18 +11,15 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Result< Input.Success, Input.Failure >
         
-        private let _receiveValue: (Input.Success) -> Void
-        private let _receiveError: (Input.Failure) -> Void
+        private let _receive: (Result< Input.Success, Input.Failure >) -> Void
         private let _completed: () -> Void
         private var _next: IFlowPipe!
         
         init(
-            _ receiveValue: @escaping (Input.Success) -> Void,
-            _ receiveError: @escaping (Input.Failure) -> Void,
+            _ receive: @escaping (Result< Input.Success, Input.Failure >) -> Void,
             _ completed: @escaping () -> Void
         ) {
-            self._receiveValue = receiveValue
-            self._receiveError = receiveError
+            self._receive = receive
             self._completed = completed
         }
         
@@ -31,12 +28,12 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            self._receiveValue(value)
+            self._receive(.success(value))
             self._next.send(value: value)
         }
         
         public func receive(error: Input.Failure) {
-            self._receiveError(error)
+            self._receive(.failure(error))
             self._next.send(error: error)
         }
         
@@ -53,59 +50,30 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
     func sink(
-        onReceiveValue: @escaping (Output.Success) -> Void,
-        onReceiveError: @escaping (Output.Failure) -> Void,
-        onCompleted: @escaping () -> Void
-    ) -> Flow.Operator.Sink< Output > {
-        let next = Flow.Operator.Sink< Output >(onReceiveValue, onReceiveError, onCompleted)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func sink(
-        onReceiveValue: @escaping (Input.Success) -> Void = { _ in },
-        onReceiveError: @escaping (Input.Failure) -> Void = { _ in },
+        onReceive: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Void,
         onCompleted: @escaping () -> Void = {}
-    ) -> Flow.Head.Builder< Flow.Operator.Sink< Input > > {
-        return .init(head: .init(onReceiveValue, onReceiveError, onCompleted))
+    ) -> Flow.Chain< Head, Flow.Operator.Sink< Tail.Output > > {
+        return self.append(.init(onReceive, onCompleted))
     }
     
-}
-
-public extension Flow.Head.Builder {
-    
-    func sink(
-        onReceiveValue: @escaping (Head.Output.Success) -> Void = { _ in },
-        onReceiveError: @escaping (Head.Output.Failure) -> Void = { _ in },
-        onCompleted: @escaping () -> Void = {}
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Sink< Head.Output > > {
-        return .init(head: self.head, tail: self.head.sink(
-            onReceiveValue: onReceiveValue,
-            onReceiveError: onReceiveError,
-            onCompleted: onCompleted
-        ))
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
+    @inlinable
     func sink(
         onReceiveValue: @escaping (Tail.Output.Success) -> Void = { _ in },
         onReceiveError: @escaping (Tail.Output.Failure) -> Void = { _ in },
         onCompleted: @escaping () -> Void = {}
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Sink< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.sink(
-            onReceiveValue: onReceiveValue,
-            onReceiveError: onReceiveError,
+    ) -> Flow.Chain< Head, Flow.Operator.Sink< Tail.Output > > {
+        return self.sink(
+            onReceive: {
+                switch $0 {
+                case .success(let value): onReceiveValue(value)
+                case .failure(let error): onReceiveError(error)
+                }
+            },
             onCompleted: onCompleted
-        ))
+        )
     }
     
 }

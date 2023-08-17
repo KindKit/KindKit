@@ -52,43 +52,12 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
-    
-    func log(
-        _ closure: @escaping (Result< Output.Success, Output.Failure >) -> ILogMessage?
-    ) -> Flow.Operator.Log< Output > {
-        let next = Flow.Operator.Log< Output >(closure)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func log(
-        _ closure: @escaping (Result< Input.Success, Input.Failure >) -> ILogMessage?
-    ) -> Flow.Head.Builder< Flow.Operator.Log< Input > > {
-        return .init(head: .init(closure))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func log(
-        _ closure: @escaping (Result< Head.Output.Success, Head.Output.Failure >) -> ILogMessage?
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Log< Head.Output > > {
-        return .init(head: self.head, tail: self.head.log(closure))
-    }
-}
-
-public extension Flow.Chain.Builder {
+public extension IFlowBuilder {
     
     func log(
         _ closure: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> ILogMessage?
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Log< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.log(closure))
+    ) -> Flow.Chain< Head, Flow.Operator.Log< Tail.Output > > {
+        return self.append(.init(closure))
     }
     
 }

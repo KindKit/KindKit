@@ -51,49 +51,14 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
-    
-    func run< Pipeline : IFlowPipeline >(
-        _ pipeline: Pipeline
-    ) -> Flow.Operator.Run< Pipeline > {
-        let next = Flow.Operator.Run< Pipeline >(pipeline)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
+public extension IFlowBuilder {
     
     func run< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Head.Builder< Flow.Operator.Run< Pipeline > > where
-        Input == Pipeline.Input
-    {
-        return .init(head: .init(pipeline))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func run< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run< Pipeline > > where
-        Head.Output == Pipeline.Input
-    {
-        return .init(head: self.head, tail: self.head.run(pipeline))
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
-    func run< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run< Pipeline > > where
+    ) -> Flow.Chain< Head, Flow.Operator.Run< Pipeline > > where
         Tail.Output == Pipeline.Input
     {
-        return .init(head: self.head, tail: self.tail.run(pipeline))
+        return self.append(.init(pipeline))
     }
     
 }

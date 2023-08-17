@@ -6,7 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Run2<
+    final class Fork2<
         Pipeline1 : IFlowPipeline,
         Pipeline2 : IFlowPipeline
     > : IFlowOperator where
@@ -20,8 +20,8 @@ public extension Flow.Operator {
 
         private let _pipeline1: Pipeline1
         private let _pipeline2: Pipeline2
-        private var _received1: [Result< Pipeline1.Output.Success, Pipeline1.Output.Failure >] = []
-        private var _received2: [Result< Pipeline2.Output.Success, Pipeline2.Output.Failure >] = []
+        private var _accumulator1: [Result< Pipeline1.Output.Success, Pipeline1.Output.Failure >] = []
+        private var _accumulator2: [Result< Pipeline2.Output.Success, Pipeline2.Output.Failure >] = []
         private var _subscription1: IFlowSubscription!
         private var _subscription2: IFlowSubscription!
         private var _next: IFlowPipe!
@@ -73,30 +73,30 @@ public extension Flow.Operator {
     
 }
 
-private extension Flow.Operator.Run2 {
+private extension Flow.Operator.Fork2 {
     
     func _receive1(value: Pipeline1.Output.Success) {
-        self._received1.append(.success(value))
+        self._accumulator1.append(.success(value))
     }
     
     func _receive2(value: Pipeline2.Output.Success) {
-        self._received2.append(.success(value))
+        self._accumulator2.append(.success(value))
     }
     
     func _receive1(error: Pipeline1.Output.Failure) {
-        self._received1.append(.failure(error))
+        self._accumulator1.append(.failure(error))
     }
     
     func _receive2(error: Pipeline2.Output.Failure) {
-        self._received2.append(.failure(error))
+        self._accumulator2.append(.failure(error))
     }
     
     func _completed() {
-        guard self._received1.isEmpty == false else { return }
-        guard self._received1.count == self._received2.count else { return }
-        let received1 = self._received1.removeFirst()
-        let received2 = self._received2.removeFirst()
-        switch (received1, received2) {
+        guard self._accumulator1.isEmpty == false else { return }
+        guard self._accumulator1.count == self._accumulator2.count else { return }
+        let accumulator1 = self._accumulator1.removeFirst()
+        let accumulator2 = self._accumulator2.removeFirst()
+        switch (accumulator1, accumulator2) {
         case (.success(let result1), .success(let result2)):
             self._next.send(value: (result1, result2))
         case (.failure(let error), _):
@@ -109,74 +109,20 @@ private extension Flow.Operator.Run2 {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
-    func run2<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline
-    >(
-        _ pipeline1: Pipeline1,
-        _ pipeline2: Pipeline2
-    ) -> Flow.Operator.Run2< Pipeline1, Pipeline2 > where
-        Pipeline1.Input == Pipeline2.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure
-    {
-        let next = Flow.Operator.Run2< Pipeline1, Pipeline2 >(pipeline1, pipeline2)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func run2<
+    func fork<
         Pipeline1 : IFlowPipeline,
         Pipeline2 : IFlowPipeline
     >(
         pipeline1: Pipeline1,
         pipeline2: Pipeline2
-    ) -> Flow.Head.Builder< Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
-        Input == Pipeline1.Input,
-        Input == Pipeline2.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure
-    {
-        return .init(head: .init(pipeline1, pipeline2))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func run2<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline
-    >(
-        pipeline1: Pipeline1,
-        pipeline2: Pipeline2
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
-        Head.Output == Pipeline1.Input,
-        Head.Output == Pipeline2.Input,
-        Pipeline1.Output.Failure == Pipeline2.Output.Failure
-    {
-        return .init(head: self.head, tail: self.head.run2(pipeline1, pipeline2))
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
-    func run2<
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline
-    >(
-        pipeline1: Pipeline1,
-        pipeline2: Pipeline2
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Run2< Pipeline1, Pipeline2 > > where
+    ) -> Flow.Chain< Head, Flow.Operator.Fork2< Pipeline1, Pipeline2 > > where
         Tail.Output == Pipeline1.Input,
         Tail.Output == Pipeline2.Input,
         Pipeline1.Output.Failure == Pipeline2.Output.Failure
     {
-        return .init(head: self.head, tail: self.tail.run2(pipeline1, pipeline2))
+        return self.append(.init(pipeline1, pipeline2))
     }
     
 }

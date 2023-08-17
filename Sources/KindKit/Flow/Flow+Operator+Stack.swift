@@ -113,102 +113,42 @@ private extension Flow.Operator.Stack {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Operator.Stack< Output, Pipeline > where
-        Output.Success == Pipeline.Input.Success,
-        Output.Failure == Pipeline.Input.Failure
+    ) -> Flow.Chain< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
+        Tail.Output.Success == Pipeline.Input.Success,
+        Tail.Output.Failure == Never
     {
-        let next = Flow.Operator.Stack< Output, Pipeline >(.fifo, pipeline)
-        self.subscribe(next: next)
-        return next
+        return self.append(.init(.fifo, pipeline))
     }
-    
-    func lifo< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Operator.Stack< Output, Pipeline > where
-        Output.Success == Pipeline.Input.Success,
-        Output.Failure == Pipeline.Input.Failure
-    {
-        let next = Flow.Operator.Stack< Output, Pipeline >(.lifo, pipeline)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
     
     func fifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Head.Builder< Flow.Operator.Stack< Input, Pipeline > > where
-        Input.Success == Pipeline.Input.Success,
-        Input.Failure == Pipeline.Input.Failure
-    {
-        return .init(head: .init(.fifo, pipeline))
-    }
-    
-    func lifo< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Head.Builder< Flow.Operator.Stack< Input, Pipeline > > where
-        Input.Success == Pipeline.Input.Success,
-        Input.Failure == Pipeline.Input.Failure
-    {
-        return .init(head: .init(.lifo, pipeline))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func fifo< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Head.Output, Pipeline > > where
-        Head.Output.Success == Pipeline.Input.Success,
-        Head.Output.Failure == Pipeline.Input.Failure
-    {
-        return .init(head: self.head, tail: self.head.fifo(
-            pipeline: pipeline
-        ))
-    }
-    
-    func lifo< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Head.Output, Pipeline > > where
-        Head.Output.Success == Pipeline.Input.Success,
-        Head.Output.Failure == Pipeline.Input.Failure
-    {
-        return .init(head: self.head, tail: self.head.lifo(
-            pipeline: pipeline
-        ))
-    }
-    
-}
-
-public extension Flow.Chain.Builder {
-    
-    func fifo< Pipeline : IFlowPipeline >(
-        pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
+    ) -> Flow.Chain< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
         Tail.Output.Success == Pipeline.Input.Success,
         Tail.Output.Failure == Pipeline.Input.Failure
     {
-        return .init(head: self.head, tail: self.tail.fifo(
-            pipeline: pipeline
-        ))
+        return self.append(.init(.fifo, pipeline))
     }
     
     func lifo< Pipeline : IFlowPipeline >(
         pipeline: Pipeline
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
+    ) -> Flow.Chain< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
+        Tail.Output.Success == Pipeline.Input.Success,
+        Tail.Output.Failure == Never
+    {
+        return self.append(.init(.lifo, pipeline))
+    }
+    
+    func lifo< Pipeline : IFlowPipeline >(
+        pipeline: Pipeline
+    ) -> Flow.Chain< Head, Flow.Operator.Stack< Tail.Output, Pipeline > > where
         Tail.Output.Success == Pipeline.Input.Success,
         Tail.Output.Failure == Pipeline.Input.Failure
     {
-        return .init(head: self.head, tail: self.tail.lifo(
-            pipeline: pipeline
-        ))
+        return self.append(.init(.lifo, pipeline))
     }
     
 }

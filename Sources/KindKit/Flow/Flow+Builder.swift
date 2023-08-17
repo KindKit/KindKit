@@ -6,47 +6,27 @@ import Foundation
 
 public extension Flow {
     
-    struct Builder< Success, Failure > where Failure : Swift.Error {
+    struct Builder< Success, Failure : Swift.Error > : IFlowBuilder {
         
-        public typealias Input = Result< Success, Failure >
+        public typealias Head = Flow.Operator.None< Result< Success, Failure > >
+        public typealias Tail = Head
+        
+        public let head: Head
         
         public init() {
+            self.head = Head()
         }
         
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func pipeline() -> Flow.Pipeline< Input, Input > {
-        return self.none().pipeline()
-    }
-    
-    func pipeline(
-        onReceive: @escaping (Result< Input.Success, Input.Failure >) -> Void,
-        onCompleted: (() -> Void)? = nil
-    ) -> Flow.Pipeline< Input, Input > {
-        let pipeline = self.pipeline()
-        _ = pipeline.subscribe(
-            onReceive: onReceive,
-            onCompleted: onCompleted
-        )
-        return pipeline
-    }
-    
-    func pipeline(
-        onReceiveValue: @escaping (Input.Success) -> Void,
-        onReceiveError: @escaping (Input.Failure) -> Void,
-        onCompleted: (() -> Void)? = nil
-    ) -> Flow.Pipeline< Input, Input > {
-        let pipeline = self.pipeline()
-        _ = pipeline.subscribe(
-            onReceiveValue: onReceiveValue,
-            onReceiveError: onReceiveError,
-            onCompleted: onCompleted
-        )
-        return pipeline
+        public func pipeline() -> Flow.Pipeline< Head.Input, Tail.Output > {
+            return Flow.Pipeline(head: self.head, tail: self.head)
+        }
+        
+        public func append< Operator : IFlowOperator >(_ `operator`: @autoclosure () -> Operator) -> Flow.Chain< Head, Operator > {
+            let next = `operator`()
+            self.head.subscribe(next: next)
+            return .init(head: self.head, tail: next)
+        }
+        
     }
     
 }

@@ -44,51 +44,14 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
-    
-    func mapValue<
-        Transform
-    >(
-        _ perform: @escaping (Output.Success) -> Transform
-    ) -> Flow.Operator.MapValue< Output, Transform > {
-        let next = Flow.Operator.MapValue< Output, Transform >(perform)
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func mapValue<
-        Transform
-    >(
-        _ perform: @escaping (Input.Success) -> Transform
-    ) -> Flow.Head.Builder< Flow.Operator.MapValue< Input, Transform > > {
-        return .init(head: .init(perform))
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func mapValue<
-        Transform
-    >(
-        _ perform: @escaping (Head.Output.Success) -> Transform
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.MapValue< Head.Output, Transform > > {
-        return .init(head: self.head, tail: self.head.mapValue(perform))
-    }
-}
-
-public extension Flow.Chain.Builder {
+public extension IFlowBuilder {
     
     func mapValue<
         Transform
     >(
         _ perform: @escaping (Tail.Output.Success) -> Transform
-    ) -> Flow.Chain.Builder< Head, Flow.Operator.MapValue< Tail.Output, Transform > > {
-        return .init(head: self.head, tail: self.tail.mapValue(perform))
+    ) -> Flow.Chain< Head, Flow.Operator.MapValue< Tail.Output, Transform > > {
+        return self.append(.init(perform))
     }
     
 }

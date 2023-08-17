@@ -50,35 +50,10 @@ public extension Flow.Operator {
     
 }
 
-extension IFlowOperator {
+public extension IFlowBuilder {
     
-    func accumulate() -> Flow.Operator.Accumulate< Output > {
-        let next = Flow.Operator.Accumulate< Output >()
-        self.subscribe(next: next)
-        return next
-    }
-    
-}
-
-public extension Flow.Builder {
-    
-    func accumulate() -> Flow.Head.Builder< Flow.Operator.Accumulate< Input > > {
-        return .init(head: .init())
-    }
-    
-}
-
-public extension Flow.Head.Builder {
-    
-    func accumulate() -> Flow.Chain.Builder< Head, Flow.Operator.Accumulate< Head.Output > > {
-        return .init(head: self.head, tail: self.head.accumulate())
-    }
-}
-
-public extension Flow.Chain.Builder {
-    
-    func accumulate() -> Flow.Chain.Builder< Head, Flow.Operator.Accumulate< Tail.Output > > {
-        return .init(head: self.head, tail: self.tail.accumulate())
+    func accumulate() -> Flow.Chain< Head, Flow.Operator.Accumulate< Tail.Output > > {
+        return self.append(.init())
     }
     
 }
