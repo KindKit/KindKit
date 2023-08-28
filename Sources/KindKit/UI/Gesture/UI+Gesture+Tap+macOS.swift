@@ -91,19 +91,19 @@ private extension KKTapGesture {
 
 extension KKTapGesture : NSGestureRecognizerDelegate {
     
-    public func gestureRecognizerShouldBegin(_ gesture: NSGestureRecognizer) -> Bool {
+    func gestureRecognizerShouldBegin(_ gesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldBegin(self) ?? true
     }
 
-    public func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGesture: NSGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldSimultaneously(self, otherGesture: otherGesture) ?? false
     }
     
-    public func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRequireFailureOf otherGesture: NSGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRequireFailureOf otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldRequireFailureOf(self, otherGesture: otherGesture) ?? false
     }
 
-    public func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldBeRequiredToFailBy otherGesture: NSGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldBeRequiredToFailBy otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldBeRequiredToFailBy(self, otherGesture: otherGesture) ?? false
     }
     

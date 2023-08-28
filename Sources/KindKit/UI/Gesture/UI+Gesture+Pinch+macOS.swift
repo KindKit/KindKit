@@ -2,9 +2,9 @@
 //  KindKit
 //
 
-#if os(iOS)
+#if os(macOS)
 
-import UIKit
+import AppKit
 
 extension UI.Gesture.Pinch {
     
@@ -33,7 +33,7 @@ extension UI.Gesture.Pinch {
     
 }
 
-final class KKPinchGesture : UIPinchGestureRecognizer {
+final class KKPinchGesture : NSMagnificationGestureRecognizer {
     
     weak var kkDelegate: KKPinchGestureDelegate?
     
@@ -41,7 +41,12 @@ final class KKPinchGesture : UIPinchGestureRecognizer {
         super.init(target: target, action: action)
         
         self.delegate = self
-        self.addTarget(self, action: #selector(self._handle))
+        self.target = self
+        self.action = #selector(self._handle)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 }
@@ -50,10 +55,12 @@ extension KKPinchGesture {
     
     func update(gesture: UI.Gesture.Pinch) {
         self.kk_update(enabled: gesture.isEnabled)
-        self.kk_update(cancelsTouchesInView: gesture.cancelsTouchesInView)
-        self.kk_update(delaysTouchesBegan: gesture.delaysTouchesBegan)
-        self.kk_update(delaysTouchesEnded: gesture.delaysTouchesEnded)
-        self.kk_update(requiresExclusiveTouchType: gesture.requiresExclusiveTouchType)
+        self.kk_update(delaysPrimaryMouseButtonEvents: gesture.delaysPrimaryMouseButtonEvents)
+        self.kk_update(delaysSecondaryMouseButtonEvents: gesture.delaysSecondaryMouseButtonEvents)
+        self.kk_update(delaysOtherMouseButtonEvents: gesture.delaysOtherMouseButtonEvents)
+        self.kk_update(delaysKeyEvents: gesture.delaysKeyEvents)
+        self.kk_update(delaysMagnificationEvents: gesture.delaysMagnificationEvents)
+        self.kk_update(delaysRotationEvents: gesture.delaysRotationEvents)
         self.kkDelegate = gesture
     }
     
@@ -79,28 +86,21 @@ private extension KKPinchGesture {
     
 }
 
-extension KKPinchGesture : UIGestureRecognizerDelegate {
+extension KKPinchGesture : NSGestureRecognizerDelegate {
     
-    func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view is UIControl {
-            return false
-        }
-        return true
-    }
-    
-    func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
+    func gestureRecognizerShouldBegin(_ gesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldBegin(self) ?? true
     }
 
-    func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGesture: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldSimultaneously(self, otherGesture: otherGesture) ?? false
     }
     
-    func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldRequireFailureOf otherGesture: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldRequireFailureOf otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldRequireFailureOf(self, otherGesture: otherGesture) ?? false
     }
 
-    func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldBeRequiredToFailBy otherGesture: UIGestureRecognizer) -> Bool {
+    func gestureRecognizer(_ gesture: NSGestureRecognizer, shouldBeRequiredToFailBy otherGesture: NSGestureRecognizer) -> Bool {
         return self.kkDelegate?.shouldBeRequiredToFailBy(self, otherGesture: otherGesture) ?? false
     }
     

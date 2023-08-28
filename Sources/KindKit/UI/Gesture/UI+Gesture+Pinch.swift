@@ -4,10 +4,6 @@
 
 import Foundation
 
-#if os(macOS)
-#warning("Require support macOS")
-#elseif os(iOS)
-
 protocol KKPinchGestureDelegate : KKGestureDelegate {
     
     func begin(_ gesture: NativeGesture)
@@ -117,12 +113,16 @@ public extension UI.Gesture {
                 }
             }
         }
-#endif
         public var velocity: Double {
             return Double(self._gesture.velocity)
         }
+#endif
         public var scale: Double {
+#if os(macOS)
+            return Double(self._gesture.magnification)
+#elseif os(iOS)
             return Double(self._gesture.scale)
+#endif
         }
         public let onShouldBegin: Signal.Empty< Bool? > = .init()
         public let onShouldSimultaneously: Signal.Args< Bool?, NativeGesture > = .init()
@@ -201,5 +201,3 @@ public extension IUIGesture where Self == UI.Gesture.Pinch {
     }
     
 }
-
-#endif

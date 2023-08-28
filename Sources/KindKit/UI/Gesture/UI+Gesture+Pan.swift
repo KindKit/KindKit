@@ -4,10 +4,6 @@
 
 import Foundation
 
-#if os(macOS)
-#warning("Require support macOS")
-#elseif os(iOS)
-
 protocol KKPanGestureDelegate : KKGestureDelegate {
     
     func begin(_ gesture: NativeGesture)
@@ -73,7 +69,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.delaysMagnificationEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(delaysMagnificationEvents: self.delaysMagnificationEvents)
+                    self._gesture.kk_update(delaysMagnificationEvents: self.delaysMagnificationEvents)
                 }
             }
         }
@@ -204,5 +200,3 @@ public extension IUIGesture where Self == UI.Gesture.Pan {
     }
     
 }
-
-#endif
