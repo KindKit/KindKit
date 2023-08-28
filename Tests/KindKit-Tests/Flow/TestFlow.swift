@@ -21,10 +21,8 @@ class TestFlow : XCTestCase {
             .delay(
                 queue: .main,
                 timeout: {
-                    switch $0 {
-                    case .success: return 3
-                    case .failure: return 2
-                    }
+                    guard case .success = $0 else { return 2 }
+                    return 3
                 }
             )
             .pipeline()
@@ -71,7 +69,7 @@ class TestFlow : XCTestCase {
     func testChain2() {
         let expectation = self.expectation(description: "Test")
         let pipeline = Flow.Builder< Int, Never >()
-            .run2(
+            .fork(
                 pipeline1: Flow.Builder< Int, Never >()
                     .mapValue({ $0 * 2 })
                     .pipeline(),
