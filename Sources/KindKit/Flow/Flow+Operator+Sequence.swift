@@ -78,9 +78,8 @@ private extension Flow.Operator.Sequence {
         }).autoCancel()
         if let send = send {
             pipeline.send(send)
-        } else {
-            pipeline.completed()
         }
+        pipeline.completed()
     }
     
     func _result() -> Result< [Pipeline.Output.Success], Pipeline.Output.Failure > {
