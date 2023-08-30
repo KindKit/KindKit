@@ -20,7 +20,7 @@ public extension RemoteImage.Flow {
         private let _query: (Input.Success) -> Query
         private let _filter: (Input.Success) -> IRemoteImageFilter?
         private let _validation: (Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation
-        private let _logging: (Input.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage?
+        private let _logging: (Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage?
         private let _map: (Input.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
         private var _state: State?
         private var _task: ICancellable? {
@@ -35,7 +35,7 @@ public extension RemoteImage.Flow {
             _ query: @escaping (Input.Success) -> Query,
             _ filter: @escaping (Input.Success) -> IRemoteImageFilter?,
             _ validation: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation,
-            _ logging: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage?,
+            _ logging: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage?,
             _ map: @escaping (Input.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
         ) {
             self._loader = loader
@@ -122,7 +122,7 @@ private extension RemoteImage.Flow.Download {
             )
         case .done:
             self._task = nil
-            if let message = self._logging(state.input,output) {
+            if let message = self._logging(state.input, output, elapsed) {
                 Log.shared.log(message: message)
             }
             switch self._map(state.input, output) {
@@ -166,7 +166,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         map: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> Result< Success, Failure >
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > {
         return self.append(.init(loader, query, filter, validation, logging, map))
@@ -181,7 +181,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, UI.Image) -> Success,
         failure: @escaping (Tail.Output.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, Success, Failure, Query > > {
@@ -201,7 +201,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, UI.Image) -> Success
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, Success, RemoteImage.Error, Query > > where
         Tail.Output.Failure == Never
@@ -222,7 +222,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, UI.Image) -> Success
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, Success, RemoteImage.Error, Query > > where
         Tail.Output.Failure == RemoteImage.Error
@@ -243,7 +243,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         failure: @escaping (Tail.Output.Success, RemoteImage.Error) -> Failure
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, UI.Image, Failure, Query > > {
         return self.append(.init(loader, query, filter, validation, logging, { input, result -> Result< UI.Image, Failure > in
@@ -261,7 +261,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil }
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, UI.Image, RemoteImage.Error, Query > > where
         Tail.Output.Failure == Never
     {
@@ -280,7 +280,7 @@ public extension IFlowBuilder {
         query: @escaping (Tail.Output.Success) -> Query,
         filter: @escaping (Tail.Output.Success) -> IRemoteImageFilter? = { _ in nil },
         validation: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >) -> ILogMessage? = { _, _ in nil }
+        logging: @escaping (Tail.Output.Success, Result< UI.Image, RemoteImage.Error >, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
     ) -> Flow.Chain< Head, RemoteImage.Flow.Download< Tail.Output, UI.Image, RemoteImage.Error, Query > > where
         Tail.Output.Failure == RemoteImage.Error
     {

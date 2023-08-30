@@ -21,7 +21,7 @@ public extension Api.Flow {
         private let _request: (Input.Success) throws -> Api.Request
         private let _response: (Input.Success) -> Response
         private let _validation: (Input.Success, Response.Result, TimeInterval) -> Flow.Validation
-        private let _logging: (Input.Success, Response.Result) -> ILogMessage?
+        private let _logging: (Input.Success, Response.Result, TimeInterval) -> ILogMessage?
         private let _map: (Input.Success, Response.Result) -> Result< Success, Failure >
         private var _task: ICancellable? {
             willSet {
@@ -36,7 +36,7 @@ public extension Api.Flow {
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
             _ validation: @escaping (Input.Success, Response.Result, TimeInterval) -> Flow.Validation,
-            _ logging: @escaping (Input.Success, Response.Result) -> ILogMessage?,
+            _ logging: @escaping (Input.Success, Response.Result, TimeInterval) -> ILogMessage?,
             _ map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
         ) {
             self._provider = provider
@@ -114,7 +114,7 @@ private extension Api.Flow.Query {
                 }
             )
         case .done:
-            if let message = self._logging(input, output) {
+            if let message = self._logging(input, output, elapsed) {
                 Log.shared.log(message: message)
             }
             self._task = nil
@@ -142,7 +142,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
         return self.append(.init(provider, queue, request, response, validation, logging, map))
@@ -158,7 +158,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
@@ -179,7 +179,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
@@ -201,7 +201,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
@@ -223,7 +223,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Failure, Response > > {
         return self.append(.init(provider, queue, request, response, validation, logging, { input, result -> Result< Response.Success, Failure > in
@@ -242,7 +242,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil }
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
     {
@@ -259,7 +259,7 @@ public extension IFlowBuilder {
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result) -> ILogMessage? = { _, _ in nil }
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
