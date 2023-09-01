@@ -15,13 +15,13 @@ public extension Flow.Operator {
         public typealias Input = Input
         public typealias Output = Result< Success, Failure >
         
-        private let _perform: (Result< Input.Success, Input.Failure >) -> Output
+        private let _function: (Result< Input.Success, Input.Failure >) -> Output
         private var _next: IFlowPipe!
         
         init(
-            _ perform: @escaping (Result< Input.Success, Input.Failure >) -> Output
+            _ function: @escaping (Result< Input.Success, Input.Failure >) -> Output
         ) {
-            self._perform = perform
+            self._function = function
         }
         
         public func subscribe(next: IFlowPipe) {
@@ -29,21 +29,11 @@ public extension Flow.Operator {
         }
         
         public func receive(value: Input.Success) {
-            switch self._perform(.success(value)) {
-            case .success(let value):
-                self._next.send(value: value)
-            case .failure(let error):
-                self._next.send(error: error)
-            }
+            self._receive(.success(value))
         }
         
         public func receive(error: Input.Failure) {
-            switch self._perform(.failure(error)) {
-            case .success(let value):
-                self._next.send(value: value)
-            case .failure(let error):
-                self._next.send(error: error)
-            }
+            self._receive(.failure(error))
         }
         
         public func completed() {
@@ -58,15 +48,76 @@ public extension Flow.Operator {
     
 }
 
+private extension Flow.Operator.Map {
+    
+    func _receive(_ input: Result< Input.Success, Input.Failure >) {
+        switch self._function(input) {
+        case .success(let value):
+            self._next.send(value: value)
+        case .failure(let error):
+            self._next.send(error: error)
+        }
+    }
+    
+}
+
 public extension IFlowBuilder {
     
     func map<
         Success,
         Failure : Swift.Error
     >(
-        _ perform: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Result< Success, Failure >
+        _ function: @escaping (Result< Tail.Output.Success, Tail.Output.Failure >) -> Result< Success, Failure >
     ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Success, Failure > > {
-        return self.append(.init(perform))
+        return self.append(.init(function))
+    }
+    
+    func map<
+        Success
+    >(
+        value function: @escaping (Tail.Output.Success) -> Success
+    ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Success, Tail.Output.Failure > > {
+        return self.append(.init({ input in
+            switch input {
+            case .success(let value): return .success(function(value))
+            case .failure(let error): return .failure(error)
+            }
+        }))
+    }
+    
+    func map<
+        Failure : Swift.Error
+    >(
+        error function: @escaping (Tail.Output.Failure) -> Failure
+    ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Tail.Output.Success, Failure > > {
+        return self.append(.init({ input in
+            switch input {
+            case .success(let value): return .success(value)
+            case .failure(let error): return .failure(function(error))
+            }
+        }))
+    }
+    
+}
+
+public extension IFlowBuilder {
+    
+    @available(*, deprecated, renamed: "IFlowBuilder.map(value:)")
+    func mapValue<
+        Transform
+    >(
+        _ perform: @escaping (Tail.Output.Success) -> Transform
+    ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Transform, Tail.Output.Failure > > {
+        return self.map(value: perform)
+    }
+    
+    @available(*, deprecated, renamed: "IFlowBuilder.map(error:)")
+    func mapError<
+        Transform : Swift.Error
+    >(
+        _ perform: @escaping (Tail.Output.Failure) -> Transform
+    ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Tail.Output.Success, Transform > > {
+        return self.map(error: perform)
     }
     
 }
