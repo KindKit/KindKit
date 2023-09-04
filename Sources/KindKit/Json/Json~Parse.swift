@@ -52,4 +52,16 @@ public extension Json {
         return try decode(json)
     }
     
+    @inlinable
+    static func parse< Result >(
+        path: Json.Path = .root,
+        contentsOf: URL,
+        decode: (Json) throws -> Result
+    ) throws -> Result {
+        guard let data = try? Data(contentsOf: contentsOf) else {
+            throw Json.Error.Parse.notJson
+        }
+        return try self.parse(path: path, data: data, decode: decode)
+    }
+    
 }

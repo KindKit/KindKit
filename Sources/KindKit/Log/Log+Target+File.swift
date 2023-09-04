@@ -45,9 +45,10 @@ public extension Log.Target {
 extension Log.Target.File : ILogTarget {
     
     public var files: [URL] {
-        return FileManager.default.kk_contents(at: self.folder).compactMap({ item -> (url: URL, createdAt: Date)? in
-            guard let createdAt = item.attributes[.creationDate] as? Date else { return nil }
-            return (url: item.url, createdAt: createdAt)
+        return FileManager.default.kk_contents(at: self.folder).compactMap({ url -> (url: URL, createdAt: Date)? in
+            guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) else { return nil }
+            guard let createdAt = attributes[.creationDate] as? Date else { return nil }
+            return (url: url, createdAt: createdAt)
         }).sorted(by: {
             return $0.createdAt > $1.createdAt
         }).map({
@@ -81,10 +82,11 @@ private extension Log.Target.File {
                 return stream
             }
         }
-        let items = FileManager.default.kk_contents(at: self.folder).compactMap({ item -> (url: URL, createdAt: Date, size: UInt64)? in
-            guard let createdAt = item.attributes[.creationDate] as? Date else { return nil }
-            guard let size = item.attributes[.size] as? UInt64 else { return nil }
-            return (url: item.url, createdAt: createdAt, size: size)
+        let items = FileManager.default.kk_contents(at: self.folder).compactMap({ url -> (url: URL, createdAt: Date, size: UInt64)? in
+            guard let attributes = try? FileManager.default.attributesOfItem(atPath: url.path) else { return nil }
+            guard let createdAt = attributes[.creationDate] as? Date else { return nil }
+            guard let size = attributes[.size] as? UInt64 else { return nil }
+            return (url: url, createdAt: createdAt, size: size)
         }).sorted(by: {
             return $0.createdAt > $1.createdAt
         })

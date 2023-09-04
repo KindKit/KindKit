@@ -70,14 +70,11 @@ public extension FileManager {
     
     func kk_contents(
         at url: URL
-    ) -> [(url: URL, attributes: [FileAttributeKey : Any])] {
+    ) -> [URL] {
         guard let urls = try? self.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
             return []
         }
-        return urls.compactMap({
-            guard let attributes = try? self.attributesOfItem(atPath: $0.path) else { return nil }
-            return (url: $0, attributes: attributes)
-        })
+        return urls
     }
     
     func kk_contents(
@@ -86,9 +83,44 @@ public extension FileManager {
     ) -> [URL] {
         let now = Date()
         return self.kk_contents(at: url).compactMap({
-            guard let updatedAt = $0.attributes[.modificationDate] as? Date else { return nil }
+            guard let attributes = try? self.attributesOfItem(atPath: $0.path) else { return nil }
+            guard let updatedAt = attributes[.modificationDate] as? Date else { return nil }
             guard now.timeIntervalSince1970 - updatedAt.timeIntervalSince1970 > olderThan else { return nil }
-            return $0.url
+            return $0
+        })
+    }
+    
+    func kk_files(
+        at url: URL,
+        recursive: Bool
+    ) -> [URL] {
+        guard let contents = try? self.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) else {
+            return []
+        }
+        var result: [URL] = []
+        for content in contents {
+            if content.hasDirectoryPath == true {
+                if recursive == true {
+                    result.append(contentsOf: self.kk_files(at: content, recursive: recursive))
+                }
+            } else {
+                result.append(content)
+            }
+        }
+        return result
+    }
+    
+    func kk_files(
+        at url: URL,
+        olderThan: TimeInterval,
+        recursive: Bool
+    ) -> [URL] {
+        let now = Date()
+        return self.kk_files(at: url, recursive: recursive).compactMap({
+            guard let attributes = try? self.attributesOfItem(atPath: $0.path) else { return nil }
+            guard let updatedAt = attributes[.modificationDate] as? Date else { return nil }
+            guard now.timeIntervalSince1970 - updatedAt.timeIntervalSince1970 > olderThan else { return nil }
+            return $0
         })
     }
     

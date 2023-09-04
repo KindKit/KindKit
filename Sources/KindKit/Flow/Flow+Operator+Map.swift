@@ -73,6 +73,20 @@ public extension IFlowBuilder {
     }
     
     func map<
+        Success,
+        Failure : Swift.Error
+    >(
+        value function: @escaping (Tail.Output.Success) -> Result< Success, Failure >
+    ) -> Flow.Chain< Head, Flow.Operator.Map< Tail.Output, Success, Failure > > where Tail.Output.Failure == Never {
+        return self.append(.init({ input in
+            switch input {
+            case .success(let value): return function(value)
+            case .failure: fatalError()
+            }
+        }))
+    }
+    
+    func map<
         Success
     >(
         value function: @escaping (Tail.Output.Success) -> Success

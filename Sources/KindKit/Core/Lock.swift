@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class Lock {
+public final class Lock {
     
     private let _lock: UnsafeMutablePointer< os_unfair_lock >
 
