@@ -15,7 +15,7 @@ public extension Storage {
             guard path.isEmpty == false else { return nil }
             self.path = path
             self.url = path.reduce(FileManager.kk_userDocumentsUrl, {
-                if #available(iOS 16.0, *) {
+                if #available(macOS 13.0, iOS 16.0, *) {
                     return $0.appending(path: $1)
                 } else {
                     return $0.appendingPathComponent($1)

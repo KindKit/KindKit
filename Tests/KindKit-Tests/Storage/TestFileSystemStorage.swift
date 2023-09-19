@@ -11,13 +11,13 @@ class TestFileSystemStorage : XCTestCase {
         guard let rootStorage = Storage.FileSystem("RootStorage") else {
             return
         }
-        guard let rootFile1 = rootStorage.append(name: "RootFile1", data: Data()) else {
+        guard let rootFile1 = rootStorage.append(name: "RootFile1", extension: "tmp", data: Data()) else {
             return
         }
         guard let subStorage = Storage.FileSystem("SubStorage", parent: rootStorage) else {
             return
         }
-        guard let subFile1 = subStorage.append(name: "SubFile1", data: Data()) else {
+        guard let subFile1 = subStorage.append(name: "SubFile1", extension: "tmp", data: Data()) else {
             return
         }
         rootStorage.clear(before: .leastNonzeroMagnitude)
