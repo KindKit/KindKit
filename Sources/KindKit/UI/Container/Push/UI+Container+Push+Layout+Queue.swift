@@ -150,7 +150,7 @@ extension UI.Container.Push.Layout.Queue {
         if delta < 0 {
             return .present(
                 push: item,
-                progress: .one + Percent(-delta / pow(size, 1.5))
+                progress: .one + Percent(-delta, from: size.pow(1.5))
             )
         }
         if delta > size {
@@ -161,7 +161,7 @@ extension UI.Container.Push.Layout.Queue {
         }
         return .dismiss(
             push: item,
-            progress: Percent(delta / size)
+            progress: Percent(delta, from: size)
         )
     }
     

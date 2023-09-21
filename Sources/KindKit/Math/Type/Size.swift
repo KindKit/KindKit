@@ -122,9 +122,18 @@ public extension Size {
 public extension Size {
     
     @inlinable
+    static prefix func + (arg: Self) -> Self {
+        return Size(width: +arg.width, height: +arg.height)
+    }
+    
+    @inlinable
     static prefix func - (arg: Self) -> Self {
         return Size(width: -arg.width, height: -arg.height)
     }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func + (lhs: Self, rhs: Self) -> Self {
@@ -132,9 +141,38 @@ public extension Size {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: Double) -> Self {
-        return Size(width: lhs.width + rhs, height: lhs.height + rhs)
+    static func + < Value : BinaryInteger >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width + Double(rhs), height: lhs.height + Double(rhs))
     }
+    
+    @inlinable
+    static func + < Value : BinaryInteger >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) + rhs.width, height: Double(lhs) + rhs.height)
+    }
+    
+    @inlinable
+    static func + < Value : BinaryFloatingPoint >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width + Double(rhs), height: lhs.height + Double(rhs))
+    }
+    
+    @inlinable
+    static func + < Value : BinaryFloatingPoint >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) + rhs.width, height: Double(lhs) + rhs.height)
+    }
+    
+    @inlinable
+    static func + (lhs: Self, rhs: Distance) -> Self {
+        return Size(width: lhs.width + rhs.value, height: lhs.height + rhs.value)
+    }
+    
+    @inlinable
+    static func + (lhs: Self, rhs: Percent) -> Self {
+        return Size(width: lhs.width + rhs.value, height: lhs.height + rhs.value)
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func += (lhs: inout Self, rhs: Self) {
@@ -142,9 +180,18 @@ public extension Size {
     }
     
     @inlinable
-    static func += (lhs: inout Self, rhs: Double) {
+    static func += (lhs: inout Self, rhs: Distance) {
         lhs = lhs + rhs
     }
+    
+    @inlinable
+    static func += (lhs: inout Self, rhs: Percent) {
+        lhs = lhs + rhs
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func - (lhs: Self, rhs: Self) -> Self {
@@ -152,9 +199,38 @@ public extension Size {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Double) -> Self {
-        return Size(width: lhs.width - rhs, height: lhs.height - rhs)
+    static func - < Value : BinaryInteger >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width - Double(rhs), height: lhs.height - Double(rhs))
     }
+    
+    @inlinable
+    static func - < Value : BinaryInteger >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) - rhs.width, height: Double(lhs) - rhs.height)
+    }
+    
+    @inlinable
+    static func - < Value : BinaryFloatingPoint >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width - Double(rhs), height: lhs.height - Double(rhs))
+    }
+    
+    @inlinable
+    static func - < Value : BinaryFloatingPoint >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) - rhs.width, height: Double(lhs) - rhs.height)
+    }
+    
+    @inlinable
+    static func - (lhs: Self, rhs: Distance) -> Self {
+        return Size(width: lhs.width - rhs.value, height: lhs.height - rhs.value)
+    }
+    
+    @inlinable
+    static func - (lhs: Self, rhs: Percent) -> Self {
+        return Size(width: lhs.width - rhs.value, height: lhs.height - rhs.value)
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func -= (lhs: inout Self, rhs: Self) {
@@ -162,9 +238,18 @@ public extension Size {
     }
     
     @inlinable
-    static func -= (lhs: inout Self, rhs: Double) {
+    static func -= (lhs: inout Self, rhs: Distance) {
         lhs = lhs - rhs
     }
+    
+    @inlinable
+    static func -= (lhs: inout Self, rhs: Percent) {
+        lhs = lhs - rhs
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func * (lhs: Self, rhs: Self) -> Self {
@@ -172,9 +257,38 @@ public extension Size {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Double) -> Self {
-        return Size(width: lhs.width * rhs, height: lhs.height * rhs)
+    static func * < Value : BinaryInteger >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width * Double(rhs), height: lhs.height * Double(rhs))
     }
+    
+    @inlinable
+    static func * < Value : BinaryInteger >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) * rhs.width, height: Double(lhs) * rhs.height)
+    }
+    
+    @inlinable
+    static func * < Value : BinaryFloatingPoint >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width * Double(rhs), height: lhs.height * Double(rhs))
+    }
+    
+    @inlinable
+    static func * < Value : BinaryFloatingPoint >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) * rhs.width, height: Double(lhs) * rhs.height)
+    }
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Distance) -> Self {
+        return Size(width: lhs.width * rhs.value, height: lhs.height * rhs.value)
+    }
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Percent) -> Self {
+        return Size(width: lhs.width * rhs.value, height: lhs.height * rhs.value)
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func *= (lhs: inout Self, rhs: Self) {
@@ -182,9 +296,18 @@ public extension Size {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Double) {
+    static func *= (lhs: inout Self, rhs: Distance) {
         lhs = lhs * rhs
     }
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Percent) {
+        lhs = lhs * rhs
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func / (lhs: Self, rhs: Self) -> Self {
@@ -192,9 +315,38 @@ public extension Size {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: Double) -> Self {
-        return Size(width: lhs.width / rhs, height: lhs.height / rhs)
+    static func / < Value : BinaryInteger >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width / Double(rhs), height: lhs.height / Double(rhs))
     }
+    
+    @inlinable
+    static func / < Value : BinaryInteger >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) / rhs.width, height: Double(lhs) / rhs.height)
+    }
+    
+    @inlinable
+    static func / < Value : BinaryFloatingPoint >(lhs: Self, rhs: Value) -> Self {
+        return .init(width: lhs.width / Double(rhs), height: lhs.height / Double(rhs))
+    }
+    
+    @inlinable
+    static func / < Value : BinaryFloatingPoint >(lhs: Value, rhs: Self) -> Self {
+        return .init(width: Double(lhs) / rhs.width, height: Double(lhs) / rhs.height)
+    }
+    
+    @inlinable
+    static func / (lhs: Self, rhs: Distance) -> Self {
+        return Size(width: lhs.width / rhs.value, height: lhs.height / rhs.value)
+    }
+    
+    @inlinable
+    static func / (lhs: Self, rhs: Percent) -> Self {
+        return Size(width: lhs.width / rhs.value, height: lhs.height / rhs.value)
+    }
+    
+}
+
+public extension Size {
     
     @inlinable
     static func /= (lhs: inout Self, rhs: Self) {
@@ -202,7 +354,12 @@ public extension Size {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: Double) {
+    static func /= (lhs: inout Self, rhs: Distance) {
+        lhs = lhs / rhs
+    }
+    
+    @inlinable
+    static func /= (lhs: inout Self, rhs: Percent) {
         lhs = lhs / rhs
     }
     

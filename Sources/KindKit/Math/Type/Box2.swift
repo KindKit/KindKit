@@ -111,8 +111,8 @@ public extension Box2 {
     @inlinable
     var centeredForm: (center: Point, extend: Point) {
         return (
-            center: (self.upper + self.lower) * 0.5,
-            extend: (self.upper - self.lower) * 0.5
+            center: (self.upper + self.lower) * .half,
+            extend: (self.upper - self.lower) * .half
         )
     }
     
@@ -144,13 +144,8 @@ public extension Box2 {
     }
     
     @inlinable
-    func inset(_ inset: Double) -> Self {
-        return Box2(lower: self.lower - inset, upper: self.upper + inset)
-    }
-    
-    @inlinable
     func inset(_ inset: Distance) -> Self {
-        return self.inset(inset.real)
+        return Box2(lower: self.lower - inset, upper: self.upper + inset)
     }
     
 }

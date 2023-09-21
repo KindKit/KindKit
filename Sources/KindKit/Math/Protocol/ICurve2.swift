@@ -27,7 +27,7 @@ public protocol ICurve2 {
 public extension ICurve2 {
     
     @inlinable
-    func offset(at: Percent, distance: Double) -> Point {
+    func offset(at: Percent, distance: Distance) -> Point {
         let point = self.point(at: at)
         let normal = self.normal(at: at)
         return point + distance * normal

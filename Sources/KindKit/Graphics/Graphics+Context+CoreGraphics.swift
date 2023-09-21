@@ -92,10 +92,10 @@ public extension Graphics.Context {
         self._instance.saveGState()
         self._instance.beginPath()
         self._instance.addEllipse(in: CGRect(
-            x: CGFloat(circle.origin.x - circle.radius),
-            y: CGFloat(circle.origin.y - circle.radius),
-            width: CGFloat(circle.radius * 2),
-            height: CGFloat(circle.radius * 2)
+            x: CGFloat(circle.origin.x - circle.radius.value),
+            y: CGFloat(circle.origin.y - circle.radius.value),
+            width: CGFloat(circle.radius.value * 2),
+            height: CGFloat(circle.radius.value * 2)
         ))
         self._draw(mode: mode)
         self._instance.restoreGState()
@@ -111,10 +111,10 @@ public extension Graphics.Context {
         for index in circles.indices {
             let circle = circles[index]
             self._instance.addEllipse(in: CGRect(
-                x: CGFloat(circle.origin.x - circle.radius),
-                y: CGFloat(circle.origin.y - circle.radius),
-                width: CGFloat(circle.radius * 2),
-                height: CGFloat(circle.radius * 2)
+                x: CGFloat(circle.origin.x - circle.radius.value),
+                y: CGFloat(circle.origin.y - circle.radius.value),
+                width: CGFloat(circle.radius.value * 2),
+                height: CGFloat(circle.radius.value * 2)
             ))
         }
         if self._instance.isPathEmpty == false {

@@ -682,7 +682,7 @@ private extension UI.Container.Page {
                 }
             }
             if let forward = self._interactiveForward {
-                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
+                let progress = max(Percent(absDeltaLocation, from: layoutSize.width), .zero)
                 self._bar.transition(to: forward.bar, progress: progress)
                 self._layout.state = .forward(current: current, next: forward, progress: progress)
             } else {
@@ -697,7 +697,7 @@ private extension UI.Container.Page {
                 }
             }
             if let backward = self._interactiveBackward {
-                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
+                let progress = max(Percent(absDeltaLocation, from: layoutSize.width), .zero)
                 self._bar.transition(to: backward.bar, progress: progress)
                 self._layout.state = .backward(current: current, next: backward, progress: progress)
             } else {

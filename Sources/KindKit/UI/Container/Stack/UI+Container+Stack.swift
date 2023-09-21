@@ -748,7 +748,7 @@ private extension UI.Container.Stack {
         let currentLocation = self._interactiveGesture.location(in: self._view)
         let deltaLocation = currentLocation - beginLocation
         let layoutSize = self._view.contentSize
-        let progress = Percent(max(0, deltaLocation.x / layoutSize.width))
+        let progress = max(Percent(deltaLocation.x, from: layoutSize.width), .zero)
         self._layout.state = .pop(backward: backward, current: current, progress: progress)
         if self._interactiveGroupBottomBar == true {
             UI.Container.BarController.shared.set(.group, visibility: self._interactiveGroupBarOldVisibility.lerp(self._interactiveGroupBarNewVisibility, progress: progress))

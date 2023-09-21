@@ -167,7 +167,7 @@ extension UI.Container.ModalItem {
                 if let potentialIndex = self.sheetLowerDetentIndex(of: currentIndex) {
                     let potentialSize = self.sheetSize(of: potentialIndex)
                     let deltaHeight = currentSize.height - potentialSize.height
-                    let progress = Percent(origin / deltaHeight)
+                    let progress = Percent(origin, from: deltaHeight)
                     size += deltaHeight
                     if progress > .one {
                         currentIndex = potentialIndex
@@ -190,7 +190,7 @@ extension UI.Container.ModalItem {
             }
             if currentIndex != lowerIndex {
                 let deltaHeight = currentSize.height - lowerSize.height
-                let progress = Percent(origin / deltaHeight)
+                let progress = Percent(origin, from: deltaHeight)
                 return (
                     from: self.sheet.detents[currentIndex],
                     to: self.sheet.detents[lowerIndex],
@@ -198,7 +198,7 @@ extension UI.Container.ModalItem {
                     progress: progress
                 )
             } else {
-                let progress = Percent(origin / size)
+                let progress = Percent(origin, from: size)
                 return (
                     from: self.sheet.detents[currentIndex],
                     to: nil,
@@ -217,7 +217,7 @@ extension UI.Container.ModalItem {
                 if let potentialIndex = self.sheetUpperDetentIndex(of: currentIndex) {
                     let potentialSize = self.sheetSize(of: potentialIndex)
                     let deltaHeight = potentialSize.height - currentSize.height
-                    let progress = Percent(origin / deltaHeight)
+                    let progress = Percent(origin, from: deltaHeight)
                     size += deltaHeight
                     if progress > .one {
                         currentIndex = potentialIndex
@@ -240,7 +240,7 @@ extension UI.Container.ModalItem {
             }
             if currentIndex != upperIndex {
                 let deltaHeight = upperSize.height - currentSize.height
-                let progress = Percent(origin / deltaHeight)
+                let progress = Percent(origin, from: deltaHeight)
                 return (
                     from: self.sheet.detents[currentIndex],
                     to: self.sheet.detents[upperIndex],
@@ -248,7 +248,7 @@ extension UI.Container.ModalItem {
                     progress: progress
                 )
             } else {
-                let progress = .one + Percent(origin / pow(size, 1.5))
+                let progress = Percent(origin, from: size.pow(1.5)).invert
                 return (
                     from: nil,
                     to: self.sheet.detents[currentIndex],

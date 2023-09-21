@@ -10,7 +10,7 @@ public extension Closest2 {
     static func find(_ point: Point, _ segment: Segment2) -> Percent {
         let r = point - segment.start
         let d = segment.end - segment.start
-        let p = Percent(r.dot(d) / d.dot(d))
+        let p = Percent(r.dot(d), from: d.dot(d))
         return p.normalized
     }
     

@@ -9,7 +9,7 @@ class TestFlow : XCTestCase {
     
     func testBase() {
         let pipeline = Flow.Builder< Int, Never >()
-            .mapValue({ String($0) })
+            .map(value: { String($0) })
             .pipeline()
         pipeline.send(value: 1)
     }
@@ -17,7 +17,7 @@ class TestFlow : XCTestCase {
     func testDelay() {
         let expectation = self.expectation(description: "Test")
         let pipeline = Flow.Builder< Int, Never >()
-            .mapValue({ String($0) })
+            .map(value: { String($0) })
             .delay(
                 queue: .main,
                 timeout: {
@@ -32,6 +32,7 @@ class TestFlow : XCTestCase {
             }
         )
         pipeline.send(value: 1)
+        pipeline.completed()
         self.wait(for: [ expectation ], timeout: 5)
         subscription.cancel()
     }
@@ -71,13 +72,13 @@ class TestFlow : XCTestCase {
         let pipeline = Flow.Builder< Int, Never >()
             .fork(
                 pipeline1: Flow.Builder< Int, Never >()
-                    .mapValue({ $0 * 2 })
+                    .map(value: { $0 * 2 })
                     .pipeline(),
                 pipeline2: Flow.Builder< Int, Never >()
-                    .mapValue({ $0 * 2 })
+                    .map(value: { $0 * 2 })
                     .pipeline()
             )
-            .mapValue({ $0.0 + $0.1 })
+            .map(value: { $0.0 + $0.1 })
             .pipeline()
         let subscription = pipeline.subscribe(
             onReceiveValue: {
@@ -120,7 +121,7 @@ class TestFlow : XCTestCase {
                     }
                 },
                 then: Flow.Builder()
-                    .mapValue({ $0 + 1 })
+                    .map(value: { $0 + 1 })
                     .pipeline()
             )
             .pipeline()

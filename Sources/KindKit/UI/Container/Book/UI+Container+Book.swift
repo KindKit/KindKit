@@ -628,7 +628,7 @@ private extension UI.Container.Book {
                 self._interactiveForward = self._forward
             }
             if let forward = self._interactiveForward {
-                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
+                let progress = max(Percent(absDeltaLocation, from: layoutSize.width), .zero)
                 self._layout.state = .forward(current: current, next: forward, progress: progress)
             } else {
                 self._layout.state = .idle(current: current)
@@ -640,7 +640,7 @@ private extension UI.Container.Book {
                 self._interactiveBackward = self._backward
             }
             if let backward = self._interactiveBackward {
-                let progress = Percent(max(0, absDeltaLocation / layoutSize.width))
+                let progress = max(Percent(absDeltaLocation, from: layoutSize.width), .zero)
                 self._layout.state = .backward(current: current, next: backward, progress: progress)
             } else {
                 self._layout.state = .idle(current: current)

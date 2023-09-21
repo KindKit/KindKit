@@ -84,14 +84,14 @@ public extension Polyline2 {
         return Polyline2(corners: cs)
     }
     
-    func offset(distance: Point) -> Self {
+    func offset(distance: Distance) -> Self {
         guard distance !~ .zero else { return self }
         return Polyline2(corners: self.corners.map({ $0 + distance }))
     }
     
-    func outline(distance: Double) -> Self {
+    func outline(distance: Distance) -> Self {
         guard self.corners.count > 2 else { return self }
-        guard distance !~ 0 else { return self }
+        guard distance !~ .zero else { return self }
         return Polyline2(
             corners: Array< Point >(unsafeUninitializedCapacity: self.corners.count, initializingWith: { buffer, count in
                 var pe = self.edges[self.edges.count - 1]

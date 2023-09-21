@@ -12,7 +12,7 @@ class TestPolyline2 : XCTestCase {
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
-        let np = op.extrude(index: EdgeIndex(0), left: 0, right: 4.5, distance: 5)
+        let np = op.extrude(index: EdgeIndex(0), left: Distance(0), right: Distance(4.5), distance: Distance(5))
         if np[corner: CornerIndex(1)] != Point(x: 0, y: -5) {
             XCTFail()
         }
@@ -32,7 +32,7 @@ class TestPolyline2 : XCTestCase {
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
-        let np = op.extrude(index: EdgeIndex(0), left: 5.5, right: 10, distance: 5)
+        let np = op.extrude(index: EdgeIndex(0), left: Distance(5.5), right: Distance(10), distance: Distance(5))
         if np[corner: CornerIndex(0)] != Point(x: 0, y: 0) {
             XCTFail()
         }
@@ -52,7 +52,7 @@ class TestPolyline2 : XCTestCase {
             Point(x: 0, y: 0),
             Point(x: 10, y: 0)
         ])
-        let np = op.extrude(index: EdgeIndex(0), left: 2.5, right: 7.5, distance: 5)
+        let np = op.extrude(index: EdgeIndex(0), left: Distance(2.5), right: Distance(7.5), distance: Distance(5))
         if np[corner: CornerIndex(0)] != Point(x: 0, y: 0) {
             XCTFail()
         }
@@ -80,7 +80,7 @@ class TestPolyline2 : XCTestCase {
             Point(x: 20, y: 10),
             Point(x: 0, y: 10)
         ])
-        let np = op.bevel(index: CornerIndex(2), distance: 5)
+        let np = op.bevel(index: CornerIndex(2), distance: Distance(5))
         if np[corner: CornerIndex(2)] != Point(x: 20, y: 5) {
             XCTFail()
         }
@@ -96,7 +96,7 @@ class TestPolyline2 : XCTestCase {
             Point(x: 20, y: 10),
             Point(x: 0, y: 10)
         ])
-        let np = op.bevel(index: CornerIndex(2), distance: 15)
+        let np = op.bevel(index: CornerIndex(2), distance: Distance(15))
         if np[corner: CornerIndex(1)] != Point(x: 20, y: 0) {
             XCTFail()
         }

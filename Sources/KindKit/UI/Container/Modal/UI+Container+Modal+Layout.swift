@@ -213,7 +213,7 @@ extension UI.Container.Modal.Layout {
             }
         } else if let view = self.appearedView {
             if delta > 0 {
-                let progress = Percent(delta / view.bounds.size.height)
+                let progress = Percent(delta, from: view.bounds.size.height)
                 self.state = .dismiss(modal: modal, progress: progress)
             } else {
                 self.state = .idle(modal: modal)
@@ -240,7 +240,7 @@ extension UI.Container.Modal.Layout {
         } else if let view = self.appearedView {
             if delta > 0 {
                 let size = view.bounds.size.height
-                let progress = Percent(delta / size)
+                let progress = Percent(delta, from: size)
                 transition = (
                     from: modal.currentDetent,
                     to: nil,
@@ -259,7 +259,7 @@ extension UI.Container.Modal.Layout {
             return nil
         }
         let baseProgress = transition.progress
-        let estimateProgress = .one - baseProgress
+        let estimateProgress = baseProgress.invert
         if baseProgress >= Percent(0.25) {
             let duration = (transition.size * estimateProgress.value) / velocity
             return Animation.default.run(

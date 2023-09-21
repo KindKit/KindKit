@@ -8,8 +8,8 @@ import KindKit
 class TestIntersection2 : XCTestCase {
     
     func testPossiblyCircleToCircle() {
-        let c1 = Circle(origin: Point(x: -1, y: 0), radius: 1)
-        let c2 = Circle(origin: Point(x: 1, y: 0), radius: 2)
+        let c1 = Circle(origin: Point(x: -1, y: 0), radius: Distance(1))
+        let c2 = Circle(origin: Point(x: 1, y: 0), radius: Distance(2))
         
         let result = Intersection2.possibly(c1, c2)
         if result == false {
@@ -18,8 +18,8 @@ class TestIntersection2 : XCTestCase {
     }
     
     func testFindCircleToCircle() {
-        let c1 = Circle(origin: Point(x: -1, y: 0), radius: 2)
-        let c2 = Circle(origin: Point(x: 1, y: 0), radius: 2)
+        let c1 = Circle(origin: Point(x: -1, y: 0), radius: Distance(2))
+        let c2 = Circle(origin: Point(x: 1, y: 0), radius: Distance(2))
         
         let result = Intersection2.find(c1, c2)
         switch result {

@@ -42,8 +42,8 @@ public extension Intersection2 {
     
     @inlinable
     static func possibly(_ circle1: Circle, _ circle2: Circle) -> Bool {
-        let cl = (circle1.origin - circle2.origin).length.real
-        let sr = circle1.radius + circle2.radius
+        let cl = (circle1.origin - circle2.origin).length.value
+        let sr = (circle1.radius + circle2.radius).value
         return cl <= sr
     }
     
@@ -51,24 +51,24 @@ public extension Intersection2 {
         let cmc = circle2.origin - circle1.origin
         let rmr = circle1.radius - circle2.radius
         let cdot = cmc.dot(cmc)
-        if cdot ~~ 0 && rmr ~~ 0 {
+        if cdot ~~ .zero && rmr ~~ .zero {
             return .identical
         }
-        let rmrqr = rmr * rmr
-        if cdot < rmrqr {
+        let rmrqr = rmr.squared
+        if cdot < rmrqr.value {
             return .none
         }
         let rpr = circle1.radius + circle2.radius
-        let rprqr = rpr * rpr
-        if cdot > rprqr {
+        let rprqr = rpr.squared
+        if cdot > rprqr.value {
             return .none
         }
-        if cdot < rprqr {
-            if rmrqr < cdot {
+        if cdot < rprqr.value {
+            if rmrqr.value < cdot {
                 let icdot = 1 / cdot
-                let s = 0.5 * ((circle1.radius * circle1.radius - circle2.radius * circle2.radius) * icdot + 1)
+                let s = 0.5 * ((circle1.radius * circle1.radius - circle2.radius * circle2.radius).value * icdot + 1)
                 let tmp = circle1.origin + s * cmc
-                var d = circle1.radius * circle2.radius * icdot - s * s
+                var d = (circle1.radius * circle2.radius).value * icdot - s * s
                 if d < 0 {
                     d = 0
                 }

@@ -4,21 +4,21 @@
 
 import Foundation
 
-public struct Distance : Hashable {
+public extension Distance {
     
-    public var value: Double
-    
-    public init< Value : BinaryInteger >(_ value: Value) {
-        self.value = Double(value)
-    }
-    
-    public init< Value : BinaryFloatingPoint >(_ value: Value) {
-        self.value = Double(value)
+    struct Squared : Hashable {
+        
+        public var value: Double
+        
+        public init(_ value: Double) {
+            self.value = value
+        }
+        
     }
     
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static var zero: Self {
@@ -27,11 +27,11 @@ public extension Distance {
     
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
-    var squared: Distance.Squared {
-        return .init(self.value * self.value)
+    var normal: Distance {
+        return .init(self.value.sqrt)
     }
     
     @inlinable
@@ -39,24 +39,9 @@ public extension Distance {
         return .init(self.value.abs)
     }
     
-    @inlinable
-    var roundUp: Self {
-        return .init(self.value.roundUp)
-    }
-    
-    @inlinable
-    var roundDown: Self {
-        return .init(self.value.roundDown)
-    }
-    
-    @inlinable
-    var roundNearest: Self {
-        return .init(self.value.roundNearest)
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static prefix func + (arg: Self) -> Self {
@@ -70,7 +55,7 @@ public extension Distance {
     
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func + (lhs: Self, rhs: Self) -> Self {
@@ -97,14 +82,9 @@ public extension Distance {
         return .init(Double(lhs) + rhs.value)
     }
     
-    @inlinable
-    static func + (lhs: Self, rhs: Percent) -> Self {
-        return .init(lhs.value + rhs.value)
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func += (lhs: inout Self, rhs: Self) {
@@ -121,14 +101,9 @@ public extension Distance {
         lhs = lhs + rhs
     }
     
-    @inlinable
-    static func += (lhs: inout Self, rhs: Percent) {
-        lhs = lhs + rhs
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func - (lhs: Self, rhs: Self) -> Self {
@@ -155,14 +130,9 @@ public extension Distance {
         return .init(Double(lhs) - rhs.value)
     }
     
-    @inlinable
-    static func - (lhs: Self, rhs: Percent) -> Self {
-        return .init(lhs.value - rhs.value)
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func -= (lhs: inout Self, rhs: Self) {
@@ -179,14 +149,9 @@ public extension Distance {
         lhs = lhs - rhs
     }
     
-    @inlinable
-    static func -= (lhs: inout Self, rhs: Percent) {
-        lhs = lhs - rhs
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func * (lhs: Self, rhs: Self) -> Self {
@@ -213,14 +178,9 @@ public extension Distance {
         return .init(Double(lhs) * rhs.value)
     }
     
-    @inlinable
-    static func * (lhs: Self, rhs: Percent) -> Self {
-        return .init(lhs.value * rhs.value)
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func *= (lhs: inout Self, rhs: Self) {
@@ -237,14 +197,9 @@ public extension Distance {
         lhs = lhs * rhs
     }
     
-    @inlinable
-    static func *= (lhs: inout Self, rhs: Percent) {
-        lhs = lhs * rhs
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func / (lhs: Self, rhs: Self) -> Self {
@@ -271,14 +226,9 @@ public extension Distance {
         return .init(Double(lhs) / rhs.value)
     }
     
-    @inlinable
-    static func / (lhs: Self, rhs: Percent) -> Self {
-        return .init(lhs.value / rhs.value)
-    }
-    
 }
 
-public extension Distance {
+public extension Distance.Squared {
     
     @inlinable
     static func /= (lhs: inout Self, rhs: Self) {
@@ -295,14 +245,9 @@ public extension Distance {
         lhs = lhs / rhs
     }
     
-    @inlinable
-    static func /= (lhs: inout Self, rhs: Percent) {
-        lhs = lhs / rhs
-    }
-    
 }
 
-extension Distance : INearEqutable {
+extension Distance.Squared : INearEqutable {
     
     @inlinable
     public static func ~~ (lhs: Self, rhs: Self) -> Bool {
@@ -311,7 +256,7 @@ extension Distance : INearEqutable {
     
 }
 
-extension Distance : Comparable {
+extension Distance.Squared : Comparable {
     
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.value < rhs.value

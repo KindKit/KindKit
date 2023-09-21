@@ -51,7 +51,7 @@ public extension Animation.Task {
                     self.isRunning = true
                     self.preparing?()
                 }
-                let progress = Percent((self.elapsed - self.delay) / self.duration).normalized
+                let progress = Percent(self.elapsed - self.delay, from: self.duration).normalized
                 self.processing(.init(self.ease.perform(progress.value)))
             }
             return self.elapsed >= (self.duration + self.delay)

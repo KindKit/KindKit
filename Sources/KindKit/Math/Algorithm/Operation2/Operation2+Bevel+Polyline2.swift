@@ -9,31 +9,31 @@ public extension Operation2.Bevel {
     static func perform(
         polyline: Polyline2,
         index: CornerIndex,
-        distance: Double
+        distance: Distance
     ) -> Polyline2 {
         guard polyline.isValid(index) == true else { return polyline }
         guard polyline.corners.count > 2 else { return polyline }
         guard let es = polyline[edges: index] else { return polyline }
-        guard distance !~ 0 else { return polyline }
+        guard distance !~ .zero else { return polyline }
         var cs = polyline.corners
         do {
             let ls = polyline[segment: es.left]
-            let lsl = ls.length.real
+            let lsl = ls.length
             let rs = polyline[segment: es.right]
-            let rsl = rs.length.real
+            let rsl = rs.length
             let ml = min(lsl, rsl)
             let nd = min(ml, distance)
             if ml > nd {
                 let i = min(index.value + 1, cs.endIndex)
-                let sls = ls.split(at: Percent(1 - (nd / lsl)))
-                let srs = rs.split(at: Percent(nd / rsl))
+                let sls = ls.split(at: Percent(nd.value, from: lsl.value).invert)
+                let srs = rs.split(at: Percent(nd.value, from: rsl.value))
                 cs[index.value] = sls.left.end
                 cs.insert(srs.right.start, at: i)
             } else if lsl > nd {
-                let ss = ls.split(at: Percent(1 - (nd / lsl)))
+                let ss = ls.split(at: Percent(nd.value, from: lsl.value).invert)
                 cs[index.value] = ss.left.end
             } else if rsl > nd {
-                let ss = rs.split(at: Percent(nd / rsl))
+                let ss = rs.split(at: Percent(nd.value, from: rsl.value))
                 cs[index.value] = ss.right.start
             } else {
                 cs.remove(at: index.value)
@@ -46,7 +46,7 @@ public extension Operation2.Bevel {
 
 public extension Polyline2 {
     
-    func bevel(index: CornerIndex, distance: Double) -> Self {
+    func bevel(index: CornerIndex, distance: Distance) -> Self {
         return Operation2.Bevel.perform(polyline: self, index: index, distance: distance)
     }
     

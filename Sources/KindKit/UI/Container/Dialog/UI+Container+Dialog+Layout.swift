@@ -270,9 +270,9 @@ extension UI.Container.Dialog.Layout {
         let dialogOffset = self._offset(dialog: dialog, size: size, delta: delta)
         let dialogSize = self._size(dialog: dialog, size: size)
         if dialogOffset < 0 {
-            return Percent(dialogOffset / pow(dialogSize, 1.25))
+            return Percent(dialogOffset, from: dialogSize.pow(1.25))
         }
-        return Percent(dialogOffset / dialogSize)
+        return Percent(dialogOffset, from: dialogSize)
     }
     
 }

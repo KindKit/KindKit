@@ -659,7 +659,7 @@ private extension UI.Container.Hamburger {
                     self._interactiveLeading = self._leading
                 }
                 let delta = min(deltaLocation.x, self._layout.leadingSize)
-                let progress = Percent(delta / self._layout.leadingSize)
+                let progress = Percent(delta, from: self._layout.leadingSize)
                 self._layout.state = .leading(progress: progress)
             } else if deltaLocation.x < 0 && self._trailing != nil {
                 if self._interactiveTrailing == nil {
@@ -667,7 +667,7 @@ private extension UI.Container.Hamburger {
                     self._interactiveTrailing = self._trailing
                 }
                 let delta = min(-deltaLocation.x, self._layout.trailingSize)
-                let progress = Percent(delta / self._layout.trailingSize)
+                let progress = Percent(delta, from: self._layout.trailingSize)
                 self._layout.state = .trailing(progress: progress)
             } else {
                 self._layout.state = beginState
@@ -679,7 +679,7 @@ private extension UI.Container.Hamburger {
                     self._interactiveLeading = self._leading
                 }
                 let delta = min(-deltaLocation.x, self._layout.leadingSize)
-                let progress = Percent(delta / self._layout.leadingSize)
+                let progress = Percent(delta, from: self._layout.leadingSize)
                 self._layout.state = .leading(progress: progress.invert)
             } else {
                 self._layout.state = beginState
@@ -691,7 +691,7 @@ private extension UI.Container.Hamburger {
                     self._interactiveTrailing = self._trailing
                 }
                 let delta = min(deltaLocation.x, self._layout.trailingSize)
-                let progress = Percent(delta / self._layout.trailingSize)
+                let progress = Percent(delta, from: self._layout.trailingSize)
                 self._layout.state = .trailing(progress: progress.invert)
             } else {
                 self._layout.state = beginState

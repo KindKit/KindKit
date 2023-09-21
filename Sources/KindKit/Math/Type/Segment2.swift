@@ -23,7 +23,7 @@ public extension Segment2 {
     
     @inlinable
     var center: Point {
-        return self.start + (self.delta / 2)
+        return self.start + (self.delta * Percent.half)
     }
     
     @inlinable
@@ -34,15 +34,15 @@ public extension Segment2 {
     @inlinable
     var centeredForm: (center: Point, direction: Point, extend: Double) {
         set {
-            self.start = newValue.center - newValue.extend * newValue.direction
-            self.end = newValue.center + newValue.extend * newValue.direction
+            self.start = newValue.center - Distance(newValue.extend) * newValue.direction
+            self.end = newValue.center + Distance(newValue.extend) * newValue.direction
         }
         get {
             let n = self.delta.normalized
             return (
-                center: 0.5 * (self.start + self.end),
+                center: Percent.half * (self.start + self.end),
                 direction: n.point,
-                extend: 0.5 * n.length.real
+                extend: 0.5 * n.length.value
             )
         }
     }

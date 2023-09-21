@@ -23,10 +23,10 @@ public extension Closest2 {
         let dd1t3 = (c.end * (q.end - 2 * q.control + q.start))
         let dd1 = dd1t1 + dd1t2 + dd1t3
         let p3 = 2 * p4 - p5 + dd1
-        let sl = c.start.length.squared
-        let el = c.end.length.squared
+        let sl = c.start.squaredLength
+        let el = c.end.squaredLength
         var ll = sl
-        var r: Percent = .zero
+        var r = Percent.zero
         if el < sl {
             ll = el
             r = .one
@@ -43,7 +43,7 @@ public extension Closest2 {
             guard value > 0.0, value < 1.0 else { break }
             let nr = Percent(value)
             let p = c.point(at: nr)
-            let pl = p.length.squared
+            let pl = p.squaredLength
             if pl < ll {
                 ll = pl
                 r = nr

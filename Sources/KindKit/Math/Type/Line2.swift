@@ -23,7 +23,7 @@ public extension Line2 {
     
     @inlinable
     var invert: Self {
-        return Line2(origin: self.origin, direction: self.direction.invert)
+        return .init(origin: self.origin, direction: self.direction.invert)
     }
     
 }
@@ -34,15 +34,19 @@ public extension Line2 {
     func perpendicular(_ point: Point) -> Point {
         let n = self.direction.dot(point - self.origin)
         let d = self.direction.dot(self.direction)
-        let b = (n / d)
-        return self.origin + b * self.direction
+        return self.origin + (n / d) * self.direction
     }
     
     @inlinable
     func distance(_ point: Point) -> Distance {
+        return self.squaredDistance(point).normal
+    }
+    
+    @inlinable
+    func squaredDistance(_ point: Point) -> Distance.Squared {
         let p = self.perpendicular(point)
         let d = point - p
-        return Distance(squared: d.dot(d))
+        return .init(d.dot(d))
     }
     
 }
@@ -51,7 +55,7 @@ public extension Line2 {
     
     @inlinable
     static func + (lhs: Self, rhs: Point) -> Self {
-        return Line2(
+        return .init(
             origin: lhs.origin + rhs,
             direction: lhs.direction
         )
@@ -64,7 +68,7 @@ public extension Line2 {
     
     @inlinable
     static func - (lhs: Self, rhs: Point) -> Self {
-        return Line2(
+        return .init(
             origin: lhs.origin - rhs,
             direction: lhs.direction
         )

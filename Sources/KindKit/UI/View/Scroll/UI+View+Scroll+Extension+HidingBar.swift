@@ -433,7 +433,7 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 if delta < -threshold {
                     return .hided
                 }
-                return .hiding(progress: Percent(-delta / threshold))
+                return .hiding(progress: Percent(-delta, from: threshold))
             }
             return .showed
         case .showing:
@@ -441,7 +441,7 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 if delta > threshold {
                     return .showed
                 }
-                return .showing(progress: Percent(delta / threshold))
+                return .showing(progress: Percent(delta, from: threshold))
             }
             return .hided
         case .hiding:
@@ -449,7 +449,7 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 if delta < -threshold {
                     return .hided
                 }
-                return .hiding(progress: Percent(-delta / threshold))
+                return .hiding(progress: Percent(-delta, from: threshold))
             }
             return .showed
         case .hided:
@@ -457,7 +457,7 @@ private extension UI.View.Scroll.Extension.HidingBar {
                 if delta > threshold {
                     return .showed
                 }
-                return .showing(progress: Percent(delta / threshold))
+                return .showing(progress: Percent(delta, from: threshold))
             }
             return .hided
         }

@@ -6,17 +6,17 @@ import Foundation
 
 struct Bezier {
     
-    static func length(_ closure: (_ value: Double) -> Double) -> Double {
+    static func squaredLength(_ closure: (_ value: Percent) -> Distance.Squared) -> Distance.Squared {
         let tv = Self.Tvalues
         let cv = Self.Cvalues
         let count = tv.count
         let z = 0.5
         var s = 0.0
         for i in 0..<count {
-            let t = z * tv[i] + z
-            s += cv[i] * closure(t)
+            let t = Percent(z * tv[i] + z)
+            s += cv[i] * closure(t).value
         }
-        return z * s
+        return .init(z * s)
     }
     
     static func crt(_ v: Double) -> Double {

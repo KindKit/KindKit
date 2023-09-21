@@ -61,7 +61,7 @@ public extension CubicCurve2 {
         let control = 1.5 * d + line.point(at: .half)
         return ConvertCurve2(
             curve: QuadCurve2(start: line.start, control: control, end: line.end),
-            error: 0.144334 * (d1 - d2).length.real
+            error: 0.144334 * (d1 - d2).length.value
         )
     }
     
@@ -92,10 +92,14 @@ extension CubicCurve2 : ICurve2 {
     }
     
     public var length: Distance {
-        return Distance(squared: Bezier.length({
-            let derivative = self.derivative(at: Percent($0))
-            return derivative.length.squared
-        }))
+        return self.squaredLength.normal
+    }
+    
+    public var squaredLength: Distance.Squared {
+        return Bezier.squaredLength({
+            let derivative = self.derivative(at: $0)
+            return derivative.squaredLength
+        })
     }
     
     public var bbox: Box2 {
@@ -135,13 +139,13 @@ extension CubicCurve2 : ICurve2 {
         } else if location >= .one {
             return self.end
         }
-        let il = 1 - location.value
+        let il = location.invert
         let ill = il * il
-        let ll = location.value * 2
+        let ll = location * 2
         let a = ill * il
-        let b = ill * location.value * 3.0
+        let b = ill * location * 3.0
         let c = il * ll * 3.0
-        let d = location.value * ll
+        let d = location * ll
         return (a * self.start) + (b * self.control1) + (c * self.control2) + (d * self.end)
     }
     
@@ -161,13 +165,13 @@ extension CubicCurve2 : ICurve2 {
     }
     
     public func derivative(at location: Percent) -> Point {
-        let il = 1 - location.value
+        let il = location.invert
         let p0 = 3 * (self.control1 - self.start)
         let p1 = 3 * (self.control2 - self.control1)
         let p2 = 3 * (self.end - self.control2)
         let a = il * il
-        let b = il * location.value * 2
-        let c = location.value * location.value
+        let b = il * location * 2
+        let c = location * location
         return (a * p0) + (b * p1) + (c * p2)
     }
     
@@ -190,7 +194,7 @@ extension CubicCurve2 : ICurve2 {
     
     public func cut(start: Percent, end: Percent) -> Self {
         guard start > .zero || end < .one else { return self }
-        let k = (end.value - start.value) / 3.0
+        let k = (end - start) / 3.0
         let s = self.point(at: start)
         let e = self.point(at: end)
         let c1 = s + k * self.derivative(at: start)

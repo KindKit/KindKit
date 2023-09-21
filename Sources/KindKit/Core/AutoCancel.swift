@@ -4,7 +4,7 @@
 
 import Foundation
 
-public final class AutoCancel : ICancellable {
+public final class AutoCancel {
     
     let object: ICancellable
     
@@ -17,7 +17,11 @@ public final class AutoCancel : ICancellable {
     deinit {
         self.cancel()
     }
+    
+}
 
+extension AutoCancel : ICancellable {
+    
     public func cancel() {
         self.object.cancel()
     }
@@ -26,6 +30,7 @@ public final class AutoCancel : ICancellable {
 
 public extension ICancellable {
     
+    @inlinable
     func autoCancel() -> AutoCancel {
         return AutoCancel(self)
     }

@@ -42,6 +42,7 @@ public protocol IGraphicsCanvas : AnyObject {
 
 public extension IGraphicsCanvas {
     
+    @inlinable
     func setNeedRedraw() {
         self.appearedView?.setNeedRedraw()
     }

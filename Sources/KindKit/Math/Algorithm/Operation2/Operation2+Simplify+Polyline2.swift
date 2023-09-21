@@ -8,10 +8,10 @@ public extension Operation2.Simplify {
     
     static func perform(
         polyline: Polyline2,
-        distance: Double
+        distance: Distance
     ) -> Polyline2 {
         var corners = polyline.corners
-        if corners.count > 1 && distance > .ulpOfOne {
+        if corners.count > 1 && distance > .zero {
             let segs: [Segment2] = Array(unsafeUninitializedCapacity: corners.count, initializingWith: { buffer, count in
                 for i in 0..<corners.count {
                     buffer[i] = Segment2(start: corners[i], end: corners[(i + 1) % corners.count])
@@ -21,13 +21,13 @@ public extension Operation2.Simplify {
             var cs: [Point] = []
             for i in 0 ..< segs.count {
                 let s = segs[i]
-                let sd = s.length.real
+                let sd = s.length
                 if sd > distance {
                     cs.append(s.start)
                 }
             }
             while let f = cs.first, let l = cs.last {
-                let fld = f.distance(l).real
+                let fld = f.distance(l)
                 if fld > distance {
                     break
                 }
@@ -83,7 +83,7 @@ public extension Operation2.Simplify {
 
 public extension Polyline2 {
     
-    func simplify(distance: Double) -> Self {
+    func simplify(distance: Distance) -> Self {
         return Operation2.Simplify.perform(polyline: self, distance: distance)
     }
     

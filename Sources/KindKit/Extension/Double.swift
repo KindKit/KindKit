@@ -56,6 +56,11 @@ public extension Double {
         return Foundation.atan2(self, other)
     }
     
+    @inlinable
+    func pow(_ other: Self) -> Self {
+        return Foundation.pow(self, other)
+    }
+    
 }
 
 public extension Double {

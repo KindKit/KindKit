@@ -80,17 +80,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func + (lhs: Self, rhs: Double) -> Self {
-        return Angle(radians: lhs.radians + rhs)
-    }
-    
-    @inlinable
     static func += (lhs: inout Self, rhs: Self) {
-        lhs = lhs + rhs
-    }
-    
-    @inlinable
-    static func += (lhs: inout Self, rhs: Double) {
         lhs = lhs + rhs
     }
     
@@ -100,17 +90,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func - (lhs: Self, rhs: Double) -> Self {
-        return Angle(radians: lhs.radians - rhs)
-    }
-    
-    @inlinable
     static func -= (lhs: inout Self, rhs: Self) {
-        lhs = lhs - rhs
-    }
-    
-    @inlinable
-    static func -= (lhs: inout Self, rhs: Double) {
         lhs = lhs - rhs
     }
     
@@ -120,8 +100,8 @@ public extension Angle {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Double) -> Self {
-        return Angle(radians: lhs.radians * rhs)
+    static func * (lhs: Self, rhs: Percent) -> Self {
+        return Angle(radians: lhs.radians * rhs.value)
     }
     
     @inlinable
@@ -130,7 +110,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Double) {
+    static func *= (lhs: inout Self, rhs: Percent) {
         lhs = lhs * rhs
     }
     
@@ -140,8 +120,8 @@ public extension Angle {
     }
     
     @inlinable
-    static func / (lhs: Self, rhs: Double) -> Self {
-        return Angle(radians: lhs.radians / rhs)
+    static func / (lhs: Self, rhs: Percent) -> Self {
+        return Angle(radians: lhs.radians / rhs.value)
     }
     
     @inlinable
@@ -150,7 +130,7 @@ public extension Angle {
     }
     
     @inlinable
-    static func /= (lhs: inout Self, rhs: Double) {
+    static func /= (lhs: inout Self, rhs: Percent) {
         lhs = lhs / rhs
     }
     

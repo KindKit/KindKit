@@ -529,11 +529,11 @@ private extension UI.View.SwipeCell {
         case .idle:
             if deltaLocation.x > 0 && self.leading != nil {
                 let delta = min(deltaLocation.x, self.leadingSize)
-                let progress = Percent(delta / self.leadingSize)
+                let progress = Percent(delta, from: self.leadingSize)
                 self._layout.state = .leading(progress: progress)
             } else if deltaLocation.x < 0 && self.trailing != nil {
                 let delta = min(-deltaLocation.x, self.trailingSize)
-                let progress = Percent(delta / self.trailingSize)
+                let progress = Percent(delta, from: self.trailingSize)
                 self._layout.state = .trailing(progress: progress)
             } else {
                 self._layout.state = beginState
@@ -541,7 +541,7 @@ private extension UI.View.SwipeCell {
         case .leading:
             if deltaLocation.x < 0 {
                 let delta = min(-deltaLocation.x, self.leadingSize)
-                let progress = Percent(delta / self.leadingSize)
+                let progress = Percent(delta, from: self.leadingSize)
                 self._layout.state = .leading(progress: progress.invert)
             } else {
                 self._layout.state = beginState
@@ -549,7 +549,7 @@ private extension UI.View.SwipeCell {
         case .trailing:
             if deltaLocation.x > 0 {
                 let delta = min(deltaLocation.x, self.trailingSize)
-                let progress = Percent(delta / self.trailingSize)
+                let progress = Percent(delta, from: self.trailingSize)
                 self._layout.state = .trailing(progress: progress.invert)
             } else {
                 self._layout.state = beginState

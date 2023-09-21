@@ -359,12 +359,12 @@ public extension UI.View.Scroll {
     ) {
         let beginContentOffset = self.contentOffset
         let endContentOffset = to
-        let deltaContentOffset = beginContentOffset.distance(endContentOffset).real.abs
-        if animated == true && deltaContentOffset > 0 {
+        let deltaContentOffset = beginContentOffset.distance(endContentOffset).abs
+        if animated == true && deltaContentOffset > .zero {
             let velocity = velocity ?? max(self.bounds.width, self.bounds.height) * 5
             self._animation = Animation.default.run(
                 .custom(
-                    duration: TimeInterval(deltaContentOffset / velocity),
+                    duration: TimeInterval(deltaContentOffset.value / velocity),
                     ease: Animation.Ease.QuadraticInOut(),
                     processing: { [weak self] progress in
                         guard let self = self else { return }

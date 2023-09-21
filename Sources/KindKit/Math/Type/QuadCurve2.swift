@@ -22,7 +22,7 @@ public struct QuadCurve2 : Hashable {
     
     public init(_ line: Segment2) {
         self.start = line.start
-        self.control = 0.5 * (line.start + line.end)
+        self.control = Percent.half * (line.start + line.end)
         self.end = line.end
     }
     
@@ -34,7 +34,7 @@ public extension QuadCurve2 {
         let line = Segment2(start: self.start, end: self.end)
         return ConvertCurve2(
             curve: line,
-            error: 0.5 * (self.control - line.point(at: .half)).length.real
+            error: 0.5 * (self.control - line.point(at: .half)).length.value
         )
     }
     
@@ -62,10 +62,14 @@ extension QuadCurve2 : ICurve2 {
     }
     
     public var length: Distance {
-        return Distance(squared: Bezier.length({
-            let d = self.derivative(at: Percent($0))
-            return d.length.squared
-        }))
+        return self.squaredLength.normal
+    }
+    
+    public var squaredLength: Distance.Squared {
+        return Bezier.squaredLength({
+            let d = self.derivative(at: $0)
+            return d.squaredLength
+        })
     }
     
     public var bbox: Box2 {
@@ -100,11 +104,11 @@ extension QuadCurve2 : ICurve2 {
         } else if location >= .one {
             return self.end
         }
-        let il = 1 - location.value
+        let il = location.invert
         let ill = il * il
         let a = ill
-        let b = il * (location.value * 2)
-        let c = location.value * location.value
+        let b = il * (location * 2)
+        let c = location * location
         return (a * self.start) + (b * self.control) + (c * self.end)
     }
     
@@ -121,8 +125,8 @@ extension QuadCurve2 : ICurve2 {
     }
     
     public func derivative(at location: Percent) -> Point {
-        let a = 1 - location.value
-        let b = location.value
+        let a = location.invert
+        let b = location
         let s = 2 * (self.control - self.start)
         let e = 2 * (self.end - self.control)
         return (a * s) + (b * e)
@@ -143,7 +147,7 @@ extension QuadCurve2 : ICurve2 {
     
     public func cut(start: Percent, end: Percent) -> Self {
         guard start > .zero || end < .one else { return self }
-        let k = (end.value - start.value) / 2
+        let k = (end - start) / 2
         let s = self.point(at: start)
         let e = self.point(at: end)
         let c = (s + e) / 2 + k / 2 * (self.derivative(at: start) - self.derivative(at: end))

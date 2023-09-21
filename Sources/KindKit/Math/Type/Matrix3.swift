@@ -110,7 +110,7 @@ public extension Matrix3 {
     
     @inlinable
     var inverse: Self {
-        return self.adjugate * (1 / self.determinant)
+        return self.adjugate * Percent(1, from: self.determinant)
     }
     
 }
@@ -138,11 +138,11 @@ public extension Matrix3 {
     }
     
     @inlinable
-    static func * (lhs: Self, rhs: Double) -> Self {
+    static func * (lhs: Self, rhs: Percent) -> Self {
         return Matrix3(
-            lhs.m11 * rhs, lhs.m12 * rhs, lhs.m13 * rhs,
-            lhs.m21 * rhs, lhs.m22 * rhs, lhs.m23 * rhs,
-            lhs.m31 * rhs, lhs.m32 * rhs, lhs.m33 * rhs
+            lhs.m11 * rhs.value, lhs.m12 * rhs.value, lhs.m13 * rhs.value,
+            lhs.m21 * rhs.value, lhs.m22 * rhs.value, lhs.m23 * rhs.value,
+            lhs.m31 * rhs.value, lhs.m32 * rhs.value, lhs.m33 * rhs.value
         )
     }
     
@@ -152,7 +152,7 @@ public extension Matrix3 {
     }
     
     @inlinable
-    static func *= (lhs: inout Self, rhs: Double) {
+    static func *= (lhs: inout Self, rhs: Percent) {
         lhs = lhs * rhs
     }
     
