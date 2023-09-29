@@ -373,6 +373,9 @@ extension Size : Comparable {
     
 }
 
+extension Size : IMapable {
+}
+
 extension Size : INearEqutable {
     
     @inlinable

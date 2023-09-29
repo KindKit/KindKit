@@ -131,6 +131,9 @@ extension Inset : Comparable {
     
 }
 
+extension Inset : IMapable {
+}
+
 extension Inset : INearEqutable {
     
     @inlinable
@@ -144,11 +147,12 @@ extension Inset : ILerpable {
     
     @inlinable
     public func lerp(_ to: Self, progress: Percent) -> Self {
-        let top = self.top.lerp(to.top, progress: progress)
-        let left = self.left.lerp(to.left, progress: progress)
-        let right = self.right.lerp(to.right, progress: progress)
-        let bottom = self.bottom.lerp(to.bottom, progress: progress)
-        return .init(top: top, left: left, right: right, bottom: bottom)
+        return .init(
+            top: self.top.lerp(to.top, progress: progress),
+            left: self.left.lerp(to.left, progress: progress),
+            right: self.right.lerp(to.right, progress: progress),
+            bottom: self.bottom.lerp(to.bottom, progress: progress)
+        )
     }
     
 }

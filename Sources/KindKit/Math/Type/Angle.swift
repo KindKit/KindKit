@@ -23,30 +23,15 @@ public struct Angle : Hashable {
 
 public extension Angle {
     
-    @inlinable
-    static var degrees0: Self {
-        return Angle(radians: 0)
-    }
-    
-    @inlinable
-    static var degrees90: Self {
-        return Angle(radians: .pi / 2)
-    }
-    
-    @inlinable
-    static var degrees180: Self {
-        return Angle(radians: .pi)
-    }
-    
-    @inlinable
-    static var degrees270: Self {
-        return Angle(radians: 3 * .pi / 2)
-    }
-    
-    @inlinable
-    static var degrees360: Self {
-        return Angle(radians: .pi * 2)
-    }
+    static let degrees0 =  Angle(radians: 0)
+    static let degrees45 = Angle(radians: .pi / 4)
+    static let degrees90 = Angle(radians: .pi / 2)
+    static let degrees135 = Angle.degrees90 + Angle.degrees45
+    static let degrees180 = Angle(radians: .pi)
+    static let degrees225 = Angle.degrees180 + Angle.degrees45
+    static let degrees270 = Angle.degrees180 + Angle.degrees90
+    static let degrees315 = Angle.degrees270 + Angle.degrees45
+    static let degrees360 =  Angle(radians: .pi * 2)
 
 }
 
@@ -142,6 +127,9 @@ extension Angle : Comparable {
         return lhs.radians < rhs.radians
     }
     
+}
+
+extension Angle : IMapable {
 }
 
 extension Angle : INearEqutable {

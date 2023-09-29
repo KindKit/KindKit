@@ -23,7 +23,7 @@ public extension Segment2 {
     
     @inlinable
     var center: Point {
-        return self.start + (self.delta * Percent.half)
+        return self.start + (self.delta / 2)
     }
     
     @inlinable
@@ -32,17 +32,17 @@ public extension Segment2 {
     }
     
     @inlinable
-    var centeredForm: (center: Point, direction: Point, extend: Double) {
+    var centeredForm: CenteredForm {
         set {
             self.start = newValue.center - Distance(newValue.extend) * newValue.direction
             self.end = newValue.center + Distance(newValue.extend) * newValue.direction
         }
         get {
             let n = self.delta.normalized
-            return (
-                center: Percent.half * (self.start + self.end),
+            return .init(
+                center: self.center,
                 direction: n.point,
-                extend: 0.5 * n.length.value
+                extend: n.length.value / 2
             )
         }
     }
@@ -95,8 +95,8 @@ extension Segment2 : ICurve2 {
     }
     
     @inlinable
-    public var bbox: Box2 {
-        return Box2(point1: self.start, point2: self.end)
+    public var bbox: AlignedBox2 {
+        return .init(point1: self.start, point2: self.end)
     }
     
     @inlinable
@@ -174,6 +174,21 @@ public extension Segment2 {
     @inlinable
     static func *= (lhs: inout Self, rhs: Matrix3) {
         lhs = lhs * rhs
+    }
+    
+}
+
+extension Segment2 : IMapable {
+}
+
+extension Segment2 : ILerpable {
+    
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(
+            start: self.start.lerp(to.start, progress: progress),
+            end: self.end.lerp(to.end, progress: progress)
+        )
     }
     
 }

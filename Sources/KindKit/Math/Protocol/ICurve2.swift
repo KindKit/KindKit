@@ -13,7 +13,7 @@ public protocol ICurve2 {
     var end: Point { set get }
     var inverse: Self { get }
     var length: Distance { get }
-    var bbox: Box2 { get }
+    var bbox: AlignedBox2 { get }
     
     func point(at location: Percent) -> Point
     func normal(at location: Percent) -> Point

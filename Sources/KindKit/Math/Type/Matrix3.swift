@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 public struct Matrix3 : Hashable {
     
@@ -158,6 +157,9 @@ public extension Matrix3 {
     
 }
 
+extension Matrix3 : IMapable {
+}
+
 extension Matrix3 : INearEqutable {
     
     @inlinable
@@ -187,16 +189,17 @@ extension Matrix3 : ILerpable {
     
     @inlinable
     public func lerp(_ to: Self, progress: Percent) -> Self {
-        let m11 = self.m11.lerp(to.m11, progress: progress)
-        let m12 = self.m12.lerp(to.m12, progress: progress)
-        let m13 = self.m13.lerp(to.m13, progress: progress)
-        let m21 = self.m21.lerp(to.m21, progress: progress)
-        let m22 = self.m22.lerp(to.m22, progress: progress)
-        let m23 = self.m23.lerp(to.m23, progress: progress)
-        let m31 = self.m31.lerp(to.m31, progress: progress)
-        let m32 = self.m32.lerp(to.m32, progress: progress)
-        let m33 = self.m33.lerp(to.m33, progress: progress)
-        return Matrix3(m11, m12, m13, m21, m22, m23, m31, m32, m33)
+        return Matrix3(
+            self.m11.lerp(to.m11, progress: progress),
+            self.m12.lerp(to.m12, progress: progress),
+            self.m13.lerp(to.m13, progress: progress),
+            self.m21.lerp(to.m21, progress: progress),
+            self.m22.lerp(to.m22, progress: progress),
+            self.m23.lerp(to.m23, progress: progress),
+            self.m31.lerp(to.m31, progress: progress),
+            self.m32.lerp(to.m32, progress: progress),
+            self.m33.lerp(to.m33, progress: progress)
+        )
     }
     
 }

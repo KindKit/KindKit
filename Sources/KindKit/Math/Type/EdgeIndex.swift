@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 public struct EdgeIndex : Hashable {
     

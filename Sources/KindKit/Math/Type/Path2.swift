@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 public struct Path2 : Hashable {
     
@@ -73,4 +72,7 @@ public extension Path2 {
         self.elements.append(.close)
     }
     
+}
+
+extension Path2 : IMapable {
 }

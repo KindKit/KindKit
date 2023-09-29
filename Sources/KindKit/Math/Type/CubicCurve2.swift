@@ -102,7 +102,7 @@ extension CubicCurve2 : ICurve2 {
         })
     }
     
-    public var bbox: Box2 {
+    public var bbox: AlignedBox2 {
         var lower = self.start.min(self.end)
         var upper = self.start.max(self.end)
         let ds = self.control1 - self.start
@@ -130,7 +130,7 @@ extension CubicCurve2 : ICurve2 {
                 }
             })
         }
-        return Box2(lower: lower, upper: upper)
+        return .init(lower: lower, upper: upper)
     }
     
     public func point(at location: Percent) -> Point {
@@ -253,6 +253,23 @@ public extension CubicCurve2 {
             control1: lhs.control1 * rhs,
             control2: lhs.control2 * rhs,
             end: lhs.end * rhs
+        )
+    }
+    
+}
+
+extension CubicCurve2 : IMapable {
+}
+
+extension CubicCurve2 : ILerpable {
+    
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(
+            start: self.start.lerp(to.start, progress: progress),
+            control1: self.control1.lerp(to.control1, progress: progress),
+            control2: self.control2.lerp(to.control2, progress: progress),
+            end: self.end.lerp(to.end, progress: progress)
         )
     }
     

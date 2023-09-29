@@ -302,6 +302,17 @@ public extension Distance {
     
 }
 
+extension Distance : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.value < rhs.value
+    }
+    
+}
+
+extension Distance : IMapable {
+}
+
 extension Distance : INearEqutable {
     
     @inlinable
@@ -311,10 +322,11 @@ extension Distance : INearEqutable {
     
 }
 
-extension Distance : Comparable {
+extension Distance : ILerpable {
     
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.value < rhs.value
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(self.value.lerp(to.value, progress: progress))
     }
     
 }

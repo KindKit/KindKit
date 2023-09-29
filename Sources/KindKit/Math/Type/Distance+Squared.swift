@@ -247,19 +247,22 @@ public extension Distance.Squared {
     
 }
 
+extension Distance.Squared : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.value < rhs.value
+    }
+    
+}
+
+extension Distance.Squared : IMapable {
+}
+
 extension Distance.Squared : INearEqutable {
     
     @inlinable
     public static func ~~ (lhs: Self, rhs: Self) -> Bool {
         return lhs.value ~~ rhs.value
-    }
-    
-}
-
-extension Distance.Squared : Comparable {
-    
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.value < rhs.value
     }
     
 }

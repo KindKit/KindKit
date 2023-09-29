@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 public struct Polygon2 : Hashable {
     
@@ -12,11 +11,11 @@ public struct Polygon2 : Hashable {
             self.bbox = Self._bbox(self.countours)
         }
     }
-    public private(set) var bbox: Box2
+    public private(set) var bbox: AlignedBox2
     
     public init(
         countours: [Polyline2],
-        bbox: Box2? = nil
+        bbox: AlignedBox2? = nil
     ) {
         self.countours = countours
         self.bbox = bbox ?? Self._bbox(countours)
@@ -53,9 +52,9 @@ public extension Polygon2 {
 private extension Polygon2 {
     
     @inline(__always)
-    static func _bbox(_ countours: [Polyline2]) -> Box2 {
+    static func _bbox(_ countours: [Polyline2]) -> AlignedBox2 {
         return countours.kk_reduce({
-            return Box2()
+            return .zero
         }, {
             return $0.bbox
         }, {
@@ -63,4 +62,7 @@ private extension Polygon2 {
         })
     }
     
+}
+
+extension Polygon2 : IMapable {
 }

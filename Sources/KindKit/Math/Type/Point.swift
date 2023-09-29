@@ -91,7 +91,7 @@ public extension Point {
     
     @inlinable
     var angle: Angle {
-        return Angle(radians: self.y.atan2(self.x))
+        return .init(radians: self.y.atan2(self.x))
     }
     
 }
@@ -129,10 +129,20 @@ public extension Point {
     }
     
     @inlinable
+    func rotated(by angle: Angle, around center: Point = .zero) -> Self {
+        return self.rotated(by: Matrix3(rotation: angle), around: center)
+    }
+    
+    @inlinable
+    func rotated(by matrix: Matrix3, around center: Point = .zero) -> Self {
+        return center + ((self - center) * matrix)
+    }
+    
+    @inlinable
     func angle(_ point1: Self, _ point2: Self) -> Angle {
         let d1 = point1 - self
         let d2 = point2 - self
-        return Angle(radians: d1.cross(d2).atan2(d1.dot(d2)))
+        return .init(radians: d1.cross(d2).atan2(d1.dot(d2)))
     }
     
 }
@@ -141,12 +151,12 @@ public extension Point {
     
     @inlinable
     static prefix func + (arg: Self) -> Self {
-        return Point(x: +arg.x, y: +arg.y)
+        return .init(x: +arg.x, y: +arg.y)
     }
     
     @inlinable
     static prefix func - (arg: Self) -> Self {
-        return Point(x: -arg.x, y: -arg.y)
+        return .init(x: -arg.x, y: -arg.y)
     }
     
 }
@@ -406,19 +416,22 @@ public extension Point {
     
 }
 
+extension Point : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.x < rhs.x && lhs.y < rhs.y
+    }
+    
+}
+
+extension Point : IMapable {
+}
+
 extension Point : INearEqutable {
     
     @inlinable
     public static func ~~ (lhs: Self, rhs: Self) -> Bool {
         return lhs.x ~~ rhs.x && lhs.y ~~ rhs.y
-    }
-    
-}
-
-extension Point : Comparable {
-    
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.x < rhs.x && lhs.y < rhs.y
     }
     
 }

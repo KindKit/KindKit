@@ -419,6 +419,9 @@ extension Rect : Comparable {
     
 }
 
+extension Rect : IMapable {
+}
+
 extension Rect : INearEqutable {
     
     @inlinable

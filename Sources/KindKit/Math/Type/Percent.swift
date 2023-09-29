@@ -314,19 +314,22 @@ public extension Percent {
     
 }
 
+extension Percent : Comparable {
+    
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.value < rhs.value
+    }
+    
+}
+
+extension Percent : IMapable {
+}
+
 extension Percent : INearEqutable {
     
     @inlinable
     public static func ~~ (lhs: Self, rhs: Self) -> Bool {
         return lhs.value ~~ rhs.value
-    }
-    
-}
-
-extension Percent : Comparable {
-    
-    public static func < (lhs: Self, rhs: Self) -> Bool {
-        return lhs.value < rhs.value
     }
     
 }

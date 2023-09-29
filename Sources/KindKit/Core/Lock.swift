@@ -18,9 +18,14 @@ public final class Lock {
     }
 
     public func perform< Return >(_ block: () throws -> Return) rethrows -> Return {
-        os_unfair_lock_lock(self._lock)
-        defer { os_unfair_lock_unlock(self._lock) }
-        return try block()
+        let result: Return
+        if os_unfair_lock_trylock(self._lock) == true {
+            result = try block()
+            os_unfair_lock_unlock(self._lock)
+        } else {
+            result = try block()
+        }
+        return result
     }
     
 }

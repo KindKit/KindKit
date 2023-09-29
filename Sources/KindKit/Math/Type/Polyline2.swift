@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import CoreGraphics
 
 public struct Polyline2 : Hashable {
     
@@ -14,11 +13,11 @@ public struct Polyline2 : Hashable {
         }
     }
     public private(set) var edges: [Edge]
-    public private(set) var bbox: Box2
+    public private(set) var bbox: AlignedBox2
     
     public init(
         corners: [Point],
-        bbox: Box2? = nil
+        bbox: AlignedBox2? = nil
     ) {
         self.corners = corners
         self.edges = Self._edges(self.corners.count)
@@ -65,6 +64,18 @@ public extension Polyline2 {
     @inlinable
     func isValid(_ index: EdgeIndex) -> Bool {
         return index.value >= self.edges.startIndex && index.value < self.edges.endIndex
+    }
+    
+    @inlinable
+    func rotated(by angle: Angle, around center: Point = .zero) -> Self {
+        return self.rotated(by: Matrix3(rotation: angle), around: center)
+    }
+    
+    @inlinable
+    func rotated(by matrix: Matrix3, around center: Point = .zero) -> Self {
+        return .init(corners: self.corners.map({
+            return $0.rotated(by: matrix, around: center)
+        }))
     }
      
     func update(index: CornerIndex, closure: (_ corner: Point) -> Point) -> Self {
@@ -250,11 +261,11 @@ private extension Polyline2 {
     }
     
     @inline(__always)
-    static func _bbox(_ corners: [Point]) -> Box2 {
+    static func _bbox(_ corners: [Point]) -> AlignedBox2 {
         return corners.kk_reduce({
-            return Box2()
+            return .zero
         }, {
-            return Box2(lower: $0, upper: $0)
+            return .init(lower: $0, upper: $0)
         }, {
             return $0.union($1)
         })
@@ -294,4 +305,7 @@ private extension Polyline2 {
         return 0
     }
     
+}
+
+extension Polyline2 : IMapable {
 }

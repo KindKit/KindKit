@@ -72,7 +72,7 @@ extension QuadCurve2 : ICurve2 {
         })
     }
     
-    public var bbox: Box2 {
+    public var bbox: AlignedBox2 {
         var lower = self.start.min(self.end)
         var upper = self.start.max(self.end)
         let ds = self.control - self.start
@@ -95,7 +95,7 @@ extension QuadCurve2 : ICurve2 {
                 upper.y = v.y
             }
         }
-        return Box2(lower: lower, upper: upper)
+        return .init(lower: lower, upper: upper)
     }
     
     public func point(at location: Percent) -> Point {
@@ -182,6 +182,22 @@ public extension QuadCurve2 {
             start: lhs.start * rhs,
             control: lhs.control * rhs,
             end: lhs.end * rhs
+        )
+    }
+    
+}
+
+extension QuadCurve2 : IMapable {
+}
+
+extension QuadCurve2 : ILerpable {
+    
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(
+            start: self.start.lerp(to.start, progress: progress),
+            control: self.control.lerp(to.control, progress: progress),
+            end: self.end.lerp(to.end, progress: progress)
         )
     }
     

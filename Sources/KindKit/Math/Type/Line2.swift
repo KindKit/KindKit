@@ -17,6 +17,14 @@ public struct Line2 : Hashable {
         self.direction = direction
     }
     
+    public init(
+        origin: Point,
+        angle: Angle
+    ) {
+        self.origin = origin
+        self.direction = Point(x: 1, y: 0).rotated(by: angle)
+    }
+    
 }
 
 public extension Line2 {
@@ -42,6 +50,19 @@ public extension Line2 {
         return self.squaredDistance(point).normal
     }
     
+    @inlinable
+    func rotated(by angle: Angle, around center: Point = .zero) -> Self {
+        return self.rotated(by: Matrix3(rotation: angle), around: center)
+    }
+    
+    @inlinable
+    func rotated(by matrix: Matrix3, around center: Point = .zero) -> Self {
+        return .init(
+            origin: self.origin.rotated(by: matrix, around: center),
+            direction: self.direction.rotated(by: matrix)
+        )
+    }
+
     @inlinable
     func squaredDistance(_ point: Point) -> Distance.Squared {
         let p = self.perpendicular(point)
@@ -77,6 +98,21 @@ public extension Line2 {
     @inlinable
     static func -= (lhs: inout Self, rhs: Point) {
         lhs = lhs - rhs
+    }
+    
+}
+
+extension Line2 : IMapable {
+}
+
+extension Line2 : ILerpable {
+    
+    @inlinable
+    public func lerp(_ to: Self, progress: Percent) -> Self {
+        return .init(
+            origin: self.origin.lerp(to.origin, progress: progress),
+            direction: self.direction.lerp(to.direction, progress: progress)
+        )
     }
     
 }
