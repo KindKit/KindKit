@@ -27,13 +27,7 @@ public extension Polygon2 {
     
     @inlinable
     var segments: [Segment2] {
-        return self.countours.kk_reduce({
-            return []
-        }, {
-            return $0.segments
-        }, {
-            return $0 + $1.segments
-        })
+        return self.countours.kk_reduce({ [] }, { $0.segments }, { $0 + $1.segments })
     }
     
     @inlinable
@@ -47,19 +41,23 @@ public extension Polygon2 {
         return true
     }
     
+    @inlinable
+    var perimeter: Distance {
+        return self.countours.kk_reduce({ .zero }, { $0.perimeter }, { $0 + $1.perimeter })
+    }
+
+    @inlinable
+    var area: Area {
+        return self.countours.kk_reduce({ .zero }, { $0.area }, { $0 + $1.area })
+    }
+    
 }
 
 private extension Polygon2 {
     
     @inline(__always)
     static func _bbox(_ countours: [Polyline2]) -> AlignedBox2 {
-        return countours.kk_reduce({
-            return .zero
-        }, {
-            return $0.bbox
-        }, {
-            return $0.union($1.bbox)
-        })
+        return countours.kk_reduce({ .zero }, { $0.bbox }, { $0.union($1.bbox) })
     }
     
 }

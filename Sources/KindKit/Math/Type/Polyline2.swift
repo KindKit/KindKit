@@ -28,15 +28,6 @@ public struct Polyline2 : Hashable {
 
 public extension Polyline2 {
     
-    enum FillRule {
-        case winding
-        case evenOdd
-    }
-    
-}
-
-public extension Polyline2 {
-    
     @inlinable
     var polygon: Polygon2 {
         return Polygon2(countours: [ self ], bbox: self.bbox)
@@ -51,7 +42,34 @@ public extension Polyline2 {
     var isEmpty: Bool {
         return self.corners.isEmpty
     }
-    
+
+    @inlinable
+    var perimeter: Distance {
+        var length = Distance.zero
+        for edge in self.edges {
+            let segment = self[segment: edge]
+            length += segment.length
+        }
+        return length
+    }
+
+    @inlinable
+    var area: Area {
+        var result = 0.0
+        if self.edges.count > 2 {
+            var p0 = self[corner: self.edges[self.edges.endIndex - 2].start]
+            var p1 = self[corner: self.edges[self.edges.endIndex - 1].start]
+            for edge in self.edges {
+                let p2 = self[corner: edge.start]
+                result += p1.x * (p2.y - p0.y)
+                p0 = p1
+                p1 = p2
+            }
+            result = (result * 0.5).abs
+        }
+        return .init(result)
+    }
+
 }
 
 public extension Polyline2 {

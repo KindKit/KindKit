@@ -91,9 +91,14 @@ extension Segment2 : ICurve2 {
     
     @inlinable
     public var length: Distance {
-        return self.end.distance(self.start)
+        return self.squaredLength.normal
     }
-    
+
+    @inlinable
+    public var squaredLength: Distance.Squared {
+        return self.end.squaredDistance(self.start)
+    }
+
     @inlinable
     public var bbox: AlignedBox2 {
         return .init(point1: self.start, point2: self.end)

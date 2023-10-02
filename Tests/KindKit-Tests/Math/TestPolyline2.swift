@@ -7,6 +7,26 @@ import KindKit
 
 class TestPolyline2 : XCTestCase {
     
+    func testPerimeter() {
+        let p = Polyline2(corners: [
+            .init(x: 10, y: 10),
+            .init(x: 20, y: 10),
+            .init(x: 20, y: 20),
+            .init(x: 10, y: 20)
+        ])
+        XCTAssert(p.perimeter ~~ .init(40))
+    }
+    
+    func testArea() {
+        let p = Polyline2(corners: [
+            .init(x: 10, y: 10),
+            .init(x: 10, y: 20),
+            .init(x: 20, y: 20),
+            .init(x: 20, y: 10)
+        ])
+        XCTAssert(p.area ~~ .init(100))
+    }
+    
     func testExtrude1() {
         let op = Polyline2(corners: [
             Point(x: 0, y: 0),
