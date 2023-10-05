@@ -53,6 +53,37 @@ public extension Polygon2 {
     
 }
 
+public extension Polygon2 {
+    
+    func isContains(_ point: Point, rule: Polyline2.FillRule = .winding) -> Bool {
+        for countour in self.countours {
+            if countour.isContains(point, rule: rule) == true {
+                return true
+            }
+        }
+        return false
+    }
+    
+}
+
+public extension Polygon2 {
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
+        return .init(countours: lhs.countours.map({ $0 * rhs }))
+    }
+    
+}
+
+public extension Polygon2 {
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Matrix3) {
+        lhs = lhs * rhs
+    }
+    
+}
+
 private extension Polygon2 {
     
     @inline(__always)

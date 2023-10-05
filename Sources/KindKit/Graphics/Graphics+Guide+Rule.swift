@@ -22,25 +22,63 @@ public extension Graphics.Guide {
             self.snap = snap
         }
         
+        public func guide(_ value: Distance) -> Distance {
+            guard self.isEnabled == true else { return value }
+            let n = value.abs
+            let b = (n / self.size).roundNearest
+            let g = b * self.size
+            if n >= g - self.snap && n <= g + self.snap {
+                if value < .zero {
+                    return -g
+                } else {
+                    return g
+                }
+            }
+            return value
+        }
+        
     }
     
 }
 
-extension Graphics.Guide.Rule : IGraphicsRuleGuide {
+public extension Graphics.Guide.Rule {
     
-    public func guide(_ value: Distance) -> Distance? {
-        guard self.isEnabled == true else { return nil }
-        let n = value.abs
-        let b = (n / self.size).roundNearest
-        let g = b * self.size
-        if n >= g - self.snap && n <= g + self.snap {
-            if value < .zero {
-                return -g
-            } else {
-                return g
-            }
-        }
-        return nil
+    @inlinable
+    @discardableResult
+    func size(_ value: Distance) -> Self {
+        self.size = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func size(_ value: () -> Distance) -> Self {
+        return self.size(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func size(_ value: (Self) -> Distance) -> Self {
+        return self.size(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func snap(_ value: Distance) -> Self {
+        self.snap = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func snap(_ value: () -> Distance) -> Self {
+        return self.snap(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func snap(_ value: (Self) -> Distance) -> Self {
+        return self.snap(value(self))
     }
     
 }

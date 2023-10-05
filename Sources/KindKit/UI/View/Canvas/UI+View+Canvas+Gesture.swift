@@ -4,9 +4,13 @@
 
 import Foundation
 
-public extension Graphics {
+#if os(macOS)
+#warning("Require support macOS")
+#elseif os(iOS)
 
-    enum Gesture : CaseIterable {
+extension UI.View.Canvas {
+
+    public enum Gesture : CaseIterable {
         
         case one
         case two
@@ -18,8 +22,9 @@ public extension Graphics {
     
 }
 
-public extension Graphics.Gesture {
+public extension UI.View.Canvas.Gesture {
     
+    @inlinable
     var numberOfTouches: Int {
         switch self {
         case .one: return 1
@@ -31,3 +36,5 @@ public extension Graphics.Gesture {
     }
     
 }
+
+#endif

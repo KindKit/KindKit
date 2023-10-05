@@ -7,14 +7,18 @@ import Foundation
 public extension Angle {
     
     init(_ value: Measurement< UnitAngle >) {
-        self.radians = value.value(to: UnitAngle.radians)
+        self.radians = value.kk_value(to: UnitAngle.radians)
+    }
+    
+    init(_ value: Double, unit: UnitAngle) {
+        self.init(Measurement(value: value, unit: unit))
     }
 
     @inlinable
-    func angle(unit: UnitAngle) -> Measurement< UnitAngle > {
-        let radians = Measurement(value: self.radians, unit: UnitAngle.radians)
-        guard unit != .radians else { return radians }
-        return radians.converted(to: unit)
+    func to(unit: UnitAngle) -> Measurement< UnitAngle > {
+        let measurement = Measurement(value: self.radians, unit: UnitAngle.radians)
+        guard unit != .radians else { return measurement }
+        return measurement.converted(to: unit)
     }
 
 }

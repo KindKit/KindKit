@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension Segment2 {
+extension Segment2 {
     
     public struct CenteredForm : Hashable {
         

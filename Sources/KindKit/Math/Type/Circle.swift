@@ -23,8 +23,25 @@ public extension Circle {
     
     @inlinable
     func isContains(_ point: Point) -> Bool {
-        let distance = self.origin.squaredDistance(point)
+        let distance = self.origin.squaredLength(point)
         return distance.abs <= self.radius.squared
+    }
+    
+}
+
+public extension Circle {
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
+        return .init(
+            origin: lhs.origin * rhs,
+            radius: lhs.radius * rhs
+        )
+    }
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Matrix3) {
+        lhs = lhs * rhs
     }
     
 }

@@ -31,6 +31,15 @@ public struct OrientedBox2 : Hashable {
 public extension OrientedBox2 {
     
     @inlinable
+    static var zero: Self {
+        return .init(shape: .zero, angle: .degrees0)
+    }
+    
+}
+
+public extension OrientedBox2 {
+    
+    @inlinable
     var width: Double {
         return self.shape.width
     }
@@ -43,11 +52,6 @@ public extension OrientedBox2 {
     @inlinable
     var size: Size {
         return self.shape.size
-    }
-    
-    @inlinable
-    var area: Double {
-        return self.shape.area
     }
     
     @inlinable
@@ -93,6 +97,27 @@ public extension OrientedBox2 {
     @inlinable
     var bottomRight: Point {
         return self.shape.bottomRight.rotated(by: self.angle, around: self.shape.center)
+    }
+    
+    @inlinable
+    var perimeter: Distance {
+        return self.shape.perimeter
+    }
+    
+    @inlinable
+    var area: Area {
+        return self.shape.area
+    }
+    
+    @inlinable
+    var polyline: Polyline2 {
+        let m = Matrix3(rotation: self.angle)
+        let pc = self.shape.center
+        let ptl = self.shape.topLeft.rotated(by: m, around: pc)
+        let ptr = self.shape.topRight.rotated(by: m, around: pc)
+        let pbl = self.shape.bottomLeft.rotated(by: m, around: pc)
+        let pbr = self.shape.bottomRight.rotated(by: m, around: pc)
+        return .init(corners: [ ptl, ptr, pbr, pbl ])
     }
     
     @inlinable

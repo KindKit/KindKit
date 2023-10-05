@@ -222,6 +222,16 @@ public extension Rect {
     var integral: Self {
         return Rect(x: self.x.roundDown, y: self.y.roundDown, width: self.width.roundUp, height: self.height.roundUp)
     }
+    
+    @inlinable
+    var perimeter: Distance {
+        return .init((self.width * 2) + (self.height * 2))
+    }
+    
+    @inlinable
+    var area: Area {
+        return .init(self.width * self.height)
+    }
 
 }
 

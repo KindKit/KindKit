@@ -48,5 +48,47 @@ class TestSemaVersion : XCTestCase {
             XCTFail()
         }
     }
+    
+    func testComparable() {
+        do {
+            guard let a = SemaVersion("1.1") else {
+                XCTFail()
+                return
+            }
+            guard let b = SemaVersion("1.1.1") else {
+                XCTFail()
+                return
+            }
+            if a == b {
+                XCTFail()
+            }
+        }
+        do {
+            guard let a = SemaVersion("2.61.1") else {
+                XCTFail()
+                return
+            }
+            guard let b = SemaVersion("2.61.2") else {
+                XCTFail()
+                return
+            }
+            if a == b {
+                XCTFail()
+            }
+        }
+        do {
+            guard let a = SemaVersion("2.61") else {
+                XCTFail()
+                return
+            }
+            guard let b = SemaVersion("2.61.2") else {
+                XCTFail()
+                return
+            }
+            if a > b {
+                XCTFail()
+            }
+        }
+    }
 
 }

@@ -28,37 +28,44 @@ public extension StringFormatter.DateComponents {
     
     @inlinable
     var unitsStyle: DateComponentsFormatter.UnitsStyle {
-        return self.formatter.unitsStyle
+        nonmutating set { self.formatter.unitsStyle = newValue }
+        get { self.formatter.unitsStyle }
     }
     
     @inlinable
     var allowedUnits: NSCalendar.Unit {
-        return self.formatter.allowedUnits
+        nonmutating set { self.formatter.allowedUnits = newValue }
+        get { self.formatter.allowedUnits }
     }
     
     @inlinable
     var zeroBehavior: DateComponentsFormatter.ZeroFormattingBehavior {
-        return self.formatter.zeroFormattingBehavior
+        nonmutating set { self.formatter.zeroFormattingBehavior = newValue }
+        get { self.formatter.zeroFormattingBehavior }
     }
     
     @inlinable
     var calendar: Calendar {
-        return self.formatter.calendar ?? .current
+        nonmutating set { self.formatter.calendar = newValue }
+        get { self.formatter.calendar ?? .current }
     }
     
     @inlinable
     var maximumUnitCount: Int {
-        return self.formatter.maximumUnitCount
+        nonmutating set { self.formatter.maximumUnitCount = newValue }
+        get { self.formatter.maximumUnitCount }
     }
     
     @inlinable
     var collapsesLargestUnit: Bool {
-        return self.formatter.collapsesLargestUnit
+        nonmutating set { self.formatter.collapsesLargestUnit = newValue }
+        get { self.formatter.collapsesLargestUnit }
     }
     
     @inlinable
     var includesApproximationPhrase: Bool {
-        return self.formatter.includesApproximationPhrase
+        nonmutating set { self.formatter.includesApproximationPhrase = newValue }
+        get { self.formatter.includesApproximationPhrase }
     }
     
 }
@@ -68,49 +75,49 @@ public extension StringFormatter.DateComponents {
     @inlinable
     @discardableResult
     func unitsStyle(_ value: DateComponentsFormatter.UnitsStyle) -> Self {
-        self.formatter.unitsStyle = value
+        self.unitsStyle = value
         return self
     }
     
     @inlinable
     @discardableResult
     func allowedUnits(_ value: NSCalendar.Unit) -> Self {
-        self.formatter.allowedUnits = value
+        self.allowedUnits = value
         return self
     }
     
     @inlinable
     @discardableResult
     func zeroBehavior(_ value: DateComponentsFormatter.ZeroFormattingBehavior) -> Self {
-        self.formatter.zeroFormattingBehavior = value
+        self.zeroBehavior = value
         return self
     }
     
     @inlinable
     @discardableResult
     func calendar(_ value: Calendar) -> Self {
-        self.formatter.calendar = value
+        self.calendar = value
         return self
     }
     
     @inlinable
     @discardableResult
     func maximumUnitCount(_ value: Int) -> Self {
-        self.formatter.maximumUnitCount = value
+        self.maximumUnitCount = value
         return self
     }
     
     @inlinable
     @discardableResult
     func collapsesLargestUnit(_ value: Bool) -> Self {
-        self.formatter.collapsesLargestUnit = value
+        self.collapsesLargestUnit = value
         return self
     }
     
     @inlinable
     @discardableResult
     func includesApproximationPhrase(_ value: Bool) -> Self {
-        self.formatter.includesApproximationPhrase = value
+        self.includesApproximationPhrase = value
         return self
     }
     

@@ -27,7 +27,7 @@ extension Math.Operation2.Simplify {
                 }
             }
             while let f = cs.first, let l = cs.last {
-                let fld = f.distance(l)
+                let fld = f.length(l)
                 if fld > distance {
                     break
                 }

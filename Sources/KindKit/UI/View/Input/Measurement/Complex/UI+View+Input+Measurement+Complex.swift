@@ -694,8 +694,8 @@ public extension IUIView {
     }
     
     @inlinable
-    static func input(lenght: UnitLength) -> Self where Self == UI.View.Input.Measurement.Complex< UnitLength > {
-        return .init(unit: lenght)
+    static func input(length: UnitLength) -> Self where Self == UI.View.Input.Measurement.Complex< UnitLength > {
+        return .init(unit: length)
     }
     
     @inlinable

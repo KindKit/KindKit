@@ -16,9 +16,11 @@ public extension Graphics {
     struct Context {
         
         private let _instance: CGContext
+        private let _size: CGSize
         
-        init(_ instance: CGContext) {
+        init(_ instance: CGContext, size: CGSize) {
             self._instance = instance
+            self._size = size
         }
         
     }

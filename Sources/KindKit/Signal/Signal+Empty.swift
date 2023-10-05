@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension Signal {
+extension Signal {
     
-    final class Empty< Result > : ISignal {
+    public final class Empty< Result > : ISignal {
         
         public var isEmpty: Bool {
             return self.slot == nil && self.slots.isEmpty == true

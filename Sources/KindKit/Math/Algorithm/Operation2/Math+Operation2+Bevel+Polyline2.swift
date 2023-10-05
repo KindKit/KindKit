@@ -8,7 +8,7 @@ extension Math.Operation2.Bevel {
     
     public static func perform(
         polyline: Polyline2,
-        index: CornerIndex,
+        index: Polyline2.CornerIndex,
         distance: Distance
     ) -> Polyline2 {
         guard polyline.isValid(index) == true else { return polyline }
