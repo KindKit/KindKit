@@ -7,7 +7,7 @@ import Foundation
 public extension Measurement where UnitType : Dimension {
     
     @inlinable
-    func value(to unit: UnitType) -> Double {
+    func kk_value(to unit: UnitType) -> Double {
         return self.converted(to: unit).value
     }
     
@@ -16,7 +16,7 @@ public extension Measurement where UnitType : Dimension {
 public extension Measurement where UnitType : Dimension {
     
     @inlinable
-    var abs: Self {
+    var kk_abs: Self {
         return .init(
             value: Foundation.fabs(self.value),
             unit: self.unit
@@ -24,7 +24,7 @@ public extension Measurement where UnitType : Dimension {
     }
     
     @inlinable
-    var sqrt: Self {
+    var kk_sqrt: Self {
         return .init(
             value: Foundation.sqrt(self.value),
             unit: self.unit
@@ -32,7 +32,7 @@ public extension Measurement where UnitType : Dimension {
     }
     
     @inlinable
-    var pow2: Self {
+    var kk_pow2: Self {
         return .init(
             value: Foundation.pow(self.value, 2),
             unit: self.unit
@@ -40,7 +40,7 @@ public extension Measurement where UnitType : Dimension {
     }
     
     @inlinable
-    func pow(_ other: Self) -> Self {
+    func kk_pow(_ other: Self) -> Self {
         let lhs = self.unit.converter.baseUnitValue(fromValue: self.value)
         let rhs = other.unit.converter.baseUnitValue(fromValue: other.value)
         return .init(
@@ -55,13 +55,30 @@ public extension Measurement where UnitType : Dimension {
 
 public extension Measurement where UnitType : Dimension {
 
-    func isEqual(_ other: Self, tolerance: Self) -> Bool {
+    func kk_isEqual(_ other: Self, tolerance: Self) -> Bool {
         let delta = self - other
-        return delta.abs < tolerance
+        return delta.kk_abs < tolerance
     }
     
-    func isNotEqual(_ other: Self, tolerance: Self) -> Bool {
-        return self.isEqual(other, tolerance: tolerance) == false
+    func kk_isNotEqual(_ other: Self, tolerance: Self) -> Bool {
+        return self.kk_isEqual(other, tolerance: tolerance) == false
     }
     
 }
+
+extension Measurement : INearEqutable where UnitType : Dimension {
+    
+    public static func ~~ (lhs: Self, rhs: Self) -> Bool {
+        let lvalue, rvalue: Double
+        if lhs.unit != rhs.unit {
+            lvalue = lhs.value
+            rvalue = rhs.converted(to: lhs.unit).value
+        } else {
+            lvalue = lhs.value
+            rvalue = rhs.value
+        }
+        return lvalue ~~ rvalue
+    }
+    
+}
+

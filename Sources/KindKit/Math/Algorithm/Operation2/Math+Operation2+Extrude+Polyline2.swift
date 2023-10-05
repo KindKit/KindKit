@@ -8,7 +8,7 @@ extension Math.Operation2.Extrude {
     
     public static func perform(
         polyline: Polyline2,
-        index: EdgeIndex,
+        index: Polyline2.EdgeIndex,
         left: Distance,
         right: Distance,
         distance: Distance

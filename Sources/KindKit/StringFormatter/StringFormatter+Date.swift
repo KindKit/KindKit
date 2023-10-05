@@ -28,22 +28,26 @@ public extension StringFormatter.Date {
     
     @inlinable
     var format: String {
-        return self.formatter.dateFormat
+        nonmutating set { self.formatter.dateFormat = newValue }
+        get { self.formatter.dateFormat }
     }
     
     @inlinable
     var calendar: Calendar {
-        return self.formatter.calendar
+        nonmutating set { self.formatter.calendar = newValue }
+        get { self.formatter.calendar }
     }
     
     @inlinable
     var locale: Locale {
-        return self.formatter.locale
+        nonmutating set { self.formatter.locale = newValue }
+        get { self.formatter.locale }
     }
     
     @inlinable
     var timeZone: TimeZone {
-        return self.formatter.timeZone
+        nonmutating set { self.formatter.timeZone = newValue }
+        get { self.formatter.timeZone }
     }
     
 }
@@ -53,28 +57,28 @@ public extension StringFormatter.Date {
     @inlinable
     @discardableResult
     func format(_ value: String) -> Self {
-        self.formatter.dateFormat = value
+        self.format = value
         return self
     }
     
     @inlinable
     @discardableResult
     func calendar(_ value: Calendar) -> Self {
-        self.formatter.calendar = value
+        self.calendar = value
         return self
     }
     
     @inlinable
     @discardableResult
     func locale(_ value: Locale) -> Self {
-        self.formatter.locale = value
+        self.locale = value
         return self
     }
     
     @inlinable
     @discardableResult
     func timeZone(_ value: TimeZone) -> Self {
-        self.formatter.timeZone = value
+        self.timeZone = value
         return self
     }
     

@@ -53,6 +53,44 @@ public struct Matrix3 : Hashable {
         )
     }
     
+    public init(scale: Double) {
+        self.init(
+            scale, 0, 0,
+            0, scale, 0,
+            0, 0, 1
+        )
+    }
+    
+    public init(
+        translation: Point,
+        rotation: Angle,
+        scale: Point
+    ) {
+        var result = Matrix3.identity
+        if scale !~ .one {
+            result = Matrix3(scale: scale) * result
+        }
+        if rotation !~ .degrees0 {
+            result = Matrix3(rotation: rotation) * result
+        }
+        if translation !~ .zero {
+            result = Matrix3(translation: translation) * result
+        }
+        self = result
+    }
+    
+    public init(
+        translation: Point,
+        rotation: Angle,
+        scale: Double
+    ) {
+        self.init(
+            translation: translation,
+            rotation: rotation,
+            scale: .init(x: scale, y: scale)
+        )
+    }
+    
 }
 
 public extension Matrix3 {

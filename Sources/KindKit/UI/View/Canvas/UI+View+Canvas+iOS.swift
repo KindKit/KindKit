@@ -35,11 +35,11 @@ extension UI.View.Canvas {
 
 final class KKCanvasView : UIView {
     
-    var kkCanvas: IGraphicsCanvas?
-    var kkTapGestures: [Graphics.Gesture : UITapGestureRecognizer] = [:]
-    var kkLongPressGestures: [Graphics.Gesture : UILongPressGestureRecognizer] = [:]
-    var kkPanGestures: [Graphics.Gesture : UIPanGestureRecognizer] = [:]
-    var kkPreviousPanLocation: [Graphics.Gesture : CGPoint] = [:]
+    var kkDelegate: KKUIViewCanvasDelegate?
+    var kkTapGestures: [UI.View.Canvas.Gesture : UITapGestureRecognizer] = [:]
+    var kkLongPressGestures: [UI.View.Canvas.Gesture : UILongPressGestureRecognizer] = [:]
+    var kkPanGestures: [UI.View.Canvas.Gesture : UIPanGestureRecognizer] = [:]
+    var kkPreviousPanLocation: [UI.View.Canvas.Gesture : CGPoint] = [:]
     var kkPinchGesture: UIPinchGestureRecognizer!
     var kkPreviousPinchLocation: CGPoint?
     var kkPreviousPinchScale: CGFloat?
@@ -53,7 +53,7 @@ final class KKCanvasView : UIView {
         
         self.clipsToBounds = true
         
-        for canvasGesture in Graphics.Gesture.allCases {
+        for canvasGesture in UI.View.Canvas.Gesture.allCases {
             let numberOfTouches = canvasGesture.numberOfTouches
             do {
                 let gesture = UITapGestureRecognizer(target: self, action: #selector(self._handleTapGesture(_:)))
@@ -92,16 +92,14 @@ final class KKCanvasView : UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        if let canvas = self.kkCanvas {
-            canvas.resize(Size(self.bounds.size))
-        }
+        guard let delegate = self.kkDelegate else { return }
+        delegate.resize(Size(self.bounds.size))
     }
     
     override func draw(_ rect: CGRect) {
+        guard let delegate = self.kkDelegate else { return }
         guard let cgContext = UIGraphicsGetCurrentContext() else { return }
-        if let canvas = self.kkCanvas {
-            canvas.draw(Graphics.Context(cgContext), bounds: Rect(self.bounds))
-        }
+        delegate.draw(Graphics.Context(cgContext, size: self.bounds.size))
     }
 
 }
@@ -111,10 +109,10 @@ extension KKCanvasView {
     func update(view: UI.View.Canvas) {
         self.update(frame: view.frame)
         self.update(transform: view.transform)
-        self.update(canvas: view.canvas)
         self.update(locked: view.isLocked)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -129,11 +127,6 @@ extension KKCanvasView {
         self.isUserInteractionEnabled = locked == false
     }
     
-    func update(canvas: IGraphicsCanvas?) {
-        self.kkCanvas = canvas
-        self.setNeedsDisplay()
-    }
-    
     func update(color: UI.Color?) {
         self.backgroundColor = color?.native
     }
@@ -143,6 +136,7 @@ extension KKCanvasView {
     }
     
     func cleanup() {
+        self.kkDelegate = nil
     }
     
 }
@@ -151,54 +145,59 @@ private extension KKCanvasView {
     
     @objc
     func _handleTapGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self.kkCanvas else {
-            return
-        }
-        guard let found = self.kkTapGestures.first(where: { $0.value === gesture }) else {
-            return
-        }
-        let location = found.value.location(in: self)
-        canvas.tapGesture(found.key, location: Point(location))
+        guard let delegate = self.kkDelegate else { return }
+        guard let found = self.kkTapGestures.first(where: { $0.value === gesture }) else { return }
+        delegate.handle(tap: .init(
+            gesture: found.key,
+            location: Point(found.value.location(in: self))
+        ))
     }
     
     @objc
     func _handleLongPressGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self.kkCanvas else {
-            return
-        }
-        guard let found = self.kkTapGestures.first(where: { $0.value === gesture }) else {
-            return
-        }
-        let location = found.value.location(in: self)
-        canvas.longTapGesture(found.key, location: Point(location))
+        guard let delegate = self.kkDelegate else { return }
+        guard let found = self.kkLongPressGestures.first(where: { $0.value === gesture }) else { return }
+        delegate.handle(longTap: .init(
+            gesture: found.key,
+            location: Point(found.value.location(in: self))
+        ))
     }
     
     @objc
     func _handlePanGesture(_ gesture: UIGestureRecognizer) {
-        guard let canvas = self.kkCanvas else {
-            return
-        }
-        guard let found = self.kkPanGestures.first(where: { $0.value === gesture }) else {
-            return
-        }
+        guard let delegate = self.kkDelegate else { return }
+        guard let found = self.kkPanGestures.first(where: { $0.value === gesture }) else { return }
         switch found.value.state {
-        case .possible: break
+        case .possible: 
+            break
         case .began:
             let location = found.value.location(in: self)
             self.kkPreviousPanLocation[found.key] = location
-            canvas.beginPanGesture(found.key, location: Point(location))
+            delegate.handle(pan: .init(
+                gesture: found.key,
+                state: .begin,
+                location: Point(location)
+            ))
         case .changed:
             if found.value.numberOfTouches != found.value.minimumNumberOfTouches {
                 found.value.isEnabled = false
             } else {
                 let location = found.value.location(in: self)
                 self.kkPreviousPanLocation[found.key] = location
-                canvas.changePanGesture(found.key, location: Point(location))
+                delegate.handle(pan: .init(
+                    gesture: found.key,
+                    state: .change,
+                    location: Point(location)
+                ))
             }
         case .ended, .cancelled, .failed:
             if let location = self.kkPreviousPanLocation[found.key] {
                 self.kkPreviousPanLocation[found.key] = nil
-                canvas.endPanGesture(found.key, location: Point(location))
+                delegate.handle(pan: .init(
+                    gesture: found.key,
+                    state: .end,
+                    location: Point(location)
+                ))
             }
             found.value.isEnabled = true
         @unknown default: break
@@ -207,9 +206,7 @@ private extension KKCanvasView {
     
     @objc
     func _handlePinchGesture() {
-        guard let canvas = self.kkCanvas else {
-            return
-        }
+        guard let delegate = self.kkDelegate else { return }
         switch self.kkPinchGesture.state {
         case .possible: break
         case .began:
@@ -217,7 +214,11 @@ private extension KKCanvasView {
             let scale = self.kkPinchGesture.scale
             self.kkPreviousPinchLocation = location
             self.kkPreviousPinchScale = scale
-            canvas.beginPinchGesture(location: Point(location), scale: Double(scale))
+            delegate.handle(pinch: .init(
+                state: .begin,
+                location: Point(location),
+                scale: Double(scale)
+            ))
         case .changed:
             if self.kkPinchGesture.numberOfTouches != 2 {
                 self.kkPinchGesture.isEnabled = false
@@ -226,13 +227,21 @@ private extension KKCanvasView {
                 let scale = self.kkPinchGesture.scale
                 self.kkPreviousPinchLocation = location
                 self.kkPreviousPinchScale = scale
-                canvas.changePinchGesture(location: Point(location), scale: Double(scale))
+                delegate.handle(pinch: .init(
+                    state: .change,
+                    location: Point(location),
+                    scale: Double(scale)
+                ))
             }
         case .ended, .cancelled, .failed:
             if let location = self.kkPreviousPinchLocation, let scale = self.kkPreviousPinchScale {
                 self.kkPreviousPinchLocation = nil
                 self.kkPreviousPinchScale = nil
-                canvas.endPinchGesture(location: Point(location), scale: Double(scale))
+                delegate.handle(pinch: .init(
+                    state: .end,
+                    location: Point(location),
+                    scale: Double(scale)
+                ))
             }
             self.kkPinchGesture.isEnabled = true
         @unknown default: break
@@ -241,9 +250,7 @@ private extension KKCanvasView {
     
     @objc
     func _handleRotationGesture() {
-        guard let canvas = self.kkCanvas else {
-            return
-        }
+        guard let delegate = self.kkDelegate else { return }
         switch self.kkRotationGesture.state {
         case .possible: break
         case .began:
@@ -251,7 +258,11 @@ private extension KKCanvasView {
             let angle = self.kkRotationGesture.rotation
             self.kkPreviousRotationLocation = location
             self.kkPreviousRotationAngle = angle
-            canvas.beginRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
+            delegate.handle(rotation: .init(
+                state: .begin,
+                location: Point(location),
+                angle: Angle(radians: Double(angle))
+            ))
         case .changed:
             if self.kkRotationGesture.numberOfTouches != 2 {
                 self.kkRotationGesture.isEnabled = false
@@ -260,13 +271,21 @@ private extension KKCanvasView {
                 let angle = self.kkRotationGesture.rotation
                 self.kkPreviousRotationLocation = location
                 self.kkPreviousRotationAngle = angle
-                canvas.changeRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
+                delegate.handle(rotation: .init(
+                    state: .change,
+                    location: Point(location),
+                    angle: Angle(radians: Double(angle))
+                ))
             }
         case .ended, .cancelled, .failed:
             if let location = self.kkPreviousRotationLocation, let angle = self.kkPreviousRotationAngle {
                 self.kkPreviousRotationLocation = nil
                 self.kkPreviousRotationAngle = nil
-                canvas.endRotationGesture(location: Point(location), angle: Angle(radians: Double(angle)))
+                delegate.handle(rotation: .init(
+                    state: .end,
+                    location: Point(location),
+                    angle: Angle(radians: Double(angle))
+                ))
             }
             self.kkRotationGesture.isEnabled = true
         @unknown default: break
@@ -278,19 +297,17 @@ private extension KKCanvasView {
 extension KKCanvasView : UIGestureRecognizerDelegate {
     
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard let canvas = self.kkCanvas else {
-            return false
-        }
+        guard let delegate = self.kkDelegate else { return false }
         if let found = self.kkTapGestures.first(where: { $0.value === gestureRecognizer }) {
-            return canvas.shouldTapGesture(found.key)
+            return delegate.shouldTap(found.key)
         } else if let found = self.kkLongPressGestures.first(where: { $0.value === gestureRecognizer }) {
-            return canvas.shouldLongTapGesture(found.key)
+            return delegate.shouldLongTap(found.key)
         } else if let found = self.kkPanGestures.first(where: { $0.value === gestureRecognizer }) {
-            return canvas.shouldPanGesture(found.key)
+            return delegate.shouldPan(found.key)
         } else if gestureRecognizer === self.kkPinchGesture {
-            return canvas.shouldPinchGesture()
+            return delegate.shouldPinch()
         } else if gestureRecognizer === self.kkRotationGesture {
-            return canvas.shouldRotationGesture()
+            return delegate.shouldRotation()
         }
         return false
     }

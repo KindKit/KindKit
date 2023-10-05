@@ -97,6 +97,11 @@ public extension Size {
     }
     
     @inlinable
+    func inset(all: Double) -> Self {
+        return self.inset(horizontal: all, vertical: all)
+    }
+    
+    @inlinable
     func inset(_ value: Inset) -> Self {
         return self.inset(horizontal: value.horizontal, vertical: value.vertical)
     }

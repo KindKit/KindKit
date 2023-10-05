@@ -45,17 +45,11 @@ public extension UI.Transform {
     
     @inlinable
     var matrix: Matrix3 {
-        var result = Matrix3.identity
-        if self.isScaled == true {
-            result = Matrix3(scale: self.scale) * result
-        }
-        if self.isRotated == true {
-            result = Matrix3(rotation: self.rotation) * result
-        }
-        if self.isTranslated == true {
-            result = Matrix3(translation: self.translation) * result
-        }
-        return result
+        return .init(
+            translation: self.translation,
+            rotation: self.rotation,
+            scale: self.scale
+        )
     }
     
 }

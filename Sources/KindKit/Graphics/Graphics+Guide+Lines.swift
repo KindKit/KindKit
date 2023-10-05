@@ -21,22 +21,60 @@ public extension Graphics.Guide {
             self.lines = lines
             self.snap = snap
         }
+        
+        public func guide(_ coordinate: KindKit.Point) -> KindKit.Point {
+            guard self.isEnabled == true else { return coordinate }
+            let oi = self.lines.map({ (line: $0, distance: $0.distance(coordinate)) })
+            let fi = oi.filter({ $0.distance.abs <= self.snap })
+            let si = fi.sorted(by: { $0.distance < $1.distance })
+            if let i = si.first {
+                return i.line.perpendicular(coordinate)
+            }
+            return coordinate
+        }
 
     }
     
 }
 
-extension Graphics.Guide.Lines : IGraphicsCoordinateGuide {
+public extension Graphics.Guide.Lines {
     
-    public func guide(_ coordinate: Point) -> Point? {
-        guard self.isEnabled == true else { return nil }
-        let oi = self.lines.map({ (line: $0, distance: $0.distance(coordinate)) })
-        let fi = oi.filter({ $0.distance.abs <= self.snap })
-        let si = fi.sorted(by: { $0.distance < $1.distance })
-        if let i = si.first {
-            return i.line.perpendicular(coordinate)
-        }
-        return nil
+    @inlinable
+    @discardableResult
+    func lines(_ value: [Line2]) -> Self {
+        self.lines = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func lines(_ value: () -> [Line2]) -> Self {
+        return self.lines(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func lines(_ value: (Self) -> [Line2]) -> Self {
+        return self.lines(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func snap(_ value: Distance) -> Self {
+        self.snap = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func snap(_ value: () -> Distance) -> Self {
+        return self.snap(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func snap(_ value: (Self) -> Distance) -> Self {
+        return self.snap(value(self))
     }
     
 }

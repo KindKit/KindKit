@@ -7,24 +7,22 @@ import Foundation
 public final class UndoRedo {
     
     public weak var delegate: IUndoRedoDelegate?
-    public private(set) var isEnabled: Bool
+    public private(set) var isEnabled: Bool = true
     public var isTracking: Bool {
         return self._scope != nil
     }
+    public private(set) var isApplies: Bool = false
     
-    private var _undoStack: [UndoRedo.Scope]
-    private var _redoStack: [UndoRedo.Scope]
+    public let onRefresh = Signal.Empty< Void >()
+    
+    private var _undoStack: [UndoRedo.Scope] = []
+    private var _redoStack: [UndoRedo.Scope] = []
     private var _scope: UndoRedo.Scope?
-    private var _observer: Observer< IUndoRedoObserver >
     
     public init(
         delegate: IUndoRedoDelegate
     ) {
         self.delegate = delegate
-        self.isEnabled = true
-        self._undoStack = []
-        self._redoStack = []
-        self._observer = Observer()
     }
     
 }
@@ -43,21 +41,16 @@ public extension UndoRedo {
 
 public extension UndoRedo {
     
-    func add(observer: IUndoRedoObserver) {
-        self._observer.add(observer, priority: 0)
-    }
-    
-    func remove(observer: IUndoRedoObserver) {
-        self._observer.remove(observer)
-    }
-    
     func undo() {
         guard let delegate = self.delegate else { return }
         guard self.canUndo == true else { return }
+        guard self.isApplies == false else { return }
+        self.isApplies = true
         let scope = self._undoStack.removeLast()
         self._redoStack.append(scope)
         scope.undo(delegate)
-        self._notifyRefresh()
+        self.isApplies = false
+        self.onRefresh.emit()
     }
     
     func redo() {
@@ -66,7 +59,7 @@ public extension UndoRedo {
         let scope = self._redoStack.removeLast()
         self._undoStack.append(scope)
         scope.redo(delegate)
-        self._notifyRefresh()
+        self.onRefresh.emit()
     }
     
     func disable(_ block: () -> Void) {
@@ -94,7 +87,7 @@ public extension UndoRedo {
                 }
                 self._redoStack.removeAll()
             }
-            self._notifyRefresh()
+            self.onRefresh.emit()
         }
         self._scope = nil
     }
@@ -109,15 +102,44 @@ public extension UndoRedo {
         }
     }
     
+    func scope< Result >(_ block: () -> Result) -> Result {
+        let result: Result
+        if self.isEnabled == true && self.isTracking == false {
+            self.startScope()
+            result = block()
+            self.endScope()
+        } else {
+            result = block()
+        }
+        return result
+    }
+    
+    func track(
+        create command: String,
+        object: String,
+        _ closure: (inout IUndoRedoMutatingPermanentContext) -> Void
+    ) {
+        guard let scope = self._scope else { return }
+        scope.create(command, object, closure)
+    }
+    
     func track<
         Command : RawRepresentable
     >(
         create command: Command,
         object: String,
-        _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
+        _ closure: (inout IUndoRedoMutatingPermanentContext) -> Void
     ) where Command.RawValue == String {
+        self.track(create: command.rawValue, object: object, closure)
+    }
+    
+    func track(
+        update command: String,
+        object: String,
+        _ closure: (inout IUndoRedoMutatingTransformContext) -> Void
+    ) {
         guard let scope = self._scope else { return }
-        scope.create(command.rawValue, object, closure)
+        scope.update(command, object, closure)
     }
     
     func track<
@@ -125,10 +147,18 @@ public extension UndoRedo {
     >(
         update command: Command,
         object: String,
-        _ closure: (_ context: inout IUndoRedoMutatingTransformContext) -> Void
+        _ closure: (inout IUndoRedoMutatingTransformContext) -> Void
     ) where Command.RawValue == String {
+        self.track(update: command.rawValue, object: object, closure)
+    }
+    
+    func track(
+        delete command: String,
+        object: String,
+        _ closure: (inout IUndoRedoMutatingPermanentContext) -> Void
+    ) {
         guard let scope = self._scope else { return }
-        scope.update(command.rawValue, object, closure)
+        scope.delete(command, object, closure)
     }
     
     func track<
@@ -136,18 +166,34 @@ public extension UndoRedo {
     >(
         delete command: Command,
         object: String,
-        _ closure: (_ context: inout IUndoRedoMutatingPermanentContext) -> Void
+        _ closure: (inout IUndoRedoMutatingPermanentContext) -> Void
     ) where Command.RawValue == String {
-        guard let scope = self._scope else { return }
-        scope.delete(command.rawValue, object, closure)
+        self.track(delete: command.rawValue, object: object, closure)
     }
     
 }
 
-private extension UndoRedo {
+public extension UndoRedo {
     
-    func _notifyRefresh() {
-        self._observer.notify({ $0.refresh(self) })
+    @inlinable
+    @discardableResult
+    func onRefresh(_ closure: (() -> Void)?) -> Self {
+        self.onRefresh.link(closure)
+        return self
     }
-        
+    
+    @inlinable
+    @discardableResult
+    func onRefresh(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onRefresh.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onRefresh< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onRefresh.link(sender, closure)
+        return self
+    }
+    
 }

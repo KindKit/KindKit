@@ -218,6 +218,12 @@ public extension Distance {
         return .init(lhs.value * rhs.value)
     }
     
+    @inlinable
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
+        let point = Point(x: lhs.value, y: 0) * rhs
+        return point.length
+    }
+    
 }
 
 public extension Distance {
@@ -239,6 +245,11 @@ public extension Distance {
     
     @inlinable
     static func *= (lhs: inout Self, rhs: Percent) {
+        lhs = lhs * rhs
+    }
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Matrix3) {
         lhs = lhs * rhs
     }
     

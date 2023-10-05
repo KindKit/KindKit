@@ -66,6 +66,13 @@ public extension IUIView {
     
     @inlinable
     @discardableResult
+    func frame(_ frame: () -> Rect) -> Self {
+        self.frame = frame()
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
     func frame(_ frame: (Self) -> Rect) -> Self {
         self.frame = frame(self)
         return self

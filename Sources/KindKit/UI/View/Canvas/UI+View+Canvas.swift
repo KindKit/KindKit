@@ -8,6 +8,29 @@ import Foundation
 #warning("Require support macOS")
 #elseif os(iOS)
 
+protocol KKUIViewCanvasDelegate : AnyObject {
+    
+    func resize(_ size: Size)
+    
+    func draw(_ context: Graphics.Context)
+    
+    func shouldTap(_ gesture: UI.View.Canvas.Gesture) -> Bool
+    func handle(tap event: UI.View.Canvas.Event.Tap)
+    
+    func shouldLongTap(_ gesture: UI.View.Canvas.Gesture) -> Bool
+    func handle(longTap event: UI.View.Canvas.Event.Tap)
+    
+    func shouldPan(_ gesture: UI.View.Canvas.Gesture) -> Bool
+    func handle(pan event: UI.View.Canvas.Event.Pan)
+    
+    func shouldPinch() -> Bool
+    func handle(pinch event: UI.View.Canvas.Event.Pinch)
+    
+    func shouldRotation() -> Bool
+    func handle(rotation event: UI.View.Canvas.Event.Rotation)
+    
+}
+
 public extension UI.View {
     
     final class Canvas {
@@ -35,19 +58,6 @@ public extension UI.View {
             didSet {
                 guard self.size != oldValue else { return }
                 self.setNeedForceLayout()
-            }
-        }
-        public var canvas: IGraphicsCanvas? {
-            willSet(oldValue) {
-                guard self.canvas !== oldValue else { return }
-                self.canvas?.detach()
-            }
-            didSet {
-                guard self.canvas !== oldValue else { return }
-                self.canvas?.attach(view: self)
-                if self.isLoaded == true {
-                    self._view.update(canvas: self.canvas)
-                }
             }
         }
         public var color: UI.Color? {
@@ -84,12 +94,24 @@ public extension UI.View {
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onStyle: Signal.Args< Void, Bool > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onVisibility = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onStyle = Signal.Args< Void, Bool >()
+        public let onResize = Signal.Args< Void, Size >()
+        public let onDraw = Signal.Args< Void, Graphics.Context >()
+        public let onShouldTap = Signal.Args< Bool?, Gesture >()
+        public let onTap = Signal.Args< Void, Event.Tap >()
+        public let onShouldLongTap = Signal.Args< Bool?, Gesture >()
+        public let onLongTap = Signal.Args< Void, Event.Tap >()
+        public let onShouldPan = Signal.Args< Bool?, Gesture >()
+        public let onPan = Signal.Args< Void, Event.Pan >()
+        public let onShouldPinch = Signal.Empty< Bool? >()
+        public let onPinch = Signal.Args< Void, Event.Pinch >()
+        public let onShouldRotation = Signal.Empty< Bool? >()
+        public let onRotation = Signal.Args< Void, Event.Rotation >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -102,29 +124,6 @@ public extension UI.View {
             self._reuse.destroy()
         }
         
-    }
-    
-}
-
-public extension UI.View.Canvas {
-    
-    @inlinable
-    @discardableResult
-    func canvas(_ value: IGraphicsCanvas?) -> Self {
-        self.canvas = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func canvas(_ value: () -> IGraphicsCanvas?) -> Self {
-        return self.canvas(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func canvas(_ value: (Self) -> IGraphicsCanvas?) -> Self {
-        return self.canvas(value(self))
     }
     
 }
@@ -223,11 +222,63 @@ extension UI.View.Canvas : IUIViewColorable {
 extension UI.View.Canvas : IUIViewAlphable {
 }
 
+extension UI.View.Canvas : KKUIViewCanvasDelegate {
+    
+    func resize(_ size: Size) {
+        self.onResize.emit(size)
+    }
+    
+    func draw(_ context: Graphics.Context) {
+        self.onDraw.emit(context)
+    }
+    
+    func shouldTap(_ gesture: Gesture) -> Bool {
+        return self.onShouldTap.emit(gesture) ?? false
+    }
+    
+    func handle(tap event: Event.Tap) {
+        self.onTap.emit(event)
+    }
+    
+    func shouldLongTap(_ gesture: Gesture) -> Bool {
+        return self.onShouldLongTap.emit(gesture) ?? false
+    }
+    
+    func handle(longTap event: Event.Tap) {
+        self.onLongTap.emit(event)
+    }
+    
+    func shouldPan(_ gesture: Gesture) -> Bool {
+        return self.onShouldPan.emit(gesture) ?? false
+    }
+    
+    func handle(pan event: Event.Pan) {
+        self.onPan.emit(event)
+    }
+    
+    func shouldPinch() -> Bool {
+        return self.onShouldPinch.emit() ?? false
+    }
+    
+    func handle(pinch event: Event.Pinch) {
+        self.onPinch.emit(event)
+    }
+    
+    func shouldRotation() -> Bool {
+        return self.onShouldRotation.emit() ?? false
+    }
+    
+    func handle(rotation event: Event.Rotation) {
+        self.onRotation.emit(event)
+    }
+    
+}
+
 public extension IUIView where Self == UI.View.Canvas {
     
     @inlinable
-    static func canvas(_ canvas: IGraphicsCanvas) -> Self {
-        return .init().canvas(canvas)
+    static func canvas() -> Self {
+        return .init()
     }
     
 }

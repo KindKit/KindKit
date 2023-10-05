@@ -28,12 +28,14 @@ public extension StringFormatter.ByteCount {
     
     @inlinable
     var units: ByteCountFormatter.Units {
-        return self.formatter.allowedUnits
+        nonmutating set { self.formatter.allowedUnits = newValue }
+        get { self.formatter.allowedUnits }
     }
     
     @inlinable
     var style: ByteCountFormatter.CountStyle {
-        return self.formatter.countStyle
+        nonmutating set { self.formatter.countStyle = newValue }
+        get { self.formatter.countStyle }
     }
     
 }
@@ -43,14 +45,14 @@ public extension StringFormatter.ByteCount {
     @inlinable
     @discardableResult
     func units(_ value: ByteCountFormatter.Units) -> Self {
-        self.formatter.allowedUnits = value
+        self.units = value
         return self
     }
     
     @inlinable
     @discardableResult
     func style(_ value: ByteCountFormatter.CountStyle) -> Self {
-        self.formatter.countStyle = value
+        self.style = value
         return self
     }
     

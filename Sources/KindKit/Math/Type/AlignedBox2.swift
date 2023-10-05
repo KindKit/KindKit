@@ -24,7 +24,7 @@ public struct AlignedBox2 : Hashable {
         let w2 = size.width / 2
         let h2 = size.height / 2
         self.lower = .init(x: center.x - w2, y: center.y - h2)
-        self.upper = .init(x: center.y + w2, y: center.y + h2)
+        self.upper = .init(x: center.x + w2, y: center.y + h2)
     }
     
     public init(
@@ -74,11 +74,6 @@ public extension AlignedBox2 {
             width: self.width,
             height: self.height
         )
-    }
-    
-    @inlinable
-    var area: Double {
-        return self.width * self.height
     }
     
     @inlinable
@@ -132,6 +127,16 @@ public extension AlignedBox2 {
             center: (self.upper + self.lower) / 2,
             extent: (self.upper - self.lower) / 2
         )
+    }
+    
+    @inlinable
+    var perimeter: Distance {
+        return .init((self.width * 2) + (self.height * 2))
+    }
+    
+    @inlinable
+    var area: Area {
+        return .init(self.width * self.height)
     }
     
 }

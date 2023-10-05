@@ -12,6 +12,16 @@ extension Math.Distance2 {
         public let src: Point
         public let dst: Point
         
+        @inlinable
+        public var distance: Distance {
+            return self.squaredDistance.normal
+        }
+        
+        @inlinable
+        public var squaredDistance: Distance.Squared {
+            return self.src.squaredLength(self.dst)
+        }
+        
     }
     
     public static func find(_ line: Line2, _ box: AlignedBox2) -> LineToAlignedBox {

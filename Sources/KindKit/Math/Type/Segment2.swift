@@ -32,6 +32,16 @@ public extension Segment2 {
     }
     
     @inlinable
+    var direction: Point {
+        return self.delta.normalized.point
+    }
+    
+    @inlinable
+    var normal: Point {
+        return self.delta.perpendicular.normalized.point
+    }
+
+    @inlinable
     var centeredForm: CenteredForm {
         set {
             self.start = newValue.center - Distance(newValue.extend) * newValue.direction
@@ -96,7 +106,7 @@ extension Segment2 : ICurve2 {
 
     @inlinable
     public var squaredLength: Distance.Squared {
-        return self.end.squaredDistance(self.start)
+        return self.end.squaredLength(self.start)
     }
 
     @inlinable
@@ -116,7 +126,7 @@ extension Segment2 : ICurve2 {
     
     @inlinable
     public func normal(at location: Percent) -> Point {
-        return self.delta.perpendicular.normalized.point
+        return self.normal
     }
     
     @inlinable
@@ -128,14 +138,14 @@ extension Segment2 : ICurve2 {
     public func split(at location: Percent) -> (left: Self, right: Self) {
         let center = self.start.lerp(self.end, progress: location)
         return (
-            left: Segment2(start: self.start, end: center),
-            right: Segment2(start: center, end: self.end)
+            left: .init(start: self.start, end: center),
+            right: .init(start: center, end: self.end)
         )
     }
     
     @inlinable
     public func cut(start: Percent, end: Percent) -> Self {
-        return Segment2(start: self.point(at: start), end: self.point(at: end))
+        return .init(start: self.point(at: start), end: self.point(at: end))
     }
     
 }
@@ -144,7 +154,7 @@ public extension Segment2 {
     
     @inlinable
     static func + (lhs: Self, rhs: Point) -> Self {
-        return Segment2(
+        return .init(
             start: lhs.start + rhs,
             end: lhs.end + rhs
         )
@@ -157,7 +167,7 @@ public extension Segment2 {
     
     @inlinable
     static func - (lhs: Self, rhs: Point) -> Self {
-        return Segment2(
+        return .init(
             start: lhs.start - rhs,
             end: lhs.end - rhs
         )
@@ -170,7 +180,7 @@ public extension Segment2 {
     
     @inlinable
     static func * (lhs: Self, rhs: Matrix3) -> Self {
-        return Segment2(
+        return .init(
             start: lhs.start * rhs,
             end: lhs.end * rhs
         )

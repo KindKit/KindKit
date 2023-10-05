@@ -160,7 +160,7 @@ public extension Polyline2 {
     func corner(_ point: Point, distance: Distance, condition: ((_ index: CornerIndex) -> Bool)? = nil) -> CornerIndex? {
         var corners: [(CornerIndex, Distance)] = []
         for index in self.corners.indices {
-            let d = self.corners[index].distance(point).abs
+            let d = self.corners[index].length(point).abs
             if d <= distance {
                 corners.append((CornerIndex(index), d))
             }
@@ -182,7 +182,7 @@ public extension Polyline2 {
             let s = self[segment: e]
             let cp = s.closest(point)
             let ip = s.point(at: cp)
-            let d = ip.distance(point).abs
+            let d = ip.length(point).abs
             if d <= distance {
                 edges.append((EdgeIndex(index), d))
             }
@@ -261,6 +261,24 @@ public extension Polyline2 {
             left: self[segment: edges.left],
             right: self[segment: edges.right]
         )
+    }
+    
+}
+
+public extension Polyline2 {
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
+        return .init(corners: lhs.corners.map({ $0 * rhs }))
+    }
+    
+}
+
+public extension Polyline2 {
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Matrix3) {
+        lhs = lhs * rhs
     }
     
 }

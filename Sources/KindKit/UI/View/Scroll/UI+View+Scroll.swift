@@ -359,7 +359,7 @@ public extension UI.View.Scroll {
     ) {
         let beginContentOffset = self.contentOffset
         let endContentOffset = to
-        let deltaContentOffset = beginContentOffset.distance(endContentOffset).abs
+        let deltaContentOffset = beginContentOffset.length(endContentOffset).abs
         if animated == true && deltaContentOffset > .zero {
             let velocity = velocity ?? max(self.bounds.width, self.bounds.height) * 5
             self._animation = Animation.default.run(

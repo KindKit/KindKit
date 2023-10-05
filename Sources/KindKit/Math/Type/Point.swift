@@ -109,12 +109,12 @@ public extension Point {
     }
     
     @inlinable
-    func distance(_ other: Self) -> Distance {
-        return self.squaredDistance(other).normal
+    func length(_ other: Self) -> Distance {
+        return self.squaredLength(other).normal
     }
     
     @inlinable
-    func squaredDistance(_ other: Self) -> Distance.Squared {
+    func squaredLength(_ other: Self) -> Distance.Squared {
         return (self - other).squaredLength
     }
     

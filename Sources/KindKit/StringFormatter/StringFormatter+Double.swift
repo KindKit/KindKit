@@ -41,107 +41,128 @@ public extension StringFormatter.Double {
     
     @inlinable
     var minIntegerDigits: Int {
-        return self.formatter.minimumIntegerDigits
+        nonmutating set {  self.formatter.minimumIntegerDigits = newValue }
+        get { self.formatter.minimumIntegerDigits }
     }
     
     @inlinable
     var maxIntegerDigits: Int {
-        return self.formatter.maximumIntegerDigits
+        nonmutating set {  self.formatter.maximumIntegerDigits = newValue }
+        get { self.formatter.maximumIntegerDigits }
     }
     
     @inlinable
     var minFractionDigits: Int {
-        return self.formatter.minimumFractionDigits
+        nonmutating set {  self.formatter.minimumFractionDigits = newValue }
+        get { self.formatter.minimumFractionDigits }
     }
     
     @inlinable
     var maxFractionDigits: Int {
-        return self.formatter.maximumFractionDigits
+        nonmutating set {  self.formatter.maximumFractionDigits = newValue }
+        get { self.formatter.maximumFractionDigits }
     }
     
     @inlinable
-    var zero: String {
-        return self.formatter.zeroSymbol ?? ""
+    var zeroSymbol: String {
+        nonmutating set {  self.formatter.zeroSymbol = newValue }
+        get { self.formatter.zeroSymbol ?? "" }
     }
     
     @inlinable
-    var nan: String {
-        return self.formatter.notANumberSymbol
+    var nanSymbol: String {
+        nonmutating set {  self.formatter.notANumberSymbol = newValue }
+        get { self.formatter.notANumberSymbol }
     }
     
     @inlinable
     var plusSign: String {
-        return self.formatter.plusSign
+        nonmutating set {  self.formatter.plusSign = newValue }
+        get { self.formatter.plusSign }
     }
     
     @inlinable
     var minusSign: String {
-        return self.formatter.minusSign
+        nonmutating set {  self.formatter.minusSign = newValue }
+        get { self.formatter.minusSign }
     }
     
     @inlinable
     var positivePrefix: String {
-        return self.formatter.positivePrefix
+        nonmutating set {  self.formatter.positivePrefix = newValue }
+        get { self.formatter.positivePrefix }
     }
     
     @inlinable
     var positiveSuffix: String {
-        return self.formatter.positiveSuffix
+        nonmutating set {  self.formatter.positiveSuffix = newValue }
+        get { self.formatter.positiveSuffix }
     }
     
     @inlinable
     var negativePrefix: String {
-        return self.formatter.negativePrefix
+        nonmutating set {  self.formatter.negativePrefix = newValue }
+        get { self.formatter.negativePrefix }
     }
     
     @inlinable
     var negativeSuffix: String {
-        return self.formatter.negativeSuffix
+        nonmutating set {  self.formatter.negativeSuffix = newValue }
+        get { self.formatter.negativeSuffix }
     }
     
     @inlinable
-    var positiveInfinity: String {
-        return self.formatter.positiveInfinitySymbol
+    var positiveInfinitySymbol: String {
+        nonmutating set {  self.formatter.positiveInfinitySymbol = newValue }
+        get { self.formatter.positiveInfinitySymbol }
     }
     
     @inlinable
-    var negativeInfinity: String {
-        return self.formatter.negativeInfinitySymbol
+    var negativeInfinitySymbol: String {
+        nonmutating set {  self.formatter.negativeInfinitySymbol = newValue }
+        get { self.formatter.negativeInfinitySymbol }
     }
     
     @inlinable
     var alwaysShowsDecimalSeparator: Bool {
-        return self.formatter.alwaysShowsDecimalSeparator
+        nonmutating set {  self.formatter.alwaysShowsDecimalSeparator = newValue }
+        get { self.formatter.alwaysShowsDecimalSeparator }
     }
     
     @inlinable
     var decimalSeparator: String {
-        return self.formatter.decimalSeparator
+        nonmutating set {  self.formatter.decimalSeparator = newValue }
+        get { self.formatter.decimalSeparator }
     }
     
     @inlinable
     var usesGroupingSeparator: Bool {
-        return self.formatter.usesGroupingSeparator
+        nonmutating set {  self.formatter.usesGroupingSeparator = newValue }
+        get { self.formatter.usesGroupingSeparator }
     }
     
     @inlinable
     var groupingSeparator: String {
-        self.formatter.groupingSeparator
+        nonmutating set {  self.formatter.groupingSeparator = newValue }
+        get { self.formatter.groupingSeparator }
     }
     
     @inlinable
     var groupingSize: Int {
-        return self.formatter.groupingSize
+        nonmutating set {  self.formatter.groupingSize = newValue }
+        get { self.formatter.groupingSize }
     }
     
     @inlinable
     var secondaryGroupingSize: Int {
-        return self.formatter.secondaryGroupingSize
+        nonmutating set {  self.formatter.secondaryGroupingSize = newValue }
+        get { self.formatter.secondaryGroupingSize }
     }
     
     @inlinable
     var locale: Locale {
-        return self.formatter.locale
+        nonmutating set {  self.formatter.locale = newValue }
+        get { self.formatter.locale }
     }
     
 }
@@ -151,147 +172,147 @@ public extension StringFormatter.Double {
     @inlinable
     @discardableResult
     func minIntegerDigits(_ value: Int) -> Self {
-        self.formatter.minimumIntegerDigits = value
+        self.minIntegerDigits = value
         return self
     }
     
     @inlinable
     @discardableResult
     func maxIntegerDigits(_ value: Int) -> Self {
-        self.formatter.maximumIntegerDigits = value
+        self.maxIntegerDigits = value
         return self
     }
     
     @inlinable
     @discardableResult
     func minFractionDigits(_ value: Int) -> Self {
-        self.formatter.minimumFractionDigits = value
+        self.minFractionDigits = value
         return self
     }
     
     @inlinable
     @discardableResult
     func maxFractionDigits(_ value: Int) -> Self {
-        self.formatter.maximumFractionDigits = value
+        self.maxFractionDigits = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func zero(_ value: String) -> Self {
-        self.formatter.zeroSymbol = value
+    func zeroSymbol(_ value: String) -> Self {
+        self.zeroSymbol = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func nan(_ value: String) -> Self {
-        self.formatter.notANumberSymbol = value
+    func nanSymbol(_ value: String) -> Self {
+        self.nanSymbol = value
         return self
     }
     
     @inlinable
     @discardableResult
     func plusSign(_ value: String) -> Self {
-        self.formatter.plusSign = value
+        self.plusSign = value
         return self
     }
     
     @inlinable
     @discardableResult
     func minusSign(_ value: String) -> Self {
-        self.formatter.minusSign = value
+        self.minusSign = value
         return self
     }
     
     @inlinable
     @discardableResult
     func positivePrefix(_ value: String) -> Self {
-        self.formatter.positivePrefix = value
+        self.positivePrefix = value
         return self
     }
     
     @inlinable
     @discardableResult
     func positiveSuffix(_ value: String) -> Self {
-        self.formatter.positiveSuffix = value
+        self.positiveSuffix = value
         return self
     }
     
     @inlinable
     @discardableResult
     func negativePrefix(_ value: String) -> Self {
-        self.formatter.negativePrefix = value
+        self.negativePrefix = value
         return self
     }
     
     @inlinable
     @discardableResult
     func negativeSuffix(_ value: String) -> Self {
-        self.formatter.negativeSuffix = value
+        self.negativeSuffix = value
         return self
     }
     
     @inlinable
     @discardableResult
     func positiveInfinity(_ value: String) -> Self {
-        self.formatter.positiveInfinitySymbol = value
+        self.positiveInfinitySymbol = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func negativeInfinity(_ value: String) -> Self {
-        self.formatter.negativeInfinitySymbol = value
+    func negativeInfinitySymbol(_ value: String) -> Self {
+        self.negativeInfinitySymbol = value
         return self
     }
     
     @inlinable
     @discardableResult
     func alwaysShowsDecimalSeparator(_ value: Bool) -> Self {
-        self.formatter.alwaysShowsDecimalSeparator = value
+        self.alwaysShowsDecimalSeparator = value
         return self
     }
     
     @inlinable
     @discardableResult
     func decimalSeparator(_ value: String) -> Self {
-        self.formatter.decimalSeparator = value
+        self.decimalSeparator = value
         return self
     }
     
     @inlinable
     @discardableResult
     func usesGroupingSeparator(_ value: Bool) -> Self {
-        self.formatter.usesGroupingSeparator = value
+        self.usesGroupingSeparator = value
         return self
     }
     
     @inlinable
     @discardableResult
     func groupingSeparator(_ value: String) -> Self {
-        self.formatter.groupingSeparator = value
+        self.groupingSeparator = value
         return self
     }
     
     @inlinable
     @discardableResult
     func groupingSize(_ value: Int) -> Self {
-        self.formatter.groupingSize = value
+        self.groupingSize = value
         return self
     }
     
     @inlinable
     @discardableResult
     func secondaryGroupingSize(_ value: Int) -> Self {
-        self.formatter.secondaryGroupingSize = value
+        self.secondaryGroupingSize = value
         return self
     }
     
     @inlinable
     @discardableResult
     func locale(_ value: Locale) -> Self {
-        self.formatter.locale = value
+        self.locale = value
         return self
     }
     
