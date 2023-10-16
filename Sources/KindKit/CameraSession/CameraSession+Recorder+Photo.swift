@@ -8,6 +8,7 @@ public extension CameraSession.Recorder {
     
     final class Photo : ICameraSessionRecorder {
         
+        public weak var session: CameraSession?
         public var deviceOrientation: CameraSession.Orientation?
         public var interfaceOrientation: CameraSession.Orientation? {
             didSet {
@@ -46,6 +47,16 @@ public extension CameraSession.Recorder {
         public init() {
         }
         
+        public func attach(session: CameraSession) {
+            guard self.isAttached == false else { return }
+            self.session = session
+        }
+        
+        public func detach() {
+            guard self.isAttached == true else { return }
+            self.session = nil
+        }
+        
         public func cancel() {
             guard self.isRecording == true else { return }
             self._delegate = nil
@@ -62,7 +73,7 @@ public extension CameraSession.Recorder.Photo {
         onSuccess: @escaping (UI.Image) -> Void,
         onFailure: @escaping (Error) -> Void
     ) {
-        self.start(.init(
+        self._start(.init(
             onSuccess: onSuccess,
             onFailure: onFailure
         ))
@@ -72,16 +83,16 @@ public extension CameraSession.Recorder.Photo {
 
 private extension CameraSession.Recorder.Photo {
     
-    func start(_ context: Context) {
+    func _start(_ context: Context) {
         guard self.isRecording == false else {
             return
         }
-        if self._output.connections.isEmpty == false {
+        if self.isAttached == true {
             let delegate = Delegate(recorder: self)
             self._delegate = delegate
             self._context = context
             self._output.capturePhoto(
-                with: self._settings,
+                with: AVCapturePhotoSettings(from: self._settings),
                 delegate: delegate
             )
         } else {

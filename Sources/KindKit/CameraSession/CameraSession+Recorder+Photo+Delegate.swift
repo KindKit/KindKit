@@ -14,6 +14,7 @@ extension CameraSession.Recorder.Photo {
             recorder: CameraSession.Recorder.Photo
         ) {
             self.recorder = recorder
+            super.init()
         }
         
         func photoOutput(

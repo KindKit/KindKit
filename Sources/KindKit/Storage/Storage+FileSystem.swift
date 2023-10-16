@@ -195,7 +195,7 @@ public extension Storage.FileSystem {
     
     func contains(name: String, `extension`: String) -> Bool {
         let url = self.url(name: name, extension: `extension`)
-        guard url.absoluteString == self.url.absoluteString else { return false }
+        guard url == self.url else { return false }
         return self._fs.fileExists(atPath: url.path)
     }
     

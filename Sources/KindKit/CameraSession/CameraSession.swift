@@ -248,6 +248,7 @@ private extension CameraSession {
                     })
                     for recorder in recorders {
                         self.session.removeOutput(recorder.output)
+                        recorder.detach()
                     }
                 }
                 do {
@@ -258,6 +259,7 @@ private extension CameraSession {
                         if self.session.canAddOutput(recorder.output) == true {
                             self.session.addOutput(recorder.output)
                         }
+                        recorder.attach(session: self)
                     }
                 }
             } else {
@@ -265,6 +267,7 @@ private extension CameraSession {
                     if self.session.canAddOutput(recorder.output) == true {
                         self.session.addOutput(recorder.output)
                     }
+                    recorder.attach(session: self)
                 }
             }
             self.session.commitConfiguration()
@@ -449,6 +452,12 @@ public extension CameraSession {
         return self._set(
             recorders: recorders
         )
+    }
+    
+    func configuration(_ block: () throws -> Void) throws {
+        self.session.beginConfiguration()
+        try block()
+        self.session.commitConfiguration()
     }
     
 }
