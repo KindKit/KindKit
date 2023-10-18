@@ -27,11 +27,6 @@ public extension CameraSession.Recorder {
         public var isRecording: Bool {
             return self._delegate != nil && self._context != nil
         }
-        @available(macOS 13.0, *)
-        public var flash: Flash {
-            set { self._settings.flashMode = newValue.raw }
-            get { .init(self._settings.flashMode) ?? .off }
-        }
         @available(macOS 11.0, *)
         public var supportedFlashes: [Flash] {
             return self._output.supportedFlashModes.compactMap({
@@ -39,7 +34,6 @@ public extension CameraSession.Recorder {
             })
         }
         
-        private let _settings = AVCapturePhotoSettings()
         private let _output = AVCapturePhotoOutput()
         private var _delegate: Delegate?
         private var _context: Context?
@@ -57,6 +51,17 @@ public extension CameraSession.Recorder {
             self.session = nil
         }
         
+        public func start(
+            config: Config = .init(),
+            onSuccess: @escaping (UI.Image) -> Void,
+            onFailure: @escaping (Error) -> Void
+        ) {
+            self._start(config, .init(
+                onSuccess: onSuccess,
+                onFailure: onFailure
+            ))
+        }
+        
         public func cancel() {
             guard self.isRecording == true else { return }
             self._delegate = nil
@@ -67,39 +72,54 @@ public extension CameraSession.Recorder {
     
 }
 
-public extension CameraSession.Recorder.Photo {
-    
-    func start(
-        onSuccess: @escaping (UI.Image) -> Void,
-        onFailure: @escaping (Error) -> Void
-    ) {
-        self._start(.init(
-            onSuccess: onSuccess,
-            onFailure: onFailure
-        ))
-    }
-    
-}
-
 private extension CameraSession.Recorder.Photo {
     
-    func _start(_ context: Context) {
+    func _start(
+        _ config: Config,
+        _ context: Context
+    ) {
         guard self.isRecording == false else {
             return
         }
-        if self.isAttached == true {
-            let delegate = Delegate(recorder: self)
-            self._delegate = delegate
-            self._context = context
-            self._output.capturePhoto(
-                with: AVCapturePhotoSettings(from: self._settings),
-                delegate: delegate
-            )
+        if let session = self.session {
+            if let preset = config.preset {
+                session.configure(
+                    videoPreset: preset,
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        self._start(config, context, session)
+                    }
+                )
+            } else {
+                self._start(config, context, session)
+            }
         } else {
             DispatchQueue.main.async(execute: {
                 context.onFailure(.notConneted)
             })
         }
+    }
+    
+    func _start(
+        _ config: Config,
+        _ context: Context,
+        _ session: CameraSession
+    ) {
+        let delegate = Delegate(recorder: self)
+        self._delegate = delegate
+        self._context = context
+        
+        let settings = AVCapturePhotoSettings()
+        if #available(macOS 13.0, *) {
+            if let flash = config.flash {
+                settings.flashMode = flash.raw
+            }
+        }
+        
+        self._output.capturePhoto(
+            with: settings,
+            delegate: delegate
+        )
     }
     
 #if os(iOS)

@@ -27,7 +27,6 @@ public extension CameraSession.Recorder {
         public var isRecording: Bool {
             return self._delegate != nil && self._context != nil
         }
-        public var flashMode: CameraSession.Device.Video.Torch
         public let storage: Storage.FileSystem
 
         private let _output = AVCaptureMovieFileOutput()
@@ -35,10 +34,8 @@ public extension CameraSession.Recorder {
         private var _context: Context?
         
         public init(
-            flashMode: CameraSession.Device.Video.Torch = .off,
             storage: Storage.FileSystem
         ) {
-            self.flashMode = flashMode
             self.storage = storage
             self._output.movieFragmentInterval = CMTime.invalid
         }
@@ -73,14 +70,6 @@ public extension CameraSession.Recorder.Movie {
         return self._output.recordedFileSize
     }
     
-    var config: Config {
-        return .init(
-            maxDuration: self._output.maxRecordedDuration,
-            maxFileSize: self._output.maxRecordedFileSize,
-            minFreeDiskSpace: self._output.minFreeDiskSpaceLimit
-        )
-    }
-    
     func start(
         config: Config = .init(),
         onSuccess: @escaping (URL) -> Void,
@@ -110,25 +99,46 @@ private extension CameraSession.Recorder.Movie {
         guard self.isRecording == false else {
             return
         }
-        if self.isAttached == true {
-            let delegate = Delegate(recorder: self)
-            self._delegate = delegate
-            self._context = context
-            self._output.maxRecordedDuration = config.maxDuration
-            self._output.maxRecordedFileSize = config.maxFileSize
-            self._output.minFreeDiskSpaceLimit = config.minFreeDiskSpace
-            self._output.startRecording(
-                to: self.storage.url(
-                    name: UUID().uuidString,
-                    extension: "mp4"
-                ),
-                recordingDelegate: delegate
-            )
+        if let session = self.session {
+            if let preset = config.preset {
+                session.configure(
+                    videoPreset: preset,
+                    configureVideoDevice: { configuration in
+                        if configuration.isTorchSupported() == true {
+                            configuration.set(torch: config.flashMode)
+                        }
+                    },
+                    completion: { [weak self] in
+                        guard let self = self else { return }
+                        self._start(config, context, session)
+                    }
+                )
+            } else {
+                self._start(config, context, session)
+            }
         } else {
             DispatchQueue.main.async(execute: {
                 context.onFailure(.notConneted)
             })
         }
+    }
+    
+    func _start(
+        _ config: Config,
+        _ context: Context,
+        _ session: CameraSession
+    ) {
+        let delegate = Delegate(recorder: self)
+        self._delegate = delegate
+        self._context = context
+        
+        self._output.maxRecordedDuration = config.maxDuration
+        self._output.maxRecordedFileSize = config.maxFileSize
+        self._output.minFreeDiskSpaceLimit = config.minFreeDiskSpace
+        self._output.startRecording(
+            to: self.storage.url(name: UUID().uuidString, extension: "mp4"),
+            recordingDelegate: delegate
+        )
     }
     
 }

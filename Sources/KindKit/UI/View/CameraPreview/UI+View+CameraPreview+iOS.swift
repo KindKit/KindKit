@@ -138,12 +138,9 @@ extension KKCameraPreviewView {
         guard let videoDevice = self.kkVideoDevice else {
             return
         }
-        do {
-            try videoDevice.configuration({
-                $0.set(videoZoom: zoom)
-            })
-        } catch {
-        }
+        videoDevice.configuration({
+            $0.set(videoZoom: zoom)
+        })
     }
     
     func update(orientation: CameraSession.Orientation?) {
@@ -183,24 +180,21 @@ private extension KKCameraPreviewView {
         let viewPoint = gesture.location(in: self)
         let devicePoint = self.kkPreviewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
         let focusPoint = Point(devicePoint)
-        do {
-            try videoDevice.configuration({
-                if $0.isFocusOfPointSupported() == true {
-                    $0.set(focusOfPoint: .on(focusPoint))
-                    if $0.isFocusSupported(.auto) == true {
-                        $0.set(focus: .auto)
-                    }
+        videoDevice.configuration({
+            if $0.isFocusOfPointSupported() == true {
+                $0.set(focusOfPoint: .on(focusPoint))
+                if $0.isFocusSupported(.auto) == true {
+                    $0.set(focus: .auto)
                 }
-                if $0.isExposureOfPointSupported() == true {
-                    $0.set(exposureOfPoint: .on(focusPoint))
-                    if $0.isExposureSupported(.continuous) == true {
-                        $0.set(exposure: .continuous)
-                    }
+            }
+            if $0.isExposureOfPointSupported() == true {
+                $0.set(exposureOfPoint: .on(focusPoint))
+                if $0.isExposureSupported(.continuous) == true {
+                    $0.set(exposure: .continuous)
                 }
-            })
-            self.kkDelegate?.focus(self, point: .init(viewPoint))
-        } catch {
-        }
+            }
+        })
+        self.kkDelegate?.focus(self, point: .init(viewPoint))
     }
     
     @objc
@@ -219,26 +213,20 @@ private extension KKCameraPreviewView {
             }
             let delta = currentTranslation - previousTranslation
             self.kkZoomPanTranslation = currentTranslation
-            do {
-                try videoDevice.configuration({
-                    $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
-                })
-                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
-            } catch {
-            }
+            videoDevice.configuration({
+                $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
+            })
+            self.kkDelegate?.zooming(self, videoDevice.videoZoom())
         case .ended, .cancelled:
             guard let previousTranslation = self.kkZoomPanTranslation else {
                 return
             }
             let delta = currentTranslation - previousTranslation
             self.kkZoomPanTranslation = currentTranslation
-            do {
-                try videoDevice.configuration({
-                    $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
-                })
-                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
-            } catch {
-            }
+            videoDevice.configuration({
+                $0.set(videoZoom: videoDevice.videoZoom() + (delta / 75))
+            })
+            self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             self.kkDelegate?.endZoom(self)
         default:
             break
@@ -258,24 +246,18 @@ private extension KKCameraPreviewView {
             guard let zoomPinchBegin = self.kkZoomPinchBegin else {
                 return
             }
-            do {
-                try videoDevice.configuration({
-                    $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
-                })
-                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
-            } catch {
-            }
+            videoDevice.configuration({
+                $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
+            })
+            self.kkDelegate?.zooming(self, videoDevice.videoZoom())
         case .ended, .cancelled:
             guard let zoomPinchBegin = self.kkZoomPinchBegin else {
                 return
             }
-            do {
-                try videoDevice.configuration({
-                    $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
-                })
-                self.kkDelegate?.zooming(self, videoDevice.videoZoom())
-            } catch {
-            }
+            videoDevice.configuration({
+                $0.set(videoZoom: zoomPinchBegin * Double(gesture.scale))
+            })
+            self.kkDelegate?.zooming(self, videoDevice.videoZoom())
             self.kkDelegate?.endZoom(self)
         default:
             break

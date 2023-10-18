@@ -206,6 +206,8 @@ private extension CameraSession {
         old: State?,
         new: State,
         willConfigure: (() -> Void)? = nil,
+        configureVideoDevice: ((Device.Video.Configuration) -> Void)? = nil,
+        configureAudioDevice: ((Device.Audio.Configuration) -> Void)? = nil,
         didConfigure: (() -> Void)? = nil,
         didStart: (() -> Void)? = nil
     ) {
@@ -219,9 +221,10 @@ private extension CameraSession {
                 let raw = new.videoPreset.raw
                 if self.session.canSetSessionPreset(raw) == true {
                     self.session.sessionPreset = raw
-                } else {
-                    self.session.sessionPreset = .high
                 }
+            }
+            if let configure = configureVideoDevice {
+                new.videoDevice.configuration(configure)
             }
             if old?.videoDevice !== new.videoDevice {
                 if let videoDevice = old?.videoDevice {
@@ -230,6 +233,9 @@ private extension CameraSession {
                 if self.session.canAddInput(new.videoDevice.input) == true {
                     self.session.addInput(new.videoDevice.input)
                 }
+            }
+            if let configure = configureAudioDevice, let audioDevice = new.audioDevice {
+                audioDevice.configuration(configure)
             }
             if old?.audioDevice !== new.audioDevice {
                 if let audioDevice = old?.audioDevice {
@@ -292,40 +298,6 @@ private extension CameraSession {
     func _didStop() {
         self.isStarted = false
         self._observer.notify({ $0.stopped(self) })
-    }
-    
-    func _set(
-        videoPreset: Preset? = nil,
-        videoDevice: Device.Video? = nil,
-        audioDevice: Device.Audio? = nil,
-        recorders: [ICameraSessionRecorder]? = nil
-    ) {
-        guard let activeState = self._activeState else {
-            return
-        }
-        if let videoPreset = videoPreset, let videoDevice = videoDevice {
-            if videoDevice.isPresetSupported(videoPreset) == false {
-                return
-            }
-        }
-        self._configure(
-            old: activeState,
-            new: .init(
-                videoPreset: videoPreset ?? activeState.videoPreset,
-                videoDevice: videoDevice ?? activeState.videoDevice,
-                audioDevice: audioDevice ?? activeState.audioDevice,
-                recorders: recorders ?? activeState.recorders
-            ),
-            willConfigure: {
-                self._unsubscribeSession()
-                self.session.stopRunning()
-                self._observer.notify({ $0.startConfiguration(self) })
-            },
-            didStart: {
-                self._subscribeSession()
-                self._observer.notify({ $0.finishConfiguration(self) })
-            }
-        )
     }
     
 #if os(iOS)
@@ -407,57 +379,75 @@ public extension CameraSession {
         self.isStarting = false
     }
     
+    @inlinable
     func set(
-        videoPreset: Preset,
-        videoDevice: Device.Video,
-        audioDevice: Device.Audio,
-        recorders: [ICameraSessionRecorder]
+        video: Discovery.Video,
+        completion: @escaping () -> Void
     ) {
-        self._set(
-            videoPreset: videoPreset,
-            videoDevice: videoDevice,
-            audioDevice: audioDevice,
-            recorders: recorders
+        self.configure(
+            videoPreset: video.preset,
+            videoDevice: video.device,
+            completion: completion
         )
     }
     
-    func set(
-        video: Discovery.Video
-    ) {
-        self.set(
-            preset: video.preset,
-            device: video.device
-        )
-    }
-    
+    @inlinable
     func set(
         preset: Preset,
-        device: Device.Video
+        device: Device.Video,
+        completion: @escaping () -> Void
     ) {
-        return self._set(
+        return self.configure(
             videoPreset: preset,
-            videoDevice: device
+            videoDevice: device,
+            completion: completion
         )
     }
     
+    @inlinable
     func set(
-        device: Device.Audio
+        device: Device.Audio,
+        completion: @escaping () -> Void
     ) {
-        return self._set(audioDevice: device)
-    }
-    
-    func set(
-        recorders: [ICameraSessionRecorder]
-    ) {
-        return self._set(
-            recorders: recorders
+        return self.configure(
+            audioDevice: device,
+            completion: completion
         )
     }
     
-    func configuration(_ block: () throws -> Void) throws {
-        self.session.beginConfiguration()
-        try block()
-        self.session.commitConfiguration()
+    func configure(
+        videoPreset: Preset? = nil,
+        videoDevice: Device.Video? = nil,
+        audioDevice: Device.Audio? = nil,
+        recorders: [ICameraSessionRecorder]? = nil,
+        configureVideoDevice: ((Device.Video.Configuration) -> Void)? = nil,
+        configureAudioDevice: ((Device.Audio.Configuration) -> Void)? = nil,
+        completion: @escaping () -> Void
+    ) {
+        guard let activeState = self._activeState else {
+            return
+        }
+        self._configure(
+            old: activeState,
+            new: .init(
+                videoPreset: videoPreset ?? activeState.videoPreset,
+                videoDevice: videoDevice ?? activeState.videoDevice,
+                audioDevice: audioDevice ?? activeState.audioDevice,
+                recorders: recorders ?? activeState.recorders
+            ),
+            willConfigure: {
+                self._unsubscribeSession()
+                self.session.stopRunning()
+                self._observer.notify({ $0.startConfiguration(self) })
+            },
+            configureVideoDevice: configureVideoDevice,
+            configureAudioDevice: configureAudioDevice,
+            didStart: {
+                self._subscribeSession()
+                self._observer.notify({ $0.finishConfiguration(self) })
+                completion()
+            }
+        )
     }
     
 }

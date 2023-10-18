@@ -49,14 +49,16 @@ public extension CameraSession.Device.Video {
         
     }
     
-    func configuration(_ block: (Configuration) throws -> Void) throws {
+    @discardableResult
+    func configuration(_ block: (Configuration) -> Void) -> Bool {
         do {
             try self.device.lockForConfiguration()
-            try block(.init(self))
+            block(.init(self))
             self.device.unlockForConfiguration()
-        } catch let error {
-            throw error
+        } catch {
+            return false
         }
+        return true
     }
     
 }
