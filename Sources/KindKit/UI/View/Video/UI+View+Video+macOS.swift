@@ -5,16 +5,17 @@
 #if os(macOS)
 
 import AppKit
+import AVFoundation
 
-extension UI.View.Gradient {
+extension UI.View.Video {
     
     struct Reusable : IUIReusable {
         
-        typealias Owner = UI.View.Gradient
-        typealias Content = KKGradientView
+        typealias Owner = UI.View.Video
+        typealias Content = KKVideoView
 
         static var reuseIdentificator: String {
-            return "UI.View.Gradient"
+            return "KKVideoView"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -33,57 +34,64 @@ extension UI.View.Gradient {
     
 }
 
-final class KKGradientView : NSView {
+final class KKVideoView : NSView {
     
-    let kkLayer = CAGradientLayer()
-    
+    var kkPlayer: Player? {
+        didSet {
+            guard self.kkPlayer !== oldValue else { return }
+            if let player = self.kkPlayer {
+                self.kkLayer.player = player.native
+            } else {
+                self.kkLayer.player = nil
+            }
+        }
+    }
+    let kkLayer = AVPlayerLayer()
+
     override var isFlipped: Bool {
         return true
     }
-
-    override init(frame: NSRect) {
+    
+    override init(frame: CGRect) {
         super.init(frame: frame)
         
         self.wantsLayer = true
         self.layer = self.kkLayer
     }
     
-    required init?(coder: NSCoder) {
+    required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func hitTest(_ point: NSPoint) -> NSView? {
         return nil
     }
     
 }
 
-extension KKGradientView {
+extension KKVideoView {
     
-    func update(view: UI.View.Gradient) {
+    func update(view: UI.View.Video) {
         self.update(frame: view.frame)
-        self.update(fill: view.fill)
+        self.update(player: view.player)
+        self.update(mode: view.mode)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
+    func update(frame: KindKit.Rect) {
         self.frame = frame.cgRect
     }
     
-    func update(fill: UI.View.Gradient.Fill?) {
-        if let fill = fill {
-            switch fill.mode {
-            case .axial: self.kkLayer.type = .axial
-            case .radial: self.kkLayer.type = .radial
-            }
-            self.kkLayer.colors = fill.points.map({ $0.color.cgColor })
-            self.kkLayer.locations = fill.points.map({ NSNumber(value: $0.location) })
-            self.kkLayer.startPoint = fill.start.cgPoint
-            self.kkLayer.endPoint = fill.end.cgPoint
-            self.kkLayer.isHidden = false
-        } else {
-            self.kkLayer.isHidden = true
+    func update(player: Player?) {
+        self.kkPlayer = player
+    }
+    
+    func update(mode: UI.View.Video.Mode) {
+        switch mode {
+        case .stretch: self.kkLayer.videoGravity = .resize
+        case .aspectFit: self.kkLayer.videoGravity = .resizeAspect
+        case .aspectFill: self.kkLayer.videoGravity = .resizeAspectFill
         }
     }
     

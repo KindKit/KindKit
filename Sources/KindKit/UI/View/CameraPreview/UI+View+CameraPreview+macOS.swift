@@ -131,24 +131,21 @@ private extension KKCameraPreviewView {
         let viewPoint = gesture.location(in: self)
         let devicePoint = self.kkPreviewLayer.captureDevicePointConverted(fromLayerPoint: viewPoint)
         let focusPoint = Point(devicePoint)
-        do {
-            try videoDevice.configuration({
-                if $0.isFocusOfPointSupported() == true {
-                    $0.set(focusOfPoint: .on(focusPoint))
-                    if $0.isFocusSupported(.auto) == true {
-                        $0.set(focus: .auto)
-                    }
+        videoDevice.configuration({
+            if $0.isFocusOfPointSupported() == true {
+                $0.set(focusOfPoint: .on(focusPoint))
+                if $0.isFocusSupported(.auto) == true {
+                    $0.set(focus: .auto)
                 }
-                if $0.isExposureOfPointSupported() == true {
-                    $0.set(exposureOfPoint: .on(focusPoint))
-                    if $0.isExposureSupported(.continuous) == true {
-                        $0.set(exposure: .continuous)
-                    }
+            }
+            if $0.isExposureOfPointSupported() == true {
+                $0.set(exposureOfPoint: .on(focusPoint))
+                if $0.isExposureSupported(.continuous) == true {
+                    $0.set(exposure: .continuous)
                 }
-            })
-            self.kkDelegate?.focus(self, point: .init(viewPoint))
-        } catch {
-        }
+            }
+        })
+        self.kkDelegate?.focus(self, point: .init(viewPoint))
     }
     
 }
