@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+extension Formatter.String {
 
-    struct ByteCount : IStringFormatter, Equatable {
+    public struct ByteCount : IFormatter, Equatable {
         
         public typealias InputType = Int64
         
@@ -24,7 +24,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.ByteCount {
+public extension Formatter.String.ByteCount {
     
     @inlinable
     var units: ByteCountFormatter.Units {
@@ -40,7 +40,7 @@ public extension StringFormatter.ByteCount {
     
 }
 
-public extension StringFormatter.ByteCount {
+public extension Formatter.String.ByteCount {
     
     @inlinable
     @discardableResult
@@ -58,7 +58,7 @@ public extension StringFormatter.ByteCount {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.ByteCount {
+public extension IFormatter where Self == Formatter.String.ByteCount {
     
     static func byteCount() -> Self {
         return .init()
@@ -69,7 +69,7 @@ public extension IStringFormatter where Self == StringFormatter.ByteCount {
 public extension Int64 {
     
     @inlinable
-    func kk_format(byteCount formatter: StringFormatter.ByteCount) -> String {
+    func kk_format(byteCount formatter: Formatter.String.ByteCount) -> String {
         return formatter.format(self)
     }
     

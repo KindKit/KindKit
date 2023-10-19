@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+public extension Formatter.String {
 
-    struct Double< InputType : BinaryFloatingPoint > : IStringFormatter, Equatable {
+    struct Double< InputType : BinaryFloatingPoint > : IFormatter, Equatable {
         
         public let formatter: NumberFormatter
         
@@ -37,7 +37,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.Double {
+public extension Formatter.String.Double {
     
     @inlinable
     var minIntegerDigits: Int {
@@ -167,7 +167,7 @@ public extension StringFormatter.Double {
     
 }
 
-public extension StringFormatter.Double {
+public extension Formatter.String.Double {
     
     @inlinable
     @discardableResult
@@ -318,7 +318,7 @@ public extension StringFormatter.Double {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Double< Swift.Float > {
+public extension IFormatter where Self == Formatter.String.Double< Swift.Float > {
     
     static func float() -> Self {
         return .init()
@@ -326,7 +326,7 @@ public extension IStringFormatter where Self == StringFormatter.Double< Swift.Fl
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Double< Swift.Double > {
+public extension IFormatter where Self == Formatter.String.Double< Swift.Double > {
     
     static func double() -> Self {
         return .init()
@@ -334,7 +334,7 @@ public extension IStringFormatter where Self == StringFormatter.Double< Swift.Do
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Double< Swift.Float32 > {
+public extension IFormatter where Self == Formatter.String.Double< Swift.Float32 > {
     
     static func float32() -> Self {
         return .init()
@@ -342,7 +342,7 @@ public extension IStringFormatter where Self == StringFormatter.Double< Swift.Fl
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Double< Swift.Float64 > {
+public extension IFormatter where Self == Formatter.String.Double< Swift.Float64 > {
     
     static func double64() -> Self {
         return .init()
@@ -353,7 +353,7 @@ public extension IStringFormatter where Self == StringFormatter.Double< Swift.Fl
 public extension BinaryFloatingPoint {
     
     @inlinable
-    func kk_format(floatingPoint formatter: StringFormatter.Double< Self >) -> String {
+    func kk_format(floatingPoint formatter: Formatter.String.Double< Self >) -> String {
         return formatter.format(self)
     }
     

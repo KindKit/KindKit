@@ -69,6 +69,24 @@ public extension Timer {
     }
     
     @discardableResult
+    func onStarted(_ value: ((TimeInterval) -> Void)?) -> Self {
+        self._impl.onStarted.link(value)
+        return self
+    }
+    
+    @discardableResult
+    func onStarted(_ closure: @escaping (Self, TimeInterval) -> Void) -> Self {
+        self._impl.onStarted.link(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onStarted< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, TimeInterval) -> Void) -> Self {
+        self._impl.onStarted.link(sender, closure)
+        return self
+    }
+    
+    @discardableResult
     func onRepeat(_ value: (() -> Void)?) -> Self {
         self._impl.onRepeat.link(value)
         return self
@@ -87,6 +105,24 @@ public extension Timer {
     }
     
     @discardableResult
+    func onRepeat(_ value: ((TimeInterval) -> Void)?) -> Self {
+        self._impl.onRepeat.link(value)
+        return self
+    }
+    
+    @discardableResult
+    func onRepeat(_ closure: @escaping (Self, TimeInterval) -> Void) -> Self {
+        self._impl.onRepeat.link(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onRepeat< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, TimeInterval) -> Void) -> Self {
+        self._impl.onRepeat.link(sender, closure)
+        return self
+    }
+    
+    @discardableResult
     func onFinished(_ value: (() -> Void)?) -> Self {
         self._impl.onFinished.link(value)
         return self
@@ -100,6 +136,24 @@ public extension Timer {
     
     @discardableResult
     func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self._impl.onFinished.link(sender, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onFinished(_ value: ((TimeInterval) -> Void)?) -> Self {
+        self._impl.onFinished.link(value)
+        return self
+    }
+    
+    @discardableResult
+    func onFinished(_ closure: @escaping (Self, TimeInterval) -> Void) -> Self {
+        self._impl.onFinished.link(self, closure)
+        return self
+    }
+    
+    @discardableResult
+    func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, TimeInterval) -> Void) -> Self {
         self._impl.onFinished.link(sender, closure)
         return self
     }

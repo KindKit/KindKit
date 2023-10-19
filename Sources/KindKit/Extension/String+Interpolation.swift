@@ -14,10 +14,10 @@ public extension String.StringInterpolation {
     }
     
     @inlinable
-    mutating func appendInterpolation< FormatterType : IStringFormatter >(
+    mutating func appendInterpolation< FormatterType : IFormatter >(
         _ value: FormatterType.InputType,
         formatter: FormatterType
-    ) {
+    ) where FormatterType.OutputType == String {
         self.appendLiteral(formatter.format(value))
     }
     

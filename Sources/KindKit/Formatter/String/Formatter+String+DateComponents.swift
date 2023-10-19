@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+public extension Formatter.String {
 
-    struct DateComponents : IStringFormatter, Equatable {
+    struct DateComponents : IFormatter, Equatable {
         
         public typealias InputType = TimeInterval
         
@@ -24,7 +24,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.DateComponents {
+public extension Formatter.String.DateComponents {
     
     @inlinable
     var unitsStyle: DateComponentsFormatter.UnitsStyle {
@@ -70,7 +70,7 @@ public extension StringFormatter.DateComponents {
     
 }
 
-public extension StringFormatter.DateComponents {
+public extension Formatter.String.DateComponents {
     
     @inlinable
     @discardableResult
@@ -123,7 +123,7 @@ public extension StringFormatter.DateComponents {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.DateComponents {
+public extension IFormatter where Self == Formatter.String.DateComponents {
     
     @inlinable
     static func dateComponents() -> Self {
@@ -135,7 +135,7 @@ public extension IStringFormatter where Self == StringFormatter.DateComponents {
 public extension TimeInterval {
     
     @inlinable
-    func kk_format(dateComponents formatter: StringFormatter.DateComponents) -> String {
+    func kk_format(dateComponents formatter: Formatter.String.DateComponents) -> String {
         return formatter.format(self)
     }
     

@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+public extension Formatter.String {
 
-    struct Dimension< DimensionType : Foundation.Dimension > : IStringFormatter, Equatable {
+    struct Dimension< DimensionType : Foundation.Dimension > : IFormatter, Equatable {
         
         public let unit: DimensionType
         public let formatter: MeasurementFormatter
@@ -31,7 +31,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.Dimension {
+public extension Formatter.String.Dimension {
     
     @inlinable
     var minIntegerDigits: Int {
@@ -119,7 +119,7 @@ public extension StringFormatter.Dimension {
     
 }
 
-public extension StringFormatter.Dimension {
+public extension Formatter.String.Dimension {
     
     @inlinable
     @discardableResult
@@ -221,7 +221,7 @@ public extension StringFormatter.Dimension {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Dimension< UnitLength > {
+public extension IFormatter where Self == Formatter.String.Dimension< UnitLength > {
     
     static func length(_ unit: UnitLength) -> Self {
         return .init(unit: unit)

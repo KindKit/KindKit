@@ -19,9 +19,9 @@ extension Timer {
         public private(set) var isPaused: Bool
         public private(set) var repeated: UInt
 
-        let onStarted: Signal.Empty< Void > = .init()
-        let onRepeat: Signal.Empty< Void > = .init()
-        let onFinished: Signal.Empty< Void > = .init()
+        let onStarted: Signal.Args< Void, TimeInterval > = .init()
+        let onRepeat: Signal.Args< Void, TimeInterval > = .init()
+        let onFinished: Signal.Args< Void, TimeInterval > = .init()
         let onStoped: Signal.Empty< Void > = .init()
         let onPaused: Signal.Empty< Void > = .init()
         let onResumed: Signal.Empty< Void > = .init()
@@ -29,6 +29,7 @@ extension Timer {
         private var _startDelayDate: Date?
         private var _startDate: Date?
         private var _pauseDate: Date?
+        private var _tickDate: Date?
         private var _timer: Foundation.Timer?
 
         public init(
@@ -57,7 +58,7 @@ extension Timer {
             if self.isStarted == false {
                 self.isStarted = true
                 self.isPaused = false
-                if self.delay > TimeInterval.ulpOfOne {
+                if self.delay >~ 0 {
                     self._startDate = Date() + self.delay
                     self.isDelaying = true
                 } else {
@@ -65,6 +66,7 @@ extension Timer {
                     self.isDelaying = false
                 }
                 self._pauseDate = nil
+                self._tickDate = self._startDate
                 self.repeated = 0
                 self._timer = Foundation.Timer(
                     fireAt: self._startDate!,
@@ -75,7 +77,7 @@ extension Timer {
                     repeats: (self.isDelaying == true) || (self.repeating != 0)
                 )
                 if self.isDelaying == false {
-                    self.onStarted.emit()
+                    self.onStarted.emit(0)
                 }
                 RunLoop.main.add(self._timer!, forMode: RunLoop.Mode.common)
             }
@@ -90,6 +92,7 @@ extension Timer {
                 self.isPaused = false
                 self._startDate = nil
                 self._pauseDate = nil
+                self._tickDate = nil
                 self.repeated = 0
                 self._timer?.invalidate()
                 self._timer = nil
@@ -115,7 +118,8 @@ extension Timer {
             if self.isStarted == true && self.isPaused == true {
                 self.isPaused = false
                 self._startDate = self._startDate! + (Date().timeIntervalSince1970 - self._pauseDate!.timeIntervalSince1970)
-                self._pauseDate = nil;
+                self._pauseDate = nil
+                self._tickDate = self._startDate
                 self._timer = Foundation.Timer(
                     fireAt: self._startDate!,
                     interval: self.interval,
@@ -169,16 +173,21 @@ private extension Timer.Impl {
 
     @objc
     func _handler(_ sender: Any) {
+        guard let oldTickDate = self._tickDate else {
+            return
+        }
+        let newTickDate = Date()
+        let delta = newTickDate.timeIntervalSince1970 - oldTickDate.timeIntervalSince1970
         if self.isDelaying == true {
             self.isDelaying = false
-            self.onStarted.emit()
+            self.onStarted.emit(delta)
         } else {
             var finished = false
             self.repeated += 1
             if self.repeating == UInt.max {
-                self.onRepeat.emit()
+                self.onRepeat.emit(delta)
             } else if self.repeated != 0 {
-                self.onRepeat.emit()
+                self.onRepeat.emit(delta)
                 if self.repeated >= self.repeating {
                     finished = true
                 }
@@ -190,9 +199,10 @@ private extension Timer.Impl {
                 self.isPaused = false
                 self._timer?.invalidate()
                 self._timer = nil
-                self.onFinished.emit()
+                self.onFinished.emit(delta)
             }
         }
+        self._tickDate = newTickDate
     }
 
 }

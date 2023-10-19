@@ -4,5 +4,5 @@
 
 import Foundation
 
-public enum StringFormatter {
+public enum Formatter {
 }

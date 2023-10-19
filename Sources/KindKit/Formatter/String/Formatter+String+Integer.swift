@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+public extension Formatter.String {
 
-    struct Integer< InputType : BinaryInteger > : IStringFormatter, Equatable {
+    struct Integer< InputType : BinaryInteger > : IFormatter, Equatable {
         
         public let formatter: NumberFormatter
         
@@ -35,7 +35,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.Integer {
+public extension Formatter.String.Integer {
     
     @inlinable
     var minIntegerDigits: Int {
@@ -123,7 +123,7 @@ public extension StringFormatter.Integer {
     
 }
 
-public extension StringFormatter.Integer {
+public extension Formatter.String.Integer {
     
     @inlinable
     @discardableResult
@@ -225,7 +225,7 @@ public extension StringFormatter.Integer {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.Int > {
     
     static func int() -> Self {
         return .init()
@@ -233,7 +233,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.I
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.UInt > {
     
     static func uint() -> Self {
         return .init()
@@ -241,7 +241,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int8 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.Int8 > {
     
     static func int8() -> Self {
         return .init()
@@ -249,7 +249,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.I
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int16 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.Int16 > {
     
     static func int16() -> Self {
         return .init()
@@ -257,7 +257,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.I
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int32 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.Int32 > {
     
     static func int32() -> Self {
         return .init()
@@ -265,7 +265,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.I
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.Int64 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.Int64 > {
     
     static func int64() -> Self {
         return .init()
@@ -273,7 +273,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.I
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt8 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.UInt8 > {
     
     static func uint8() -> Self {
         return .init()
@@ -281,7 +281,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt16 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.UInt16 > {
     
     static func uint16() -> Self {
         return .init()
@@ -289,7 +289,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt32 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.UInt32 > {
     
     static func uint32() -> Self {
         return .init()
@@ -297,7 +297,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Integer< Swift.UInt64 > {
+public extension IFormatter where Self == Formatter.String.Integer< Swift.UInt64 > {
     
     static func uint64() -> Self {
         return .init()
@@ -308,7 +308,7 @@ public extension IStringFormatter where Self == StringFormatter.Integer< Swift.U
 public extension BinaryInteger {
     
     @inlinable
-    func kk_format(integer formatter: StringFormatter.Integer< Self >) -> String {
+    func kk_format(integer formatter: Formatter.String.Integer< Self >) -> String {
         return formatter.format(self)
     }
     

@@ -4,9 +4,9 @@
 
 import Foundation
 
-public extension StringFormatter {
+public extension Formatter.String {
 
-    struct Date : IStringFormatter, Equatable {
+    struct Date : IFormatter, Equatable {
         
         public typealias InputType = Foundation.Date
         
@@ -24,7 +24,7 @@ public extension StringFormatter {
 
 }
 
-public extension StringFormatter.Date {
+public extension Formatter.String.Date {
     
     @inlinable
     var format: String {
@@ -52,7 +52,7 @@ public extension StringFormatter.Date {
     
 }
 
-public extension StringFormatter.Date {
+public extension Formatter.String.Date {
     
     @inlinable
     @discardableResult
@@ -84,7 +84,7 @@ public extension StringFormatter.Date {
     
 }
 
-public extension IStringFormatter where Self == StringFormatter.Date {
+public extension IFormatter where Self == Formatter.String.Date {
     
     static func date() -> Self {
         return .init()
@@ -95,7 +95,7 @@ public extension IStringFormatter where Self == StringFormatter.Date {
 public extension Date {
     
     @inlinable
-    func kk_format(date formatter: StringFormatter.Date) -> String {
+    func kk_format(date formatter: Formatter.String.Date) -> String {
         return formatter.format(self)
     }
     

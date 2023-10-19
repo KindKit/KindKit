@@ -83,10 +83,10 @@ public extension StringBuilder {
     
     @inlinable
     @discardableResult
-    func append< Formatter : IStringFormatter >(
-        value: Formatter.InputType,
-        formatter: Formatter
-    ) -> Self {
+    func append< FormatterType : IFormatter >(
+        value: FormatterType.InputType,
+        formatter: FormatterType
+    ) -> Self where FormatterType.OutputType == String {
         return self.append(formatter.format(value))
     }
     

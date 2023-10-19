@@ -15,7 +15,7 @@ public extension Log.Target {
         public let encoding: String.Encoding
         
         private let _queue: DispatchQueue
-        private let _dateFormatter: StringFormatter.Date
+        private let _dateFormatter: Formatter.String.Date
         private var _stream: Stream?
         
         public init(
