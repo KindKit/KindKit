@@ -53,7 +53,7 @@ public extension UI.View.Input {
                 }
             }
         }
-        public var formatter: StringFormatter.Date = .init().format("MM-dd-yyyy HH:mm") {
+        public var formatter: Formatter.String.Date = .init().format("MM-dd-yyyy HH:mm") {
             didSet {
                 guard self.formatter != oldValue else { return }
                 if self.isLoaded == true {
@@ -223,20 +223,20 @@ public extension UI.View.Input.Date {
     
     @inlinable
     @discardableResult
-    func formatter(_ value: StringFormatter.Date) -> Self {
+    func formatter(_ value: Formatter.String.Date) -> Self {
         self.formatter = value
         return self
     }
     
     @inlinable
     @discardableResult
-    func formatter(_ value: () -> StringFormatter.Date) -> Self {
+    func formatter(_ value: () -> Formatter.String.Date) -> Self {
         return self.formatter(value())
     }
 
     @inlinable
     @discardableResult
-    func formatter(_ value: (Self) -> StringFormatter.Date) -> Self {
+    func formatter(_ value: (Self) -> Formatter.String.Date) -> Self {
         return self.formatter(value(self))
     }
     

@@ -23,7 +23,7 @@ public extension UI.View.Input.Measurement.Complex {
         
         public init(
             unit: UnitType,
-            unitStyle: Formatter.UnitStyle,
+            unitStyle: Foundation.Formatter.UnitStyle,
             range: Range< Double >,
             step: Double = 1.0
         ) {

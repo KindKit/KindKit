@@ -37,7 +37,7 @@ final class KKInputDateView : UITextField {
     
     weak var kkDelegate: KKInputDateViewDelegate?
     let kkAccessoryView: KKAccessoryView
-    var kkFormatter: StringFormatter.Date? {
+    var kkFormatter: Formatter.String.Date? {
         didSet {
             guard self.kkFormatter != oldValue else { return }
             if let formatter = self.kkFormatter {
@@ -259,7 +259,7 @@ extension KKInputDateView {
         self.kkPickerView.datePickerMode = mode.datePickerMode
     }
     
-    func update(formatter: StringFormatter.Date) {
+    func update(formatter: Formatter.String.Date) {
         self.kkFormatter = formatter
     }
     
@@ -326,7 +326,7 @@ private extension KKInputDateView {
     
     func _applyText() {
         if let value = self.kkValue {
-            let formatter = self.kkFormatter ?? StringFormatter.Date()
+            let formatter = self.kkFormatter ?? Formatter.String.Date()
             self.text = formatter.format(value)
         } else {
             self.text = nil
