@@ -32,51 +32,11 @@ public extension UI.Gesture {
             }
         }
 #if os(macOS)
-        public var delaysPrimaryMouseButtonEvents: Bool = false {
+        public var delaysEvents: Bool = false {
             didSet {
-                guard self.delaysPrimaryMouseButtonEvents != oldValue else { return }
+                guard self.delaysEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.kk_update(delaysPrimaryMouseButtonEvents: self.delaysPrimaryMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysSecondaryMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysSecondaryMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysSecondaryMouseButtonEvents: self.delaysSecondaryMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysOtherMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysOtherMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysOtherMouseButtonEvents: self.delaysOtherMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysKeyEvents: Bool = false {
-            didSet {
-                guard self.delaysKeyEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysKeyEvents: self.delaysKeyEvents)
-                }
-            }
-        }
-        public var delaysMagnificationEvents: Bool = false {
-            didSet {
-                guard self.delaysMagnificationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysMagnificationEvents: self.delaysMagnificationEvents)
-                }
-            }
-        }
-        public var delaysRotationEvents: Bool = false {
-            didSet {
-                guard self.delaysRotationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysRotationEvents: self.delaysRotationEvents)
+                    self._gesture.kk_update(delaysEvents: self.delaysEvents)
                 }
             }
         }

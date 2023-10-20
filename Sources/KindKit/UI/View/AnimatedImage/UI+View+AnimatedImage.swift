@@ -4,10 +4,6 @@
 
 import Foundation
 
-#if os(macOS)
-#warning("Require support macOS")
-#elseif os(iOS)
-
 public extension UI.View {
     
     final class AnimatedImage {
@@ -17,7 +13,7 @@ public extension UI.View {
             didSet {
                 guard self.frame != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(frame: self.frame)
+                    self._view.kk_update(frame: self.frame)
                 }
             }
         }
@@ -26,7 +22,7 @@ public extension UI.View {
             didSet {
                 guard self.transform != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(transform: self.transform)
+                    self._view.kk_update(transform: self.transform)
                 }
             }
         }
@@ -41,7 +37,7 @@ public extension UI.View {
             didSet {
                 guard self.images != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(images: self.images)
+                    self._view.kk_update(images: self.images)
                 }
                 self.setNeedForceLayout()
             }
@@ -50,7 +46,7 @@ public extension UI.View {
             didSet {
                 guard self.duration != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(duration: self.duration)
+                    self._view.kk_update(duration: self.duration)
                 }
             }
         }
@@ -58,7 +54,7 @@ public extension UI.View {
             didSet {
                 guard self.repeat != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(repeat: self.repeat)
+                    self._view.kk_update(repeat: self.repeat)
                 }
             }
         }
@@ -66,7 +62,7 @@ public extension UI.View {
             didSet {
                 guard self.mode != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(mode: self.mode)
+                    self._view.kk_update(mode: self.mode)
                 }
                 self.setNeedForceLayout()
             }
@@ -75,7 +71,7 @@ public extension UI.View {
             didSet {
                 guard self.tintColor != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(tintColor: self.tintColor)
+                    self._view.kk_update(tintColor: self.tintColor)
                 }
             }
         }
@@ -83,7 +79,7 @@ public extension UI.View {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.kk_update(color: self.color)
                 }
             }
         }
@@ -91,21 +87,21 @@ public extension UI.View {
             didSet {
                 guard self.alpha != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(alpha: self.alpha)
+                    self._view.kk_update(alpha: self.alpha)
                 }
             }
         }
         public var isAnimating: Bool {
             set {
                 if newValue == true {
-                    self._view.startAnimating()
+                    self._view.kk_start()
                 } else if self.isLoaded == true {
-                    self._view.stopAnimating()
+                    self._view.kk_stop()
                 }
             }
             get {
                 guard self.isLoaded == true else { return false }
-                return self._view.isAnimating
+                return self._view.kkIsAnimating
             }
         }
         public var isHidden: Bool = false {
@@ -331,5 +327,3 @@ public extension IUIView where Self == UI.View.AnimatedImage {
     }
     
 }
-
-#endif

@@ -4,10 +4,6 @@
 
 import Foundation
 
-#if os(macOS)
-#warning("Require support macOS")
-#elseif os(iOS)
-
 protocol KKUIViewCanvasDelegate : AnyObject {
     
     func resize(_ size: Size)
@@ -179,7 +175,11 @@ extension UI.View.Canvas : IUIView {
     
     public func setNeedRedraw() {
         guard self.isAppeared == true else { return }
+#if os(macOS)
+        self._view.needsDisplay = true
+#elseif os(iOS)
         self._view.setNeedsDisplay()
+#endif
     }
     
 }
@@ -282,5 +282,3 @@ public extension IUIView where Self == UI.View.Canvas {
     }
     
 }
-
-#endif

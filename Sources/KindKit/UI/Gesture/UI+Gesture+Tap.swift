@@ -29,51 +29,19 @@ public extension UI.Gesture {
             }
         }
 #if os(macOS)
-        public var delaysPrimaryMouseButtonEvents: Bool = false {
+        public var delaysEvents: Bool = false {
             didSet {
-                guard self.delaysPrimaryMouseButtonEvents != oldValue else { return }
+                guard self.delaysEvents != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.kk_update(delaysPrimaryMouseButtonEvents: self.delaysPrimaryMouseButtonEvents)
+                    self._gesture.kk_update(delaysEvents: self.delaysEvents, buttons: self.buttons)
                 }
             }
         }
-        public var delaysSecondaryMouseButtonEvents: Bool = false {
+        public var buttons: UI.Gesture.Buttons = .primary {
             didSet {
-                guard self.delaysSecondaryMouseButtonEvents != oldValue else { return }
+                guard self.buttons != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.kk_update(delaysSecondaryMouseButtonEvents: self.delaysSecondaryMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysOtherMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysOtherMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysOtherMouseButtonEvents: self.delaysOtherMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysKeyEvents: Bool = false {
-            didSet {
-                guard self.delaysKeyEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysKeyEvents: self.delaysKeyEvents)
-                }
-            }
-        }
-        public var delaysMagnificationEvents: Bool = false {
-            didSet {
-                guard self.delaysMagnificationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysMagnificationEvents: self.delaysMagnificationEvents)
-                }
-            }
-        }
-        public var delaysRotationEvents: Bool = false {
-            didSet {
-                guard self.delaysRotationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.kk_update(delaysRotationEvents: self.delaysRotationEvents)
+                    self._gesture.kk_update(delaysEvents: self.delaysEvents, buttons: self.buttons)
                 }
             }
         }
@@ -115,7 +83,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.numberOfTapsRequired != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(numberOfTapsRequired: self.numberOfTapsRequired)
+                    self._gesture.kk_update(numberOfTapsRequired: self.numberOfTapsRequired)
                 }
             }
         }
@@ -123,7 +91,7 @@ public extension UI.Gesture {
             didSet {
                 guard self.numberOfTouchesRequired != oldValue else { return }
                 if self.isLoaded == true {
-                    self._gesture.update(numberOfTouchesRequired: self.numberOfTouchesRequired)
+                    self._gesture.kk_update(numberOfTouchesRequired: self.numberOfTouchesRequired)
                 }
             }
         }
@@ -149,23 +117,44 @@ public extension UI.Gesture {
 
 public extension UI.Gesture.Tap {
     
+#if os(macOS)
+    
+    @inlinable
+    @discardableResult
+    func buttons(_ value: UI.Gesture.Buttons) -> Self {
+        self.buttons = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func buttons(_ value: (Self) -> UI.Gesture.Buttons) -> Self {
+        return self.buttons(value(self))
+    }
+    
+#endif
+    
+    @inlinable
     @discardableResult
     func numberOfTapsRequired(_ value: UInt) -> Self {
         self.numberOfTapsRequired = value
         return self
     }
-        
+    
+    @inlinable
     @discardableResult
     func numberOfTapsRequired(_ value: (Self) -> UInt) -> Self {
         return self.numberOfTapsRequired(value(self))
     }
     
+    @inlinable
     @discardableResult
     func numberOfTouchesRequired(_ value: UInt) -> Self {
         self.numberOfTouchesRequired = value
         return self
     }
     
+    @inlinable
     @discardableResult
     func numberOfTouchesRequired(_ value: (Self) -> UInt) -> Self {
         return self.numberOfTouchesRequired(value(self))

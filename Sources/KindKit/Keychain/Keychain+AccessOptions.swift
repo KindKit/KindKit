@@ -13,9 +13,7 @@ public extension Keychain {
         case whenUnlockedThisDeviceOnly
         case afterFirstUnlock
         case afterFirstUnlockThisDeviceOnly
-        case always
         case whenPasscodeSetThisDeviceOnly
-        case alwaysThisDeviceOnly
 
         public static var defaultOption: AccessOptions {
             return .whenUnlocked
@@ -27,9 +25,7 @@ public extension Keychain {
             case .whenUnlockedThisDeviceOnly: return kSecAttrAccessibleWhenUnlockedThisDeviceOnly as String
             case .afterFirstUnlock: return kSecAttrAccessibleAfterFirstUnlock as String
             case .afterFirstUnlockThisDeviceOnly: return kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as String
-            case .always: return kSecAttrAccessibleAlways as String
             case .whenPasscodeSetThisDeviceOnly: return kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly as String
-            case .alwaysThisDeviceOnly: return kSecAttrAccessibleAlwaysThisDeviceOnly as String
             }
         }
     }

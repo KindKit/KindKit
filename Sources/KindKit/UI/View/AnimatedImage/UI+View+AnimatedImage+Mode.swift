@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-#if os(iOS)
-
 import Foundation
 
 public extension UI.View.AnimatedImage {
@@ -17,5 +15,3 @@ public extension UI.View.AnimatedImage {
     }
     
 }
-
-#endif

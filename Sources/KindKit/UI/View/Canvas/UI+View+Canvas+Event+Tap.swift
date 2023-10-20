@@ -4,10 +4,6 @@
 
 import Foundation
 
-#if os(macOS)
-#warning("Require support macOS")
-#elseif os(iOS)
-
 extension UI.View.Canvas.Event {
 
     public struct Tap {
@@ -18,5 +14,3 @@ extension UI.View.Canvas.Event {
     }
     
 }
-
-#endif

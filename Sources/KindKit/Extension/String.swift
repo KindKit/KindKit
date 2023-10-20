@@ -92,9 +92,7 @@ public extension String {
         }
         return result
     }
-
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
+    
     var kk_md2: Self? {
         if let data = self.data(using: .utf8) {
             return data.kk_md2.kk_hexString
@@ -102,8 +100,6 @@ public extension String {
         return nil
     }
 
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var kk_md4: Self? {
         if let data = self.data(using: .utf8) {
             return data.kk_md4.kk_hexString
@@ -111,8 +107,6 @@ public extension String {
         return nil
     }
 
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var kk_md5: Self? {
         if let data = self.data(using: .utf8) {
             return data.kk_md5.kk_hexString

@@ -33,57 +33,7 @@ public extension UI.Gesture {
                 }
             }
         }
-#if os(macOS)
-        public var delaysPrimaryMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysPrimaryMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysPrimaryMouseButtonEvents: self.delaysPrimaryMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysSecondaryMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysSecondaryMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysSecondaryMouseButtonEvents:
-                                            self.delaysSecondaryMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysOtherMouseButtonEvents: Bool = false {
-            didSet {
-                guard self.delaysOtherMouseButtonEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysOtherMouseButtonEvents: self.delaysOtherMouseButtonEvents)
-                }
-            }
-        }
-        public var delaysKeyEvents: Bool = false {
-            didSet {
-                guard self.delaysKeyEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysKeyEvents: self.delaysKeyEvents)
-                }
-            }
-        }
-        public var delaysMagnificationEvents: Bool = false {
-            didSet {
-                guard self.delaysMagnificationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysMagnificationEvents: self.delaysMagnificationEvents)
-                }
-            }
-        }
-        public var delaysRotationEvents: Bool = false {
-            didSet {
-                guard self.delaysRotationEvents != oldValue else { return }
-                if self.isLoaded == true {
-                    self._gesture.update(delaysRotationEvents: self.delaysRotationEvents)
-                }
-            }
-        }
-#elseif os(iOS)
+#if os(iOS)
         public var cancelsTouchesInView: Bool = false {
             didSet {
                 guard self.cancelsTouchesInView != oldValue else { return }

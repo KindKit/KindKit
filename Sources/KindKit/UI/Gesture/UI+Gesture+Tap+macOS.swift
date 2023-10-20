@@ -22,11 +22,11 @@ extension UI.Gesture.Tap {
         }
         
         static func configureReuse(owner: Owner, content: Content) {
-            content.update(gesture: owner)
+            content.kk_update(gesture: owner)
         }
         
         static func cleanupReuse(content: Content) {
-            content.cleanup()
+            content.kk_cleanup()
         }
         
     }
@@ -53,28 +53,30 @@ final class KKTapGesture : NSClickGestureRecognizer {
 
 extension KKTapGesture {
     
-    func update(gesture: UI.Gesture.Tap) {
+    func kk_update(gesture: UI.Gesture.Tap) {
         self.kk_update(enabled: gesture.isEnabled)
-        self.kk_update(delaysPrimaryMouseButtonEvents: gesture.delaysPrimaryMouseButtonEvents)
-        self.kk_update(delaysSecondaryMouseButtonEvents: gesture.delaysSecondaryMouseButtonEvents)
-        self.kk_update(delaysOtherMouseButtonEvents: gesture.delaysOtherMouseButtonEvents)
-        self.kk_update(delaysKeyEvents: gesture.delaysKeyEvents)
-        self.kk_update(delaysMagnificationEvents: gesture.delaysMagnificationEvents)
-        self.kk_update(delaysRotationEvents: gesture.delaysRotationEvents)
-        self.update(numberOfTapsRequired: gesture.numberOfTapsRequired)
-        self.update(numberOfTouchesRequired: gesture.numberOfTouchesRequired)
+        self.kk_update(delaysEvents: gesture.delaysEvents, buttons: gesture.buttons)
+        self.kk_update(numberOfTapsRequired: gesture.numberOfTapsRequired)
+        self.kk_update(numberOfTouchesRequired: gesture.numberOfTouchesRequired)
         self.kkDelegate = gesture
     }
     
-    func update(numberOfTapsRequired: UInt) {
+    func kk_update(delaysEvents: Bool, buttons: UI.Gesture.Buttons) {
+        self.delaysPrimaryMouseButtonEvents = buttons.delayPrimary
+        self.delaysSecondaryMouseButtonEvents = buttons.delaySecondary
+        self.delaysOtherMouseButtonEvents = buttons.delayOther
+        self.buttonMask = buttons.mask
+    }
+    
+    func kk_update(numberOfTapsRequired: UInt) {
         self.numberOfClicksRequired = Int(numberOfTapsRequired)
     }
     
-    func update(numberOfTouchesRequired: UInt) {
+    func kk_update(numberOfTouchesRequired: UInt) {
         self.numberOfTouchesRequired = Int(numberOfTouchesRequired)
     }
     
-    func cleanup() {
+    func kk_cleanup() {
         self.kkDelegate = nil
     }
     

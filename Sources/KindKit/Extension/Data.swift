@@ -17,25 +17,19 @@ public extension DataProtocol {
 }
 
 public extension Data {
-
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
+    
     var kk_md2: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD2_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD2($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var kk_md4: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD4_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD4($0.baseAddress, CC_LONG(self.count), &hash) })
         return Data(hash)
     }
 
-    @available(macOS, introduced: 10.4, deprecated: 10.15, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
-    @available(iOS, introduced: 2.0, deprecated: 13.0, message: "This function is cryptographically broken and should not be used in security contexts. Clients should migrate to SHA256 (or stronger).")
     var kk_md5: Data {
         var hash = [UInt8](repeating: 0,  count: Int(CC_MD5_DIGEST_LENGTH))
         self.withUnsafeBytes({ _ = CC_MD5($0.baseAddress, CC_LONG(self.count), &hash) })

@@ -55,13 +55,12 @@ extension KKPinchGesture {
     
     func update(gesture: UI.Gesture.Pinch) {
         self.kk_update(enabled: gesture.isEnabled)
-        self.kk_update(delaysPrimaryMouseButtonEvents: gesture.delaysPrimaryMouseButtonEvents)
-        self.kk_update(delaysSecondaryMouseButtonEvents: gesture.delaysSecondaryMouseButtonEvents)
-        self.kk_update(delaysOtherMouseButtonEvents: gesture.delaysOtherMouseButtonEvents)
-        self.kk_update(delaysKeyEvents: gesture.delaysKeyEvents)
-        self.kk_update(delaysMagnificationEvents: gesture.delaysMagnificationEvents)
-        self.kk_update(delaysRotationEvents: gesture.delaysRotationEvents)
+        self.kk_update(delaysEvents: gesture.delaysEvents)
         self.kkDelegate = gesture
+    }
+    
+    func kk_update(delaysEvents: Bool) {
+        self.delaysMagnificationEvents = delaysEvents
     }
     
     func cleanup() {

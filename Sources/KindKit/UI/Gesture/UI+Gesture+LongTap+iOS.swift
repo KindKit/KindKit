@@ -6,15 +6,15 @@
 
 import UIKit
 
-extension UI.Gesture.Tap {
+extension UI.Gesture.LongTap {
     
     struct Reusable : IUIReusable {
         
-        typealias Owner = UI.Gesture.Tap
-        typealias Content = KKTapGesture
+        typealias Owner = UI.Gesture.LongTap
+        typealias Content = KKLongTapGesture
 
         static var reuseIdentificator: String {
-            return "UI.Gesture.Tap"
+            return "UI.Gesture.LongTap"
         }
         
         static func createReuse(owner: Owner) -> Content {
@@ -33,7 +33,7 @@ extension UI.Gesture.Tap {
     
 }
 
-final class KKTapGesture : UITapGestureRecognizer {
+final class KKLongTapGesture : UILongPressGestureRecognizer {
     
     weak var kkDelegate: KKTapGestureDelegate?
     
@@ -46,9 +46,9 @@ final class KKTapGesture : UITapGestureRecognizer {
     
 }
 
-extension KKTapGesture {
+extension KKLongTapGesture {
     
-    func kk_update(gesture: UI.Gesture.Tap) {
+    func kk_update(gesture: UI.Gesture.LongTap) {
         self.kk_update(enabled: gesture.isEnabled)
         self.kk_update(cancelsTouchesInView: gesture.cancelsTouchesInView)
         self.kk_update(delaysTouchesBegan: gesture.delaysTouchesBegan)
@@ -56,6 +56,8 @@ extension KKTapGesture {
         self.kk_update(requiresExclusiveTouchType: gesture.requiresExclusiveTouchType)
         self.kk_update(numberOfTapsRequired: gesture.numberOfTapsRequired)
         self.kk_update(numberOfTouchesRequired: gesture.numberOfTouchesRequired)
+        self.kk_update(minimumDuration: gesture.minimumDuration)
+        self.kk_update(allowableMovement: gesture.allowableMovement)
         self.kkDelegate = gesture
     }
     
@@ -67,13 +69,21 @@ extension KKTapGesture {
         self.numberOfTouchesRequired = Int(numberOfTouchesRequired)
     }
     
+    func kk_update(minimumDuration: TimeInterval) {
+        self.minimumPressDuration = minimumDuration
+    }
+    
+    func kk_update(allowableMovement: Double) {
+        self.allowableMovement = CGFloat(allowableMovement)
+    }
+    
     func kk_cleanup() {
         self.kkDelegate = nil
     }
     
 }
 
-private extension KKTapGesture {
+private extension KKLongTapGesture {
     
     @objc
     func _handle() {
@@ -82,7 +92,7 @@ private extension KKTapGesture {
     
 }
 
-extension KKTapGesture : UIGestureRecognizerDelegate {
+extension KKLongTapGesture : UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gesture: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view is UIControl {

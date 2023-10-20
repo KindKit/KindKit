@@ -12,21 +12,7 @@ public protocol IUIGesture : AnyObject {
     
     var isEnabled: Bool { set get }
     
-#if os(macOS)
-    
-    var delaysPrimaryMouseButtonEvents: Bool { set get }
-    
-    var delaysSecondaryMouseButtonEvents: Bool { set get }
-    
-    var delaysOtherMouseButtonEvents: Bool { set get }
-    
-    var delaysKeyEvents: Bool { set get }
-    
-    var delaysMagnificationEvents: Bool { set get }
-    
-    var delaysRotationEvents: Bool { set get }
-    
-#elseif os(iOS)
+#if os(iOS)
     
     var cancelsTouchesInView: Bool { set get }
     
@@ -80,127 +66,7 @@ public extension IUIGesture {
     
 }
 
-#if os(macOS)
-
-public extension IUIGesture {
-    
-    @inlinable
-    @discardableResult
-    func delaysPrimaryMouseButtonEvents(_ value: Bool) -> Self {
-        self.delaysPrimaryMouseButtonEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysPrimaryMouseButtonEvents(_ value: () -> Bool) -> Self {
-        return self.delaysPrimaryMouseButtonEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysPrimaryMouseButtonEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysPrimaryMouseButtonEvents(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysSecondaryMouseButtonEvents(_ value: Bool) -> Self {
-        self.delaysSecondaryMouseButtonEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysSecondaryMouseButtonEvents(_ value: () -> Bool) -> Self {
-        return self.delaysSecondaryMouseButtonEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysSecondaryMouseButtonEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysSecondaryMouseButtonEvents(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysOtherMouseButtonEvents(_ value: Bool) -> Self {
-        self.delaysOtherMouseButtonEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysOtherMouseButtonEvents(_ value: () -> Bool) -> Self {
-        return self.delaysOtherMouseButtonEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysOtherMouseButtonEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysOtherMouseButtonEvents(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysKeyEvents(_ value: Bool) -> Self {
-        self.delaysKeyEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysKeyEvents(_ value: () -> Bool) -> Self {
-        return self.delaysKeyEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysKeyEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysKeyEvents(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysMagnificationEvents(_ value: Bool) -> Self {
-        self.delaysMagnificationEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysMagnificationEvents(_ value: () -> Bool) -> Self {
-        return self.delaysMagnificationEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysMagnificationEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysMagnificationEvents(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysRotationEvents(_ value: Bool) -> Self {
-        self.delaysRotationEvents = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func delaysRotationEvents(_ value: () -> Bool) -> Self {
-        return self.delaysRotationEvents(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func delaysRotationEvents(_ value: (Self) -> Bool) -> Self {
-        return self.delaysRotationEvents(value(self))
-    }
-    
-}
-
-#elseif os(iOS)
+#if os(iOS)
 
 public extension IUIGesture {
     

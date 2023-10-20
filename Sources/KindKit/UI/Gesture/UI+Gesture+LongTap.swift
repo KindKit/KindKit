@@ -4,18 +4,15 @@
 
 import Foundation
 
-protocol KKPanGestureDelegate : KKGestureDelegate {
+protocol KKLongTapGestureDelegate : KKGestureDelegate {
     
-    func begin(_ gesture: NativeGesture)
-    func changed(_ gesture: NativeGesture)
-    func cancel(_ gesture: NativeGesture)
-    func end(_ gesture: NativeGesture)
+    func triggered(_ gesture: NativeGesture)
     
 }
 
 public extension UI.Gesture {
     
-    final class Pan {
+    final class LongTap {
         
         public var native: NativeGesture {
             return self._gesture
@@ -81,19 +78,48 @@ public extension UI.Gesture {
                 }
             }
         }
+        public var numberOfTapsRequired: UInt = 1 {
+            didSet {
+                guard self.numberOfTapsRequired != oldValue else { return }
+                if self.isLoaded == true {
+                    self._gesture.kk_update(numberOfTapsRequired: self.numberOfTapsRequired)
+                }
+            }
+        }
 #endif
+        public var numberOfTouchesRequired: UInt = 1 {
+            didSet {
+                guard self.numberOfTouchesRequired != oldValue else { return }
+                if self.isLoaded == true {
+                    self._gesture.kk_update(numberOfTouchesRequired: self.numberOfTouchesRequired)
+                }
+            }
+        }
+        public var minimumDuration: TimeInterval = 0.5 {
+            didSet {
+                guard self.minimumDuration != oldValue else { return }
+                if self.isLoaded == true {
+                    self._gesture.kk_update(minimumDuration: self.minimumDuration)
+                }
+            }
+        }
+        public var allowableMovement: Double = 10 {
+            didSet {
+                guard self.allowableMovement != oldValue else { return }
+                if self.isLoaded == true {
+                    self._gesture.kk_update(allowableMovement: self.allowableMovement)
+                }
+            }
+        }
         public let onShouldBegin: Signal.Empty< Bool? > = .init()
         public let onShouldSimultaneously: Signal.Args< Bool?, NativeGesture > = .init()
         public let onShouldRequireFailure: Signal.Args< Bool?, NativeGesture > = .init()
         public let onShouldBeRequiredToFailBy: Signal.Args< Bool?, NativeGesture > = .init()
-        public let onBegin: Signal.Empty< Void > = .init()
-        public let onChange: Signal.Empty< Void > = .init()
-        public let onCancel: Signal.Empty< Void > = .init()
-        public let onEnd: Signal.Empty< Void > = .init()
+        public let onTriggered: Signal.Empty< Void > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
         @inline(__always) private var _gesture: Reusable.Content { self._reuse.content }
-
+        
         public init() {
         }
         
@@ -101,25 +127,92 @@ public extension UI.Gesture {
             self._reuse.destroy()
         }
         
-        public func translation(in view: IUIView) -> Point {
-            return Point(self._gesture.translation(in: view.native))
-        }
-        
-        public func velocity(in view: IUIView) -> Point {
-            return Point(self._gesture.velocity(in: view.native))
-        }
-        
     }
     
 }
 
-extension UI.Gesture.Pan : IUIGesture {
+public extension UI.Gesture.LongTap {
+    
+#if os(macOS)
+    
+    @inlinable
+    @discardableResult
+    func buttons(_ value: UI.Gesture.Buttons) -> Self {
+        self.buttons = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func buttons(_ value: (Self) -> UI.Gesture.Buttons) -> Self {
+        return self.buttons(value(self))
+    }
+    
+#elseif os(iOS)
+    
+    @inlinable
+    @discardableResult
+    func numberOfTapsRequired(_ value: UInt) -> Self {
+        self.numberOfTapsRequired = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func numberOfTapsRequired(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfTapsRequired(value(self))
+    }
+    
+#endif
+    
+    @inlinable
+    @discardableResult
+    func numberOfTouchesRequired(_ value: UInt) -> Self {
+        self.numberOfTouchesRequired = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func numberOfTouchesRequired(_ value: (Self) -> UInt) -> Self {
+        return self.numberOfTouchesRequired(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func minimumDuration(_ value: TimeInterval) -> Self {
+        self.minimumDuration = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func minimumDuration(_ value: (Self) -> TimeInterval) -> Self {
+        return self.minimumDuration(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func allowableMovement(_ value: Double) -> Self {
+        self.allowableMovement = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func allowableMovement(_ value: (Self) -> Double) -> Self {
+        return self.allowableMovement(value(self))
+    }
+    
 }
 
-extension UI.Gesture.Pan : IUIGestureContinusable {
+extension UI.Gesture.LongTap : IUIGesture {
 }
 
-extension UI.Gesture.Pan : KKGestureDelegate {
+extension UI.Gesture.LongTap : IUIGestureTriggerable {
+}
+
+extension UI.Gesture.LongTap : KKGestureDelegate {
     
     func shouldBegin(_ gesture: NativeGesture) -> Bool {
         return self.onShouldBegin.emit(default: true)
@@ -139,30 +232,18 @@ extension UI.Gesture.Pan : KKGestureDelegate {
     
 }
 
-extension UI.Gesture.Pan : KKPanGestureDelegate {
+extension UI.Gesture.LongTap : KKTapGestureDelegate {
     
-    func begin(_ gesture: NativeGesture) {
-        self.onBegin.emit()
-    }
-    
-    func changed(_ gesture: NativeGesture) {
-        self.onChange.emit()
-    }
-    
-    func cancel(_ gesture: NativeGesture) {
-        self.onCancel.emit()
-    }
-    
-    func end(_ gesture: NativeGesture) {
-        self.onEnd.emit()
+    func triggered(_ gesture: NativeGesture) {
+        self.onTriggered.emit()
     }
     
 }
 
-public extension IUIGesture where Self == UI.Gesture.Pan {
+public extension IUIGesture where Self == UI.Gesture.LongTap {
     
     @inlinable
-    static func pan() -> Self {
+    static func longTap() -> Self {
         return .init()
     }
     
