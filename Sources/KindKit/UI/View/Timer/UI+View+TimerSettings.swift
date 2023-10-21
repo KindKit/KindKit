@@ -37,11 +37,11 @@ extension UI.View {
 
 extension UI.View.TimerSettings {
     
-    var `repeat`: UInt {
+    var `repeat`: Int {
         if self.duration.isInfinite == true {
             return .max
         }
-        return UInt(self.duration / self.interval) + 1
+        return Int(self.duration / self.interval) + 1
     }
     
     var isDone: Bool {

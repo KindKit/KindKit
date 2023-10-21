@@ -28,8 +28,8 @@ extension UI.View {
         public let onFinish = Signal.Empty< Void >()
         
         private var _current: TimerSettings?
-        private var _timer: KindKit.Timer? {
-            willSet { self._timer?.stop() }
+        private var _timer: KindKit.Timer.Every? {
+            willSet { self._timer?.pause() }
             didSet { self._timer?.start() }
         }
         
@@ -43,10 +43,6 @@ extension UI.View {
             self.body = body
         }
         
-        deinit {
-            self._timer?.stop()
-        }
-        
     }
     
 }
@@ -56,9 +52,9 @@ public extension UI.View.Timer {
     @discardableResult
     func start() -> Self {
         self._current = self.settings
-        self._timer = .init(interval: self.settings.interval, repeating: self.settings.repeat)
-            .onRepeat(self, { $0._onTimer($1) })
-            .onFinished(self, { $0._onTimer($1) })
+        self._timer = .init(interval: .timeInterval(self.settings.interval), iterations: self.settings.repeat)
+            .onTriggered(self, { $0._onTimer($1) })
+            .start()
         return self
     }
     

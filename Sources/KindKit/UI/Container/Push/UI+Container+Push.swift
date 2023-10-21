@@ -144,7 +144,7 @@ public extension UI.Container {
 #endif
             }
         }
-        private var _timer: Timer?
+        private var _timer: Timer.Once?
         private var _animation: ICancellable? {
             willSet { self._animation?.cancel() }
         }
@@ -475,8 +475,8 @@ private extension UI.Container.Push {
     
     func _didPresent(push: UI.Container.PushItem) {
         if let duration = push.container.pushDuration {
-            self._timer = Timer(interval: duration, delay: 0, repeating: 0)
-                .onFinished(self, { $0._timerTriggered() })
+            self._timer = Timer.Once(interval: .timeInterval(duration))
+                .onTriggered(self, { $0._timerTriggered() })
                 .start()
         } else {
             self._timer = nil
