@@ -72,7 +72,7 @@ public extension CameraSession.Recorder.Movie {
     
     func start(
         config: Config = .init(),
-        onSuccess: @escaping (URL) -> Void,
+        onSuccess: @escaping (TemporaryFile) -> Void,
         onFailure: @escaping (Error) -> Void
     ) {
         self._start(config, .init(
@@ -145,7 +145,7 @@ private extension CameraSession.Recorder.Movie {
 
 extension CameraSession.Recorder.Movie {
     
-    func finish(_ url: URL) {
+    func finish(_ url: TemporaryFile) {
         guard let context = self._context else {
             return
         }

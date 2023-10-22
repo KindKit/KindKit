@@ -11,11 +11,11 @@ extension Timer {
         public private(set) var interval: Timer.Interval
         public let tolerance: DispatchTimeInterval
         public let queue: DispatchQueue
-        public let onTriggered: Signal.Args< Void, TimeInterval > = .init()
+        public let onStarted = Signal.Empty< Void >()
+        public let onTriggered = Signal.Empty< Void >()
         
         private var _state: State = .paused
         private let _timer: DispatchSourceTimer
-        private var _lastTime: DispatchTime?
         
         public init(
             interval: Timer.Interval,
@@ -34,68 +34,6 @@ extension Timer {
             self._timer.cancel()
         }
         
-    }
-    
-}
-
-public extension Timer.Clock {
-    
-    var isRunning: Bool {
-        return self._state.isRunning
-    }
-    
-    var isExecuting: Bool {
-        return self._state.isExecuting
-    }
-    
-    var isFinished: Bool {
-        return self._state.isFinished
-    }
-    
-}
-
-public extension Timer.Clock {
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ value: (() -> Void)?) -> Self {
-        self.onTriggered.link(value)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ value: ((TimeInterval) -> Void)?) -> Self {
-        self.onTriggered.link(value)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onTriggered.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered(_ closure: @escaping (Self, TimeInterval) -> Void) -> Self {
-        self.onTriggered.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onTriggered.link(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, TimeInterval) -> Void) -> Self {
-        self.onTriggered.link(sender, closure)
-        return self
     }
     
 }
@@ -127,9 +65,9 @@ public extension Timer.Clock {
         self._reconfigureTimer()
         self._state = .paused
         if restart == true {
-            self._lastTime = .now()
             self._timer.resume()
             self._state = .running
+            self.onStarted.emit()
         }
         return self
     }
@@ -137,13 +75,9 @@ public extension Timer.Clock {
     @discardableResult
     func start() -> Self {
         if self._state.isRunning == false {
-            if self._state.isFinished == true {
-                self.reset(restart: true)
-            } else {
-                self._lastTime = .now()
-                self._timer.resume()
-                self._state = .running
-            }
+            self._timer.resume()
+            self._state = .running
+            self.onStarted.emit()
         }
         return self
     }
@@ -169,7 +103,11 @@ extension Timer.Clock : Equatable {
     
 }
 
-extension Timer.Clock : ICancellable {
+extension Timer.Clock : ITimer {
+    
+    public var isRunning: Bool {
+        return self._state.isRunning
+    }
     
     public func cancel() {
         self.reset(restart: false)
@@ -203,19 +141,13 @@ private extension Timer.Clock {
             return false
         }
         self._timer.suspend()
-        self._lastTime = nil
         self._state = newState
         return true
     }
     
     func _fired() {
-        guard let lastTime = self._lastTime else { return }
-        let nextTime = DispatchTime.now()
-        self._lastTime = nextTime
         self._state = .executing
-        let delta = TimeInterval(nextTime.uptimeNanoseconds - lastTime.uptimeNanoseconds) / 1_000_000_000
-        self.onTriggered.emit(delta)
-
+        self.onTriggered.emit()
     }
     
 }

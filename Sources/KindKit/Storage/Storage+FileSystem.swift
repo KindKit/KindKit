@@ -115,6 +115,12 @@ public extension Storage.FileSystem {
         return newUrl
     }
     
+    @inlinable
+    @discardableResult
+    func append(_ file: TemporaryFile) -> URL? {
+        return self.append(url: file.url)
+    }
+    
     @discardableResult
     func append(name: String = UUID().uuidString, `extension`: String, data: Data) -> URL? {
         do {

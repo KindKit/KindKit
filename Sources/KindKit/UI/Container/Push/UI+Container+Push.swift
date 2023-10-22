@@ -655,7 +655,7 @@ private extension UI.Container.Push {
     func _cancelInteractiveAnimation() {
         self._interactiveBeginLocation = nil
         self._animation = nil
-        self._timer?.resume()
+        self._timer?.start()
         if let current = self._current {
             current.container.cancelHide(interactive: true)
             self._layout.state = .idle(push: current)

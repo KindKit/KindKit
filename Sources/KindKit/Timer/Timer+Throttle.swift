@@ -13,12 +13,14 @@ extension Timer {
         public private(set) var immediateFire: Bool
         public let queue: DispatchQueue
         
-        public let onTriggered: Signal.Empty< Void > = .init()
+        public let onStarted = Signal.Empty< Void >()
+        public let onTriggered = Signal.Empty< Void >()
+        public let onFinished = Signal.Empty< Void >()
         
-        private var _task: DispatchWorkItem?
         private var _previousScheduled: DispatchTime?
         private var _lastExecutionTime: DispatchTime?
         private var _waitingForPerform: Bool = false
+        private var _task: DispatchWorkItem?
         
         public init(
             mode: Mode = .fixed,
@@ -41,21 +43,55 @@ public extension Timer.Throttle {
     func emit() {
         if let task = self._task {
             task.cancel()
+        } else {
+            self.onStarted.emit()
         }
-        let task = DispatchWorkItem(block: { [weak self] in
+        self._task = DispatchWorkItem(block: { [weak self] in
             guard let self = self else { return }
             self._lastExecutionTime = .now()
             self._waitingForPerform = false
+            self._task = nil
             self.onTriggered.emit()
+            if let previousScheduled = self._previousScheduled, let lastExecutionTime = self._lastExecutionTime {
+                if previousScheduled < lastExecutionTime {
+                    self.onFinished.emit()
+                }
+            }
         })
-        self._task = task
-        let now = DispatchTime.now()
-        self._previousScheduled = now
+        self._previousScheduled = .now()
         self._waitingForPerform = true
         self.queue.asyncAfter(
-            deadline: self._resolveDeadline(now),
-            execute: task
+            deadline: self._resolveDeadline(self._previousScheduled!),
+            execute: self._task!
         )
+    }
+    
+}
+
+extension Timer.Throttle : Equatable {
+    
+    public static func == (lhs: Timer.Throttle, rhs: Timer.Throttle) -> Bool {
+        return lhs === rhs
+    }
+    
+}
+
+extension Timer.Throttle : ITimerWithEnding {
+    
+    public var isRunning: Bool {
+        return self._task != nil
+    }
+    
+    public var isFinished: Bool {
+        return self._task == nil
+    }
+    
+    public func cancel() {
+        self._previousScheduled = nil
+        self._lastExecutionTime = nil
+        self._waitingForPerform = false
+        self._task?.cancel()
+        self._task = nil
     }
     
 }
@@ -82,7 +118,7 @@ private extension Timer.Throttle {
             }
         case .deferred:
             if let lastExecutionTime = self._lastExecutionTime {
-                let time = (lastExecutionTime + self.interval)
+                let time = lastExecutionTime + self.interval
                 if time > now {
                     return time
                 }
@@ -92,14 +128,6 @@ private extension Timer.Throttle {
             }
         }
         return now
-    }
-    
-}
-
-extension Timer.Throttle : Equatable {
-    
-    public static func == (lhs: Timer.Throttle, rhs: Timer.Throttle) -> Bool {
-        return lhs === rhs
     }
     
 }

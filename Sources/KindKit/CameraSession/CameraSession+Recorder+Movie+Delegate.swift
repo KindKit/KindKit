@@ -32,7 +32,7 @@ extension CameraSession.Recorder.Movie {
                     case AVError.Code.maximumDurationReached.rawValue:
                         fallthrough
                     case AVError.Code.maximumFileSizeReached.rawValue:
-                        recorder.finish(outputFileURL)
+                        recorder.finish(.init(url: outputFileURL))
                     default:
                         recorder.finish(error)
                     }
@@ -40,7 +40,7 @@ extension CameraSession.Recorder.Movie {
                     recorder.finish(error)
                 }
             } else {
-                recorder.finish(outputFileURL)
+                recorder.finish(.init(url: outputFileURL))
             }
         }
         

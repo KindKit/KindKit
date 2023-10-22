@@ -8,8 +8,6 @@ extension Timer {
     
     public final class Debounce {
         
-        public let onTriggered: Signal.Empty< Void > = .init()
-        
         private let _timer: Timer.Once
         
         public init(
@@ -22,8 +20,6 @@ extension Timer {
                 tolerance: tolerance,
                 queue: queue
             )
-            
-            self._timer.onTriggered(self, { $0.onTriggered.emit() })
         }
         
     }
@@ -37,39 +33,9 @@ public extension Timer.Debounce {
         get { self._timer.interval }
     }
     
-    var isRunning: Bool {
-        return self._timer.isRunning
+    var tolerance: DispatchTimeInterval {
+        return self._timer.tolerance
     }
-    
-    var isFinished: Bool {
-        return self._timer.isFinished
-    }
-    
-}
-
-public extension Timer.Debounce {
-    
-    @discardableResult
-    func onTriggered(_ value: (() -> Void)?) -> Self {
-        self.onTriggered.link(value)
-        return self
-    }
-    
-    @discardableResult
-    func onTriggered(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onTriggered.link(self, closure)
-        return self
-    }
-    
-    @discardableResult
-    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onTriggered.link(sender, closure)
-        return self
-    }
-    
-}
-
-public extension Timer.Debounce {
     
     func emit() -> Self {
         if self._timer.isFinished == false {
@@ -90,7 +56,31 @@ extension Timer.Debounce : Equatable {
     
 }
 
-extension Timer.Debounce : ICancellable {
+extension Timer.Debounce : ITimerWithEnding {
+    
+    public var queue: DispatchQueue {
+        return self._timer.queue
+    }
+    
+    public var isRunning: Bool {
+        return self._timer.isRunning
+    }
+    
+    public var isFinished: Bool {
+        return self._timer.isFinished
+    }
+    
+    public var onStarted: Signal.Empty< Void > {
+        return self._timer.onStarted
+    }
+    
+    public var onTriggered: Signal.Empty< Void > {
+        return self._timer.onTriggered
+    }
+    
+    public var onFinished: Signal.Empty< Void > {
+        return self._timer.onFinished
+    }
     
     public func cancel() {
         self._timer.cancel()

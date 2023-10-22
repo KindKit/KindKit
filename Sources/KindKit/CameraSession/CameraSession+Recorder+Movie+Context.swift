@@ -8,7 +8,7 @@ extension CameraSession.Recorder.Movie {
     
     struct Context {
         
-        let onSuccess: (URL) -> Void
+        let onSuccess: (TemporaryFile) -> Void
         let onFailure: (Error) -> Void
         
     }
