@@ -106,12 +106,10 @@ private extension UI.View.Clock {
     func onTriggeredTimer() {
         guard let startedTime = self._startedTime else { return }
         let now = DispatchTime.now()
-        print("Tick - \(startedTime) : \(now)")
         self._tick = .init(
             duration: self._tick.duration,
             elapsed: TimeInterval((now.uptimeNanoseconds - startedTime.uptimeNanoseconds)) / 1_000_000_000
         )
-        print("Tick - \(self._tick.duration - self._tick.elapsed)")
         self.applier.apply(self._tick, self.body)
     }
     
