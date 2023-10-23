@@ -19,6 +19,15 @@ extension CameraSession.Recorder.Movie {
         
         func fileOutput(
             _ output: AVCaptureFileOutput,
+            didStartRecordingTo fileURL: URL,
+            from connections: [AVCaptureConnection]
+        ) {
+            guard let recorder = self.recorder else { return }
+            recorder.started()
+        }
+        
+        func fileOutput(
+            _ output: AVCaptureFileOutput,
             didFinishRecordingTo outputFileURL: URL,
             from connections: [AVCaptureConnection],
             error: Swift.Error?

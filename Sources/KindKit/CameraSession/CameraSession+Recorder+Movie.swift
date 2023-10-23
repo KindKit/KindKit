@@ -32,6 +32,7 @@ public extension CameraSession.Recorder {
         private let _output = AVCaptureMovieFileOutput()
         private var _delegate: Delegate?
         private var _context: Context?
+        private var _config: Config?
         
         public init(
             storage: Storage.FileSystem
@@ -103,11 +104,6 @@ private extension CameraSession.Recorder.Movie {
             if let preset = config.preset {
                 session.configure(
                     videoPreset: preset,
-                    configureVideoDevice: { configuration in
-                        if configuration.isTorchSupported() == true {
-                            configuration.set(torch: config.flashMode)
-                        }
-                    },
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._start(config, context, session)
@@ -131,6 +127,7 @@ private extension CameraSession.Recorder.Movie {
         let delegate = Delegate(recorder: self)
         self._delegate = delegate
         self._context = context
+        self._config = config
         
         self._output.maxRecordedDuration = config.maxDuration
         self._output.maxRecordedFileSize = config.maxFileSize
@@ -144,6 +141,18 @@ private extension CameraSession.Recorder.Movie {
 }
 
 extension CameraSession.Recorder.Movie {
+    
+    func started() {
+        guard let device = self.session?.activeVideoDevice else { return }
+        guard let config = self._config else { return }
+        device.configuration({
+            if let flashMode = config.flashMode {
+                if $0.isTorchSupported() == true {
+                    $0.set(torch: flashMode)
+                }
+            }
+        })
+    }
     
     func finish(_ url: TemporaryFile) {
         guard let context = self._context else {
