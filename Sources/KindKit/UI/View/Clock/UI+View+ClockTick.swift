@@ -14,3 +14,12 @@ extension UI.View {
     }
     
 }
+
+public extension UI.View.ClockTick {
+    
+    @inlinable
+    var remainder: TimeInterval {
+        return self.duration - self.elapsed
+    }
+    
+}

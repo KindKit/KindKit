@@ -59,6 +59,7 @@ extension UI.View {
                 queue: .main
             )
             
+            self.applier.apply(self._tick, self.body)
             self._timer.onTriggered(self, { $0.onTriggeredTimer() })
             self._timer.onFinished(self, { $0.onFinishedTimer() })
         }
@@ -88,9 +89,13 @@ public extension UI.View.Clock {
     
     @discardableResult
     func stop() -> Self {
-        self._startedTime = nil
-        self.onTriggeredTimer()
         self._timer.pause()
+        self._startedTime = nil
+        self._tick = .init(
+            duration: self._tick.duration,
+            elapsed: 0
+        )
+        self.applier.apply(self._tick, self.body)
         return self
     }
     
@@ -99,18 +104,14 @@ public extension UI.View.Clock {
 private extension UI.View.Clock {
     
     func onTriggeredTimer() {
-        if let startedTime = self._startedTime {
-            let now = DispatchTime.now()
-            self._tick = .init(
-                duration: self._tick.duration,
-                elapsed: TimeInterval((now.uptimeNanoseconds - startedTime.uptimeNanoseconds) / 1_000_000_000)
-            )
-        } else {
-            self._tick = .init(
-                duration: self._tick.duration,
-                elapsed: 0
-            )
-        }
+        guard let startedTime = self._startedTime else { return }
+        let now = DispatchTime.now()
+        print("Tick - \(startedTime) : \(now)")
+        self._tick = .init(
+            duration: self._tick.duration,
+            elapsed: TimeInterval((now.uptimeNanoseconds - startedTime.uptimeNanoseconds)) / 1_000_000_000
+        )
+        print("Tick - \(self._tick.duration - self._tick.elapsed)")
         self.applier.apply(self._tick, self.body)
     }
     
