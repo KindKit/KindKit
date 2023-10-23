@@ -69,6 +69,16 @@ extension UI.View {
 
 public extension UI.View.Clock {
     
+    var interval: Timer.Interval {
+        set { self._timer.reset(interval: newValue, restart: self._timer.isRunning) }
+        get { self._timer.interval }
+    }
+    
+    var iterations: Int {
+        set { self._timer.reset(iterations: newValue, restart: self._timer.isRunning) }
+        get { self._timer.iterations }
+    }
+    
     @discardableResult
     func start() -> Self {
         self._startedTime = .now()

@@ -27,12 +27,24 @@ extension Timer {
             self.tolerance = tolerance
             self.queue = queue
             self._timer = DispatchSource.makeTimerSource(queue: self.queue)
+            self._timer.setEventHandler(handler: { [weak self] in
+                guard let self = self else { return }
+                if self._timer.isCancelled == false {
+                    self._fired()
+                }
+            })
             self._configureTimer()
         }
         
         deinit {
             self._timer.setEventHandler(handler: nil)
             self._timer.cancel()
+            switch self._state {
+            case .paused, .finished:
+                self._timer.resume()
+            case .running, .executing:
+                break
+            }
         }
         
     }
@@ -125,14 +137,9 @@ private extension Timer.Once {
     func _configureTimer() {
         let interval = self.interval.asDispatchTimeInterval
         self._timer.schedule(deadline: .now() + interval, leeway: self.tolerance)
-        self._timer.setEventHandler(handler: { [weak self] in
-            guard let self = self else { return }
-            self._fired()
-        })
     }
     
     func _unconfigureTimer() {
-        self._timer.setEventHandler(handler: nil)
         self._timer.cancel()
     }
     

@@ -286,6 +286,9 @@ extension UI.View.Button : IUIViewLockable {
 extension UI.View.Button : IUIViewPressable {
 }
 
+extension UI.View.Button : IUIViewAlphable {
+}
+
 public extension IUIView where Self == UI.View.Button {
     
     @inlinable
