@@ -104,6 +104,7 @@ extension KKVideoView {
     }
     
     func cleanup() {
+        self.kkPlayer = nil
     }
     
 }

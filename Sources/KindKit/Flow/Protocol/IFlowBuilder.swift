@@ -30,6 +30,18 @@ public extension IFlowBuilder {
     }
     
     func pipeline(
+        onReceive: @escaping (Tail.Output.Success) -> Void,
+        onCompleted: (() -> Void)? = nil
+    ) -> Flow.Pipeline< Head.Input, Tail.Output > where Tail.Output.Failure == Never {
+        let pipeline = self.pipeline()
+        _ = pipeline.subscribe(
+            onReceive: onReceive,
+            onCompleted: onCompleted
+        )
+        return pipeline
+    }
+    
+    func pipeline(
         onReceiveValue: @escaping (Tail.Output.Success) -> Void,
         onReceiveError: @escaping (Tail.Output.Failure) -> Void,
         onCompleted: (() -> Void)? = nil

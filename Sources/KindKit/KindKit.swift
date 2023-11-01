@@ -17,6 +17,12 @@ import CoreLocation
 #if canImport(CoreServices)
 import CoreServices
 #endif
+#if canImport(CoreMedia)
+import CoreMedia
+#endif
+#if canImport(AVFoundation)
+import AVFoundation
+#endif
 #if canImport(UniformTypeIdentifiers)
 import UniformTypeIdentifiers
 #endif

@@ -16,27 +16,6 @@ public extension CameraSession.Device.Video {
     
 }
 
-extension CameraSession.Device.Video.Focus {
-    
-    var raw: AVCaptureDevice.FocusMode {
-        switch self {
-        case .locked: return .locked
-        case .auto: return .autoFocus
-        case .continuous: return .continuousAutoFocus
-        }
-    }
-    
-    init?(_ raw: AVCaptureDevice.FocusMode) {
-        switch raw {
-        case .locked: self = .locked
-        case .autoFocus: self = .auto
-        case .continuousAutoFocus: self = .continuous
-        @unknown default: return nil
-        }
-    }
-    
-}
-
 public extension CameraSession.Device.Video {
     
     func isFocusSupported(_ feature: Focus) -> Bool {
@@ -61,6 +40,27 @@ public extension CameraSession.Device.Video.Configuration {
     
     func focus() -> CameraSession.Device.Video.Focus? {
         return .init(self.device.device.focusMode)
+    }
+    
+}
+
+extension CameraSession.Device.Video.Focus {
+    
+    var raw: AVCaptureDevice.FocusMode {
+        switch self {
+        case .locked: return .locked
+        case .auto: return .autoFocus
+        case .continuous: return .continuousAutoFocus
+        }
+    }
+    
+    init?(_ raw: AVCaptureDevice.FocusMode) {
+        switch raw {
+        case .locked: self = .locked
+        case .autoFocus: self = .auto
+        case .continuousAutoFocus: self = .continuous
+        @unknown default: return nil
+        }
     }
     
 }

@@ -6,10 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Stack<
-        Input : IFlowResult,
-        Pipeline : IFlowPipeline
-    > : IFlowOperator where
+    final class Stack< Input : IFlowResult, Pipeline : IFlowPipeline > : IFlowOperator where
         Input.Success == Pipeline.Input.Success,
         Input.Failure == Pipeline.Input.Failure
     {

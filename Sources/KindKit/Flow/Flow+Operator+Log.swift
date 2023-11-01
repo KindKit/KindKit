@@ -6,9 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Log<
-        Input : IFlowResult
-    > : IFlowOperator {
+    final class Log< Input : IFlowResult > : IFlowOperator {
         
         public typealias Input = Input
         public typealias Output = Input

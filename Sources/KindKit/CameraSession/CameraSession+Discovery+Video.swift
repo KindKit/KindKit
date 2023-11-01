@@ -8,7 +8,7 @@ public extension CameraSession.Discovery {
     
     struct Video {
         
-        public let preset: CameraSession.Preset
+        public let preset: CameraSession.Device.Video.Preset
         public let device: CameraSession.Device.Video
         
     }
@@ -19,7 +19,7 @@ public extension CameraSession {
     
     func videoDevices(
         builtIns: [Device.Video.BuiltIn],
-        presets: [Preset]
+        presets: [Device.Video.Preset]
     ) -> [Discovery.Video] {
         var result: [Discovery.Video] = []
         let allDevices = self.videoDevices
@@ -43,7 +43,7 @@ public extension CameraSession {
     func videoDevice(
         positions: [Device.Video.Position],
         builtIns: [Device.Video.BuiltIn],
-        presets: [Preset]
+        presets: [Device.Video.Preset]
     ) -> Discovery.Video? {
         let allDevices = self.videoDevices
         for position in positions {

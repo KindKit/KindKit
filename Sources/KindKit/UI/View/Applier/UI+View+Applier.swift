@@ -6,176 +6,51 @@ import Foundation
 
 extension UI.View {
     
-    public final class Clock<
+    public final class Applier<
         BodyType : IUIView,
         ApplierType : IApplier
     > : IUIWidgetView where
-        ApplierType.InputType == ClockTick,
         ApplierType.TargetType == BodyType
     {
         
-        public var settings: ClockSettings {
+        public var content: ApplierType.InputType {
             didSet {
-                self.body.content = .init(
-                    duration: self.settings.duration,
-                    elapsed: 0
-                )
-                self._timer.reset(
-                    interval: self.settings.interval,
-                    iterations: self.settings.iterations,
-                    restart: self._timer.isRunning
-                )
+                self.applier.apply(self.content, self.body)
             }
         }
         public var applier: ApplierType {
-            set { self.body.applier = newValue }
-            get { self.body.applier }
+            didSet {
+                self.applier.apply(self.content, self.body)
+            }
         }
-        public let body: UI.View.Applier< BodyType, ApplierType >
-        public let onFinish = Signal.Empty< Void >()
-        
-        private var _startedTime: DispatchTime?
-        private let _timer: Timer.Every
+        public let body: BodyType
         
         public init(
-            settings: ClockSettings,
+            content: ApplierType.InputType,
             applier: ApplierType,
             body: BodyType
         ) {
-            self.settings = settings
-            self.body = .init(
-                content: .init(
-                    duration: settings.duration,
-                    elapsed: 0
-                ),
-                applier: applier,
-                body: body
-            )
-            self._timer = .init(
-                interval: settings.interval,
-                iterations: settings.iterations,
-                tolerance: settings.tolerance,
-                queue: .main
-            )
+            self.content = content
+            self.applier = applier
+            self.body = body
             
-            self._timer.onTriggered(self, { $0.onTriggeredTimer() })
-            self._timer.onFinished(self, { $0.onFinishedTimer() })
+            self.apply()
         }
         
     }
     
 }
 
-public extension UI.View.Clock {
+public extension UI.View.Applier {
     
-    var interval: Timer.Interval {
-        set {
-            self.settings = .init(
-                interval: newValue,
-                iterations: self.settings.iterations,
-                tolerance: self.settings.tolerance
-            )
-        }
-        get { self._timer.interval }
-    }
-    
-    var iterations: Int {
-        set {
-            self.settings = .init(
-                interval: self.settings.interval,
-                iterations: newValue,
-                tolerance: self.settings.tolerance
-            )
-        }
-        get { self._timer.iterations }
-    }
-    
-    @discardableResult
-    func start() -> Self {
-        self._startedTime = .now()
-        self._timer.start()
-        return self
-    }
-    
-    @discardableResult
-    func stop() -> Self {
-        self._timer.pause()
-        self._startedTime = nil
-        self.body.content = .init(
-            duration: self.body.content.duration,
-            elapsed: 0
-        )
-        return self
+    @inlinable
+    func apply() {
+        self.applier.apply(self.content, self.body)
     }
     
 }
 
-private extension UI.View.Clock {
-    
-    func onTriggeredTimer() {
-        guard let startedTime = self._startedTime else { return }
-        let now = DispatchTime.now()
-        self.body.content = .init(
-            duration: self.body.content.duration,
-            elapsed: TimeInterval((now.uptimeNanoseconds - startedTime.uptimeNanoseconds)) / 1_000_000_000
-        )
-    }
-    
-    func onFinishedTimer() {
-        self.onFinish.emit()
-    }
-    
-}
-
-public extension UI.View.Clock {
-    
-    @inlinable
-    @discardableResult
-    func settings(_ value: UI.View.ClockSettings) -> Self {
-        self.settings = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func settings(_ value: () -> UI.View.ClockSettings) -> Self {
-        return self.settings(value())
-    }
-    
-    @inlinable
-    @discardableResult
-    func settings(_ value: (Self) -> UI.View.ClockSettings) -> Self {
-        return self.settings(value(self))
-    }
-    
-}
-
-public extension UI.View.Clock {
-    
-    @inlinable
-    @discardableResult
-    func onFinish(_ closure: (() -> Void)?) -> Self {
-        self.onFinish.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFinish(_ closure: ((Self) -> Void)?) -> Self {
-        self.onFinish.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: ((Sender) -> Void)?) -> Self {
-        self.onFinish.link(sender, closure)
-        return self
-    }
-    
-}
-
-public extension UI.View.Clock where BodyType == UI.View.AttributedText {
+public extension UI.View.Applier where BodyType == UI.View.AttributedText {
     
     @inlinable
     var alignment: UI.Text.Alignment? {
@@ -254,7 +129,7 @@ public extension UI.View.Clock where BodyType == UI.View.AttributedText {
     
 }
 
-public extension UI.View.Clock where BodyType == UI.View.Text {
+public extension UI.View.Applier where BodyType == UI.View.Text {
     
     @inlinable
     var textFont: UI.Font {
@@ -383,41 +258,41 @@ public extension UI.View.Clock where BodyType == UI.View.Text {
     
 }
 
-extension UI.View.Clock : IUIViewReusable where BodyType : IUIViewReusable {
+extension UI.View.Applier : IUIViewReusable where BodyType : IUIViewReusable {
 }
 
-extension UI.View.Clock : IUIViewDynamicSizeable where BodyType : IUIViewDynamicSizeable {
+extension UI.View.Applier : IUIViewDynamicSizeable where BodyType : IUIViewDynamicSizeable {
 }
 
-extension UI.View.Clock : IUIViewStaticSizeable where BodyType : IUIViewStaticSizeable {
+extension UI.View.Applier : IUIViewStaticSizeable where BodyType : IUIViewStaticSizeable {
 }
 
-extension UI.View.Clock : IUIViewEditable where BodyType : IUIViewEditable {
+extension UI.View.Applier : IUIViewEditable where BodyType : IUIViewEditable {
 }
 
-extension UI.View.Clock : IUIViewStyleable where BodyType : IUIViewStyleable {
+extension UI.View.Applier : IUIViewStyleable where BodyType : IUIViewStyleable {
 }
 
-extension UI.View.Clock : IUIViewHighlightable where BodyType : IUIViewHighlightable {
+extension UI.View.Applier : IUIViewHighlightable where BodyType : IUIViewHighlightable {
 }
 
-extension UI.View.Clock : IUIViewSelectable where BodyType : IUIViewSelectable {
+extension UI.View.Applier : IUIViewSelectable where BodyType : IUIViewSelectable {
 }
 
-extension UI.View.Clock : IUIViewLockable where BodyType : IUIViewLockable {
+extension UI.View.Applier : IUIViewLockable where BodyType : IUIViewLockable {
 }
 
-extension UI.View.Clock : IUIViewPressable where BodyType : IUIViewPressable {
+extension UI.View.Applier : IUIViewPressable where BodyType : IUIViewPressable {
 }
 
-extension UI.View.Clock : IUIViewAnimatable where BodyType : IUIViewAnimatable {
+extension UI.View.Applier : IUIViewAnimatable where BodyType : IUIViewAnimatable {
 }
 
-extension UI.View.Clock : IUIViewCornerRadiusable where BodyType : IUIViewCornerRadiusable {
+extension UI.View.Applier : IUIViewCornerRadiusable where BodyType : IUIViewCornerRadiusable {
 }
 
-extension UI.View.Clock : IUIViewColorable where BodyType : IUIViewColorable {
+extension UI.View.Applier : IUIViewColorable where BodyType : IUIViewColorable {
 }
 
-extension UI.View.Clock : IUIViewAlphable where BodyType : IUIViewAlphable {
+extension UI.View.Applier : IUIViewAlphable where BodyType : IUIViewAlphable {
 }

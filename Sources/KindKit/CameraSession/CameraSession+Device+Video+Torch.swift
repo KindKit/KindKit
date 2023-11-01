@@ -24,6 +24,34 @@ public extension CameraSession.Device.Video.Torch {
     
 }
 
+public extension CameraSession.Device.Video {
+    
+    func isTorchSupported() -> Bool {
+        return self.device.isTorchAvailable
+    }
+    
+    func torch() -> Torch? {
+        return .init(self.device)
+    }
+    
+}
+
+public extension CameraSession.Device.Video.Configuration {
+    
+    func isTorchSupported() -> Bool {
+        return self.device.isTorchSupported()
+    }
+    
+    func torch() -> CameraSession.Device.Video.Torch? {
+        return self.device.torch()
+    }
+    
+    func set(torch: CameraSession.Device.Video.Torch) {
+        torch.apply(self.device.device)
+    }
+    
+}
+
 extension CameraSession.Device.Video.Torch {
     
     var raw: AVCaptureDevice.TorchMode {
@@ -51,34 +79,6 @@ extension CameraSession.Device.Video.Torch {
             device.torchMode = .on
             try! device.setTorchModeOn(level: max(0, min(Float(level), 1)))
         }
-    }
-    
-}
-
-public extension CameraSession.Device.Video {
-    
-    func isTorchSupported() -> Bool {
-        return self.device.isTorchAvailable
-    }
-    
-    func torch() -> Torch? {
-        return .init(self.device)
-    }
-    
-}
-
-public extension CameraSession.Device.Video.Configuration {
-    
-    func isTorchSupported() -> Bool {
-        return self.device.isTorchSupported()
-    }
-    
-    func torch() -> CameraSession.Device.Video.Torch? {
-        return self.device.torch()
-    }
-    
-    func set(torch: CameraSession.Device.Video.Torch) {
-        torch.apply(self.device.device)
     }
     
 }

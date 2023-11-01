@@ -4,7 +4,7 @@
 
 import AVFoundation
 
-public extension CameraSession {
+public extension CameraSession.Device.Video {
     
     enum Preset {
         
@@ -22,7 +22,15 @@ public extension CameraSession {
     
 }
 
-extension CameraSession.Preset {
+public extension CameraSession.Device.Video {
+    
+    func isPresetSupported(_ preset: CameraSession.Device.Video.Preset) -> Bool {
+        return self.device.supportsSessionPreset(preset.raw)
+    }
+    
+}
+
+extension CameraSession.Device.Video.Preset {
     
     var raw: AVCaptureSession.Preset {
         switch self {

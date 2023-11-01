@@ -4,7 +4,7 @@
 
 import AVFoundation
 
-public extension CameraSession.Recorder.Photo {
+public extension CameraSession.Device.Video {
     
     enum Flash {
         
@@ -16,7 +16,7 @@ public extension CameraSession.Recorder.Photo {
     
 }
 
-extension CameraSession.Recorder.Photo.Flash {
+extension CameraSession.Device.Video.Flash {
     
     var raw: AVCaptureDevice.FlashMode {
         switch self {

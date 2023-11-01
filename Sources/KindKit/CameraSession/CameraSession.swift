@@ -7,7 +7,6 @@ import CoreMotion
 
 public final class CameraSession {
     
-    public let permission: IPermission
     public private(set) var isStarting: Bool = false
     public private(set) var isStarted: Bool = false
 #if os(iOS)
@@ -44,7 +43,7 @@ public final class CameraSession {
             Device.Audio($0)
         })
     }
-    public var activeVideoPreset: Preset? {
+    public var activeVideoPreset: Device.Video.Preset? {
         return self._activeState?.videoPreset
     }
     public var activeVideoDevice: Device.Video? {
@@ -62,22 +61,17 @@ public final class CameraSession {
     public let motionManager = CMMotionManager()
 #endif
     
-    private var _startState: State?
     private var _activeState: State?
     private var _queue = DispatchQueue(label: "KindKit.CameraSession")
     private let _observer = Observer< ICameraSessionObserver >()
     private var _captureSessionStartObserver: NSObjectProtocol?
     private var _captureSessionStopObserver: NSObjectProtocol?
     
-    public init(
-        _ permission: IPermission
-    ) {
-        self.permission = permission
+    public init() {
         self._setup()
     }
     
     deinit {
-        self._destroy()
         self.stop()
     }
     
@@ -89,11 +83,6 @@ private extension CameraSession {
 #if os(iOS)
         self.motionManager.accelerometerUpdateInterval = 0.1
 #endif
-        self.permission.add(observer: self, priority: .internal)
-    }
-    
-    func _destroy() {
-        self.permission.remove(observer: self)
     }
     
     func _subscribeSession() {
@@ -176,22 +165,6 @@ private extension CameraSession {
 
     func _start(
         _ state: State
-    ) {
-        switch self.permission.status {
-        case .notSupported:
-            return
-        case .notDetermined:
-            self._startState = state
-            self.permission.request(source: self)
-        case .authorized:
-            self._configure(state: state)
-        case .denied:
-            self._startState = state
-        }
-    }
-    
-    func _configure(
-        state: State
     ) {
         self._configure(
             old: self._activeState,
@@ -351,7 +324,7 @@ public extension CameraSession {
     }
     
     func start(
-        videoPreset: Preset,
+        videoPreset: Device.Video.Preset,
         videoDevice: Device.Video,
         audioDevice: Device.Audio? = nil,
         recorders: [ICameraSessionRecorder] = []
@@ -393,7 +366,7 @@ public extension CameraSession {
     
     @inlinable
     func set(
-        preset: Preset,
+        preset: Device.Video.Preset,
         device: Device.Video,
         completion: @escaping () -> Void
     ) {
@@ -416,7 +389,7 @@ public extension CameraSession {
     }
     
     func configure(
-        videoPreset: Preset? = nil,
+        videoPreset: Device.Video.Preset? = nil,
         videoDevice: Device.Video? = nil,
         audioDevice: Device.Audio? = nil,
         recorders: [ICameraSessionRecorder]? = nil,
@@ -448,37 +421,6 @@ public extension CameraSession {
                 completion()
             }
         )
-    }
-    
-}
-
-extension CameraSession : IPermissionObserver {
-    
-    public func didRedirectToSettings(_ permission: IPermission, source: Any?) {
-    }
-    
-    public func willRequest(_ permission: IPermission, source: Any?) {
-    }
-    
-    public func didRequest(_ permission: IPermission, source: Any?) {
-        if self.permission === permission {
-            switch self.permission.status {
-            case .authorized:
-                if self.isStarting == true {
-                    if let state = self._startState {
-                        self._startState = nil
-                        self._configure(state: state)
-                    }
-                }
-            default:
-                if self.isStarting == true {
-                    self._activeState = nil
-                    self.isStarting = false
-                } else if self.isStarted == true {
-                    self.stop()
-                }
-            }
-        }
     }
     
 }

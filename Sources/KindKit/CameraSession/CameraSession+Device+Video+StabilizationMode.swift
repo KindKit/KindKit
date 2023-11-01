@@ -6,9 +6,9 @@
 
 import AVFoundation
 
-public extension CameraSession {
+public extension CameraSession.Device.Video {
     
-    enum VideoStabilizationMode {
+    enum StabilizationMode {
         
         case off
         case auto
@@ -21,7 +21,7 @@ public extension CameraSession {
     
 }
 
-extension CameraSession.VideoStabilizationMode {
+extension CameraSession.Device.Video.StabilizationMode {
     
     var raw: AVCaptureVideoStabilizationMode {
         switch self {
@@ -36,11 +36,15 @@ extension CameraSession.VideoStabilizationMode {
                 return .cinematic
             }
         case .previewOptimized:
+#if swift(>=5.9)
             if #available(iOS 17.0, *) {
                 return .previewOptimized
             } else {
                 return .standard
             }
+#else
+            return .standard
+#endif
         }
     }
     
@@ -51,7 +55,9 @@ extension CameraSession.VideoStabilizationMode {
         case .standard: self = .standard
         case .cinematic: self = .cinematic
         case .cinematicExtended: self = .cinematicExtended
+#if swift(>=5.9)
         case .previewOptimized: self = .previewOptimized
+#endif
         @unknown default: return nil
         }
     }

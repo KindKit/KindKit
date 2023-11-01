@@ -9,18 +9,26 @@ public extension CameraSession.Recorder {
     final class Movie : ICameraSessionRecorder {
         
         public weak var session: CameraSession?
-        public var deviceOrientation: CameraSession.Orientation?
-        public var interfaceOrientation: CameraSession.Orientation? {
+#if os(iOS)
+        public var deviceOrientation: CameraSession.Orientation? {
             didSet {
-                guard self.interfaceOrientation != oldValue else { return }
-                guard let connection = self._output.connection(with: .video) else { return }
-                if let videoOrientation = self.interfaceOrientation?.avOrientation {
-                    connection.videoOrientation = videoOrientation
-                } else {
-                    connection.videoOrientation = .portrait
+                guard self.deviceOrientation != oldValue else { return }
+                if let context = self._context {
+                    let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+                    self.apply(videoOrientation: orientation)
                 }
             }
         }
+        public var interfaceOrientation: CameraSession.Orientation? {
+            didSet {
+                guard self.interfaceOrientation != oldValue else { return }
+                if let context = self._context {
+                    let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+                    self.apply(videoOrientation: orientation)
+                }
+            }
+        }
+#endif
         public var output: AVCaptureOutput {
             return self._output
         }
@@ -28,17 +36,24 @@ public extension CameraSession.Recorder {
             return self._delegate != nil && self._context != nil
         }
         public let storage: Storage.FileSystem
+        public let supportedCodecs: [Codec]
 
         private let _output = AVCaptureMovieFileOutput()
         private var _delegate: Delegate?
         private var _context: Context?
-        private var _config: Config?
-        
+        private var _restorePreset: CameraSession.Device.Video.Preset?
+        private var _restoreFlashMode: CameraSession.Device.Video.Torch?
+
         public init(
             storage: Storage.FileSystem
         ) {
             self.storage = storage
-            self._output.movieFragmentInterval = CMTime.invalid
+#if os(macOS)
+            self.supportedCodecs = [ .hevc, .h264 ]
+#elseif os(iOS)
+            self.supportedCodecs = self._output.availableVideoCodecTypes.compactMap({ .init($0) })
+#endif
+            self._output.movieFragmentInterval = .invalid
         }
         
         public func attach(session: CameraSession) {
@@ -76,7 +91,8 @@ public extension CameraSession.Recorder.Movie {
         onSuccess: @escaping (TemporaryFile) -> Void,
         onFailure: @escaping (Error) -> Void
     ) {
-        self._start(config, .init(
+        self._start(.init(
+            config: config,
             onSuccess: onSuccess,
             onFailure: onFailure
         ))
@@ -94,23 +110,23 @@ public extension CameraSession.Recorder.Movie {
 private extension CameraSession.Recorder.Movie {
     
     func _start(
-        _ config: Config,
         _ context: Context
     ) {
         guard self.isRecording == false else {
             return
         }
         if let session = self.session {
-            if let preset = config.preset {
+            if let preset = context.config.preset {
+                self._restorePreset = preset
                 session.configure(
                     videoPreset: preset,
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._start(config, context, session)
+                        self._start(context, session)
                     }
                 )
             } else {
-                self._start(config, context, session)
+                self._start(context, session)
             }
         } else {
             DispatchQueue.main.async(execute: {
@@ -120,21 +136,57 @@ private extension CameraSession.Recorder.Movie {
     }
     
     func _start(
-        _ config: Config,
         _ context: Context,
         _ session: CameraSession
     ) {
         let delegate = Delegate(recorder: self)
         self._delegate = delegate
         self._context = context
-        self._config = config
         
-        self._output.maxRecordedDuration = config.maxDuration
-        self._output.maxRecordedFileSize = config.maxFileSize
-        self._output.minFreeDiskSpaceLimit = config.minFreeDiskSpace
+#if os(iOS)
+        let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+        self.apply(videoOrientation: orientation)
+#endif
+        
+        if let connection = self.videoConnection {
+            if let codec = context.config.codec {
+                if self.supportedCodecs.contains(codec) == true {
+                    self._output.setOutputSettings([ AVVideoCodecKey : codec.raw ], for: connection)
+                } else {
+#if DEBUG
+                    fatalError("Not supported codec type \(codec)")
+#endif
+                }
+            }
+#if os(iOS)
+            if let stabilizationMode = context.config.stabilizationMode {
+                connection.preferredVideoStabilizationMode = stabilizationMode.raw
+            }
+            if context.config.rotateToDeviceOrientation == true {
+                self._output.setRecordsVideoOrientationAndMirroringChangesAsMetadataTrack(true, for: connection)
+            }
+#endif
+        }
+        self._output.maxRecordedDuration = context.config.maxDuration
+        self._output.maxRecordedFileSize = context.config.maxFileSize
         self._output.startRecording(
             to: self.storage.url(name: UUID().uuidString, extension: "mp4"),
             recordingDelegate: delegate
+        )
+    }
+    
+    func _restore(_ completion: @escaping () -> Void) {
+        guard let session = self.session else { return }
+        session.configure(
+            videoPreset: self._restorePreset,
+            configureVideoDevice: {
+                if let flashMode = self._restoreFlashMode {
+                    if $0.isTorchSupported() == true {
+                        $0.set(torch: flashMode)
+                    }
+                }
+            },
+            completion: completion
         )
     }
     
@@ -144,14 +196,17 @@ extension CameraSession.Recorder.Movie {
     
     func started() {
         guard let device = self.session?.activeVideoDevice else { return }
-        guard let config = self._config else { return }
-        device.configuration({
-            if let flashMode = config.flashMode {
-                if $0.isTorchSupported() == true {
-                    $0.set(torch: flashMode)
+        guard let context = self._context else { return }
+        if context.config.flashMode != nil {
+            device.configuration({
+                if let flashMode = context.config.flashMode {
+                    if $0.isTorchSupported() == true {
+                        self._restoreFlashMode = $0.torch()
+                        $0.set(torch: flashMode)
+                    }
                 }
-            }
-        })
+            })
+        }
     }
     
     func finish(_ url: TemporaryFile) {
@@ -160,7 +215,9 @@ extension CameraSession.Recorder.Movie {
         }
         self._delegate = nil
         self._context = nil
-        context.onSuccess(url)
+        self._restore({
+            context.onSuccess(url)
+        })
     }
     
     func finish(_ error: Swift.Error) {
@@ -169,7 +226,9 @@ extension CameraSession.Recorder.Movie {
         }
         self._delegate = nil
         self._context = nil
-        context.onFailure(.internal(error))
+        self._restore({
+            context.onFailure(.internal(error))
+        })
     }
 
 }

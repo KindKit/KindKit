@@ -49,7 +49,24 @@ public final class Player {
             self.status = .load
         }
     }
-    public private(set) var isBuffering: Bool = false
+    public private(set) var isBuffering: Bool = false {
+        didSet {
+            guard self.isBuffering != oldValue else { return }
+            switch self.isBuffering {
+            case true: self.onBeginBuffering.emit()
+            case false: self.onEndBuffering.emit()
+            }
+        }
+    }
+    public private(set) var isSeeking: Bool = false {
+        didSet {
+            guard self.isSeeking != oldValue else { return }
+            switch self.isSeeking {
+            case true: self.onBeginSeeking.emit()
+            case false: self.onEndSeeking.emit()
+            }
+        }
+    }
     public var options: Options = []
     public var mute: Bool = false {
         didSet {
@@ -67,12 +84,15 @@ public final class Player {
     
     public let onShouldPlay = Signal.Empty< Bool? >()
     public let onSkip = Signal.Empty< Void >()
-    public let onStartBuffering = Signal.Empty< Void >()
+    public let onBeginBuffering = Signal.Empty< Void >()
     public let onEndBuffering = Signal.Empty< Void >()
+    public let onBeginSeeking = Signal.Empty< Void >()
+    public let onEndSeeking = Signal.Empty< Void >()
     public let onChangeStatus = Signal.Args< Void, Status >()
     public let onChangeTime = Signal.Args< Void, CMTime >()
     
     private var _observer: Observer!
+    private var _chasingTime: CMTime?
     
     public init() {
         self.native = .init()
@@ -134,37 +154,18 @@ public extension Player {
         case .idle, .load, .ready, .pause, .finish, .error:
             break
         case .play:
-            if self.onShouldPlay.emit() == true {
-                self.native.pause()
-                self.status = .play
-            }
+            self.native.pause()
+            self.status = .pause
         }
         return self
     }
     
     @discardableResult
-    func seek(
-        to time: CMTime,
-        tolerance: SeekTolerance = .init(),
-        completion: ((Bool) -> Void)? = nil
-    ) -> Self {
-        switch self.status {
-        case .idle, .load, .error:
-            break
-        case .ready, .play, .pause, .finish:
-            if let completion = completion {
-                self.native.seek(
-                    to: time,
-                    toleranceBefore: tolerance.before,
-                    toleranceAfter: tolerance.after,
-                    completionHandler: completion
-                )
-            } else {
-                self.native.seek(
-                    to: time,
-                    toleranceBefore: tolerance.before,
-                    toleranceAfter: tolerance.after
-                )
+    func seek(to time: CMTime) -> Self {
+        if self._chasingTime != time {
+            self._chasingTime = time
+            if self.isSeeking == false {
+                self._trySeek()
             }
         }
         return self
@@ -290,22 +291,22 @@ public extension Player {
     
     @inlinable
     @discardableResult
-    func onStartBuffering(_ closure: (() -> Void)?) -> Self {
-        self.onStartBuffering.link(closure)
+    func onBeginBuffering(_ closure: (() -> Void)?) -> Self {
+        self.onBeginBuffering.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onStartBuffering(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onStartBuffering.link(self, closure)
+    func onBeginBuffering(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onBeginBuffering.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onStartBuffering< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onStartBuffering.link(sender, closure)
+    func onBeginBuffering< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onBeginBuffering.link(sender, closure)
         return self
     }
     
@@ -327,6 +328,48 @@ public extension Player {
     @discardableResult
     func onEndBuffering< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
         self.onEndBuffering.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginSeeking(_ closure: (() -> Void)?) -> Self {
+        self.onBeginSeeking.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginSeeking(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onBeginSeeking.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginSeeking< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onBeginSeeking.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndSeeking(_ closure: (() -> Void)?) -> Self {
+        self.onEndSeeking.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndSeeking(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onEndSeeking.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndSeeking< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onEndSeeking.link(sender, closure)
         return self
     }
     
@@ -387,13 +430,11 @@ extension Player {
     func startBuffering() {
         guard self.isBuffering == false else { return }
         self.isBuffering = true
-        self.onStartBuffering.emit()
     }
     
     func endBuffering() {
         guard self.isBuffering == true else { return }
         self.isBuffering = false
-        self.onEndBuffering.emit()
     }
     
     func change(status: Status) {
@@ -404,6 +445,34 @@ extension Player {
         self.onChangeTime.emit(time)
     }
 
+}
+
+private extension Player {
+    
+    func _trySeek() {
+        switch self.status {
+        case .idle, .load, .error:
+            break
+        case .ready, .play, .pause, .finish:
+            guard let time = self._chasingTime else { return }
+            self._seek(to: time)
+        }
+    }
+    
+    func _seek(to time: CMTime) {
+        self.isSeeking = true
+        self.native.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero, completionHandler: { [weak self] _ in
+            guard let self = self, let chasingTime = self._chasingTime else { return }
+            self.onChangeTime.emit(self.currentTime)
+            if CMTimeCompare(chasingTime, time) == 0 {
+                self._chasingTime = nil
+                self.isSeeking = false
+            } else {
+                self._trySeek()
+            }
+        })
+    }
+    
 }
 
 #endif

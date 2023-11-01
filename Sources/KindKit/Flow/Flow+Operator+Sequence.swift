@@ -6,9 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Sequence<
-        Pipeline : IFlowPipeline
-    > : IFlowOperator {
+    final class Sequence< Pipeline : IFlowPipeline > : IFlowOperator {
         
         public typealias Input = Pipeline.Input
         public typealias Output = Result< [Pipeline.Output.Success], Pipeline.Output.Failure >

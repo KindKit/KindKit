@@ -38,6 +38,18 @@ public extension IFlowPipeline {
     
     @inlinable
     func subscribe(
+        onReceive: @escaping (Output.Success) -> Void,
+        onCompleted: (() -> Void)? = nil
+    ) -> IFlowSubscription where Output.Failure == Never {
+        return self.subscribe(
+            onReceiveValue: { onReceive($0) },
+            onReceiveError: { _ in },
+            onCompleted: onCompleted
+        )
+    }
+    
+    @inlinable
+    func subscribe(
         onReceiveValue: @escaping (Output.Success) -> Void,
         onReceiveError: @escaping (Output.Failure) -> Void,
         onCompleted: (() -> Void)? = nil

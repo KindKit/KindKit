@@ -16,27 +16,6 @@ public extension CameraSession.Device.Video {
     
 }
 
-extension CameraSession.Device.Video.WhiteBalance {
-    
-    var raw: AVCaptureDevice.WhiteBalanceMode {
-        switch self {
-        case .locked: return .locked
-        case .auto: return .autoWhiteBalance
-        case .continuous: return .continuousAutoWhiteBalance
-        }
-    }
-    
-    init?(_ raw: AVCaptureDevice.WhiteBalanceMode) {
-        switch raw {
-        case .locked: self = .locked
-        case .autoWhiteBalance: self = .auto
-        case .continuousAutoWhiteBalance: self = .continuous
-        @unknown default: return nil
-        }
-    }
-    
-}
-
 public extension CameraSession.Device.Video {
     
     func isWhiteBalanceSupported(_ feature: WhiteBalance) -> Bool {
@@ -61,6 +40,27 @@ public extension CameraSession.Device.Video.Configuration {
     
     func set(whiteBalance: CameraSession.Device.Video.WhiteBalance) {
         self.device.device.whiteBalanceMode = whiteBalance.raw
+    }
+    
+}
+
+extension CameraSession.Device.Video.WhiteBalance {
+    
+    var raw: AVCaptureDevice.WhiteBalanceMode {
+        switch self {
+        case .locked: return .locked
+        case .auto: return .autoWhiteBalance
+        case .continuous: return .continuousAutoWhiteBalance
+        }
+    }
+    
+    init?(_ raw: AVCaptureDevice.WhiteBalanceMode) {
+        switch raw {
+        case .locked: self = .locked
+        case .autoWhiteBalance: self = .auto
+        case .continuousAutoWhiteBalance: self = .continuous
+        @unknown default: return nil
+        }
     }
     
 }

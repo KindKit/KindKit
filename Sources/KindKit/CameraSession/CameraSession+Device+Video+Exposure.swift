@@ -19,6 +19,34 @@ public extension CameraSession.Device.Video {
     
 }
 
+public extension CameraSession.Device.Video {
+    
+    func isExposureSupported(_ feature: Exposure) -> Bool {
+        return self.device.isExposureModeSupported(feature.raw)
+    }
+    
+    func exposure() -> Exposure? {
+        return .init(self.device)
+    }
+    
+}
+
+public extension CameraSession.Device.Video.Configuration {
+    
+    func isExposureSupported(_ feature: CameraSession.Device.Video.Exposure) -> Bool {
+        return self.device.isExposureSupported(feature)
+    }
+    
+    func exposure() -> CameraSession.Device.Video.Exposure? {
+        return self.device.exposure()
+    }
+    
+    func set(exposure: CameraSession.Device.Video.Exposure) {
+        exposure.apply(self.device.device)
+    }
+    
+}
+
 extension CameraSession.Device.Video.Exposure {
     
     var raw: AVCaptureDevice.ExposureMode {
@@ -60,34 +88,6 @@ extension CameraSession.Device.Video.Exposure {
             )
 #endif
         }
-    }
-    
-}
-
-public extension CameraSession.Device.Video {
-    
-    func isExposureSupported(_ feature: Exposure) -> Bool {
-        return self.device.isExposureModeSupported(feature.raw)
-    }
-    
-    func exposure() -> Exposure? {
-        return .init(self.device)
-    }
-    
-}
-
-public extension CameraSession.Device.Video.Configuration {
-    
-    func isExposureSupported(_ feature: CameraSession.Device.Video.Exposure) -> Bool {
-        return self.device.isExposureSupported(feature)
-    }
-    
-    func exposure() -> CameraSession.Device.Video.Exposure? {
-        return self.device.exposure()
-    }
-    
-    func set(exposure: CameraSession.Device.Video.Exposure) {
-        exposure.apply(self.device.device)
     }
     
 }

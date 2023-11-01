@@ -99,7 +99,7 @@ public extension Storage.FileSystem {
             return url
         }
         let base = url.deletingLastPathComponent()
-        if base.absoluteString == self.url.absoluteString {
+        if base == self.url {
             return url
         }
         let newUrl = self.url.appendingPathComponent(url.lastPathComponent)

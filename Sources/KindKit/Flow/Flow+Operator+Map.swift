@@ -6,11 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Map<
-        Input : IFlowResult,
-        Success,
-        Failure : Swift.Error
-    > : IFlowOperator {
+    final class Map< Input : IFlowResult, Success, Failure : Swift.Error > : IFlowOperator {
         
         public typealias Input = Input
         public typealias Output = Result< Success, Failure >

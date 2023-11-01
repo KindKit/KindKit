@@ -6,12 +6,7 @@ import Foundation
 
 public extension Flow.Operator {
     
-    final class Condition2<
-        Input : IFlowResult,
-        Output : IFlowResult,
-        Pipeline1 : IFlowPipeline,
-        Pipeline2 : IFlowPipeline
-    > : IFlowOperator {
+    final class Condition2< Input : IFlowResult, Output : IFlowResult, Pipeline1 : IFlowPipeline, Pipeline2 : IFlowPipeline > : IFlowOperator {
         
         public typealias Input = Input
         public typealias Output = Output

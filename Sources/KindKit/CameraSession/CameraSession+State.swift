@@ -8,7 +8,7 @@ extension CameraSession {
     
     struct State {
         
-        let videoPreset: Preset
+        let videoPreset: Device.Video.Preset
         let videoDevice: Device.Video
         let audioDevice: Device.Audio?
         let recorders: [ICameraSessionRecorder]

@@ -9,36 +9,45 @@ public extension CameraSession.Recorder {
     final class Photo : ICameraSessionRecorder {
         
         public weak var session: CameraSession?
-        public var deviceOrientation: CameraSession.Orientation?
-        public var interfaceOrientation: CameraSession.Orientation? {
+#if os(iOS)
+        public var deviceOrientation: CameraSession.Orientation? {
             didSet {
-                guard self.interfaceOrientation != oldValue else { return }
-                guard let connection = self._output.connection(with: .video) else { return }
-                if let videoOrientation = self.interfaceOrientation?.avOrientation {
-                    connection.videoOrientation = videoOrientation
-                } else {
-                    connection.videoOrientation = .portrait
+                guard self.deviceOrientation != oldValue else { return }
+                if let context = self._context {
+                    let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+                    self.apply(videoOrientation: orientation)
                 }
             }
         }
+        public var interfaceOrientation: CameraSession.Orientation? {
+            didSet {
+                guard self.interfaceOrientation != oldValue else { return }
+                if let context = self._context {
+                    let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+                    self.apply(videoOrientation: orientation)
+                }
+            }
+        }
+#endif
         public var output: AVCaptureOutput {
             return self._output
         }
         public var isRecording: Bool {
             return self._delegate != nil && self._context != nil
         }
-        @available(macOS 11.0, *)
-        public var supportedFlashes: [Flash] {
-            return self._output.supportedFlashModes.compactMap({
-                return Flash($0)
-            })
-        }
+        public let supportedFlashes: [CameraSession.Device.Video.Flash]
         
         private let _output = AVCapturePhotoOutput()
         private var _delegate: Delegate?
         private var _context: Context?
+        private var _restorePreset: CameraSession.Device.Video.Preset?
 
         public init() {
+            if #available(macOS 11.0, iOS 10.0, *) {
+                self.supportedFlashes = self._output.supportedFlashModes.compactMap({ .init($0) })
+            } else {
+                self.supportedFlashes = [ .off ]
+            }
         }
         
         public func attach(session: CameraSession) {
@@ -56,7 +65,8 @@ public extension CameraSession.Recorder {
             onSuccess: @escaping (UI.Image) -> Void,
             onFailure: @escaping (Error) -> Void
         ) {
-            self._start(config, .init(
+            self._start(.init(
+                config: config,
                 onSuccess: onSuccess,
                 onFailure: onFailure
             ))
@@ -75,23 +85,23 @@ public extension CameraSession.Recorder {
 private extension CameraSession.Recorder.Photo {
     
     func _start(
-        _ config: Config,
         _ context: Context
     ) {
         guard self.isRecording == false else {
             return
         }
         if let session = self.session {
-            if let preset = config.preset {
+            if let preset = context.config.preset {
+                self._restorePreset = preset
                 session.configure(
                     videoPreset: preset,
                     completion: { [weak self] in
                         guard let self = self else { return }
-                        self._start(config, context, session)
+                        self._start(context, session)
                     }
                 )
             } else {
-                self._start(config, context, session)
+                self._start(context, session)
             }
         } else {
             DispatchQueue.main.async(execute: {
@@ -101,7 +111,6 @@ private extension CameraSession.Recorder.Photo {
     }
     
     func _start(
-        _ config: Config,
         _ context: Context,
         _ session: CameraSession
     ) {
@@ -109,9 +118,14 @@ private extension CameraSession.Recorder.Photo {
         self._delegate = delegate
         self._context = context
         
+#if os(iOS)
+        let orientation = self.resolveOrientation(shouldRotateToDevice: context.config.rotateToDeviceOrientation)
+        self.apply(videoOrientation: orientation)
+#endif
+
         let settings = AVCapturePhotoSettings()
         if #available(macOS 13.0, *) {
-            if let flash = config.flash {
+            if let flash = context.config.flash {
                 settings.flashMode = flash.raw
             }
         }
@@ -122,39 +136,13 @@ private extension CameraSession.Recorder.Photo {
         )
     }
     
-#if os(iOS)
-    
-    func _image(_ data: Data) -> UIImage? {
-        guard let uiImage = UIImage(data: data) else {
-            return nil
-        }
-        guard let cgImage = uiImage.cgImage else {
-            return nil
-        }
-        let oldOrientation = uiImage.imageOrientation
-        let isMirrored: Bool
-        switch oldOrientation {
-        case .rightMirrored, .leftMirrored, .upMirrored, .downMirrored:
-            isMirrored = true
-        default:
-            isMirrored = false
-        }
-        let newOrientation: UIImage.Orientation
-        switch self.deviceOrientation {
-        case .landscapeLeft:
-            newOrientation = isMirrored == true ? .upMirrored : .up
-        case .landscapeRight:
-            newOrientation = isMirrored == true ? .downMirrored : .down
-        default:
-            newOrientation = isMirrored == true ? .leftMirrored : .right
-        }
-        if oldOrientation != newOrientation {
-            return UIImage(cgImage: cgImage, scale: uiImage.scale, orientation: newOrientation)
-        }
-        return uiImage
+    func _restore(_ completion: @escaping () -> Void) {
+        guard let session = self.session else { return }
+        session.configure(
+            videoPreset: self._restorePreset,
+            completion: completion
+        )
     }
-    
-#endif
     
 }
 
@@ -170,24 +158,14 @@ extension CameraSession.Recorder.Photo {
             context.onFailure(.imageRepresentation)
             return
         }
-#if os(macOS)
-        guard let nsImage = NSImage(data: data) else {
+        guard let nativeImage = NativeImage(data: data) else {
             context.onFailure(.imageRepresentation)
             return
         }
-        let image = UI.Image(nsImage)
-        context.onSuccess(image)
-#elseif os(iOS)
-        guard let uiImage = self._image(data) else {
-            context.onFailure(.imageRepresentation)
-            return
-        }
-        let originImage = UI.Image(uiImage)
-        let unrotateImage = originImage.unrotate()
-        context.onSuccess(unrotateImage)
-#else
-        context.onFailure(.imageRepresentation)
-#endif
+        let image = UI.Image(nativeImage)
+        self._restore({
+            context.onSuccess(image)
+        })
     }
     
     func finish(_ error: Swift.Error) {
@@ -196,7 +174,9 @@ extension CameraSession.Recorder.Photo {
         }
         self._delegate = nil
         self._context = nil
-        context.onFailure(.internal(error))
+        self._restore({
+            context.onFailure(.internal(error))
+        })
     }
 
 }
