@@ -36,7 +36,13 @@ public extension CameraSession.Recorder {
             return self._delegate != nil && self._context != nil
         }
         public let storage: Storage.FileSystem
-        public let supportedCodecs: [Codec]
+        public var supportedCodecs: [Codec] {
+#if os(macOS)
+            return [ .hevc, .h264 ]
+#elseif os(iOS)
+            return self._output.availableVideoCodecTypes.compactMap({ .init($0) })
+#endif
+        }
 
         private let _output = AVCaptureMovieFileOutput()
         private var _delegate: Delegate?
@@ -48,11 +54,6 @@ public extension CameraSession.Recorder {
             storage: Storage.FileSystem
         ) {
             self.storage = storage
-#if os(macOS)
-            self.supportedCodecs = [ .hevc, .h264 ]
-#elseif os(iOS)
-            self.supportedCodecs = self._output.availableVideoCodecTypes.compactMap({ .init($0) })
-#endif
             self._output.movieFragmentInterval = .invalid
         }
         
@@ -177,17 +178,47 @@ private extension CameraSession.Recorder.Movie {
     
     func _restore(_ completion: @escaping () -> Void) {
         guard let session = self.session else { return }
-        session.configure(
-            videoPreset: self._restorePreset,
-            configureVideoDevice: {
-                if let flashMode = self._restoreFlashMode {
+        self._restoreStep1(session: session, completion: completion)
+    }
+    
+    func _restoreStep1(
+        session: CameraSession,
+        completion: @escaping () -> Void
+    ) {
+        if let preset = self._restorePreset {
+            session.configure(videoPreset: preset, completion: { [weak self] in
+                if let self = self {
+                    self._restoreStep2(session: session, completion: completion)
+                } else {
+                    completion()
+                }
+            })
+        } else {
+            self._restoreStep2(session: session, completion: completion)
+        }
+    }
+    
+    func _restoreStep2(
+        session: CameraSession,
+        completion: @escaping () -> Void
+    ) {
+        if let flashMode = self._restoreFlashMode {
+            if let device = session.activeVideoDevice {
+                device.configuration({
                     if $0.isTorchSupported() == true {
                         $0.set(torch: flashMode)
                     }
-                }
-            },
-            completion: completion
-        )
+                })
+            }
+        }
+        self._restoreStep3(session: session, completion: completion)
+    }
+    
+    func _restoreStep3(
+        session: CameraSession,
+        completion: @escaping () -> Void
+    ) {
+        completion()
     }
     
 }

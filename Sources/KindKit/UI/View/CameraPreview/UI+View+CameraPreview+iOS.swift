@@ -23,11 +23,11 @@ extension UI.View.CameraPreview {
         }
         
         static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+            content.kk_update(view: owner)
         }
         
         static func cleanupReuse(content: Content) {
-            content.cleanup()
+            content.kk_cleanup()
         }
         
     }
@@ -41,7 +41,6 @@ final class KKCameraPreviewView : UIView {
         didSet {
             guard self.kkCameraSession !== oldValue else { return }
             self.kkPreviewLayer.session = self.kkCameraSession?.session
-            self.kkVideoDevice = self.kkCameraSession?.activeVideoDevice
             if let cameraSession = self.kkCameraSession, let connection = self.kkPreviewLayer.connection {
                 if connection.isVideoOrientationSupported == true {
                     if let avOrientation = cameraSession.interfaceOrientation?.avOrientation {
@@ -56,7 +55,9 @@ final class KKCameraPreviewView : UIView {
             }
         }
     }
-    var kkVideoDevice: CameraSession.Device.Video?
+    var kkVideoDevice: CameraSession.Device.Video? {
+        return self.kkCameraSession?.activeVideoDevice
+    }
     var kkPreviewLayer: AVCaptureVideoPreviewLayer {
         return self.layer as! AVCaptureVideoPreviewLayer
     }
@@ -78,6 +79,36 @@ final class KKCameraPreviewView : UIView {
     }()
     var kkZoomPanTranslation: Double?
     var kkZoomPinchBegin: Double?
+    var kkBlurView: UIVisualEffectView? {
+        willSet {
+            guard self.kkBlurView != newValue else { return }
+            if let view = self.kkBlurView {
+                view.removeFromSuperview()
+            }
+        }
+        didSet {
+            guard self.kkBlurView != oldValue else { return }
+            if let view = self.kkBlurView {
+                view.frame = self.bounds
+                self.addSubview(view)
+            }
+        }
+    }
+    var kkSnapshootView: UIImageView? {
+        willSet {
+            guard self.kkSnapshootView != newValue else { return }
+            if let view = self.kkSnapshootView {
+                view.removeFromSuperview()
+            }
+        }
+        didSet {
+            guard self.kkSnapshootView != oldValue else { return }
+            if let view = self.kkSnapshootView {
+                view.frame = self.bounds
+                self.addSubview(view)
+            }
+        }
+    }
     
     override class var layerClass : AnyClass {
         return AVCaptureVideoPreviewLayer.self
@@ -95,38 +126,41 @@ final class KKCameraPreviewView : UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.kkSnapshootView?.frame = self.bounds
+        self.kkBlurView?.frame = self.bounds
+    }
+    
 }
 
 extension KKCameraPreviewView {
     
-    func update(view: UI.View.CameraPreview) {
-        self.update(frame: view.frame)
-        self.update(transform: view.transform)
-        self.update(cameraSession: view.cameraSession)
-        self.update(mode: view.mode)
-        self.update(zoom: view.zoom)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: UI.View.CameraPreview) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(transform: view.transform)
+        self.kk_update(cameraSession: view.cameraSession)
+        self.kk_update(mode: view.mode)
+        self.kk_update(zoom: view.zoom)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
         self.kkDelegate = view
     }
     
-    func update(frame: Rect) {
+    func kk_update(frame: Rect) {
         self.frame = frame.cgRect
     }
     
-    func update(transform: UI.Transform) {
+    func kk_update(transform: UI.Transform) {
         self.layer.setAffineTransform(transform.matrix.cgAffineTransform)
     }
     
-    func update(cameraSession: CameraSession) {
+    func kk_update(cameraSession: CameraSession) {
         self.kkCameraSession = cameraSession
     }
     
-    func update(videoDevice: CameraSession.Device.Video?) {
-        self.kkVideoDevice = videoDevice
-    }
-    
-    func update(mode: UI.View.CameraPreview.Mode) {
+    func kk_update(mode: UI.View.CameraPreview.Mode) {
         switch mode {
         case .origin: self.kkPreviewLayer.videoGravity = .resize
         case .aspectFit: self.kkPreviewLayer.videoGravity = .resizeAspect
@@ -134,7 +168,7 @@ extension KKCameraPreviewView {
         }
     }
     
-    func update(zoom: Double) {
+    func kk_update(zoom: Double) {
         guard let videoDevice = self.kkVideoDevice else {
             return
         }
@@ -143,7 +177,7 @@ extension KKCameraPreviewView {
         })
     }
     
-    func update(orientation: CameraSession.Orientation?) {
+    func kk_update(orientation: CameraSession.Orientation?) {
         if let connection = self.kkPreviewLayer.connection {
             if connection.isVideoOrientationSupported == true {
                 if let avOrientation = orientation?.avOrientation {
@@ -155,15 +189,36 @@ extension KKCameraPreviewView {
         }
     }
     
-    func update(color: UI.Color?) {
+    func kk_update(color: UI.Color?) {
         self.backgroundColor = color?.native
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alpha = CGFloat(alpha)
     }
     
-    func cleanup() {
+    func kk_startConfiguration(_ snapshoot: UI.Image?) {
+        guard self.kkBlurView == nil else { return }
+        if let snapshoot = snapshoot {
+            self.kkSnapshootView = UIImageView(image: snapshoot.native)
+        }
+        self.kkBlurView = UIVisualEffectView(effect: nil)
+        UIView.transition(with: self, duration: 0.25, options: [ .beginFromCurrentState, .transitionCrossDissolve ], animations: {
+            self.kkBlurView?.effect = UIBlurEffect(style: .regular)
+        })
+    }
+
+    func kk_finishConfiguration() {
+        guard self.kkBlurView != nil else { return }
+        self.kkSnapshootView = nil
+        UIView.transition(with: self, duration: 0.25, options: [ .beginFromCurrentState, .transitionCrossDissolve ], animations: {
+            self.kkBlurView?.effect = nil
+        }, completion: { _ in
+            self.kkBlurView = nil
+        })
+    }
+
+    func kk_cleanup() {
         self.kkCameraSession = nil
         self.kkDelegate = nil
     }

@@ -52,6 +52,9 @@ public final class CameraSession {
     public var activeAudioDevice: Device.Audio? {
         return self._activeState?.audioDevice
     }
+    public var activeOutputs: [ICameraSessionOutput] {
+        return self._activeState?.outputs ?? []
+    }
     public var activeRecorders: [ICameraSessionRecorder] {
         return self._activeState?.recorders ?? []
     }
@@ -220,6 +223,35 @@ private extension CameraSession {
                     }
                 }
             }
+            if let oldOutputs = old?.outputs {
+                do {
+                    let outputs = oldOutputs.filter({ output in
+                        return new.outputs.contains(where: { $0 === output }) == false
+                    })
+                    for output in outputs {
+                        self.session.removeOutput(output.output)
+                        output.detach()
+                    }
+                }
+                do {
+                    let outputs = new.outputs.filter({ output in
+                        return oldOutputs.contains(where: { $0 === output }) == false
+                    })
+                    for output in outputs {
+                        if self.session.canAddOutput(output.output) == true {
+                            self.session.addOutput(output.output)
+                        }
+                        output.attach(session: self)
+                    }
+                }
+            } else {
+                for output in new.outputs {
+                    if self.session.canAddOutput(output.output) == true {
+                        self.session.addOutput(output.output)
+                    }
+                    output.attach(session: self)
+                }
+            }
             if let oldRecorders = old?.recorders {
                 do {
                     let recorders = oldRecorders.filter({ recorder in
@@ -313,12 +345,14 @@ public extension CameraSession {
     func start(
         video: Discovery.Video,
         audio: Device.Audio? = nil,
+        outputs: [ICameraSessionOutput] = [],
         recorders: [ICameraSessionRecorder] = []
     ) {
         self.start(
             videoPreset: video.preset,
             videoDevice: video.device,
             audioDevice: audio,
+            outputs: outputs,
             recorders: recorders
         )
     }
@@ -327,6 +361,7 @@ public extension CameraSession {
         videoPreset: Device.Video.Preset,
         videoDevice: Device.Video,
         audioDevice: Device.Audio? = nil,
+        outputs: [ICameraSessionOutput] = [],
         recorders: [ICameraSessionRecorder] = []
     ) {
         guard self.isStarting == false && self.isStarted == false else {
@@ -337,6 +372,7 @@ public extension CameraSession {
             videoPreset: videoPreset,
             videoDevice: videoDevice,
             audioDevice: audioDevice,
+            outputs: outputs,
             recorders: recorders
         ))
     }
@@ -392,6 +428,7 @@ public extension CameraSession {
         videoPreset: Device.Video.Preset? = nil,
         videoDevice: Device.Video? = nil,
         audioDevice: Device.Audio? = nil,
+        outputs: [ICameraSessionOutput]? = nil,
         recorders: [ICameraSessionRecorder]? = nil,
         configureVideoDevice: ((Device.Video.Configuration) -> Void)? = nil,
         configureAudioDevice: ((Device.Audio.Configuration) -> Void)? = nil,
@@ -406,6 +443,7 @@ public extension CameraSession {
                 videoPreset: videoPreset ?? activeState.videoPreset,
                 videoDevice: videoDevice ?? activeState.videoDevice,
                 audioDevice: audioDevice ?? activeState.audioDevice,
+                outputs: outputs ?? activeState.outputs,
                 recorders: recorders ?? activeState.recorders
             ),
             willConfigure: {

@@ -29,7 +29,7 @@ public extension UI.View {
             didSet {
                 guard self.frame != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(frame: self.frame)
+                    self._view.kk_update(frame: self.frame)
                 }
             }
         }
@@ -38,7 +38,7 @@ public extension UI.View {
             didSet {
                 guard self.transform != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(transform: self.transform)
+                    self._view.kk_update(transform: self.transform)
                 }
             }
         }
@@ -54,14 +54,14 @@ public extension UI.View {
                 guard self.cameraSession !== newValue else { return }
                 self.cameraSession.remove(observer: self)
                 if self.isLoaded == true {
-                    self._view.update(cameraSession: self.cameraSession)
+                    self._view.kk_update(cameraSession: self.cameraSession)
                 }
             }
             didSet {
                 guard self.cameraSession !== oldValue else { return }
                 self.cameraSession.add(observer: self, priority: .public)
                 if self.isLoaded == true {
-                    self._view.update(cameraSession: self.cameraSession)
+                    self._view.kk_update(cameraSession: self.cameraSession)
                 }
             }
         }
@@ -69,7 +69,7 @@ public extension UI.View {
             didSet {
                 guard self.mode != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(mode: self.mode)
+                    self._view.kk_update(mode: self.mode)
                 }
             }
         }
@@ -81,7 +81,7 @@ public extension UI.View {
             set {
                 guard self._zoom != newValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(zoom: self._zoom)
+                    self._view.kk_update(zoom: self._zoom)
                 }
             }
             get { self._zoom }
@@ -91,7 +91,7 @@ public extension UI.View {
             didSet {
                 guard self.color != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(color: self.color)
+                    self._view.kk_update(color: self.color)
                 }
             }
         }
@@ -99,7 +99,7 @@ public extension UI.View {
             didSet {
                 guard self.alpha != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(alpha: self.alpha)
+                    self._view.kk_update(alpha: self.alpha)
                 }
             }
         }
@@ -451,30 +451,27 @@ extension UI.View.CameraPreview : ICameraSessionObserver {
     
     public func started(_ camera: CameraSession) {
         if self.isLoaded == true {
-            self._view.update(videoDevice: camera.activeVideoDevice)
 #if os(iOS)
-            self._view.update(zoom: self._zoom)
+            self._view.kk_update(zoom: self._zoom)
 #endif
         }
     }
     
     public func stopped(_ camera: CameraSession) {
-        if self.isLoaded == true {
-            self._view.update(videoDevice: nil)
-        }
     }
     
 #if os(iOS)
     
     public func changed(_ camera: CameraSession, interfaceOrientation: CameraSession.Orientation?) {
-        self._view.update(orientation: interfaceOrientation)
+        self._view.kk_update(orientation: interfaceOrientation)
     }
     
 #endif
     
     public func startConfiguration(_ camera: CameraSession) {
         if self.isLoaded == true {
-            self._view.update(videoDevice: nil)
+            let outputs = camera.activeOutputs.compactMap({ $0 as? CameraSession.Output.Frame })
+            self._view.kk_startConfiguration(outputs.first?.frame)
         }
     }
     
@@ -483,7 +480,7 @@ extension UI.View.CameraPreview : ICameraSessionObserver {
         self._zoom = 1
 #endif
         if self.isLoaded == true {
-            self._view.update(videoDevice: camera.activeVideoDevice)
+            self._view.kk_finishConfiguration()
         }
     }
     

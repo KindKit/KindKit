@@ -35,7 +35,12 @@ public extension CameraSession.Recorder {
         public var isRecording: Bool {
             return self._delegate != nil && self._context != nil
         }
-        public let supportedFlashes: [CameraSession.Device.Video.Flash]
+        public var supportedFlashes: [CameraSession.Device.Video.Flash] {
+            if #available(macOS 11.0, iOS 10.0, *) {
+                return self._output.supportedFlashModes.compactMap({ .init($0) })
+            }
+            return [ .off ]
+        }
         
         private let _output = AVCapturePhotoOutput()
         private var _delegate: Delegate?
@@ -43,11 +48,6 @@ public extension CameraSession.Recorder {
         private var _restorePreset: CameraSession.Device.Video.Preset?
 
         public init() {
-            if #available(macOS 11.0, iOS 10.0, *) {
-                self.supportedFlashes = self._output.supportedFlashModes.compactMap({ .init($0) })
-            } else {
-                self.supportedFlashes = [ .off ]
-            }
         }
         
         public func attach(session: CameraSession) {
@@ -138,10 +138,31 @@ private extension CameraSession.Recorder.Photo {
     
     func _restore(_ completion: @escaping () -> Void) {
         guard let session = self.session else { return }
-        session.configure(
-            videoPreset: self._restorePreset,
-            completion: completion
-        )
+        self._restoreStep1(session: session, completion: completion)
+    }
+    
+    func _restoreStep1(
+        session: CameraSession,
+        completion: @escaping () -> Void
+    ) {
+        if let preset = self._restorePreset {
+            session.configure(videoPreset: preset, completion: { [weak self] in
+                if let self = self {
+                    self._restoreStep2(session: session, completion: completion)
+                } else {
+                    completion()
+                }
+            })
+        } else {
+            self._restoreStep2(session: session, completion: completion)
+        }
+    }
+    
+    func _restoreStep2(
+        session: CameraSession,
+        completion: @escaping () -> Void
+    ) {
+        completion()
     }
     
 }

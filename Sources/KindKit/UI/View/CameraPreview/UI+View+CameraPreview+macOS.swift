@@ -23,11 +23,11 @@ extension UI.View.CameraPreview {
         }
         
         static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+            content.kk_update(view: owner)
         }
         
         static func cleanupReuse(content: Content) {
-            content.cleanup()
+            content.kk_cleanup()
         }
         
     }
@@ -41,10 +41,11 @@ final class KKCameraPreviewView : NSView {
         didSet {
             guard self.kkCameraSession !== oldValue else { return }
             self.kkPreviewLayer.session = self.kkCameraSession?.session
-            self.kkVideoDevice = self.kkCameraSession?.activeVideoDevice
         }
     }
-    var kkVideoDevice: CameraSession.Device.Video?
+    var kkVideoDevice: CameraSession.Device.Video? {
+        return self.kkCameraSession?.activeVideoDevice
+    }
     var kkPreviewLayer: AVCaptureVideoPreviewLayer
     lazy var kkFocusGesture: NSClickGestureRecognizer = {
         let gesture = NSClickGestureRecognizer()
@@ -77,28 +78,28 @@ final class KKCameraPreviewView : NSView {
 
 extension KKCameraPreviewView {
     
-    func update(view: UI.View.CameraPreview) {
-        self.update(frame: view.frame)
-        self.update(cameraSession: view.cameraSession)
-        self.update(mode: view.mode)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: UI.View.CameraPreview) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(cameraSession: view.cameraSession)
+        self.kk_update(mode: view.mode)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
         self.kkDelegate = view
     }
     
-    func update(frame: Rect) {
+    func kk_update(frame: Rect) {
         self.frame = frame.cgRect
     }
     
-    func update(cameraSession: CameraSession) {
+    func kk_update(cameraSession: CameraSession) {
         self.kkCameraSession = cameraSession
     }
     
-    func update(videoDevice: CameraSession.Device.Video?) {
+    func kk_update(videoDevice: CameraSession.Device.Video?) {
         self.kkVideoDevice = videoDevice
     }
 
-    func update(mode: UI.View.CameraPreview.Mode) {
+    func kk_update(mode: UI.View.CameraPreview.Mode) {
         switch mode {
         case .origin: self.kkPreviewLayer.videoGravity = .resize
         case .aspectFit: self.kkPreviewLayer.videoGravity = .resizeAspect
@@ -106,15 +107,21 @@ extension KKCameraPreviewView {
         }
     }
     
-    func update(color: UI.Color?) {
+    func kk_update(color: UI.Color?) {
         self.kkPreviewLayer.backgroundColor = color?.native.cgColor
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
     }
     
-    func cleanup() {
+    func kk_startConfiguration(_ snapshoot: UI.Image?) {
+    }
+
+    func kk_finishConfiguration() {
+    }
+    
+    func kk_cleanup() {
         self.kkCameraSession = nil
         self.kkDelegate = nil
     }

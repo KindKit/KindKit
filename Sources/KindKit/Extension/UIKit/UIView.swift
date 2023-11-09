@@ -26,12 +26,12 @@ public extension UIView {
 
 public extension UIView {
     
-    func kk_snapshot() -> UIImage? {
+    func kk_snapshot(afterScreenUpdates: Bool = true) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
         return renderer.image(actions: {
             self.drawHierarchy(
                 in: CGRect(origin: .zero, size: $0.currentImage.size),
-                afterScreenUpdates: true
+                afterScreenUpdates: afterScreenUpdates
             )
         })
     }
