@@ -70,7 +70,8 @@ extension UI.Layout {
                         self._disappear(view: view)
                     }
                 }
-                for (index, view) in views.enumerated() {
+                var index: Int = 0
+                for view in views {
                     let isLoaded = view.isLoaded
                     let isAppeared = view.isAppeared
                     let isHidden = view.isHidden
@@ -106,6 +107,7 @@ extension UI.Layout {
                                 view.invisible()
                             }
                         }
+                        index += 1
                     } else {
                         if isAppeared == false {
                             view.appear(to: layout)
