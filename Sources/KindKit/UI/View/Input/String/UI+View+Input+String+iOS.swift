@@ -75,11 +75,14 @@ final class KKInputStringView : UITextField {
         set { self.kkAccessoryView.kkSuggestionVariants = newValue }
         get { self.kkAccessoryView.kkSuggestionVariants }
     }
+    var kkSuggestionVariantsTask: ICancellable? {
+        willSet { self.kkSuggestionVariantsTask?.cancel() }
+    }
     override var text: String? {
         didSet {
             let newText = self.text ?? ""
             guard newText != oldValue else { return }
-            self.kkRefreshSuggestionVariants(newText)
+            self._refreshSuggestionVariants(newText)
         }
     }
 
@@ -394,14 +397,17 @@ extension KKInputStringView.KKAccessoryView {
 
 extension KKInputStringView {
     
-    func kkRefreshSuggestionVariants(_ newText: String) {
-        let variants: [String]
+    func _refreshSuggestionVariants(_ newText: String) {
         if let suggestion = self.kkSuggestion {
-            variants = suggestion.variants(newText)
+            self.kkSuggestionVariantsTask = suggestion.variants(newText, completed: { [weak self] variants in
+                guard let self = self else { return }
+                self.kkSuggestionVariantsTask = nil
+                self.kkSuggestionVariants = variants
+            })
         } else {
-            variants = []
+            self.kkSuggestionVariantsTask = nil
+            self.kkSuggestionVariants = []
         }
-        self.kkSuggestionVariants = variants
     }
     
 }
@@ -526,10 +532,7 @@ private extension KKInputStringView {
 extension KKInputStringView : UITextFieldDelegate {
 
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        let text = textField.text ?? ""
-        if let suggestion = self.kkSuggestion {
-            self.kkSuggestionVariants = suggestion.variants(text)
-        }
+        self._refreshSuggestionVariants(textField.text ?? "")
         self.kkDelegate?.beginEditing(self)
     }
     
@@ -566,8 +569,8 @@ extension KKInputStringView : UITextFieldDelegate {
                 }
             }
         }
-        self.kkRefreshSuggestionVariants(newText)
         if newText == modidfyText {
+            self._refreshSuggestionVariants(newText)
             self.kkDelegate?.editing(self, value: newText)
             return true
         }

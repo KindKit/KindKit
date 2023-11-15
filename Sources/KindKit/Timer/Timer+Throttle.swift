@@ -40,7 +40,7 @@ extension Timer {
 
 public extension Timer.Throttle {
     
-    func emit() {
+    func emit() -> Self {
         if let task = self._task {
             task.cancel()
         } else {
@@ -58,12 +58,15 @@ public extension Timer.Throttle {
                 }
             }
         })
-        self._previousScheduled = .now()
+        let now = DispatchTime.now()
+        let deadline = self._resolveDeadline(now)
+        self._previousScheduled = now
         self._waitingForPerform = true
         self.queue.asyncAfter(
-            deadline: self._resolveDeadline(self._previousScheduled!),
+            deadline: deadline,
             execute: self._task!
         )
+        return self
     }
     
 }

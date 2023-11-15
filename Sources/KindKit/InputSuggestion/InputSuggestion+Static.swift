@@ -34,7 +34,7 @@ public extension InputSuggestion {
             return item.origin
         }
         
-        public func variants(_ text: String) -> [String] {
+        public func variants(_ text: String, completed: @escaping ([String]) -> Void) -> ICancellable? {
             var items: [Item]
             if text.isEmpty == true {
                 if self._options.contains(.allowEmpty) == true {
@@ -49,7 +49,8 @@ public extension InputSuggestion {
             if self._limit > 0 {
                 items = Array(items.prefix(Int(self._limit)))
             }
-            return items.map({ $0.origin })
+            completed(items.map({ $0.origin }))
+            return nil
         }
         
     }
