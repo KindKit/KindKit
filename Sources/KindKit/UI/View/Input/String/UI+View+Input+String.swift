@@ -16,7 +16,7 @@ protocol KKInputStringViewDelegate : AnyObject {
     func editing(_ view: KKInputStringView, value: String)
     func endEditing(_ view: KKInputStringView)
     func pressedReturn(_ view: KKInputStringView)
-    func pressed(_ view: KKInputStringView, suggestion: String)
+    func pressed(_ view: KKInputStringView, suggestion: String, index: Int)
     
 }
 
@@ -174,7 +174,7 @@ public extension UI.View.Input {
         public let onEditing: Signal.Empty< Void > = .init()
         public let onEndEditing: Signal.Empty< Void > = .init()
         public let onPressedReturn: Signal.Empty< Void > = .init()
-        public let onSuggestion: Signal.Args< Void, Swift.String > = .init()
+        public let onSuggestion: Signal.Args< Void, Int > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -531,21 +531,21 @@ public extension UI.View.Input.String {
     
     @inlinable
     @discardableResult
-    func onSuggestion(_ closure: ((Swift.String) -> Void)?) -> Self {
+    func onSuggestion(_ closure: ((Int) -> Void)?) -> Self {
         self.onSuggestion.link(closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSuggestion(_ closure: @escaping (Self, Swift.String) -> Void) -> Self {
+    func onSuggestion(_ closure: @escaping (Self, Int) -> Void) -> Self {
         self.onSuggestion.link(self, closure)
         return self
     }
     
     @inlinable
     @discardableResult
-    func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Swift.String) -> Void) -> Self {
+    func onSuggestion< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Int) -> Void) -> Self {
         self.onSuggestion.link(sender, closure)
         return self
     }
@@ -700,6 +700,7 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
     
     func beginEditing(_ view: KKInputStringView) {
         self.onBeginEditing.emit()
+        self.suggestion?.begin()
     }
     
     func editing(_ view: KKInputStringView, value: Swift.String) {
@@ -710,6 +711,7 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
     }
     
     func endEditing(_ view: KKInputStringView) {
+        self.suggestion?.end()
         self.onEndEditing.emit()
     }
     
@@ -717,12 +719,12 @@ extension UI.View.Input.String : KKInputStringViewDelegate {
         self.onPressedReturn.emit()
     }
     
-    func pressed(_ view: KKInputStringView, suggestion: String) {
+    func pressed(_ view: KKInputStringView, suggestion: String, index: Int) {
         if self._value != suggestion {
             self._value = suggestion
             self.onEditing.emit()
         }
-        self.onSuggestion.emit(suggestion)
+        self.onSuggestion.emit(index)
         self.onPressedReturn.emit()
     }
     

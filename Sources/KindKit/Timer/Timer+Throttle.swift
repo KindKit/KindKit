@@ -20,7 +20,9 @@ extension Timer {
         private var _previousScheduled: DispatchTime?
         private var _lastExecutionTime: DispatchTime?
         private var _waitingForPerform: Bool = false
-        private var _task: DispatchWorkItem?
+        private var _task: DispatchWorkItem? {
+            willSet { self._task?.cancel() }
+        }
         
         public init(
             mode: Mode = .fixed,
@@ -40,10 +42,9 @@ extension Timer {
 
 public extension Timer.Throttle {
     
+    @discardableResult
     func emit() -> Self {
-        if let task = self._task {
-            task.cancel()
-        } else {
+        if self._task == nil {
             self.onStarted.emit()
         }
         self._task = DispatchWorkItem(block: { [weak self] in

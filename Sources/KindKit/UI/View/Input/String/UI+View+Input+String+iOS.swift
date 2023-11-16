@@ -75,16 +75,13 @@ final class KKInputStringView : UITextField {
         set { self.kkAccessoryView.kkSuggestionVariants = newValue }
         get { self.kkAccessoryView.kkSuggestionVariants }
     }
-    var kkSuggestionVariantsTask: ICancellable? {
-        willSet { self.kkSuggestionVariantsTask?.cancel() }
-    }
     var kkDisableSuggestion: Bool = false
     override var text: String? {
         didSet {
             let newText = self.text ?? ""
             guard newText != oldValue else { return }
             if self.kkDisableSuggestion == false {
-                self._refreshSuggestionVariants(newText)
+                self.kkSuggestion?.variants(newText)
             }
         }
     }
@@ -123,9 +120,11 @@ final class KKInputStringView : UITextField {
         return bounds.inset(by: inset)
     }
     
-    func select(suggestion: String) {
-        self.text = suggestion
-        self.kkDelegate?.pressed(self, suggestion: suggestion)
+    func select(suggestion: String, index: Int) {
+        self._lockSuggestion({
+            self.text = suggestion
+        })
+        self.kkDelegate?.pressed(self, suggestion: suggestion, index: index)
     }
     
     @discardableResult
@@ -159,9 +158,7 @@ extension KKInputStringView {
         var kkSuggestion: IInputSuggestion? {
             didSet {
                 guard self.kkSuggestion !== oldValue else { return }
-                if self.kkSuggestion != nil {
-                    let size = self.bounds.size
-                    
+                if let suggestion = self.kkSuggestion {
                     let layout = UICollectionViewFlowLayout()
                     layout.scrollDirection = .horizontal
                     layout.sectionInset = .init(top: 0, left: 8, bottom: 0, right: 8)
@@ -169,7 +166,7 @@ extension KKInputStringView {
                     layout.minimumLineSpacing = 0
                     
                     let view = UICollectionView(
-                        frame: CGRect(x: 0, y: 0, width: size.width, height: 56),
+                        frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: 56),
                         collectionViewLayout: layout
                     )
                     view.contentInsetAdjustmentBehavior = .never
@@ -179,11 +176,19 @@ extension KKInputStringView {
                     view.backgroundColor = nil
                     view.register(KKSuggestionDataCell.self, forCellWithReuseIdentifier: Self.suggestionCellIdentifier)
                     view.register(KKSuggestionSeparatorCell.self, forCellWithReuseIdentifier: Self.separatorCellIdentifier)
+                    
+                    self.kkSuggestionSubscribe = suggestion.onVariants.subscribe(self, {
+                        $0.kkSuggestionVariants = $1
+                    })
                     self.kkSuggestionView = view
                 } else {
+                    self.kkSuggestionSubscribe = nil
                     self.kkSuggestionView = nil
                 }
             }
+        }
+        var kkSuggestionSubscribe: ICancellable? {
+            willSet { self.kkSuggestionSubscribe?.cancel() }
         }
         var kkSuggestionVariants: [String] = [] {
             didSet {
@@ -406,19 +411,6 @@ extension KKInputStringView {
         self.kkDisableSuggestion = false
     }
     
-    func _refreshSuggestionVariants(_ newText: String) {
-        if let suggestion = self.kkSuggestion {
-            self.kkSuggestionVariantsTask = suggestion.variants(newText, completed: { [weak self] variants in
-                guard let self = self else { return }
-                self.kkSuggestionVariantsTask = nil
-                self.kkSuggestionVariants = variants
-            })
-        } else {
-            self.kkSuggestionVariantsTask = nil
-            self.kkSuggestionVariants = []
-        }
-    }
-    
 }
 
 extension KKInputStringView {
@@ -541,8 +533,8 @@ private extension KKInputStringView {
 extension KKInputStringView : UITextFieldDelegate {
 
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        self._refreshSuggestionVariants(textField.text ?? "")
         self.kkDelegate?.beginEditing(self)
+        self.kkSuggestion?.variants(textField.text ?? "")
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString replacement: String) -> Bool {
@@ -578,7 +570,7 @@ extension KKInputStringView : UITextFieldDelegate {
                 }
             }
         }
-        self._refreshSuggestionVariants(newText)
+        self.kkSuggestion?.variants(newText)
         self.kkDelegate?.editing(self, value: newText)
         if newText == modidfyText {
             return true
@@ -642,7 +634,7 @@ extension KKInputStringView.KKAccessoryView : UICollectionViewDelegate {
         if isOdd == true {
             let index = indexPath.item / 2
             let variant = self.kkSuggestionVariants[index]
-            self.kkInput?.select(suggestion: variant)
+            self.kkInput?.select(suggestion: variant, index: index)
         }
         collectionView.deselectItem(at: indexPath, animated: true)
     }

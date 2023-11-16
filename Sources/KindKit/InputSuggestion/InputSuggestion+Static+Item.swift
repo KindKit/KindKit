@@ -6,9 +6,9 @@ import Foundation
 
 extension InputSuggestion.Static {
     
-    struct Item {
+    struct Item : Equatable {
         
-        let origin: String
+        let origin: StoreType
         let search: String
         
     }
