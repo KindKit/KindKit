@@ -10,6 +10,14 @@ public extension InputSuggestion {
         
         public let prepare: (String) -> InputType?
         public let dataSource: KindKit.DataSource.Action.Api< InputType, ResponseType >
+        
+        public init(
+            prepare: @escaping (String) -> InputType?,
+            dataSource: KindKit.DataSource.Action.Api< InputType, ResponseType >
+        ) {
+            self.prepare = prepare
+            self.dataSource = dataSource
+        }
 
         public init(
             provider: KindKit.Api.Provider,
