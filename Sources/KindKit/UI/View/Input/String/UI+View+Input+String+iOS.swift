@@ -78,11 +78,14 @@ final class KKInputStringView : UITextField {
     var kkSuggestionVariantsTask: ICancellable? {
         willSet { self.kkSuggestionVariantsTask?.cancel() }
     }
+    var kkDisableSuggestion: Bool = false
     override var text: String? {
         didSet {
             let newText = self.text ?? ""
             guard newText != oldValue else { return }
-            self._refreshSuggestionVariants(newText)
+            if self.kkDisableSuggestion == false {
+                self._refreshSuggestionVariants(newText)
+            }
         }
     }
 
@@ -397,6 +400,12 @@ extension KKInputStringView.KKAccessoryView {
 
 extension KKInputStringView {
     
+    func _lockSuggestion(_ block: () -> Void) {
+        self.kkDisableSuggestion = true
+        block()
+        self.kkDisableSuggestion = false
+    }
+    
     func _refreshSuggestionVariants(_ newText: String) {
         if let suggestion = self.kkSuggestion {
             self.kkSuggestionVariantsTask = suggestion.variants(newText, completed: { [weak self] variants in
@@ -569,31 +578,33 @@ extension KKInputStringView : UITextFieldDelegate {
                 }
             }
         }
+        self._refreshSuggestionVariants(newText)
+        self.kkDelegate?.editing(self, value: newText)
         if newText == modidfyText {
-            self._refreshSuggestionVariants(newText)
-            self.kkDelegate?.editing(self, value: newText)
             return true
         }
-        textField.text = modidfyText
-        if caretLower != caretUpper {
-            let selectionLower = textField.position(
-                from: textField.beginningOfDocument,
-                offset: caretLower.utf16Offset(in: modidfyText)
-            )
-            let selectionUpper = textField.position(
-                from: textField.beginningOfDocument,
-                offset: caretUpper.utf16Offset(in: modidfyText)
-            )
-            if let selectionLower = selectionLower, let selectionUpper = selectionUpper {
-                textField.selectedTextRange = textField.textRange(from: selectionLower, to: selectionUpper)
+        self._lockSuggestion({
+            textField.text = modidfyText
+            if caretLower != caretUpper {
+                let selectionLower = textField.position(
+                    from: textField.beginningOfDocument,
+                    offset: caretLower.utf16Offset(in: modidfyText)
+                )
+                let selectionUpper = textField.position(
+                    from: textField.beginningOfDocument,
+                    offset: caretUpper.utf16Offset(in: modidfyText)
+                )
+                if let selectionLower = selectionLower, let selectionUpper = selectionUpper {
+                    textField.selectedTextRange = textField.textRange(from: selectionLower, to: selectionUpper)
+                }
             }
-        }
-        self.kkDelegate?.editing(self, value: modidfyText)
+        })
         return false
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         self.kkSuggestionVariants = []
+        self.kkDelegate?.editing(self, value: textField.text ?? "")
         self.kkDelegate?.endEditing(self)
     }
     
