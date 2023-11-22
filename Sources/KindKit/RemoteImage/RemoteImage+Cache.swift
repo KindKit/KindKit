@@ -205,7 +205,7 @@ private extension RemoteImage.Cache {
     
     @inline(__always)
     func _canStoreInMemory(image: UI.Image) -> Bool {
-        return image.size.area < self.config.memory.maxImageArea
+        return image.size.area.value < self.config.memory.maxImageArea
     }
     
 }

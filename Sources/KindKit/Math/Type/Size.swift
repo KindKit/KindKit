@@ -56,8 +56,8 @@ public extension Size {
     }
     
     @inlinable
-    var area: Double {
-        return self.width * self.height
+    var area: Area {
+        return .init(self.width * self.height)
     }
     
     @inlinable

@@ -9,7 +9,7 @@ public struct Polyline2 : Hashable {
     public var corners: [Point] {
         didSet {
             self.edges = Self._edges(self.corners.count)
-            self.bbox = Self._bbox(self.corners)
+            self.bbox = .init(self.corners)
         }
     }
     public private(set) var edges: [Edge]
@@ -21,7 +21,7 @@ public struct Polyline2 : Hashable {
     ) {
         self.corners = corners
         self.edges = Self._edges(self.corners.count)
-        self.bbox = bbox ?? Self._bbox(self.corners)
+        self.bbox = bbox ?? .init(self.corners)
     }
     
 }
@@ -293,17 +293,6 @@ private extension Polyline2 {
                 buffer[i] = Edge(start: i, end: (i + 1) % total)
             }
             count = total
-        })
-    }
-    
-    @inline(__always)
-    static func _bbox(_ corners: [Point]) -> AlignedBox2 {
-        return corners.kk_reduce({
-            return .zero
-        }, {
-            return .init(lower: $0, upper: $0)
-        }, {
-            return $0.union($1)
         })
     }
     

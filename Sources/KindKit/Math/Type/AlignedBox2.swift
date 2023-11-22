@@ -35,6 +35,12 @@ public struct AlignedBox2 : Hashable {
         self.upper = point1.max(point2)
     }
     
+    public init(
+        _ points: [Point]
+    ) {
+        self = points.kk_reduce({ .zero }, { .init(lower: $0, upper: $0) }, { $0.union($1) })
+    }
+    
 }
 
 public extension AlignedBox2 {
