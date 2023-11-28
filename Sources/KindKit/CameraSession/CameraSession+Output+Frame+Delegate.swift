@@ -53,7 +53,11 @@ private extension CameraSession.Output.Frame.Delegate {
         guard let cgImage = context.makeImage() else {
             return nil
         }
+#if os(macOS)
+        let image = NSImage(cgImage: cgImage, size: .init(width: width, height: height))
+#elseif os(iOS)
         let image = UIImage(cgImage: cgImage, scale: 1, orientation: .right)
+#endif
         return .init(image)
     }
     

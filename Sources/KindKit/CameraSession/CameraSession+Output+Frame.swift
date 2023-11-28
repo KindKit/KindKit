@@ -28,6 +28,7 @@ public extension CameraSession.Output {
         public var output: AVCaptureOutput {
             return self._output
         }
+#if os(iOS)
         public var rotateToDeviceOrientation: Bool {
             didSet {
                 guard self.rotateToDeviceOrientation != oldValue else { return }
@@ -35,6 +36,7 @@ public extension CameraSession.Output {
                 self.apply(videoOrientation: orientation)
             }
         }
+#endif
         public private(set) var frame: UI.Image? {
             didSet {
                 guard self.frame != oldValue else { return }
@@ -55,6 +57,7 @@ public extension CameraSession.Output {
         private let _workQueue = DispatchQueue(label: "KindKit.CameraSession.Output.Frame")
         private let _syncQueue: DispatchQueue
 
+#if os(iOS)
         public init(
             rotateToDeviceOrientation: Bool = true,
             queue: DispatchQueue = .main
@@ -62,6 +65,13 @@ public extension CameraSession.Output {
             self.rotateToDeviceOrientation = rotateToDeviceOrientation
             self._syncQueue = queue
         }
+#else
+        public init(
+            queue: DispatchQueue = .main
+        ) {
+            self._syncQueue = queue
+        }
+#endif
         
         public func attach(session: CameraSession) {
             guard self.isAttached == false else { return }

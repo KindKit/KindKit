@@ -94,10 +94,6 @@ extension KKCameraPreviewView {
     func kk_update(cameraSession: CameraSession) {
         self.kkCameraSession = cameraSession
     }
-    
-    func kk_update(videoDevice: CameraSession.Device.Video?) {
-        self.kkVideoDevice = videoDevice
-    }
 
     func kk_update(mode: UI.View.CameraPreview.Mode) {
         switch mode {

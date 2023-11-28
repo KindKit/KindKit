@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+#if os(iOS)
+
 import Foundation
 
 protocol KKSliderViewDelegate : AnyObject {
@@ -358,3 +360,5 @@ public extension IUIView where Self == UI.View.Slider {
     }
     
 }
+
+#endif
