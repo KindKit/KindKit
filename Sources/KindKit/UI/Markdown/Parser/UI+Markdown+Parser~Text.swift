@@ -195,6 +195,9 @@ fileprivate extension UI.Markdown.Parser {
                 result.append(.char("\n"))
             }
         }
+        if let char = prevChar {
+            result.append(.char(char))
+        }
         return result
     }
     

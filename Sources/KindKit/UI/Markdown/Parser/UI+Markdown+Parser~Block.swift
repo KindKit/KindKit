@@ -141,13 +141,13 @@ fileprivate extension UI.Markdown.Parser {
         guard let markerRange = Self.__contentRange(buffer: buffer, from: beforeMarkerSkipRange.upperBound, endWith: markerEnd) else {
             return nil
         }
-        guard let afterMarkerSkipRange = Self.__skipRange(buffer: buffer, from: markerRange.upperBound) else {
+        guard markerRange.lowerBound != markerRange.upperBound else {
             return nil
         }
-        guard let afterContentSkipRange = Self.__skipRange(buffer: buffer, from: afterMarkerSkipRange.upperBound + 1) else {
+        guard let afterMarkerSkipRange = Self.__skipRange(buffer: buffer, from: markerRange.upperBound + 1) else {
             return nil
         }
-        guard let contentRange = Self.__contentRange(buffer: buffer, from: afterContentSkipRange.upperBound, endWith: endWith) else {
+        guard let contentRange = Self.__contentRange(buffer: buffer, from: afterMarkerSkipRange.upperBound, endWith: endWith) else {
             return nil
         }
         defer {
@@ -240,22 +240,20 @@ fileprivate extension UI.Markdown.Parser {
         from: Int,
         endWith: Character
     ) -> Range< Int >? {
-        var lastChar = from
+        var length = 0
         for index in from ..< buffer.endIndex {
             let token = buffer[index]
             switch token {
-            case .start:
-                break
-            case .tab, .space, .escape:
-                break
+            case .start, .tab, .space, .escape:
+                length += 1
             case .raw(let char):
                 if endWith == char {
                     return .init(uncheckedBounds: (
                         lower: from,
-                        upper: lastChar + 1
+                        upper: from + length
                     ))
                 } else {
-                    lastChar = index
+                    length += 1
                 }
             case .end:
                 return nil
