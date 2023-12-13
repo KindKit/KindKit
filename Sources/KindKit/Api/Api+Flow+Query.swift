@@ -16,7 +16,7 @@ public extension Api.Flow {
         public typealias Input = Input
         public typealias Output = Result< Success, Failure >
         
-        private let _provider: Api.Provider
+        private let _provider: (Input.Success) -> Api.Provider
         private let _queue: DispatchQueue
         private let _request: (Input.Success) throws -> Api.Request
         private let _response: (Input.Success) -> Response
@@ -31,7 +31,7 @@ public extension Api.Flow {
         private var _next: IFlowPipe!
         
         init(
-            _ provider: Api.Provider,
+            _ provider: @escaping (Input.Success) -> Api.Provider,
             _ queue: DispatchQueue,
             _ request: @escaping (Input.Success) throws -> Api.Request,
             _ response: @escaping (Input.Success) -> Response,
@@ -89,7 +89,8 @@ private extension Api.Flow.Query {
         _ startedAt: Date,
         _ input: Input.Success
     ) {
-        self._task = self._provider.send(
+        let provider = self._provider(input)
+        self._task = provider.send(
             request: try self._request(input),
             response: self._response(input),
             queue: self._queue,
@@ -137,7 +138,7 @@ public extension IFlowBuilder {
         Failure : Swift.Error,
         Response : IApiResponse
     >(
-        provider: Api.Provider,
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
@@ -159,6 +160,22 @@ public extension IFlowBuilder {
         response: @escaping (Tail.Output.Success) -> Response,
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
+        map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, map))
+    }
+    
+    func apiQuery<
+        Success,
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
@@ -172,9 +189,31 @@ public extension IFlowBuilder {
     
     func apiQuery<
         Success,
+        Failure : Swift.Error,
         Response : IApiResponse
     >(
         provider: Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
+        success: @escaping (Tail.Output.Success, Response.Success) -> Success,
+        failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Failure, Response > > {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Result< Success, Failure > in
+            switch result {
+            case .success(let value): return .success(success(input, value))
+            case .failure(let error): return .failure(failure(input, error))
+            }
+        }))
+    }
+    
+    func apiQuery<
+        Success,
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
@@ -204,6 +243,28 @@ public extension IFlowBuilder {
         logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
+        Tail.Output.Failure == Never
+    {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Result< Success, Response.Failure > in
+            switch result {
+            case .success(let value): return .success(success(input, value))
+            case .failure(let error): return .failure(error)
+            }
+        }))
+    }
+    
+    func apiQuery<
+        Success,
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
+        success: @escaping (Tail.Output.Success, Response.Success) -> Success
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
         return self.append(.init(provider, queue, request, response, validation, logging, { input, result -> Result< Success, Response.Failure > in
@@ -215,10 +276,32 @@ public extension IFlowBuilder {
     }
     
     func apiQuery<
-        Failure : Swift.Error,
+        Success,
         Response : IApiResponse
     >(
         provider: Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
+        success: @escaping (Tail.Output.Success, Response.Success) -> Success
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Success, Response.Failure, Response > > where
+        Tail.Output.Failure == Response.Failure
+    {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Result< Success, Response.Failure > in
+            switch result {
+            case .success(let value): return .success(success(input, value))
+            case .failure(let error): return .failure(error)
+            }
+        }))
+    }
+    
+    func apiQuery<
+        Failure : Swift.Error,
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
@@ -235,9 +318,29 @@ public extension IFlowBuilder {
     }
     
     func apiQuery<
+        Failure : Swift.Error,
         Response : IApiResponse
     >(
         provider: Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil },
+        failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Failure, Response > > {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Result< Response.Success, Failure > in
+            switch result {
+            case .success(let value): return .success(value)
+            case .failure(let error): return .failure(failure(input, error))
+            }
+        }))
+    }
+    
+    func apiQuery<
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Api.Request,
         response: @escaping (Tail.Output.Success) -> Response,
@@ -261,9 +364,43 @@ public extension IFlowBuilder {
         validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
         logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
     ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
+        Tail.Output.Failure == Never
+    {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Response.Result in
+            return result
+        }))
+    }
+    
+    func apiQuery<
+        Response : IApiResponse
+    >(
+        provider: @escaping (Tail.Output.Success) -> Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
         return self.append(.init(provider, queue, request, response, validation, logging, { input, result -> Response.Result in
+            return result
+        }))
+    }
+    
+    func apiQuery<
+        Response : IApiResponse
+    >(
+        provider: Api.Provider,
+        queue: DispatchQueue,
+        request: @escaping (Tail.Output.Success) throws -> Api.Request,
+        response: @escaping (Tail.Output.Success) -> Response,
+        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> Flow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> ILogMessage? = { _, _, _ in nil }
+    ) -> Flow.Chain< Head, Api.Flow.Query< Tail.Output, Response.Success, Response.Failure, Response > > where
+        Tail.Output.Failure == Response.Failure
+    {
+        return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Response.Result in
             return result
         }))
     }

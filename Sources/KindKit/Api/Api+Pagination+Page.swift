@@ -11,12 +11,15 @@ public extension Api.Pagination {
         public let page: UInt
         public let size: UInt
         
-        public init(
-            page: UInt,
-            size: UInt
+        public init< 
+            P : BinaryInteger,
+            S : BinaryInteger
+        >(
+            page: P,
+            size: S
         ) {
-            self.page = page
-            self.size = size
+            self.page = UInt(page)
+            self.size = UInt(size)
         }
         
         public func next() -> Self {

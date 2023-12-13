@@ -139,6 +139,15 @@ public extension Database.Statement {
     }
     
     func decode<
+        Alias : IDatabaseValueAlias
+    >(
+        _ decoder: Alias.Type,
+        at index: Database.Index
+    ) throws -> Alias.DatabaseValueCoder.DatabaseCoded {
+        return try self.decode(Alias.DatabaseValueCoder, at: index)
+    }
+    
+    func decode<
         KeyPath : IDatabaseKeyPath
     >(
         _ keyPath: KeyPath

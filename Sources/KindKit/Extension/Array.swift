@@ -292,4 +292,13 @@ public extension Array {
         )
     }
     
+    @inlinable
+    func kk_stride(size: Int) -> [[Element]] where Element : Hashable {
+        return stride(from: 0, to: self.count, by: size).map({
+            let from = $0
+            let to = Swift.min(from.advanced(by: size), self.endIndex)
+            return Array(self[from..<to])
+        })
+    }
+    
 }
