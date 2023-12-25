@@ -46,6 +46,7 @@ public extension CameraSession.Recorder {
         private var _delegate: Delegate?
         private var _context: Context?
         private var _restorePreset: CameraSession.Device.Video.Preset?
+        private var _restoreFrameDuration: CameraSession.Device.Video.FrameDuration?
 
         public init() {
         }
@@ -92,9 +93,12 @@ private extension CameraSession.Recorder.Photo {
         }
         if let session = self.session {
             if let preset = context.config.preset {
-                self._restorePreset = preset
+                self._restorePreset = session.activeVideoPreset
                 session.configure(
                     videoPreset: preset,
+                    configureVideoDevice: { [weak self] device in
+                        guard let self = self else { return }
+                    },
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._start(context, session)

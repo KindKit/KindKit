@@ -48,6 +48,7 @@ public extension CameraSession.Recorder {
         private var _delegate: Delegate?
         private var _context: Context?
         private var _restorePreset: CameraSession.Device.Video.Preset?
+        private var _restoreFrameDuration: CameraSession.Device.Video.FrameDuration?
         private var _restoreFlashMode: CameraSession.Device.Video.Torch?
 
         public init(
@@ -118,7 +119,7 @@ private extension CameraSession.Recorder.Movie {
         }
         if let session = self.session {
             if let preset = context.config.preset {
-                self._restorePreset = preset
+                self._restorePreset = session.activeVideoPreset
                 session.configure(
                     videoPreset: preset,
                     completion: { [weak self] in
@@ -150,14 +151,25 @@ private extension CameraSession.Recorder.Movie {
 #endif
         
         if let connection = self.videoConnection {
+            var settings: [String : Any] = [:]
+            var compressionProperties: [String : Any] = [:]
             if let codec = context.config.codec {
                 if self.supportedCodecs.contains(codec) == true {
-                    self._output.setOutputSettings([ AVVideoCodecKey : codec.raw ], for: connection)
+                    settings[AVVideoCodecKey] = codec.raw
                 } else {
 #if DEBUG
                     fatalError("Not supported codec type \(codec)")
 #endif
                 }
+            }
+            if let averageBitRate = context.config.averageBitRate {
+                compressionProperties[AVVideoAverageBitRateKey] = NSNumber(value: averageBitRate)
+            }
+            if compressionProperties.isEmpty == false {
+                settings[AVVideoCompressionPropertiesKey] = compressionProperties
+            }
+            if settings.isEmpty == false {
+                self._output.setOutputSettings(settings, for: connection)
             }
 #if os(iOS)
             if let stabilizationMode = context.config.stabilizationMode {
@@ -202,11 +214,16 @@ private extension CameraSession.Recorder.Movie {
         session: CameraSession,
         completion: @escaping () -> Void
     ) {
-        if let flashMode = self._restoreFlashMode {
+        if self._restoreFrameDuration != nil || self._restoreFlashMode != nil {
             if let device = session.activeVideoDevice {
                 device.configuration({
-                    if $0.isTorchSupported() == true {
-                        $0.set(torch: flashMode)
+                    if let frameDuration = self._restoreFrameDuration {
+                        $0.set(frameDuration: frameDuration)
+                    }
+                    if let flashMode = self._restoreFlashMode {
+                        if $0.isTorchSupported() == true {
+                            $0.set(torch: flashMode)
+                        }
                     }
                 })
             }
@@ -230,6 +247,10 @@ extension CameraSession.Recorder.Movie {
         guard let context = self._context else { return }
         if context.config.flashMode != nil {
             device.configuration({
+                if let frameDuration = context.config.frameDuration {
+                    self._restoreFrameDuration = $0.frameDuration()
+                    $0.set(frameDuration: frameDuration)
+                }
                 if let flashMode = context.config.flashMode {
                     if $0.isTorchSupported() == true {
                         self._restoreFlashMode = $0.torch()

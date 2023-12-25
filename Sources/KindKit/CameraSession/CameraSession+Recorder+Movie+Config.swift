@@ -15,6 +15,8 @@ extension CameraSession.Recorder.Movie {
         public let stabilizationMode: CameraSession.Device.Video.StabilizationMode?
         public let rotateToDeviceOrientation: Bool
 #endif
+        public let frameDuration: CameraSession.Device.Video.FrameDuration?
+        public let averageBitRate: UInt?
         public let maxDuration: CMTime
         public let maxFileSize: Int64
         public let minFreeDiskSpace: Int64
@@ -25,6 +27,8 @@ extension CameraSession.Recorder.Movie {
             preset: CameraSession.Device.Video.Preset? = nil,
             codec: CameraSession.Recorder.Movie.Codec? = nil,
             flashMode: CameraSession.Device.Video.Torch? = nil,
+            frameDuration: CameraSession.Device.Video.FrameDuration? = nil,
+            averageBitRate: UInt? = nil,
             maxDuration: CMTime = .invalid,
             maxFileSize: Int64 = 0,
             minFreeDiskSpace: Int64 = 0
@@ -32,6 +36,8 @@ extension CameraSession.Recorder.Movie {
             self.preset = preset
             self.codec = codec
             self.flashMode = flashMode
+            self.frameDuration = frameDuration
+            self.averageBitRate = averageBitRate
             self.maxDuration = maxDuration
             self.maxFileSize = maxFileSize
             self.minFreeDiskSpace = minFreeDiskSpace
@@ -45,6 +51,8 @@ extension CameraSession.Recorder.Movie {
             flashMode: CameraSession.Device.Video.Torch? = nil,
             stabilizationMode: CameraSession.Device.Video.StabilizationMode? = nil,
             rotateToDeviceOrientation: Bool = true,
+            frameDuration: CameraSession.Device.Video.FrameDuration? = nil,
+            averageBitRate: UInt? = nil,
             maxDuration: CMTime = .invalid,
             maxFileSize: Int64 = 0,
             minFreeDiskSpace: Int64 = 0
@@ -54,6 +62,8 @@ extension CameraSession.Recorder.Movie {
             self.flashMode = flashMode
             self.stabilizationMode = stabilizationMode
             self.rotateToDeviceOrientation = rotateToDeviceOrientation
+            self.frameDuration = frameDuration
+            self.averageBitRate = averageBitRate
             self.maxDuration = maxDuration
             self.maxFileSize = maxFileSize
             self.minFreeDiskSpace = minFreeDiskSpace
@@ -61,6 +71,14 @@ extension CameraSession.Recorder.Movie {
         
 #endif
         
+    }
+    
+}
+
+extension CameraSession.Recorder.Movie.Config {
+    
+    var shouldConfigure: Bool {
+        return self.preset != nil || self.frameDuration != nil
     }
     
 }
