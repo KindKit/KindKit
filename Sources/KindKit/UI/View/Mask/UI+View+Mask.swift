@@ -4,6 +4,12 @@
 
 import Foundation
 
+protocol KKMaskViewDelegate : AnyObject {
+    
+    func isDynamic(_ view: KKMaskView) -> Bool
+    
+}
+
 public extension UI.View {
 
     final class Mask {
@@ -30,7 +36,7 @@ public extension UI.View {
         public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var content: IUIView? {
@@ -82,15 +88,14 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
         
         lazy var layout = UI.View.Mask.Layout()
         
@@ -178,10 +183,6 @@ extension UI.View.Mask : IUIView {
         self.onVisible.emit()
     }
     
-    public func visibility() {
-        self.onVisibility.emit()
-    }
-    
     public func invisible() {
         self.isVisible = false
         self.onInvisible.emit()
@@ -231,6 +232,14 @@ extension UI.View.Mask : IUIViewColorable {
 }
 
 extension UI.View.Mask : IUIViewAlphable {
+}
+
+extension UI.View.Mask : KKMaskViewDelegate {
+    
+    func isDynamic(_ view: KKMaskView) -> Bool {
+        return self.width.isStatic == false || self.height.isStatic == false
+    }
+    
 }
 
 public extension IUIView where Self == UI.View.Mask {

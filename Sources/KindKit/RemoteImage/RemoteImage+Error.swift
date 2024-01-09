@@ -6,7 +6,7 @@ import Foundation
 
 public extension RemoteImage {
     
-    enum Error : Swift.Error {
+    enum Error : Swift.Error, Hashable, Equatable {
         
         case request(Api.Error.Request)
         case network(Api.Error.Network)

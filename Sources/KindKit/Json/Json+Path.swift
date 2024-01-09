@@ -6,7 +6,7 @@ import Foundation
 
 public extension Json {
 
-    struct Path : Equatable {
+    struct Path : Hashable, Equatable {
         
         public let items: [Item]
         

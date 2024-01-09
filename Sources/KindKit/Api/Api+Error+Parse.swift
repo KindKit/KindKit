@@ -6,7 +6,7 @@ import Foundation
 
 public extension Api.Error {
         
-    struct Parse : Swift.Error, Equatable {
+    struct Parse : Swift.Error, Hashable, Equatable {
         
         public let statusCode: Int?
         public let response: Data?

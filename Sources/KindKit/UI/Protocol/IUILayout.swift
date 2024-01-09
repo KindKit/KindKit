@@ -38,7 +38,7 @@ public extension IUILayout {
     }
     
     @inlinable
-    func setNeedForceUpdate(_ view: IUIView? = nil) {
+    func setNeedUpdate(_ view: IUIView? = nil) {
         if let view = view {
             self.invalidate(view)
         }
@@ -55,14 +55,9 @@ public extension IUILayout {
         }
         if forceParent == true {
             if let view = self.appearedView {
-                view.appearedLayout?.setNeedForceUpdate(view)
+                view.appearedLayout?.setNeedUpdate(view)
             }
         }
-    }
-    
-    @inlinable
-    func setNeedUpdate() {
-        self.delegate?.setNeedUpdate(self)
     }
     
     @inlinable
@@ -74,6 +69,11 @@ public extension IUILayout {
     func update() {
         self.delegate?.setNeedUpdate(self)
         self.delegate?.updateIfNeeded(self)
+    }
+    
+    @inlinable
+    func layout(bounds: Rect, inset: Inset) -> Size {
+        return self.layout(bounds: bounds.inset(inset)).inset(-inset)
     }
     
     @inlinable

@@ -46,7 +46,7 @@ public extension UI.View.Input {
         public var size: UI.Size.Static = .init(.fill, .fixed(28)) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var value: Swift.String {
@@ -160,21 +160,20 @@ public extension UI.View.Input {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onShouldReplace: Signal.Args< Bool?, ShouldReplace > = .init()
-        public let onBeginEditing: Signal.Empty< Void > = .init()
-        public let onEditing: Signal.Empty< Void > = .init()
-        public let onEndEditing: Signal.Empty< Void > = .init()
-        public let onPressedReturn: Signal.Empty< Void > = .init()
-        public let onSuggestion: Signal.Args< Void, Int > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onShouldReplace = Signal.Args< Bool?, ShouldReplace >()
+        public let onBeginEditing = Signal.Empty< Void >()
+        public let onEditing = Signal.Empty< Void >()
+        public let onEndEditing = Signal.Empty< Void >()
+        public let onPressedReturn = Signal.Empty< Void >()
+        public let onSuggestion = Signal.Args< Void, Int >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -629,10 +628,6 @@ extension UI.View.Input.String : IUIView {
     public func visible() {
         self.isVisible = true
         self.onVisible.emit()
-    }
-    
-    public func visibility() {
-        self.onVisibility.emit()
     }
     
     public func invisible() {

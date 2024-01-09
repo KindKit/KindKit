@@ -36,14 +36,14 @@ public extension UI.Layout {
                 guard self.inset != oldValue else { return }
                 self._contentSize = nil
                 self._detailSize = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var content: IUIView? {
             didSet {
                 guard self.content !== oldValue else { return }
                 self._contentSize = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var detailSpacing: Double = 0 {
@@ -51,14 +51,14 @@ public extension UI.Layout {
                 guard self.detailSpacing != oldValue else { return }
                 self._contentSize = nil
                 self._detailSize = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var detail: IUIView? {
             didSet {
                 guard self.detail !== oldValue else { return }
                 self._detailSize = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var isAnimating: Bool {
@@ -70,7 +70,7 @@ public extension UI.Layout {
         private var _status: Status = .collapsed {
             didSet {
                 guard self._status != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         private var _animation: ICancellable? {

@@ -15,14 +15,14 @@ public extension UI.DragAndDrop {
         public let onItems: Signal.Empty< [NSItemProvider]? > = .init()
 #endif
         public let onAllow: Signal.Args< Bool?, UI.DragAndDrop.Operation > = .init()
-        public let onBegin: Signal.Empty< Void > = .init()
+        public let onBegin = Signal.Empty< Void >()
         public let onEnd: Signal.Args< Void, UI.DragAndDrop.Operation > = .init()
-        public let onPreview: Signal.Args< NativeView?, NSItemProvider > = .init()
+        public let onPreview = Signal.Args< NativeView?, NSItemProvider >()
 #if os(iOS)
-        public let onPreviewParameters: Signal.Args< UIDragPreviewParameters?, NSItemProvider > = .init()
+        public let onPreviewParameters = Signal.Args< UIDragPreviewParameters?, NSItemProvider >()
 #endif
-        public let onBeginPreview: Signal.Args< Void, NSItemProvider > = .init()
-        public let onEndPreview: Signal.Args< Void, NSItemProvider > = .init()
+        public let onBeginPreview = Signal.Args< Void, NSItemProvider >()
+        public let onEndPreview = Signal.Args< Void, NSItemProvider >()
         
 #if os(macOS)
         

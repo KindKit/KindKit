@@ -13,13 +13,13 @@ public extension UI.Layout {
         public var direction: Direction = .horizontal {
             didSet {
                 guard self.direction != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var views: [IUIView] {
             set {
                 self._views = newValue
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
             get { self._views }
         }

@@ -17,6 +17,13 @@ public struct Size : Hashable {
         self.height = height
     }
     
+    public init(
+        _ point: Point
+    ) {
+        self.width = point.x
+        self.height = point.y
+    }
+    
 }
 
 public extension Size {

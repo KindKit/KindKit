@@ -30,7 +30,7 @@ public extension UI.View {
         public var size: UI.Size.Static = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var path: Path2? {
@@ -84,15 +84,14 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -226,10 +225,6 @@ extension UI.View.Shape : IUIView {
     public func visible() {
         self.isVisible = true
         self.onVisible.emit()
-    }
-    
-    public func visibility() {
-        self.onVisibility.emit()
     }
     
     public func invisible() {

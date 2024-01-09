@@ -14,22 +14,22 @@ extension UI.View.SwipeCell {
             didSet { self.setNeedUpdate() }
         }
         var background: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var content: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var leading: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var leadingSize: Double = 0 {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var trailing: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var trailingSize: Double = 0 {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
 
         init() {

@@ -6,6 +6,8 @@ import Foundation
 
 protocol KKCustomViewDelegate : AnyObject {
     
+    func isDynamic(_ view: KKCustomView) -> Bool
+    
     func shouldHighlighting(_ view: KKCustomView) -> Bool
     func set(_ view: KKCustomView, highlighted: Bool)
     func hasHit(_ view: KKCustomView, point: Point) -> Bool
@@ -38,7 +40,7 @@ public extension UI.View {
         public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var content: IUILayout? {
@@ -52,8 +54,8 @@ public extension UI.View {
                 if self.isLoaded == true {
                     self._view.update(content: self.content)
                 }
-                self.content?.setNeedForceUpdate()
-                self.setNeedForceLayout()
+                self.content?.setNeedUpdate()
+                self.setNeedLayout()
             }
         }
         public var contentSize: Size {
@@ -130,17 +132,16 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onHit: Signal.Args< Bool?, Point > = .init()
-        public let onStyle: Signal.Args< Void, Bool > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onHit = Signal.Args< Bool?, Point >()
+        public let onStyle = Signal.Args< Void, Bool >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -281,10 +282,6 @@ extension UI.View.Custom : IUIView {
         self.onVisible.emit()
     }
     
-    public func visibility() {
-        self.onVisibility.emit()
-    }
-    
     public func invisible() {
         self.isVisible = false
         self.onInvisible.emit()
@@ -343,6 +340,10 @@ extension UI.View.Custom : IUIViewAlphable {
 }
 
 extension UI.View.Custom : KKCustomViewDelegate {
+    
+    func isDynamic(_ view: KKCustomView) -> Bool {
+        return self.width.isStatic == false || self.height.isStatic == false
+    }
     
     func shouldHighlighting(_ view: KKCustomView) -> Bool {
         return self.shouldHighlighting

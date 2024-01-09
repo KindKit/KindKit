@@ -6,7 +6,7 @@ import Foundation
 
 public extension Api.Error {
     
-    enum Network : Swift.Error {
+    enum Network : Swift.Error, Hashable, Equatable {
         
         case notConnected
         case lost

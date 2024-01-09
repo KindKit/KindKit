@@ -21,7 +21,7 @@ extension Signal {
         }
         
         deinit {
-            self._reset()
+            self.clear()
         }
 
         func remove(_ slot: ISlot) {
@@ -32,17 +32,6 @@ extension Signal {
             }
         }
         
-    }
-    
-}
-
-private extension Signal.Empty {
-    
-    func _reset() {
-        for slot in self.slots {
-            slot.reset()
-        }
-        self.slot?.reset()
     }
     
 }
@@ -72,10 +61,6 @@ public extension Signal.Empty {
         }
     }
     
-}
-
-public extension Signal.Empty {
-    
     @discardableResult
     func subscribe(
         _ closure: @escaping () -> Result
@@ -93,6 +78,13 @@ public extension Signal.Empty {
         let slot = Slot.Empty.Sender(self, sender, closure)
         self.slots.append(slot)
         return slot
+    }
+    
+    func clear() {
+        for slot in self.slots {
+            slot.reset()
+        }
+        self.slot?.reset()
     }
     
 }

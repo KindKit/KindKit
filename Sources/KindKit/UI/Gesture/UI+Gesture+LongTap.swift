@@ -111,11 +111,11 @@ public extension UI.Gesture {
                 }
             }
         }
-        public let onShouldBegin: Signal.Empty< Bool? > = .init()
-        public let onShouldSimultaneously: Signal.Args< Bool?, NativeGesture > = .init()
-        public let onShouldRequireFailure: Signal.Args< Bool?, NativeGesture > = .init()
-        public let onShouldBeRequiredToFailBy: Signal.Args< Bool?, NativeGesture > = .init()
-        public let onTriggered: Signal.Empty< Void > = .init()
+        public let onShouldBegin = Signal.Empty< Bool? >()
+        public let onShouldSimultaneously = Signal.Args< Bool?, NativeGesture >()
+        public let onShouldRequireFailure = Signal.Args< Bool?, NativeGesture >()
+        public let onShouldBeRequiredToFailBy = Signal.Args< Bool?, NativeGesture >()
+        public let onTriggered = Signal.Empty< Void >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self, unloadBehaviour: .whenDestroy)
         @inline(__always) private var _gesture: Reusable.Content { self._reuse.content }

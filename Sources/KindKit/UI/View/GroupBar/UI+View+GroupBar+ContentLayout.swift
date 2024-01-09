@@ -13,14 +13,14 @@ extension UI.View.GroupBar {
         var items: [IUIView] = [] {
             didSet {
                 self._cache = Array< Size? >(repeating: nil, count: self.items.count)
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         var itemsInset: Inset = Inset(horizontal: 12, vertical: 0) {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var itemsSpacing: Double = 4 {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         
         private var _cache: [Size?] = []

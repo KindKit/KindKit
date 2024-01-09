@@ -37,7 +37,7 @@ public extension UI.View {
             }
         }
         public private(set) var isLoading: Bool = false
-        public let onProgress: Signal.Args< Void, Double > = .init()
+        public let onProgress = Signal.Args< Void, Double >()
         public let onFinish: Signal.Args< IUIView?, UI.Image > = .init()
         public let onError: Signal.Args< Void, KindKit.RemoteImage.Error > = .init()
         

@@ -7,7 +7,7 @@ import Foundation
 
 public extension UI {
     
-    struct Image : Equatable {
+    struct Image : Hashable, Equatable {
 
         public var native: NativeImage
         public var size: KindKit.Size

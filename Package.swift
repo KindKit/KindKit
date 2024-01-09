@@ -11,22 +11,16 @@ let package = Package(
     ],
     products: [
         .library(name: "KindKit", targets: [ "KindKit" ]),
-        .library(name: "KindKitTest", targets: [ "KindKitTest" ])
+        .library(name: "KindTest", targets: [ "KindTest" ])
     ],
     targets: [
-        .target(
-            name: "KindKit"
-        ),
-        .target(
-            name: "KindKitTest",
-            dependencies: [ .target(name: "KindKit") ]
-        ),
-        .testTarget(
-            name: "KindKit-Tests",
-            dependencies: [
-                .target(name: "KindKit"),
-                .target(name: "KindKitTest")
-            ]
-        )
+        .target(name: "KindKit"),
+        .target(name: "KindTest", dependencies: [
+            .target(name: "KindKit")
+        ]),
+        .testTarget(name: "KindKitTest", dependencies: [
+            .target(name: "KindKit"),
+            .target(name: "KindTest")
+        ])
     ]
 )

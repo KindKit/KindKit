@@ -29,11 +29,11 @@ public extension UI.Layout {
         public var inset: Inset {
             didSet {
                 guard self.inset != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var entity: IUICompositionLayoutEntity {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
 
         public init(

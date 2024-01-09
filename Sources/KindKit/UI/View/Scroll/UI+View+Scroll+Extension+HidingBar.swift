@@ -157,6 +157,15 @@ extension UI.View.Scroll.Extension.HidingBar : IUIScrollViewObserver {
         self._end()
     }
     
+    public func beginZooming(scroll: UI.View.Scroll) {
+    }
+    
+    public func zooming(scroll: UI.View.Scroll) {
+    }
+    
+    public func endZooming(scroll: UI.View.Scroll) {
+    }
+    
     public func scrollToTop(scroll: UI.View.Scroll) {
         self._end(forceShow: false)
     }

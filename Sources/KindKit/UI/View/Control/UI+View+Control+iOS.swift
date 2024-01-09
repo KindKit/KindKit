@@ -47,13 +47,10 @@ final class KKControlView : UIControl {
             if self.frame.size != oldValue.size {
                 if self.window != nil {
                     self.kkLayoutManager.invalidate()
-                    self._needLayout = true
                 }
             }
         }
     }
-    
-    private var _needLayout = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -67,7 +64,10 @@ final class KKControlView : UIControl {
         self.addTarget(self, action: #selector(self._handleUnhighlighting(_:)), for: .touchCancel)
         self.addTarget(self, action: #selector(self._handlePressed(_:)), for: .touchUpInside)
         
-        self.kkLayoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self.kkLayoutManager = .init(
+            delegate: self,
+            view: self
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -79,20 +79,14 @@ final class KKControlView : UIControl {
         
         if superview == nil {
             self.kkLayoutManager.clear()
-            self._needLayout = true
         }
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if self._needLayout == true {
-            self._needLayout = false
-            
-            let bounds = Rect(self.bounds)
-            self.kkLayoutManager.layout(bounds: bounds)
-            self.kkLayoutManager.visible(bounds: bounds)
-        }
+        self.kkLayoutManager.visibleFrame = .init(self.bounds)
+        self.kkLayoutManager.updateIfNeeded()
     }
     
 }
@@ -120,7 +114,6 @@ extension KKControlView {
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
         self.setNeedsLayout()
-        self._needLayout = true
     }
     
     func update(color: UI.Color?) {
@@ -173,8 +166,15 @@ private extension KKControlView {
 extension KKControlView : IUILayoutDelegate {
     
     func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
-        self.setNeedsLayout()
-        self._needLayout = true
+        guard let delegate = self.kkDelegate else { return false }
+        defer {
+            self.setNeedsLayout()
+        }
+        guard delegate.isDynamic(self) == true else {
+            self.kkLayoutManager.setNeed(layout: true)
+            return false
+        }
+        self.kkLayoutManager.setNeed(layout: true)
         return true
     }
     

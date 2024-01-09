@@ -19,7 +19,7 @@ public extension DataSource.Action {
             return self._task != nil
         }
         public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
+        public let onFinish = Signal.Args< Void, Result >()
         
         private let _provider: KindKit.Api.Provider
         private let _request: (Params) throws -> KindKit.Api.Request

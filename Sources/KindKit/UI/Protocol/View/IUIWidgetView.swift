@@ -67,18 +67,8 @@ public extension IUIWidgetView {
     }
     
     @inlinable
-    var onVisibility: Signal.Empty< Void > {
-        self.body.onVisibility
-    }
-    
-    @inlinable
     var onInvisible: Signal.Empty< Void > {
         self.body.onInvisible
-    }
-    
-    @inlinable
-    func setNeedForceLayout() {
-        self.body.setNeedForceLayout()
     }
     
     @inlinable
@@ -109,11 +99,6 @@ public extension IUIWidgetView {
     @inlinable
     func visible() {
         self.body.visible()
-    }
-    
-    @inlinable
-    func visibility() {
-        self.body.visibility()
     }
     
     @inlinable

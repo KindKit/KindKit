@@ -35,6 +35,7 @@ extension UI.View.Mask {
 
 final class KKMaskView : NSView {
     
+    weak var kkDelegate: KKMaskViewDelegate?
     var kkBorder: UI.Border {
         set { self.kkClipView.kkBorder = newValue }
         get { self.kkClipView.kkBorder }
@@ -101,7 +102,10 @@ final class KKMaskView : NSView {
         
         self.addSubview(self.kkClipView)
         
-        self.kkLayoutManager = UI.Layout.Manager(contentView: self.kkClipView, delegate: self)
+        self.kkLayoutManager = .init(
+            delegate: self,
+            view: self.kkClipView
+        )
     }
         
     required init?(coder: NSCoder) {
@@ -119,9 +123,8 @@ final class KKMaskView : NSView {
     override func layout() {
         super.layout()
         
-        let bounds = Rect(self.bounds)
-        self.kkLayoutManager.layout(bounds: bounds)
-        self.kkLayoutManager.visible(bounds: bounds)
+        self.kkLayoutManager.visibleFrame = .init(self.bounds)
+        self.kkLayoutManager.updateIfNeeded()
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -206,6 +209,7 @@ extension KKMaskView {
         self.update(shadow: view.shadow)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
+        self.kkDelegate = view
     }
     
     func update(frame: Rect) {
@@ -240,6 +244,7 @@ extension KKMaskView {
     
     func cleanup() {
         self.kkLayoutManager.layout = nil
+        self.kkDelegate = nil
     }
     
 }
@@ -275,7 +280,15 @@ private extension KKMaskView.KKClipView {
 extension KKMaskView : IUILayoutDelegate {
     
     func setNeedUpdate(_ layout: IUILayout) -> Bool {
-        self.needsLayout = true
+        guard let delegate = self.kkDelegate else { return false }
+        defer {
+            self.needsLayout = true
+        }
+        guard delegate.isDynamic(self) == true else {
+            self.kkLayoutManager.setNeed(layout: true)
+            return false
+        }
+        self.kkLayoutManager.setNeed(layout: true)
         return true
     }
     

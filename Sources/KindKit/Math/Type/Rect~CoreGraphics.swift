@@ -17,8 +17,13 @@ public extension Rect {
     }
     
     init(_ cgRect: CGRect) {
-        self.origin = Point(cgRect.origin)
-        self.size = Size(cgRect.size)
+        self.origin = .init(cgRect.origin)
+        self.size = .init(cgRect.size)
+    }
+    
+    init(origin: CGPoint, size: CGSize) {
+        self.origin = .init(origin)
+        self.size = .init(size)
     }
     
 }

@@ -12,7 +12,7 @@ public extension UI.View {
         public var size: UI.Size.Dynamic = .init(.fit, .fit) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var inset: Inset {

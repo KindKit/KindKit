@@ -36,21 +36,17 @@ extension UI.View.Scroll {
 final class KKScrollView : NSScrollView {
     
     weak var kkDelegate: KKScrollViewDelegate?
-    var kkNeedLayoutContent: Bool = true {
-        didSet {
-            if self.kkNeedLayoutContent == true {
-                self.kkDocumentView.needsLayout = true
-                self.kkContentView.needsLayout = true
-            }
-        }
-    }
     var kkContentView: KKScrollContentView!
     var kkDocumentView: KKScrollDocumentView!
     var kkLayoutManager: UI.Layout.Manager!
-    var kkVisibleInset: Inset = .zero {
+    var kkContentSize: CGSize = .zero {
         didSet {
-            guard self.kkVisibleInset != oldValue else { return }
-            self.kkNeedLayoutContent = true
+            guard self.kkContentSize != oldValue else { return }
+            self.contentSize = .init(
+                width: self.kkContentSize.width * self.magnification,
+                height: self.kkContentSize.height * self.magnification
+            )
+            self.kkDelegate?.update(self, contentSize: .init(self.kkContentSize))
         }
     }
     var kkIsLocked: Bool = false
@@ -65,7 +61,8 @@ final class KKScrollView : NSScrollView {
                 if self.window != nil {
                     self.kkLayoutManager.invalidate()
                 }
-                self.kkNeedLayoutContent = true
+                self.kkDocumentView.needsLayout = true
+                self.kkContentView.needsLayout = true
             }
         }
     }
@@ -87,11 +84,17 @@ final class KKScrollView : NSScrollView {
         self.automaticallyAdjustsContentInsets = false
         self.wantsLayer = true
         
-        self.kkLayoutManager = .init(contentView: self.kkDocumentView, delegate: self)
+        self.kkLayoutManager = .init(
+            delegate: self,
+            view: self.kkDocumentView
+        )
         
         NotificationCenter.default.addObserver(self, selector: #selector(self._startDragging(_:)), name: Self.willStartLiveScrollNotification, object: self)
         NotificationCenter.default.addObserver(self, selector: #selector(self._dragging(_:)), name: Self.didLiveScrollNotification, object: self)
         NotificationCenter.default.addObserver(self, selector: #selector(self._endDragging(_:)), name: Self.didEndLiveScrollNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._startZooming(_:)), name: Self.willStartLiveMagnifyNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._zooming(_:)), name: Self.didEndLiveMagnifyNotification, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(self._endZooming(_:)), name: Self.didEndLiveMagnifyNotification, object: self)
     }
     
     required init?(coder: NSCoder) {
@@ -107,7 +110,8 @@ final class KKScrollView : NSScrollView {
         
         if superview == nil {
             self.kkLayoutManager.clear()
-            self.kkNeedLayoutContent = true
+            self.kkDocumentView.needsLayout = true
+            self.kkContentView.needsLayout = true
         }
     }
     
@@ -119,17 +123,9 @@ final class KKScrollView : NSScrollView {
     }
     
     func layoutContent() {
-        if self.kkNeedLayoutContent == true {
-            let bounds = Rect(self.bounds)
-            self.kkLayoutManager.layout(bounds: bounds)
-            self.contentSize = self.kkLayoutManager.size.cgSize
-            self.kkDelegate?.update(self, contentSize: self.kkLayoutManager.size)
-            self.kkNeedLayoutContent = false
-        }
-        do {
-            let visibleRect = Rect(self.contentView.documentVisibleRect)
-            self.kkLayoutManager.visible(bounds: visibleRect, inset: self.kkVisibleInset)
-        }
+        self.kkLayoutManager.visibleFrame = .init(self.documentVisibleRect)
+        self.kkLayoutManager.updateIfNeeded()
+        self.kkContentSize = self.kkLayoutManager.size.cgSize
     }
     
 }
@@ -237,12 +233,14 @@ extension KKScrollView {
     
     func update(view: UI.View.Scroll) {
         self.update(frame: view.frame)
+        self.update(bounce: view.bounce)
         self.update(direction: view.direction)
         self.update(indicatorDirection: view.indicatorDirection)
         self.update(visibleInset: view.visibleInset)
         self.update(contentInset: view.contentInset)
         self.update(contentSize: view.contentSize)
         self.update(contentOffset: view.contentOffset)
+        self.update(zoom: view.zoom, limit: view.zoomLimit)
         self.update(content: view.content)
         self.update(color: view.color)
         self.update(alpha: view.alpha)
@@ -256,13 +254,16 @@ extension KKScrollView {
     
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
-        self.kkNeedLayoutContent = true
+        self.kkDocumentView.needsLayout = true
+        self.kkContentView.needsLayout = true
+    }
+    
+    func update(bounce: UI.View.Scroll.Bounce) {
+        self.horizontalScrollElasticity = bounce.contains(.horizontal) ? .allowed : .none
+        self.verticalScrollElasticity = bounce.contains(.vertical) ? .allowed : .none
     }
     
     func update(direction: UI.View.Scroll.Direction) {
-        self.horizontalScrollElasticity = direction.contains(.horizontal) && direction.contains(.bounds) ? .allowed : .none
-        self.verticalScrollElasticity = direction.contains(.vertical) && direction.contains(.bounds) ? .allowed : .none
-        self.kkNeedLayoutContent = true
     }
     
     func update(indicatorDirection: UI.View.Scroll.Direction) {
@@ -271,7 +272,7 @@ extension KKScrollView {
     }
     
     func update(visibleInset: Inset) {
-        self.kkVisibleInset = visibleInset
+        self.kkLayoutManager.preloadInsets = visibleInset
     }
     
     func update(contentInset: Inset) {
@@ -284,6 +285,13 @@ extension KKScrollView {
     
     func update(contentOffset: Point) {
         self.scroll(contentOffset.cgPoint)
+    }
+    
+    func update(zoom: Double, limit: Range< Double >) {
+        self.magnification = zoom
+        self.minMagnification = limit.lowerBound
+        self.maxMagnification = limit.upperBound
+        self.allowsMagnification = limit.lowerBound < limit.upperBound
     }
     
     func update(color: UI.Color?) {
@@ -322,16 +330,36 @@ private extension KKScrollView {
         self.kkDelegate?.endDragging(self, decelerate: false)
     }
     
+    @objc
+    func _startZooming(_ sender: Any) {
+        self.kkDelegate?.beginZooming(self)
+    }
+    
+    @objc
+    func _zooming(_ sender: Any) {
+        self.kkDelegate?.zooming(self, zoom: Double(self.magnification))
+    }
+    
+    @objc
+    func _endZooming(_ sender: Any) {
+        self.kkDelegate?.endZooming(self)
+    }
+    
 }
 
 extension KKScrollView : IUILayoutDelegate {
     
     func setNeedUpdate(_ layout: IUILayout) -> Bool {
-        self.kkNeedLayoutContent = true
-        if let kkDelegate = self.kkDelegate {
-            return kkDelegate.isDynamicSize(self)
+        guard let delegate = self.kkDelegate else { return false }
+        defer {
+            self.needsLayout = true
         }
-        return false
+        guard delegate.isDynamic(self) == true else {
+            self.kkLayoutManager.setNeed(layout: true)
+            return false
+        }
+        self.kkLayoutManager.setNeed(layout: true)
+        return true
     }
     
     func updateIfNeeded(_ layout: IUILayout) {

@@ -14,35 +14,35 @@ public extension UI.Layout {
             didSet {
                 guard self.direction != oldValue else { return }
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var alignment: Alignment {
             didSet {
                 guard self.alignment != oldValue else { return }
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var inset: Inset {
             didSet {
                 guard self.inset != oldValue else { return }
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var columns: Int {
             didSet {
                 guard self.columns != oldValue else { return }
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var spacing: Point {
             didSet {
                 guard self.spacing != oldValue else { return }
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var views: [IUIView] {
@@ -50,7 +50,7 @@ public extension UI.Layout {
                 self._views = newValue
                 self._cache = Array< Size? >(repeating: nil, count: newValue.count)
                 self._pass = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
             get { self._views }
         }
@@ -154,7 +154,7 @@ public extension UI.Layout.Grid {
         self._views.insert(contentsOf: views, at: safeIndex)
         self._cache.insert(contentsOf: Array< Size? >(repeating: nil, count: views.count), at: safeIndex)
         self._pass = nil
-        self.setNeedForceUpdate()
+        self.setNeedUpdate()
     }
     
     func insert(index: Int, view: IUIView) {
@@ -165,7 +165,7 @@ public extension UI.Layout.Grid {
         self._views.removeSubrange(range)
         self._cache.removeSubrange(range)
         self._pass = nil
-        self.setNeedForceUpdate()
+        self.setNeedUpdate()
     }
     
     func delete(views: [IUIView]) {
@@ -175,7 +175,7 @@ public extension UI.Layout.Grid {
                 self._views.remove(at: index)
                 self._cache.remove(at: index)
             }
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
     }
     

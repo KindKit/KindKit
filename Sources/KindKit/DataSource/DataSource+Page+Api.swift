@@ -17,7 +17,7 @@ public extension DataSource.Page {
         }
         public private(set) var canMore: Bool
         public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
+        public let onFinish = Signal.Args< Void, Result >()
         
         private let _provider: KindKit.Api.Provider
         private let _request: (Cursor?) throws -> KindKit.Api.Request

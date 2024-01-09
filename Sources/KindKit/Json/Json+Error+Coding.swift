@@ -6,7 +6,7 @@ import Foundation
 
 public extension Json.Error {
 
-    enum Coding : Swift.Error {
+    enum Coding : Swift.Error, Hashable, Equatable {
         
         case access(Json.Path)
         case cast(Json.Path)

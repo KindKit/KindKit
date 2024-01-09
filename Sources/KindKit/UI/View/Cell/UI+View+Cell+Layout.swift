@@ -11,13 +11,13 @@ extension UI.View.Cell {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         var background: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var content: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var contentInset: Inset = .zero {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         
         init() {

@@ -12,11 +12,17 @@ public protocol IUIScrollViewObserver : AnyObject {
     func beginDecelerating(scroll: UI.View.Scroll)
     func endDecelerating(scroll: UI.View.Scroll)
     
+    func beginZooming(scroll: UI.View.Scroll)
+    func zooming(scroll: UI.View.Scroll)
+    func endZooming(scroll: UI.View.Scroll)
+    
     func scrollToTop(scroll: UI.View.Scroll)
     
 }
 
 protocol KKScrollViewDelegate : AnyObject {
+    
+    func isDynamic(_ view: KKScrollView) -> Bool
     
     func update(_ view: KKScrollView, contentSize: Size)
     
@@ -28,9 +34,11 @@ protocol KKScrollViewDelegate : AnyObject {
     func beginDecelerating(_ view: KKScrollView)
     func endDecelerating(_ view: KKScrollView)
     
-    func scrollToTop(_ view: KKScrollView)
+    func beginZooming(_ view: KKScrollView)
+    func zooming(_ view: KKScrollView, zoom: Double)
+    func endZooming(_ view: KKScrollView)
     
-    func isDynamicSize(_ view: KKScrollView) -> Bool
+    func scrollToTop(_ view: KKScrollView)
     
 }
 
@@ -60,14 +68,30 @@ public extension UI.View {
         public var size: UI.Size.Dynamic = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
-        public var direction: Direction = [ .vertical, .bounds ] {
+        public var bounce: Bounce = [ .vertical, .zoom ] {
+            didSet {
+                guard self.bounce != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(bounce: self.bounce)
+                }
+            }
+        }
+        public var direction: Direction = .vertical {
             didSet {
                 guard self.direction != oldValue else { return }
                 if self.isLoaded == true {
                     self._view.update(direction: self.direction)
+                }
+            }
+        }
+        public var indicatorDirection: Direction = .vertical {
+            didSet {
+                guard self.indicatorDirection != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(indicatorDirection: self.indicatorDirection)
                 }
             }
         }
@@ -104,7 +128,7 @@ public extension UI.View {
                     }
                 }
                 if self.size.isStatic == false {
-                    self.setNeedForceLayout()
+                    self.setNeedLayout()
                 }
             }
         }
@@ -126,11 +150,21 @@ public extension UI.View {
                 }
             }
         }
-        public var indicatorDirection: Direction = .vertical {
-            didSet {
-                guard self.indicatorDirection != oldValue else { return }
+        public var zoom: Double {
+            set {
+                guard self._zoom != newValue else { return }
+                self._zoom = newValue
                 if self.isLoaded == true {
-                    self._view.update(indicatorDirection: self.indicatorDirection)
+                    self._view.update(zoom: self._zoom, limit: self.zoomLimit)
+                }
+            }
+            get { self._zoom }
+        }
+        public var zoomLimit: Range< Double > = 1.0..<1.0 {
+            didSet {
+                guard self.zoomLimit != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(zoom: self._zoom, limit: self.zoomLimit)
                 }
             }
         }
@@ -194,29 +228,33 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
         public private(set) var isDragging: Bool = false
         public private(set) var isDecelerating: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onStyle: Signal.Args< Void, Bool > = .init()
-        public let onBeginDragging: Signal.Empty< Void > = .init()
-        public let onDragging: Signal.Empty< Void > = .init()
-        public let onEndDragging: Signal.Args< Void, Bool > = .init()
-        public let onBeginDecelerating: Signal.Empty< Void > = .init()
-        public let onEndDecelerating: Signal.Empty< Void > = .init()
-        public let onTriggeredRefresh: Signal.Empty< Void > = .init()
-        public let onScrollToTop: Signal.Empty< Void > = .init()
+        public private(set) var isZooming: Bool = false
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onStyle = Signal.Args< Void, Bool >()
+        public let onScrollToTop = Signal.Empty< Void >()
+        public let onBeginDragging = Signal.Empty< Void >()
+        public let onDragging = Signal.Empty< Void >()
+        public let onEndDragging = Signal.Args< Void, Bool >()
+        public let onBeginDecelerating = Signal.Empty< Void >()
+        public let onEndDecelerating = Signal.Empty< Void >()
+        public let onBeginZooming = Signal.Empty< Void >()
+        public let onZooming = Signal.Empty< Void >()
+        public let onEndZooming = Signal.Empty< Void >()
+        public let onTriggeredRefresh = Signal.Empty< Void >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
         private var _contentOffset: Point = .zero
+        private var _zoom: Double = 1.0
         private var _refreshColor: UI.Color?
         private var _isRefreshing: Bool = false
         private var _isLocked: Bool = false
@@ -428,6 +466,25 @@ public extension UI.View.Scroll {
     
     @inlinable
     @discardableResult
+    func bounce(_ value: Bounce) -> Self {
+        self.bounce = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func bounce(_ value: () -> Bounce) -> Self {
+        return self.bounce(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func bounce(_ value: (Self) -> Bounce) -> Self {
+        return self.bounce(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
     func direction(_ value: Direction) -> Self {
         self.direction = value
         return self
@@ -462,6 +519,44 @@ public extension UI.View.Scroll {
     @discardableResult
     func indicatorDirection(_ value: (Self) -> Direction) -> Self {
         return self.indicatorDirection(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func zoom(_ value: Double) -> Self {
+        self.zoom = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func zoom(_ value: () -> Double) -> Self {
+        return self.zoom(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func zoom(_ value: (Self) -> Double) -> Self {
+        return self.zoom(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func zoomLimit(_ value: Range< Double >) -> Self {
+        self.zoomLimit = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func zoomLimit(_ value: () -> Range< Double >) -> Self {
+        return self.zoomLimit(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func zoomLimit(_ value: (Self) -> Range< Double >) -> Self {
+        return self.zoomLimit(value(self))
     }
     
 #if os(iOS)
@@ -552,6 +647,69 @@ public extension UI.View.Scroll {
         return self
     }
     
+    @inlinable
+    @discardableResult
+    func onBeginZooming(_ closure: (() -> Void)?) -> Self {
+        self.onBeginZooming.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginZooming(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onBeginZooming.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onBeginZooming.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onZooming(_ closure: (() -> Void)?) -> Self {
+        self.onZooming.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onZooming(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onZooming.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onZooming.link(sender, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndZooming(_ closure: (() -> Void)?) -> Self {
+        self.onEndZooming.link(closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndZooming(_ closure: @escaping (Self) -> Void) -> Self {
+        self.onEndZooming.link(self, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
+        self.onEndZooming.link(sender, closure)
+        return self
+    }
+    
 }
 
 extension UI.View.Scroll : IUIView {
@@ -598,10 +756,6 @@ extension UI.View.Scroll : IUIView {
     public func visible() {
         self.isVisible = true
         self.onVisible.emit()
-    }
-    
-    public func visibility() {
-        self.onVisibility.emit()
     }
     
     public func invisible() {
@@ -654,6 +808,10 @@ extension UI.View.Scroll : IUIViewLockable {
 
 extension UI.View.Scroll : KKScrollViewDelegate {
     
+    func isDynamic(_ view: KKScrollView) -> Bool {
+        return self.width.isStatic == false || self.height.isStatic == false
+    }
+    
     func update(_ view: KKScrollView, contentSize: Size) {
         self.contentSize = contentSize
     }
@@ -702,12 +860,32 @@ extension UI.View.Scroll : KKScrollViewDelegate {
         }
     }
     
-    func scrollToTop(_ view: KKScrollView) {
-        self._scrollToTop()
+    func beginZooming(_ view: KKScrollView) {
+        if self.isZooming == false {
+            self.isZooming = true
+            self.onBeginZooming.emit()
+            self._observer.notify({ $0.beginZooming(scroll: self) })
+        }
     }
     
-    func isDynamicSize(_ view: KKScrollView) -> Bool {
-        return self.width.isStatic == true && self.height.isStatic == true
+    func zooming(_ view: KKScrollView, zoom: Double) {
+        if self._zoom != zoom {
+            self._zoom = zoom
+            self.onZooming.emit()
+            self._observer.notify({ $0.zooming(scroll: self) })
+        }
+    }
+    
+    func endZooming(_ view: KKScrollView) {
+        if self.isZooming == true {
+            self.isZooming = false
+            self.onEndZooming.emit()
+            self._observer.notify({ $0.endZooming(scroll: self) })
+        }
+    }
+    
+    func scrollToTop(_ view: KKScrollView) {
+        self._scrollToTop()
     }
     
 }

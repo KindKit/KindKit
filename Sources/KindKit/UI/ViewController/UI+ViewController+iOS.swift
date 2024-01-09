@@ -27,7 +27,7 @@ public extension UI {
         }
         public let owner: AnyObject?
         public let container: UI.Container.Root
-        public let onSnake: Signal.Empty< Void > = .init()
+        public let onSnake = Signal.Empty< Void >()
         
         var kkRootView: KKRootView! {
             didSet { self.view = self.kkRootView }

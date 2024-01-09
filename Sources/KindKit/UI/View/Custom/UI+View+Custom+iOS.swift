@@ -98,20 +98,20 @@ final class KKCustomView : UIView {
             if self.frame.size != oldValue.size {
                 if self.window != nil {
                     self.kkLayoutManager.invalidate()
-                    self._needLayout = true
                 }
             }
         }
     }
-    
-    private var _needLayout = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         self.clipsToBounds = true
         
-        self.kkLayoutManager = UI.Layout.Manager(contentView: self, delegate: self)
+        self.kkLayoutManager = .init(
+            delegate: self,
+            view: self
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -123,20 +123,14 @@ final class KKCustomView : UIView {
         
         if superview == nil {
             self.kkLayoutManager.clear()
-            self._needLayout = true
         }
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if self._needLayout == true {
-            self._needLayout = false
-            
-            let bounds = Rect(self.bounds)
-            self.kkLayoutManager.layout(bounds: bounds)
-            self.kkLayoutManager.visible(bounds: bounds)
-        }
+        self.kkLayoutManager.visibleFrame = .init(self.bounds)
+        self.kkLayoutManager.updateIfNeeded()
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -198,7 +192,6 @@ extension KKCustomView {
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
         self.setNeedsLayout()
-        self._needLayout = true
     }
     
     func update(gestures: [IUIGesture]) {
@@ -358,8 +351,15 @@ extension KKCustomView : UIDropInteractionDelegate {
 extension KKCustomView : IUILayoutDelegate {
     
     func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
-        self._needLayout = true
-        self.setNeedsLayout()
+        guard let delegate = self.kkDelegate else { return false }
+        defer {
+            self.setNeedsLayout()
+        }
+        guard delegate.isDynamic(self) == true else {
+            self.kkLayoutManager.setNeed(layout: true)
+            return false
+        }
+        self.kkLayoutManager.setNeed(layout: true)
         return true
     }
     

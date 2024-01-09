@@ -11,56 +11,95 @@ import UIKit
 
 extension UI.Layout {
 
-    struct Manager {
+    final class Manager {
         
-        unowned let contentView: NativeView
         unowned let delegate: IUILayoutDelegate
+        unowned let view: NativeView
         var layout: IUILayout? {
             willSet {
-                self.layout?.delegate = nil
+                guard let layout = self.layout else { return }
+                layout.delegate = nil
                 self.clear()
             }
             didSet {
-                self.layout?.delegate = self.delegate
+                guard let layout = self.layout else { return }
+                layout.delegate = self.delegate
+                self._needLayout = true
+                self._needVisibility = true
             }
         }
-        var size: Size
-        var views: [IUIView]
+        var visibleFrame: Rect = .zero {
+            didSet {
+                guard self.visibleFrame != oldValue else { return }
+                if self.visibleFrame.size != oldValue.size {
+                    self._needLayout = true
+                    self._needVisibility = true
+                } else {
+                    self._needVisibility = true
+                }
+            }
+        }
+        var contentInsets: Inset = .zero {
+            didSet {
+                guard self.contentInsets != oldValue else { return }
+                self._needLayout = true
+                self._needVisibility = true
+            }
+        }
+        var preloadInsets: Inset = .zero {
+            didSet {
+                guard self.preloadInsets != oldValue else { return }
+                self.setNeed(visibility: true)
+            }
+        }
+        private(set) var size: Size = .zero
+        private(set) var views: [IUIView] = []
+        
+        private var _needLayout = true
+        private var _needVisibility = true
 
-        @inline(__always)
-        init(contentView: NativeView, delegate: IUILayoutDelegate) {
-            self.contentView = contentView
+        init(
+            delegate: IUILayoutDelegate,
+            view: NativeView
+        ) {
             self.delegate = delegate
-            self.size = .zero
-            self.views = []
+            self.view = view
         }
         
-        @inline(__always)
         func invalidate() {
             if let layout = self.layout {
                 layout.invalidate()
             }
+            self._needLayout = true
+            self._needVisibility = true
         }
         
-        @inline(__always)
-        mutating func layout(bounds: Rect) {
-            if let layout = self.layout {
-                self.size = layout.layout(bounds: bounds)
-            } else {
-                self.size = .zero
+        func setNeed(layout: Bool, visibility: Bool) {
+            if layout == true {
+                self._needLayout = true
+                self._needVisibility = true
+            } else if visibility == true {
+                self._needVisibility = true
             }
         }
         
-        @inline(__always)
-        mutating func visible(bounds: Rect, inset: Inset = .zero) {
-            if let layout = self.layout {
+        func updateIfNeeded() {
+            guard let layout = self.layout else {
+                self.size = .zero
+                self.clear()
+                return
+            }
+            if self._needLayout == true {
+                self._needLayout = false
+                self.size = layout.layout(bounds: .init(
+                    origin: .zero,
+                    size: self.visibleFrame.size
+                ))
+            }
+            if self._needVisibility == true {
+                self._needVisibility = false
                 let views = layout.views(
-                    bounds: Rect(
-                        x: bounds.origin.x - inset.left,
-                        y: bounds.origin.y - inset.top,
-                        width: bounds.size.width + inset.horizontal,
-                        height: bounds.size.height + inset.vertical
-                    )
+                    bounds: self.visibleFrame.inset(-self.preloadInsets)
                 )
                 let disappearing = self.views.filter({ view in
                     return views.contains(where: { view === $0 }) == false
@@ -77,34 +116,29 @@ extension UI.Layout {
                     let isHidden = view.isHidden
                     if isHidden == false {
                         let frame = view.frame
-                        let isVisible = bounds.isIntersects(frame)
+                        let isVisible = self.visibleFrame.isIntersects(frame)
                         if isLoaded == true || isVisible == true {
                             view.frame = frame
-                            if view.native.superview !== self.contentView {
+                            if view.native.superview !== self.view {
 #if os(macOS)
-                                let subviews = self.contentView.subviews
+                                let subviews = self.view.subviews
                                 if subviews.isEmpty == true || index >= subviews.count {
-                                    self.contentView.addSubview(view.native)
+                                    self.view.addSubview(view.native)
                                 } else {
-                                    self.contentView.addSubview(view.native, positioned: .below, relativeTo: subviews[index])
+                                    self.view.addSubview(view.native, positioned: .below, relativeTo: subviews[index])
                                 }
 #elseif os(iOS)
-                                self.contentView.insertSubview(view.native, at: index)
+                                self.view.insertSubview(view.native, at: index)
 #endif
                             }
                         }
                         if isAppeared == false {
                             view.appear(to: layout)
                         }
-                        if isVisible == true {
-                            if view.isVisible == false {
-                                view.visible()
-                            } else {
-                                view.visibility()
-                            }
-                        } else {
-                            if view.isVisible == true {
-                                view.invisible()
+                        if isVisible != view.isVisible {
+                            switch isVisible {
+                            case false: view.invisible()
+                            case true: view.visible()
                             }
                         }
                         index += 1
@@ -121,13 +155,10 @@ extension UI.Layout {
                     }
                 }
                 self.views = views
-            } else {
-                self.clear()
             }
         }
         
-        @inline(__always)
-        mutating func clear() {
+        func clear() {
             for view in self.views {
                 self._disappear(view: view)
             }
@@ -137,6 +168,20 @@ extension UI.Layout {
         
     }
 
+}
+
+extension UI.Layout.Manager {
+    
+    @inline(__always)
+    func setNeed(layout: Bool) {
+        self.setNeed(layout: layout, visibility: false)
+    }
+    
+    @inline(__always)
+    func setNeed(visibility: Bool) {
+        self.setNeed(layout: false, visibility: visibility)
+    }
+    
 }
 
 private extension UI.Layout.Manager {
@@ -149,13 +194,13 @@ private extension UI.Layout.Manager {
         } else {
             native = nil
         }
+        native?.removeFromSuperview()
         if view.isVisible == true {
             view.invisible()
         }
         if view.isAppeared == true {
             view.disappear()
         }
-        native?.removeFromSuperview()
     }
     
 }

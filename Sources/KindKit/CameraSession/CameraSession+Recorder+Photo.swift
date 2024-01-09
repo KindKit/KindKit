@@ -96,9 +96,6 @@ private extension CameraSession.Recorder.Photo {
                 self._restorePreset = session.activeVideoPreset
                 session.configure(
                     videoPreset: preset,
-                    configureVideoDevice: { [weak self] device in
-                        guard let self = self else { return }
-                    },
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._start(context, session)

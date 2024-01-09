@@ -17,7 +17,7 @@ public extension DataSource.Sync {
         public let permission: Permission.Location
         public let behaviour: Behaviour
         public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
+        public let onFinish = Signal.Args< Void, Result >()
         public private(set) var isSyncing: Bool
         public var isNeedSync: Bool {
             return self.behaviour.isNeedSync(self.syncAt)

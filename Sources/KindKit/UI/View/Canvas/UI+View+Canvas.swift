@@ -53,7 +53,7 @@ public extension UI.View {
         public var size: UI.Size.Static = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var color: UI.Color? {
@@ -86,14 +86,13 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
         public let onAppear = Signal.Empty< Void >()
         public let onDisappear = Signal.Empty< Void >()
         public let onVisible = Signal.Empty< Void >()
-        public let onVisibility = Signal.Empty< Void >()
         public let onInvisible = Signal.Empty< Void >()
         public let onStyle = Signal.Args< Void, Bool >()
         public let onResize = Signal.Args< Void, Size >()
@@ -162,10 +161,6 @@ extension UI.View.Canvas : IUIView {
     public func visible() {
         self.isVisible = true
         self.onVisible.emit()
-    }
-    
-    public func visibility() {
-        self.onVisibility.emit()
     }
     
     public func invisible() {

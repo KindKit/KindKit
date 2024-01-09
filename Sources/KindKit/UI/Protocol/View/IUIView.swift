@@ -11,19 +11,16 @@ public protocol IUIView : IUIAnyView {
     var isHidden: Bool { set get }
     var isVisible: Bool { get }
     var onVisible: Signal.Empty< Void > { get }
-    var onVisibility: Signal.Empty< Void > { get }
     var onInvisible: Signal.Empty< Void > { get }
     
     func loadIfNeeded()
     
-    func setNeedForceLayout()
     func setNeedLayout()
     func layoutIfNeeded()
     
     func appear(to layout: IUILayout)
     
     func visible()
-    func visibility()
     func invisible()
     
 }
@@ -181,27 +178,6 @@ public extension IUIView {
     
     @inlinable
     @discardableResult
-    func onVisibility(_ closure: (() -> Void)?) -> Self {
-        self.onVisibility.link(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onVisibility.link(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onVisibility< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onVisibility.link(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
     func onInvisible(_ closure: (() -> Void)?) -> Self {
         self.onInvisible.link(closure)
         return self
@@ -226,18 +202,18 @@ public extension IUIView {
 public extension IUIView {
     
     @inlinable
-    func setNeedForceLayout() {
-        self.appearedLayout?.setNeedForceUpdate(self)
-    }
-    
-    @inlinable
     func setNeedLayout() {
-        self.appearedLayout?.setNeedUpdate()
+        self.appearedLayout?.setNeedUpdate(self)
     }
     
     @inlinable
     func layoutIfNeeded() {
         self.appearedLayout?.updateIfNeeded()
+    }
+    
+    @inlinable
+    func updateLayout() {
+        self.appearedLayout?.update()
     }
     
     func parent< View >(of type: View.Type) -> View? {

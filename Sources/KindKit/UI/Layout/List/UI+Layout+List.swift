@@ -14,25 +14,25 @@ public extension UI.Layout {
             didSet {
                 guard self.direction != oldValue else { return }
                 self._firstVisible = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var alignment: Alignment = .fill {
             didSet {
                 guard self.alignment != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var inset: Inset = .zero {
             didSet {
                 guard self.inset != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var spacing: Double = 0 {
             didSet {
                 guard self.spacing != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var views: [IUIView] {
@@ -40,7 +40,7 @@ public extension UI.Layout {
                 self._views = newValue
                 self._cache = Array< Size? >(repeating: nil, count: newValue.count)
                 self._firstVisible = nil
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
             get { self._views }
         }
@@ -277,7 +277,7 @@ public extension UI.Layout.List {
                 progress: .zero
             ))
         } else {
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
     }
     
@@ -296,7 +296,7 @@ public extension UI.Layout.List {
         } else {
             self._views.remove(at: index)
             self._cache.remove(at: index)
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
     }
     
@@ -311,7 +311,7 @@ public extension UI.Layout.List {
         } else {
             self._views.removeSubrange(range)
             self._cache.removeSubrange(range)
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
     }
     
@@ -330,7 +330,7 @@ public extension UI.Layout.List {
                     self._views.remove(at: index)
                     self._cache.remove(at: index)
                 }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
     }
@@ -411,8 +411,7 @@ private extension UI.Layout.List {
                     for operation in self._operations {
                         operation.progress = progress
                     }
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
+                    self.update()
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }
@@ -435,8 +434,7 @@ private extension UI.Layout.List {
                         self._animation = nil
                         self.isAnimating = false
                     }
-                    self.setNeedForceUpdate()
-                    self.updateIfNeeded()
+                    self.update()
                     animation.completion?()
                     if let animation = self._animations.first {
                         self._animate(animation: animation)

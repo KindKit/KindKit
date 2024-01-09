@@ -11,34 +11,34 @@ extension UI.View.Button {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         var inset: Inset = Inset(horizontal: 4, vertical: 4) {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var alignment: UI.View.Button.Alignment = .center {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var background: IUIView? {
-            didSet { self.setNeedForceUpdate(self.background) }
+            didSet { self.setNeedUpdate(self.background) }
         }
         var spinner: IUIView? {
-            didSet { self.setNeedForceUpdate(self.spinner) }
+            didSet { self.setNeedUpdate(self.spinner) }
         }
         var spinnerPosition: UI.View.Button.SpinnerPosition = .fill {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var spinnerAnimating: Bool = false {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var primary: IUIView? {
-            didSet { self.setNeedForceUpdate(self.primary) }
+            didSet { self.setNeedUpdate(self.primary) }
         }
         var secondary: IUIView? {
-            didSet { self.setNeedForceUpdate(self.secondary) }
+            didSet { self.setNeedUpdate(self.secondary) }
         }
         var secondaryPosition: UI.View.Button.SecondaryPosition = .left {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var secondarySpacing: Double = 4 {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         private var _cacheSpinnerSize: Size?
         private var _cacheSecondarySize: Size?

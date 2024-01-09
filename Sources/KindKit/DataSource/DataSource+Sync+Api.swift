@@ -20,7 +20,7 @@ public extension DataSource.Sync {
         }
         public private(set) var syncAt: Date?
         public private(set) var result: Result?
-        public let onFinish: Signal.Args< Void, Result > = .init()
+        public let onFinish = Signal.Args< Void, Result >()
         public let behaviour: Behaviour
         
         private let _provider: KindKit.Api.Provider

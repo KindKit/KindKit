@@ -11,22 +11,22 @@ extension UI.View.Bar {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         var placement: UI.View.Bar.Placement {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var size: Double? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var safeArea: Inset = .zero {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var background: IUIView {
-            didSet { self.setNeedForceUpdate(self.background) }
+            didSet { self.setNeedUpdate(self.background) }
         }
         var content: IUIView {
-            didSet { self.setNeedForceUpdate(self.content) }
+            didSet { self.setNeedUpdate(self.content) }
         }
         var separator: IUIView? {
-            didSet { self.setNeedForceUpdate(self.separator) }
+            didSet { self.setNeedUpdate(self.separator) }
         }
         
         init(

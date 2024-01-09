@@ -40,7 +40,7 @@ public extension UI.View {
         public var size: UI.Size.Static = .init(.fill, .fixed(32)) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var items: [Item] = [] {
@@ -111,16 +111,15 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onStyle: Signal.Args< Void, Bool > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onStyle = Signal.Args< Void, Bool >()
         public let onSelect: Signal.Args< Void, UI.View.Segmented.Item > = .init()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
@@ -312,10 +311,6 @@ extension UI.View.Segmented : IUIView {
     public func visible() {
         self.isVisible = true
         self.onVisible.emit()
-    }
-    
-    public func visibility() {
-        self.onVisibility.emit()
     }
     
     public func invisible() {

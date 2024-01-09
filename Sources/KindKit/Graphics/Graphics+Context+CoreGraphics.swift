@@ -15,14 +15,23 @@ public extension Graphics {
     
     struct Context {
         
-        private let _instance: CGContext
-        private let _size: CGSize
+        public let native: CGContext
+        public var size: Size
         
-        init(_ instance: CGContext, size: CGSize) {
-            self._instance = instance
-            self._size = size
+        init(_ native: CGContext, size: CGSize) {
+            self.native = native
+            self.size = .init(size)
         }
         
+    }
+    
+}
+
+public extension Graphics.Context {
+    
+    @inlinable
+    var bbox: AlignedBox2 {
+        return .init(lower: .zero, upper: .init(self.size))
     }
     
 }
@@ -54,7 +63,7 @@ public extension Graphics.Context {
         stroke: Graphics.Stroke? = nil,
         block: () -> Void
     ) {
-        self._instance.saveGState()
+        self.native.saveGState()
         if let matrix = matrix {
             self._apply(matrix: matrix)
         }
@@ -68,7 +77,7 @@ public extension Graphics.Context {
             self._apply(stroke: stroke)
         }
         block()
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func apply(
@@ -76,7 +85,7 @@ public extension Graphics.Context {
         stroke: Graphics.Stroke? = nil,
         block: () -> Void
     ) {
-        self._instance.saveGState()
+        self.native.saveGState()
         if let fill = fill {
             self._apply(fill: fill)
         }
@@ -84,23 +93,23 @@ public extension Graphics.Context {
             self._apply(stroke: stroke)
         }
         block()
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
         circle: Circle,
         mode: Graphics.DrawMode
     ) {
-        self._instance.saveGState()
-        self._instance.beginPath()
-        self._instance.addEllipse(in: CGRect(
+        self.native.saveGState()
+        self.native.beginPath()
+        self.native.addEllipse(in: CGRect(
             x: CGFloat(circle.origin.x - circle.radius.value),
             y: CGFloat(circle.origin.y - circle.radius.value),
             width: CGFloat(circle.radius.value * 2),
             height: CGFloat(circle.radius.value * 2)
         ))
         self._draw(mode: mode)
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
@@ -108,46 +117,46 @@ public extension Graphics.Context {
         mode: Graphics.DrawMode
     ) {
         guard circles.isEmpty == false else { return }
-        self._instance.saveGState()
-        self._instance.beginPath()
+        self.native.saveGState()
+        self.native.beginPath()
         for index in circles.indices {
             let circle = circles[index]
-            self._instance.addEllipse(in: CGRect(
+            self.native.addEllipse(in: CGRect(
                 x: CGFloat(circle.origin.x - circle.radius.value),
                 y: CGFloat(circle.origin.y - circle.radius.value),
                 width: CGFloat(circle.radius.value * 2),
                 height: CGFloat(circle.radius.value * 2)
             ))
         }
-        if self._instance.isPathEmpty == false {
+        if self.native.isPathEmpty == false {
             self._draw(mode: mode)
         }
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
         segment: Segment2
     ) {
-        self._instance.saveGState()
-        self._instance.beginPath()
-        self._instance.move(to: segment.start.cgPoint)
-        self._instance.addLine(to: segment.end.cgPoint)
-        self._instance.drawPath(using: .stroke)
-        self._instance.restoreGState()
+        self.native.saveGState()
+        self.native.beginPath()
+        self.native.move(to: segment.start.cgPoint)
+        self.native.addLine(to: segment.end.cgPoint)
+        self.native.drawPath(using: .stroke)
+        self.native.restoreGState()
     }
     
     func draw(
         segments: [Segment2]
     ) {
         guard segments.isEmpty == false else { return }
-        self._instance.saveGState()
-        self._instance.beginPath()
+        self.native.saveGState()
+        self.native.beginPath()
         for segment in segments {
-            self._instance.move(to: segment.start.cgPoint)
-            self._instance.addLine(to: segment.end.cgPoint)
+            self.native.move(to: segment.start.cgPoint)
+            self.native.addLine(to: segment.end.cgPoint)
         }
-        self._instance.drawPath(using: .stroke)
-        self._instance.restoreGState()
+        self.native.drawPath(using: .stroke)
+        self.native.restoreGState()
     }
     
     func draw(
@@ -155,17 +164,17 @@ public extension Graphics.Context {
         mode: Graphics.DrawMode
     ) {
         guard polyline.corners.isEmpty == false else { return }
-        self._instance.saveGState()
-        self._instance.beginPath()
-        self._instance.move(to: polyline.corners[0].cgPoint)
+        self.native.saveGState()
+        self.native.beginPath()
+        self.native.move(to: polyline.corners[0].cgPoint)
         for point in polyline.corners[1 ..< polyline.corners.endIndex] {
-            self._instance.addLine(to: point.cgPoint)
+            self.native.addLine(to: point.cgPoint)
         }
-        self._instance.closePath()
-        if self._instance.isPathEmpty == false {
+        self.native.closePath()
+        if self.native.isPathEmpty == false {
             self._draw(mode: mode)
         }
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
@@ -173,20 +182,20 @@ public extension Graphics.Context {
         mode: Graphics.DrawMode
     ) {
         guard polygon.countours.isEmpty == false else { return }
-        self._instance.saveGState()
-        self._instance.beginPath()
+        self.native.saveGState()
+        self.native.beginPath()
         for countour in polygon.countours {
             guard countour.corners.isEmpty == false else { continue }
-            self._instance.move(to: countour.corners[0].cgPoint)
+            self.native.move(to: countour.corners[0].cgPoint)
             for point in countour.corners[1 ..< countour.corners.endIndex] {
-                self._instance.addLine(to: point.cgPoint)
+                self.native.addLine(to: point.cgPoint)
             }
-            self._instance.closePath()
+            self.native.closePath()
         }
-        if self._instance.isPathEmpty == false {
+        if self.native.isPathEmpty == false {
             self._draw(mode: mode)
         }
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
@@ -194,21 +203,21 @@ public extension Graphics.Context {
         mode: Graphics.DrawMode
     ) {
         guard path.elements.isEmpty == false else { return }
-        self._instance.saveGState()
-        self._instance.beginPath()
+        self.native.saveGState()
+        self.native.beginPath()
         for element in path.elements {
             switch element {
-            case .move(let to): self._instance.move(to: to.cgPoint)
-            case .line(let to): self._instance.addLine(to: to.cgPoint)
-            case .quad(let to, let control): self._instance.addQuadCurve(to: to.cgPoint, control: control.cgPoint)
-            case .cubic(let to, let control1, let control2): self._instance.addCurve(to: to.cgPoint, control1: control1.cgPoint, control2: control2.cgPoint)
-            case .close: self._instance.closePath()
+            case .move(let to): self.native.move(to: to.cgPoint)
+            case .line(let to): self.native.addLine(to: to.cgPoint)
+            case .quad(let to, let control): self.native.addQuadCurve(to: to.cgPoint, control: control.cgPoint)
+            case .cubic(let to, let control1, let control2): self.native.addCurve(to: to.cgPoint, control1: control1.cgPoint, control2: control2.cgPoint)
+            case .close: self.native.closePath()
             }
         }
-        if self._instance.isPathEmpty == false {
+        if self.native.isPathEmpty == false {
             self._draw(mode: mode)
         }
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
     
     func draw(
@@ -230,25 +239,25 @@ public extension Graphics.Context {
         case .bottom: rect = CGRect(x: -(w / 2), y: -h, width: w, height: h)
         case .bottomRight: rect = CGRect(x: -w, y: -h, width: w, height: h)
         }
-        self._instance.saveGState()
-        self._instance.scaleBy(x: 1, y: -1)
-        self._instance.draw(cgImage, in: rect)
-        self._instance.restoreGState()
+        self.native.saveGState()
+        self.native.scaleBy(x: 1, y: -1)
+        self.native.draw(cgImage, in: rect)
+        self.native.restoreGState()
     }
     
     func draw(
         text: NSAttributedString,
         rect: Rect
     ) {
-        self._instance.saveGState()
+        self.native.saveGState()
         text.draw(with: rect.cgRect, options: [ .usesLineFragmentOrigin, .usesFontLeading ], context: nil)
-        self._instance.restoreGState()
+        self.native.restoreGState()
     }
 
     func clear(
         rect: Rect
     ) {
-        self._instance.clear(rect.cgRect)
+        self.native.clear(rect.cgRect)
     }
     
 }
@@ -259,14 +268,14 @@ private extension Graphics.Context {
     func _apply(
         matrix: Matrix3
     ) {
-        self._instance.concatenate(matrix.cgAffineTransform)
+        self.native.concatenate(matrix.cgAffineTransform)
     }
     
     @inline(__always)
     func _apply(
         alpha: Double
     ) {
-        self._instance.setAlpha(CGFloat(alpha))
+        self.native.setAlpha(CGFloat(alpha))
     }
     
     @inline(__always)
@@ -275,14 +284,14 @@ private extension Graphics.Context {
     ) {
         switch fill {
         case .color(let color):
-            self._instance.setFillColor(color.cgColor)
+            self.native.setFillColor(color.cgColor)
         case .pattern(let pattern):
             if let cgPattern = pattern.cgPattern {
                 var alpha: CGFloat = 1.0
                 if let cs = CGColorSpace(patternBaseSpace: nil) {
-                    self._instance.setFillColorSpace(cs)
+                    self.native.setFillColorSpace(cs)
                 }
-                self._instance.setFillPattern(cgPattern, colorComponents: &alpha)
+                self.native.setFillPattern(cgPattern, colorComponents: &alpha)
             }
         }
     }
@@ -291,30 +300,30 @@ private extension Graphics.Context {
     func _apply(
         stroke: Graphics.Stroke
     ) {
-        self._instance.setLineWidth(CGFloat(stroke.width))
-        self._instance.setLineJoin(stroke.join.cgLineJoin)
+        self.native.setLineWidth(CGFloat(stroke.width))
+        self.native.setLineJoin(stroke.join.cgLineJoin)
         if let miterLimit = stroke.join.miterLimit {
-            self._instance.setMiterLimit(CGFloat(miterLimit))
+            self.native.setMiterLimit(CGFloat(miterLimit))
         }
-        self._instance.setLineCap(stroke.cap.cgLineCap)
+        self.native.setLineCap(stroke.cap.cgLineCap)
         if let dash = stroke.dash {
-            self._instance.setLineDash(
+            self.native.setLineDash(
                 phase: CGFloat(dash.phase),
                 lengths: dash.lengths.map({ CGFloat($0) })
             )
         } else {
-            self._instance.setLineDash(phase: 0, lengths: [])
+            self.native.setLineDash(phase: 0, lengths: [])
         }
         switch stroke.fill {
         case .color(let color):
-            self._instance.setStrokeColor(color.cgColor)
+            self.native.setStrokeColor(color.cgColor)
         case .pattern(let pattern):
             if let cgPattern = pattern.cgPattern {
                 var alpha: CGFloat = 1.0
                 if let cs = CGColorSpace(patternBaseSpace: nil) {
-                    self._instance.setStrokeColorSpace(cs)
+                    self.native.setStrokeColorSpace(cs)
                 }
-                self._instance.setStrokePattern(cgPattern, colorComponents: &alpha)
+                self.native.setStrokePattern(cgPattern, colorComponents: &alpha)
             }
         }
     }
@@ -324,11 +333,11 @@ private extension Graphics.Context {
         mode: Graphics.DrawMode
     ) {
         if mode.contains([ .fill, .stroke ]) == true {
-            self._instance.drawPath(using: .fillStroke)
+            self.native.drawPath(using: .fillStroke)
         } else if mode.contains(.fill) == true {
-            self._instance.drawPath(using: .fill)
+            self.native.drawPath(using: .fill)
         } else if mode.contains(.stroke) == true {
-            self._instance.drawPath(using: .stroke)
+            self.native.drawPath(using: .stroke)
         }
     }
     

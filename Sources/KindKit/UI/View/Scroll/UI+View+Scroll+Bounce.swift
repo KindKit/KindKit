@@ -6,7 +6,7 @@ import Foundation
 
 public extension UI.View.Scroll {
     
-    struct Direction : OptionSet {
+    struct Bounce : OptionSet {
         
         public typealias RawValue = UInt
         
@@ -20,9 +20,10 @@ public extension UI.View.Scroll {
     
 }
 
-public extension UI.View.Scroll.Direction {
+public extension UI.View.Scroll.Bounce {
     
     static var horizontal = Self(rawValue: 1 << 0)
     static var vertical = Self(rawValue: 1 << 1)
+    static var zoom = Self(rawValue: 1 << 2)
     
 }

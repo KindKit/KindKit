@@ -36,21 +36,8 @@ extension UI.View.Paging {
 final class KKPagingView : UIScrollView {
     
     weak var kkDelegate: KKPagingViewDelegate?
-    var kkNeedLayoutContent: Bool = true {
-        didSet {
-            if self.kkNeedLayoutContent == true {
-                self.setNeedsLayout()
-            }
-        }
-    }
     var kkContentView: UIView!
     var kkLayoutManager: UI.Layout.Manager!
-    var kkVisibleInset: Inset = .zero {
-        didSet {
-            guard self.kkVisibleInset != oldValue else { return }
-            self.setNeedsLayout()
-        }
-    }
     var kkRevalidatePage: Double?
     
     override var frame: CGRect {
@@ -70,7 +57,7 @@ final class KKPagingView : UIScrollView {
                             contentSize: oldContentSize
                         )
                     }
-                    self.kkNeedLayoutContent = true
+                    self.setNeedsLayout()
                 }
             }
         }
@@ -79,7 +66,7 @@ final class KKPagingView : UIScrollView {
     override var contentSize: CGSize {
         set {
             guard super.contentSize != newValue else { return }
-            self.kkContentView.frame = CGRect(origin: CGPoint.zero, size: newValue)
+            self.kkContentView.frame = CGRect(origin: .zero, size: newValue)
             super.contentSize = newValue
             self.setNeedsLayout()
         }
@@ -99,7 +86,10 @@ final class KKPagingView : UIScrollView {
         self.kkContentView = UIView(frame: .zero)
         self.addSubview(self.kkContentView)
         
-        self.kkLayoutManager = UI.Layout.Manager(contentView: self.kkContentView, delegate: self)
+        self.kkLayoutManager = .init(
+            delegate: self,
+            view: self.kkContentView
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -117,47 +107,36 @@ final class KKPagingView : UIScrollView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if self.kkNeedLayoutContent == true {
-            let bounds = Rect(self.bounds)
-            let layoutBounds: Rect
+        do {
+            self.kkLayoutManager.visibleFrame = .init(self.bounds)
             if #available(iOS 11.0, *) {
-                layoutBounds = .init(
-                    origin: .zero,
-                    size: bounds.size.inset(self.adjustedContentInset)
-                )
-            } else {
-                layoutBounds = .init(
-                    origin: .zero,
-                    size: bounds.size
-                )
+                self.kkLayoutManager.preloadInsets = .init(self.safeAreaInsets)
             }
+            self.kkLayoutManager.updateIfNeeded()
+        }
+        do {
+            let viewportSize = Size(self.bounds.size)
             let contentInset = self.contentInset
-            self.kkLayoutManager.layout(bounds: layoutBounds)
-            let size = self.kkLayoutManager.size
-            self.contentSize = size.cgSize
+            let contentSize = self.kkLayoutManager.size
+            self.contentSize = contentSize.cgSize
             let numberOfPages = Self._numberOfPages(
-                viewportSize: bounds.size,
+                viewportSize: viewportSize,
                 contentInset: contentInset,
-                contentSize: size
+                contentSize: contentSize
             )
-            self.kkDelegate?.update(self, numberOfPages: numberOfPages, contentSize: size)
+            self.kkDelegate?.update(self, numberOfPages: numberOfPages, contentSize: contentSize)
             if let page = self.kkRevalidatePage {
+                self.kkRevalidatePage = nil
                 UIView.performWithoutAnimation({
                     self.contentOffset = Self._contentOffset(
                         currentPage: page,
-                        viewportSize: bounds.size,
+                        viewportSize: viewportSize,
                         contentInset: contentInset,
-                        contentSize: size
+                        contentSize: contentSize
                     )
                 })
-                self.kkRevalidatePage = nil
             }
-            self.kkNeedLayoutContent = false
         }
-        self.kkLayoutManager.visible(
-            bounds: Rect(self.bounds),
-            inset: self.kkVisibleInset
-        )
     }
     
 }
@@ -196,12 +175,11 @@ extension KKPagingView {
             self.alwaysBounceHorizontal = false
             self.alwaysBounceVertical = bounds
         }
-        self.kkNeedLayoutContent = true
     }
     
     func update(content: IUILayout?) {
         self.kkLayoutManager.layout = content
-        self.kkNeedLayoutContent = true
+        self.setNeedsLayout()
     }
     
     func update(contentSize: Size) {
@@ -213,7 +191,7 @@ extension KKPagingView {
     }
     
     func update(visibleInset: Inset) {
-        self.kkVisibleInset = visibleInset
+        self.kkLayoutManager.preloadInsets = visibleInset
     }
     
     func update(direction: UI.View.Paging.Direction, currentPage: Double, numberOfPages: UInt) {
@@ -386,12 +364,16 @@ extension KKPagingView : UIScrollViewDelegate {
 extension KKPagingView : IUILayoutDelegate {
     
     func setNeedUpdate(_ appearedLayout: IUILayout) -> Bool {
-        self.kkNeedLayoutContent = true
-        self.setNeedsLayout()
-        if let kkDelegate = self.kkDelegate {
-            return kkDelegate.isDynamicSize(self)
+        guard let delegate = self.kkDelegate else { return false }
+        defer {
+            self.setNeedsLayout()
         }
-        return false
+        guard delegate.isDynamic(self) == true else {
+            self.kkLayoutManager.setNeed(layout: true)
+            return false
+        }
+        self.kkLayoutManager.setNeed(layout: true)
+        return true
     }
     
     func updateIfNeeded(_ appearedLayout: IUILayout) {

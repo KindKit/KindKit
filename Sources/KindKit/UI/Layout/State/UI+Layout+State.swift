@@ -13,7 +13,7 @@ public extension UI.Layout {
         public var inset: Inset = .zero {
             didSet {
                 guard self.inset != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         public var state: State {
@@ -36,7 +36,7 @@ public extension UI.Layout {
         private var _internalState: InternalState {
             didSet {
                 guard self._internalState != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         private var _animation: ICancellable? {
@@ -125,7 +125,7 @@ public extension UI.Layout.State {
     @discardableResult
     func data(_ value: [State : Data]) -> Self {
         self.data = value
-        self.setNeedForceUpdate()
+        self.setNeedUpdate()
         return self
     }
     
@@ -149,7 +149,7 @@ public extension UI.Layout.State {
     func set(state: State, inset: Inset) -> Self {
         self._data(state: state, update: { $0.inset = inset })
         if self._internalState.contains(state: state) == true {
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
         return self
     }
@@ -162,7 +162,7 @@ public extension UI.Layout.State {
     func set(state: State, alignment: Alignment) -> Self {
         self._data(state: state, update: { $0.alignment = alignment })
         if self._internalState.contains(state: state) == true {
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
         return self
     }
@@ -175,7 +175,7 @@ public extension UI.Layout.State {
     func set(state: State, view: IUIView?) -> Self {
         self._data(state: state, update: { $0.view = view })
         if self._internalState.contains(state: state) == true {
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
         return self
     }
@@ -188,7 +188,7 @@ public extension UI.Layout.State {
     func set(state: State, data: Data?) -> Self {
         self.data[state] = data
         if self._internalState.contains(state: state) == true {
-            self.setNeedForceUpdate()
+            self.setNeedUpdate()
         }
         return self
     }
@@ -203,7 +203,7 @@ public extension UI.Layout.State {
     
     func reset() {
         self.data = [:]
-        self.setNeedForceUpdate()
+        self.setNeedUpdate()
     }
     
     func animate(

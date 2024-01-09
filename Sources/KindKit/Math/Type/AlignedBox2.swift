@@ -187,6 +187,30 @@ public extension AlignedBox2 {
             angle: angle
         )
     }
+    
+}
+
+public extension AlignedBox2 {
+    
+    @inlinable
+    static func * (lhs: Self, rhs: Matrix3) -> Self {
+        let points = [
+            lhs.topLeft * rhs,
+            lhs.topRight * rhs,
+            lhs.bottomLeft * rhs,
+            lhs.bottomRight * rhs
+        ]
+        return .init(points)
+    }
+    
+}
+
+public extension AlignedBox2 {
+    
+    @inlinable
+    static func *= (lhs: inout Self, rhs: Matrix3) {
+        lhs = lhs * rhs
+    }
         
 }
 

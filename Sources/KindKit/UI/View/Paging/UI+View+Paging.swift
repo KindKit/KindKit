@@ -18,6 +18,8 @@ public protocol IUIPagingViewObserver : AnyObject {
 
 protocol KKPagingViewDelegate : AnyObject {
     
+    func isDynamic(_ view: KKPagingView) -> Bool
+    
     func update(_ view: KKPagingView, numberOfPages: UInt, contentSize: Size)
 
     func beginDragging(_ view: KKPagingView)
@@ -25,8 +27,6 @@ protocol KKPagingViewDelegate : AnyObject {
     func endDragging(_ view: KKPagingView, decelerate: Bool)
     func beginDecelerating(_ view: KKPagingView)
     func endDecelerating(_ view: KKPagingView)
-    
-    func isDynamicSize(_ view: KKPagingView) -> Bool
     
 }
 
@@ -56,7 +56,7 @@ public extension UI.View {
         public var size: UI.Size.Dynamic = .init(.fill, .fill) {
             didSet {
                 guard self.size != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public var direction: Direction = .horizontal(bounds: true) {
@@ -158,23 +158,22 @@ public extension UI.View {
         public var isHidden: Bool = false {
             didSet {
                 guard self.isHidden != oldValue else { return }
-                self.setNeedForceLayout()
+                self.setNeedLayout()
             }
         }
         public private(set) var isDragging: Bool = false
         public private(set) var isDecelerating: Bool = false
         public private(set) var isVisible: Bool = false
-        public let onAppear: Signal.Empty< Void > = .init()
-        public let onDisappear: Signal.Empty< Void > = .init()
-        public let onVisible: Signal.Empty< Void > = .init()
-        public let onVisibility: Signal.Empty< Void > = .init()
-        public let onInvisible: Signal.Empty< Void > = .init()
-        public let onStyle: Signal.Args< Void, Bool > = .init()
-        public let onBeginDragging: Signal.Empty< Void > = .init()
-        public let onDragging: Signal.Empty< Void > = .init()
-        public let onEndDragging: Signal.Args< Void, Bool > = .init()
-        public let onBeginDecelerating: Signal.Empty< Void > = .init()
-        public let onEndDecelerating: Signal.Empty< Void > = .init()
+        public let onAppear = Signal.Empty< Void >()
+        public let onDisappear = Signal.Empty< Void >()
+        public let onVisible = Signal.Empty< Void >()
+        public let onInvisible = Signal.Empty< Void >()
+        public let onStyle = Signal.Args< Void, Bool >()
+        public let onBeginDragging = Signal.Empty< Void >()
+        public let onDragging = Signal.Empty< Void >()
+        public let onEndDragging = Signal.Args< Void, Bool >()
+        public let onBeginDecelerating = Signal.Empty< Void >()
+        public let onEndDecelerating = Signal.Empty< Void >()
         
         private lazy var _reuse: UI.Reuse.Item< Reusable > = .init(owner: self)
         @inline(__always) private var _view: Reusable.Content { self._reuse.content }
@@ -342,10 +341,6 @@ extension UI.View.Paging : IUIView {
         self.onVisible.emit()
     }
     
-    public func visibility() {
-        self.onVisibility.emit()
-    }
-    
     public func invisible() {
         self.isVisible = false
         self.onInvisible.emit()
@@ -399,6 +394,10 @@ extension UI.View.Paging : IUIViewLockable {
 
 extension UI.View.Paging : KKPagingViewDelegate {
     
+    func isDynamic(_ view: KKPagingView) -> Bool {
+        return self.width.isStatic == false || self.height.isStatic == false
+    }
+    
     func update(_ view: KKPagingView, numberOfPages: UInt, contentSize: Size) {
         self.numberOfPages = numberOfPages
         self.contentSize = contentSize
@@ -443,10 +442,6 @@ extension UI.View.Paging : KKPagingViewDelegate {
             self.onEndDecelerating.emit()
             self._observer.notify({ $0.endDecelerating(paging: self) })
         }
-    }
-    
-    func isDynamicSize(_ view: KKPagingView) -> Bool {
-        return self.width.isStatic == true && self.height.isStatic == true
     }
     
 }

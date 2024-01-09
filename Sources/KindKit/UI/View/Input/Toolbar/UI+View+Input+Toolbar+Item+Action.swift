@@ -11,7 +11,7 @@ public extension UI.View.Input.Toolbar.Item {
     final class Action : IUIViewInputToolbarItem {
         
         public let barItem: UIBarButtonItem
-        public let onPressed: Signal.Empty< Void > = .init()
+        public let onPressed = Signal.Empty< Void >()
         
         public init(
             plain text: String

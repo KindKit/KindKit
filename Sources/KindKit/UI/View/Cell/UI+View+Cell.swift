@@ -38,7 +38,7 @@ public extension UI.View {
             get { self._isSelected }
         }
         public let pressedGesture = UI.Gesture.Tap()
-        public let onPressed: Signal.Empty< Void > = .init()
+        public let onPressed = Signal.Empty< Void >()
         
         private var _isSelected: Bool = false
         private var _layout: Layout

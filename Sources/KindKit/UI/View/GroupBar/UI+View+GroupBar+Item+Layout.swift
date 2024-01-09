@@ -11,10 +11,10 @@ extension UI.View.GroupBar.Item {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         var inset: Inset = Inset(horizontal: 8, vertical: 4) {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var content: IUIView? {
-            didSet { self.setNeedForceUpdate(self.content) }
+            didSet { self.setNeedUpdate(self.content) }
         }
         
         init() {

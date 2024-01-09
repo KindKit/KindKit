@@ -74,9 +74,9 @@ public extension UI.View {
         public let pressedGesture = UI.Gesture.Tap()
         public let interactiveGesture = UI.Gesture.Pan()
 #endif
-        public let onLeading: Signal.Args< Void, Bool > = .init()
-        public let onTrailing: Signal.Args< Void, Bool > = .init()
-        public let onPressed: Signal.Empty< Void > = .init()
+        public let onLeading = Signal.Args< Void, Bool >()
+        public let onTrailing = Signal.Args< Void, Bool >()
+        public let onPressed = Signal.Empty< Void >()
         
         private var _isSelected: Bool = false
 #if os(iOS)

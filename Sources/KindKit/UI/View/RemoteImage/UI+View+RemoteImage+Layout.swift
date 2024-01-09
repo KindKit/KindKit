@@ -13,20 +13,20 @@ extension UI.View.RemoteImage {
         var state: State = .loading {
             didSet {
                 guard self.state != oldValue else { return }
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         var placeholder: IUIView? {
-            didSet { self.setNeedForceUpdate(self.placeholder) }
+            didSet { self.setNeedUpdate(self.placeholder) }
         }
         var image: IUIView? {
-            didSet { self.setNeedForceUpdate(self.image) }
+            didSet { self.setNeedUpdate(self.image) }
         }
         var progress: IUIView? {
-            didSet { self.setNeedForceUpdate(self.progress) }
+            didSet { self.setNeedUpdate(self.progress) }
         }
         var error: IUIView? {
-            didSet { self.setNeedForceUpdate(self.error) }
+            didSet { self.setNeedUpdate(self.error) }
         }
 
         init() {

@@ -6,7 +6,7 @@ import Foundation
 
 public extension Json.Path {
 
-    enum Item : Equatable {
+    enum Item : Hashable, Equatable {
         
         case key(String)
         case index(Int)

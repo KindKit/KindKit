@@ -6,7 +6,7 @@ import Foundation
 
 public extension Api.Error.Request {
     
-    enum Body : Swift.Error {
+    enum Body : Swift.Error, Hashable, Equatable {
         
         case unknown
         case file(Api.Error.Request.Body.File)

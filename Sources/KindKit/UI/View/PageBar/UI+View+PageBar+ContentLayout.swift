@@ -11,13 +11,13 @@ extension UI.View.PageBar {
         weak var delegate: IUILayoutDelegate?
         weak var appearedView: IUIView?
         var leading: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var trailing: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var indicator: IUIView? {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var indicatorState: IndicatorState = .empty {
             didSet { self.setNeedUpdate() }
@@ -25,14 +25,14 @@ extension UI.View.PageBar {
         var items: [IUIView] = [] {
             didSet {
                 self._cache = Array< Size? >(repeating: nil, count: self.items.count)
-                self.setNeedForceUpdate()
+                self.setNeedUpdate()
             }
         }
         var itemsInset: Inset = Inset(horizontal: 12, vertical: 0) {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         var itemsSpacing: Double = 4 {
-            didSet { self.setNeedForceUpdate() }
+            didSet { self.setNeedUpdate() }
         }
         
         private var _cache: [Size?] = []
