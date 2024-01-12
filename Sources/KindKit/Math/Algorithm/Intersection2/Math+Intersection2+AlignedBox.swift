@@ -6,10 +6,13 @@ import Foundation
 
 extension Math.Intersection2 {
     
-    public enum AlignedBoxToAlignedBox : Equatable {
+    public struct AlignedBoxToAlignedBox : Equatable {
         
-        case none
-        case box(AlignedBox2)
+        public let box: AlignedBox2
+        
+        public init(box: AlignedBox2) {
+            self.box = box
+        }
         
     }
         
@@ -21,14 +24,14 @@ extension Math.Intersection2 {
     }
     
     @inlinable
-    public static func find(_ box1: AlignedBox2, _ box2: AlignedBox2) -> AlignedBoxToAlignedBox {
+    public static func find(_ box1: AlignedBox2, _ box2: AlignedBox2) -> AlignedBoxToAlignedBox? {
         let l = Swift.max(box1.lower, box2.lower)
         let u = Swift.min(box1.upper, box2.upper)
         let d = u - l
         if d.x >= 0, d.y >= 0 {
-            return .box(.init(lower: l, upper: u))
+            return .init(box: .init(lower: l, upper: u))
         }
-        return .none
+        return nil
     }
     
 }
@@ -36,16 +39,13 @@ extension Math.Intersection2 {
 public extension AlignedBox2 {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
+    func isIntersects(_ other: AlignedBox2) -> Bool {
         return Math.Intersection2.possibly(self, other)
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Self? {
-        switch Math.Intersection2.find(self, other) {
-        case .none: return nil
-        case .box(let box): return box
-        }
+    func intersection(_ other: AlignedBox2) -> Math.Intersection2.AlignedBoxToAlignedBox? {
+        return Math.Intersection2.find(self, other)
     }
     
 }

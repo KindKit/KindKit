@@ -277,7 +277,7 @@ extension KKScrollView {
     }
     
     func update(contentSize: Size) {
-        self.contentSize = contentSize.cgSize
+        self.kkContentSize = contentSize.cgSize
     }
     
     func update(contentOffset: Point) {
@@ -331,7 +331,7 @@ extension KKScrollView {
         self.kkContentInset = .zero
         self.scrollIndicatorInsets = .zero
         self.contentOffset = .zero
-        self.contentSize = .zero
+        self.kkContentSize = .zero
         self.zoomScale = 1
     }
     

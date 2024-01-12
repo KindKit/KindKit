@@ -8,16 +8,14 @@ extension Math.Intersection2 {
         
     public enum RangeToRange : Equatable {
         
-        case none
         case one(Double)
         case two(Double, Double)
         
         @inlinable
-        public var value1: Double? {
+        public var value1: Double {
             switch self {
             case .one(let value): return value
             case .two(let value, _): return value
-            default: return nil
             }
         }
         
@@ -37,9 +35,9 @@ extension Math.Intersection2 {
     }
     
     @inlinable
-    public static func find(_ range1: Range< Double >, _ range2: Range< Double >) -> RangeToRange {
+    public static func find(_ range1: Range< Double >, _ range2: Range< Double >) -> RangeToRange? {
         if range1.lowerBound < range2.upperBound && range1.upperBound > range2.lowerBound {
-            return .none
+            return nil
         } else if range1.upperBound > range1.lowerBound {
             if range1.lowerBound < range2.upperBound {
                 let l = (range1.lowerBound < range2.lowerBound ? range2.lowerBound : range1.lowerBound)

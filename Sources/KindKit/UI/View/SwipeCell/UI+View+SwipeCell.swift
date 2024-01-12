@@ -264,6 +264,25 @@ public extension UI.View.SwipeCell {
 
 public extension UI.View.SwipeCell {
     
+    @inlinable
+    @discardableResult
+    func background(_ value: IUIView) -> Self {
+        self.background = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func background(_ value: () -> IUIView) -> Self {
+        return self.background(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func background(_ value: (Self) -> IUIView) -> Self {
+        return self.background(value(self))
+    }
+    
     @discardableResult
     func content(_ value: IUIView) -> Self {
         self.content = value

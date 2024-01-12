@@ -286,6 +286,9 @@ public extension UI.Layout.List {
     }
     
     func delete(index: Int) {
+        guard index < self._views.count else {
+            return
+        }
         self._firstVisible = nil
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(
@@ -301,6 +304,13 @@ public extension UI.Layout.List {
     }
     
     func delete(range: Range< Int >) {
+        let range = Range< Int >(uncheckedBounds: (
+            lower: min(max(range.lowerBound, 0), self._views.count),
+            upper: min(max(range.upperBound, 0), self._views.count)
+        ))
+        guard range.isEmpty == false else {
+            return
+        }
         self._firstVisible = nil
         if self._animations.isEmpty == false {
             self._operations.append(Helper.Operation(

@@ -45,8 +45,18 @@ public extension OrientedBox2 {
     }
     
     @inlinable
+    var halfWidth: Double {
+        return self.shape.halfWidth
+    }
+    
+    @inlinable
     var height: Double {
         return self.shape.height
+    }
+    
+    @inlinable
+    var halfHeight: Double {
+        return self.shape.halfHeight
     }
     
     @inlinable
@@ -76,7 +86,8 @@ public extension OrientedBox2 {
     
     @inlinable
     var center: Point {
-        return self.shape.center
+        set { self.shape.center = newValue }
+        get { self.shape.center }
     }
     
     @inlinable
@@ -142,12 +153,26 @@ public extension OrientedBox2 {
     
 }
 
-public extension OrientedBox2  {
+public extension OrientedBox2 {
     
     @inlinable
     func isContains(_ point: Point) -> Bool {
         let point = point.rotated(by: -self.angle, around: self.shape.center)
         return self.shape.isContains(point)
+    }
+    
+    @inlinable
+    func isContains(_ polyline: Polyline2) -> Bool {
+        guard polyline.isEmpty == false else {
+            return false
+        }
+        for point in polyline.corners {
+            let rotated = point.rotated(by: -self.angle, around: self.shape.center)
+            if self.shape.isContains(rotated) == false {
+                return false
+            }
+        }
+        return true
     }
     
 }

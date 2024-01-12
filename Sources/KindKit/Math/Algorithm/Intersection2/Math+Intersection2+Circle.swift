@@ -8,27 +8,9 @@ extension Math.Intersection2 {
     
     public enum CircleToCircle : Equatable {
         
-        case none
         case identical
         case one(Point)
         case two(Point, Point)
-        
-        @inlinable
-        public var point1: Point? {
-            switch self {
-            case .one(let point): return point
-            case .two(let point, _): return point
-            default: return nil
-            }
-        }
-        
-        @inlinable
-        public var point2: Point? {
-            switch self {
-            case .two(_, let point): return point
-            default: return nil
-            }
-        }
         
     }
     
@@ -39,7 +21,7 @@ extension Math.Intersection2 {
         return cl <= sr
     }
     
-    public static func find(_ circle1: Circle, _ circle2: Circle) -> CircleToCircle {
+    public static func find(_ circle1: Circle, _ circle2: Circle) -> CircleToCircle? {
         let cmc = circle2.origin - circle1.origin
         let rmr = circle1.radius - circle2.radius
         let cdot = cmc.dot(cmc)
@@ -48,12 +30,12 @@ extension Math.Intersection2 {
         }
         let rmrqr = rmr.squared
         if cdot < rmrqr.value {
-            return .none
+            return nil
         }
         let rpr = circle1.radius + circle2.radius
         let rprqr = rpr.squared
         if cdot > rprqr.value {
-            return .none
+            return nil
         }
         if cdot < rprqr.value {
             if rmrqr.value < cdot {
@@ -82,12 +64,12 @@ extension Math.Intersection2 {
 public extension Circle {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
+    func isIntersects(_ other: Circle) -> Bool {
         return Math.Intersection2.possibly(self, other)
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Math.Intersection2.CircleToCircle {
+    func intersection(_ other: Circle) -> Math.Intersection2.CircleToCircle? {
         return Math.Intersection2.find(self, other)
     }
     

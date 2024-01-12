@@ -10,12 +10,12 @@ extension Segment2 {
         
         public var center: Point
         public var direction: Point
-        public var extend: Double
+        public var extend: Distance
         
         public init(
             center: Point,
             direction: Point,
-            extend: Double
+            extend: Distance
         ) {
             self.center = center
             self.direction = direction

@@ -156,6 +156,26 @@ public extension Polyline2 {
         case .evenOdd: return count % 2 != 0
         }
     }
+    
+    func isContains(_ polyline: Self, rule: FillRule = .winding) -> Bool {
+        guard polyline.isEmpty == false else {
+            return false
+        }
+        for point in polyline.corners {
+            if self.isContains(point, rule: rule) == false {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func isContains(_ box: AlignedBox2, rule: FillRule = .winding) -> Bool {
+        return self.isContains(box.polyline, rule: rule)
+    }
+    
+    func isContains(_ box: OrientedBox2, rule: FillRule = .winding) -> Bool {
+        return self.isContains(box.polyline, rule: rule)
+    }
 
     func corner(_ point: Point, distance: Distance, condition: ((_ index: CornerIndex) -> Bool)? = nil) -> CornerIndex? {
         var corners: [(CornerIndex, Distance)] = []

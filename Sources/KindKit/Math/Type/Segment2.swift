@@ -44,15 +44,15 @@ public extension Segment2 {
     @inlinable
     var centeredForm: CenteredForm {
         set {
-            self.start = newValue.center - Distance(newValue.extend) * newValue.direction
-            self.end = newValue.center + Distance(newValue.extend) * newValue.direction
+            self.start = newValue.center - newValue.extend * newValue.direction
+            self.end = newValue.center + newValue.extend * newValue.direction
         }
         get {
             let n = self.delta.normalized
             return .init(
                 center: self.center,
                 direction: n.point,
-                extend: n.length.value / 2
+                extend: n.length.normal / 2
             )
         }
     }

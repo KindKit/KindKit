@@ -8,16 +8,14 @@ extension Math.Intersection2 {
     
     public enum LineToSegment : Equatable {
         
-        case none
         case one(Point)
         case two(Point, Point)
         
         @inlinable
-        public var point1: Point? {
+        public var point1: Point {
             switch self {
             case .one(let point): return point
             case .two(let point, _): return point
-            default: return nil
             }
         }
         
@@ -46,18 +44,18 @@ extension Math.Intersection2 {
         }
     }
     
-    public static func find(_ line: Line2, _ segment: Segment2) -> LineToSegment {
+    public static func find(_ line: Line2, _ segment: Segment2) -> LineToSegment? {
         let sl = Line2(origin: segment.start, direction: segment.delta)
         switch Self.find(line, sl) {
-        case .none:
-            return .none
         case .parallel:
             return .two(segment.start, segment.end)
         case .point(let location):
             if location.parameter2 >= 0 && location.parameter2 <= 1 {
                 return .one(location.point)
             }
-            return .none
+            return nil
+        case .none:
+            return nil
         }
     }
     
@@ -71,7 +69,7 @@ public extension Line2 {
     }
     
     @inlinable
-    func intersection(_ other: Segment2) -> Math.Intersection2.LineToSegment {
+    func intersection(_ other: Segment2) -> Math.Intersection2.LineToSegment? {
         return Math.Intersection2.find(self, other)
     }
     

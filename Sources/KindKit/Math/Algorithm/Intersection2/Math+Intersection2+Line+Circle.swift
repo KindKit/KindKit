@@ -8,7 +8,6 @@ extension Math.Intersection2 {
     
     public enum LineToCircle : Equatable {
         
-        case none
         case one(Point)
         case two(Point, Point)
         
@@ -20,7 +19,7 @@ extension Math.Intersection2 {
         return distance <= circle.radius.squared
     }
     
-    public static func find(_ line: Line2, _ circle: Circle) -> LineToCircle {
+    public static func find(_ line: Line2, _ circle: Circle) -> LineToCircle? {
         let delta = circle.origin - line.origin
         let a1 = delta.dot(delta) - (circle.radius * circle.radius).value
         let a2 = line.direction.dot(delta)
@@ -39,7 +38,7 @@ extension Math.Intersection2 {
                 line.origin + i * line.direction
             )
         }
-        return .none
+        return nil
     }
     
 }
@@ -52,7 +51,7 @@ public extension Line2 {
     }
     
     @inlinable
-    func intersection(_ other: Circle) -> Math.Intersection2.LineToCircle {
+    func intersection(_ other: Circle) -> Math.Intersection2.LineToCircle? {
         return Math.Intersection2.find(self, other)
     }
     

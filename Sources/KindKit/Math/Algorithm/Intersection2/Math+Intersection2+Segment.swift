@@ -8,23 +8,21 @@ extension Math.Intersection2 {
     
     public enum SegmentToSegment : Equatable {
         
-        case none
-        case one(Point)
-        case two(Point, Point)
+        case point(Point)
+        case segment(Segment2)
         
         @inlinable
-        public var point1: Point? {
+        public var point1: Point {
             switch self {
-            case .one(let point): return point
-            case .two(let point, _): return point
-            default: return nil
+            case .point(let point): return point
+            case .segment(let segment): return segment.start
             }
         }
         
         @inlinable
         public var point2: Point? {
             switch self {
-            case .two(_, let point): return point
+            case .segment(let segment): return segment.end
             default: return nil
             }
         }
@@ -37,54 +35,58 @@ extension Math.Intersection2 {
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
         let line2 = Line2(origin: cf2.center, direction: cf2.direction)
         switch Self.find(line1, line2) {
-        case .none:
-            return false
         case .parallel:
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Self.find(
-                Range(uncheckedBounds: (lower: -cf1.extend, upper: cf1.extend)),
-                Range(uncheckedBounds: (lower: t - cf2.extend, upper: t + cf2.extend))
+                Range(uncheckedBounds: (lower: -cf1.extend.value, upper: cf1.extend.value)),
+                Range(uncheckedBounds: (lower: t - cf2.extend.value, upper: t + cf2.extend.value))
             )
             switch i {
             case .none: return false
             case .one, .two: return true
             }
         case .point(let data):
-            if data.parameter1.abs <= cf1.extend && data.parameter2.abs <= cf2.extend {
+            if data.parameter1.abs <= cf1.extend.value && data.parameter2.abs <= cf2.extend.value {
                 return true
             }
+            return false
+        case .none:
             return false
         }
     }
     
-    public static func find(_ segment1: Segment2, _ segment2: Segment2) -> SegmentToSegment {
+    public static func find(_ segment1: Segment2, _ segment2: Segment2) -> SegmentToSegment? {
         let cf1 = segment1.centeredForm
         let cf2 = segment2.centeredForm
         let line1 = Line2(origin: cf1.center, direction: cf1.direction)
         let line2 = Line2(origin: cf2.center, direction: cf2.direction)
         switch Self.find(line1, line2) {
-        case .none:
-            return .none
         case .parallel:
             let d = cf2.center - cf1.center
             let t = cf1.direction.dot(d)
             let i = Self.find(
-                Range(uncheckedBounds: (lower: -cf1.extend, upper: cf1.extend)),
-                Range(uncheckedBounds: (lower: t - cf2.extend, upper: t + cf2.extend))
+                Range(uncheckedBounds: (lower: -cf1.extend.value, upper: cf1.extend.value)),
+                Range(uncheckedBounds: (lower: t - cf2.extend.value, upper: t + cf2.extend.value))
             )
             switch i {
-            case .none: return .none
             case .one(let value):
-                return .one(cf1.center + value * cf1.direction)
+                return .point(cf1.center + value * cf1.direction)
             case .two(let value1, let value2):
-                return .two(cf1.center + value1 * cf1.direction, cf1.center + value2 * cf1.direction)
+                return .segment(.init(
+                    start: cf1.center + value1 * cf1.direction,
+                    end: cf1.center + value2 * cf1.direction
+                ))
+            case .none:
+                return nil
             }
         case .point(let data):
-            if data.parameter1.abs <= cf1.extend && data.parameter2.abs <= cf2.extend {
-                return .one(data.point)
+            if data.parameter1.abs <= cf1.extend.value && data.parameter2.abs <= cf2.extend.value {
+                return .point(data.point)
             }
-            return .none
+            return nil
+        case .none:
+            return nil
         }
     }
     
@@ -93,12 +95,12 @@ extension Math.Intersection2 {
 public extension Segment2 {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
+    func isIntersects(_ other: Segment2) -> Bool {
         return Math.Intersection2.possibly(self, other)
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Math.Intersection2.SegmentToSegment {
+    func intersection(_ other: Segment2) -> Math.Intersection2.SegmentToSegment? {
         return Math.Intersection2.find(self, other)
     }
     

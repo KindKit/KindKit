@@ -70,16 +70,28 @@ public extension AlignedBox2 {
     }
     
     @inlinable
+    var halfWidth: Double {
+        return self.width / 2
+    }
+    
+    @inlinable
     var height: Double {
         return Swift.max(self.upper.y - self.lower.y, 0)
     }
     
     @inlinable
+    var halfHeight: Double {
+        return self.height / 2
+    }
+    
+    @inlinable
     var size: Size {
-        return .init(
-            width: self.width,
-            height: self.height
-        )
+        return .init(width: self.width, height: self.height)
+    }
+    
+    @inlinable
+    var halfSize: Size {
+        return .init(width: self.halfWidth, height: self.halfHeight)
     }
     
     @inlinable
@@ -89,7 +101,7 @@ public extension AlignedBox2 {
     
     @inlinable
     var top: Point {
-        return Point(x: self.lower.x + self.width / 2, y: self.lower.y)
+        return Point(x: self.lower.x + self.halfWidth, y: self.lower.y)
     }
     
     @inlinable
@@ -99,17 +111,27 @@ public extension AlignedBox2 {
     
     @inlinable
     var left: Point {
-        return Point(x: self.lower.x, y: self.lower.y + self.height / 2)
+        return Point(x: self.lower.x, y: self.lower.y + self.halfHeight)
     }
     
     @inlinable
     var center: Point {
-        return .init(x: self.lower.x + self.width / 2, y: self.lower.y + self.height / 2)
+        set {
+            let hs = self.halfSize
+            self.lower = .init(x: newValue.x - hs.width, y: newValue.y - hs.height)
+            self.upper = .init(x: newValue.x + hs.width, y: newValue.y + hs.height)
+        }
+        get {
+            return .init(
+                x: self.lower.x + self.halfWidth,
+                y: self.lower.y + self.halfHeight
+            )
+        }
     }
     
     @inlinable
     var right: Point {
-        return .init(x: self.upper.x, y: self.lower.y + self.height / 2)
+        return .init(x: self.upper.x, y: self.lower.y + self.halfHeight)
     }
     
     @inlinable
@@ -119,7 +141,7 @@ public extension AlignedBox2 {
     
     @inlinable
     var bottom: Point {
-        return .init(x: self.lower.x + self.width / 2, y: self.lower.y + self.height)
+        return .init(x: self.lower.x + self.halfWidth, y: self.lower.y + self.height)
     }
     
     @inlinable
@@ -145,6 +167,16 @@ public extension AlignedBox2 {
         return .init(self.width * self.height)
     }
     
+    @inlinable
+    var polyline: Polyline2 {
+        return .init(corners: [ 
+            self.topLeft,
+            self.topRight,
+            self.bottomLeft,
+            self.bottomRight
+        ])
+    }
+    
 }
 
 public extension AlignedBox2 {
@@ -153,6 +185,19 @@ public extension AlignedBox2 {
     func isContains(_ point: Point) -> Bool {
         guard point.x >= self.lower.x && point.x <= self.upper.x else { return false }
         guard point.y >= self.lower.y && point.y <= self.upper.y else { return false }
+        return true
+    }
+    
+    @inlinable
+    func isContains(_ polyline: Polyline2) -> Bool {
+        guard polyline.isEmpty == false else {
+            return false
+        }
+        for point in polyline.corners {
+            if self.isContains(point) == false {
+                return false
+            }
+        }
         return true
     }
     

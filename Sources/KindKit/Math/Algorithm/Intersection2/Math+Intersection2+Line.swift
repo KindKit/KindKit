@@ -8,7 +8,6 @@ extension Math.Intersection2 {
     
     public enum LineToLine : Equatable {
         
-        case none
         case parallel
         case point(Location)
         
@@ -35,7 +34,7 @@ extension Math.Intersection2 {
         return true
     }
     
-    public static func find(_ line1: Line2, _ line2: Line2) -> LineToLine {
+    public static func find(_ line1: Line2, _ line2: Line2) -> LineToLine? {
         let od = line2.origin - line1.origin
         let dp = line1.direction.dot(line2.direction.perpendicular)
         if dp !~ 0 {
@@ -53,7 +52,7 @@ extension Math.Intersection2 {
         if oddp.abs ~~ 0 {
             return .parallel
         }
-        return .none
+        return nil
     }
     
 }
@@ -61,12 +60,12 @@ extension Math.Intersection2 {
 public extension Line2 {
     
     @inlinable
-    func isIntersects(_ other: Self) -> Bool {
+    func isIntersects(_ other: Line2) -> Bool {
         return Math.Intersection2.possibly(self, other)
     }
     
     @inlinable
-    func intersection(_ other: Self) -> Math.Intersection2.LineToLine {
+    func intersection(_ other: Line2) -> Math.Intersection2.LineToLine? {
         return Math.Intersection2.find(self, other)
     }
     

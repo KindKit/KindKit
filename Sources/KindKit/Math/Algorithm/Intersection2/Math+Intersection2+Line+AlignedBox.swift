@@ -8,7 +8,6 @@ extension Math.Intersection2 {
     
     public enum LineToAlignedBox : Equatable {
         
-        case none
         case one(Point)
         case two(Point, Point)
         
@@ -22,7 +21,7 @@ extension Math.Intersection2 {
         return lhs <= rhs
     }
     
-    public static func find(_ line: Line2, _ box: AlignedBox2) -> LineToAlignedBox {
+    public static func find(_ line: Line2, _ box: AlignedBox2) -> LineToAlignedBox? {
         let bcf = box.centeredForm
         let o = line.origin - bcf.center
         var t1 = Double(Int.min)
@@ -79,7 +78,7 @@ public extension Line2 {
     }
     
     @inlinable
-    func intersection(_ other: AlignedBox2) -> Math.Intersection2.LineToAlignedBox {
+    func intersection(_ other: AlignedBox2) -> Math.Intersection2.LineToAlignedBox? {
         return Math.Intersection2.find(self, other)
     }
     
