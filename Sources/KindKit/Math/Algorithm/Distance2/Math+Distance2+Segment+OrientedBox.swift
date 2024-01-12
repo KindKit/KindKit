@@ -6,20 +6,24 @@ import Foundation
 
 extension Math.Distance2 {
     
-    public struct SegmentToOrientedBox {
+    public struct SegmentToOrientedBox : Equatable {
         
-        public let closest: Double
-        public let src: Point
-        public let dst: Point
+        public let segment: PointIntoLine
+        public let box: Point
+        public let squaredDistance: Distance.Squared
+        
+        init(
+            segment: PointIntoLine,
+            box: Point
+        ) {
+            self.segment = segment
+            self.box = box
+            self.squaredDistance = segment.point.squaredLength(box)
+        }
         
         @inlinable
         public var distance: Distance {
             return self.squaredDistance.normal
-        }
-        
-        @inlinable
-        public var squaredDistance: Distance.Squared {
-            return self.src.squaredLength(self.dst)
         }
         
     }
@@ -27,27 +31,30 @@ extension Math.Distance2 {
     public static func find(_ segment: Segment2, _ box: OrientedBox2) -> SegmentToOrientedBox {
         let l = segment.line
         let lr = Self.find(l, box)
-        if lr.closest >~ 0 {
-            if lr.closest <~ 1 {
+        if lr.line.closest >~ .zero {
+            if lr.line.closest <~ .one {
                 return .init(
-                    closest: lr.closest,
-                    src: lr.src,
-                    dst: lr.dst
+                    segment: lr.line,
+                    box: lr.box
                 )
             } else {
                 let pr = Self.find(segment.end, box)
                 return .init(
-                    closest: 1,
-                    src: segment.end,
-                    dst: pr.dst
+                    segment: .init(
+                        closest: .one,
+                        point: segment.end
+                    ),
+                    box: pr.box
                 )
             }
         } else {
             let pr = Self.find(segment.start, box)
             return .init(
-                closest: 0,
-                src: segment.start,
-                dst: pr.dst
+                segment: .init(
+                    closest: .zero,
+                    point: segment.start
+                ),
+                box: pr.box
             )
         }
     }

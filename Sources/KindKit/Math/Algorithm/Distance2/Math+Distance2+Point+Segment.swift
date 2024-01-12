@@ -6,20 +6,24 @@ import Foundation
 
 extension Math.Distance2 {
     
-    public struct PointToSegment {
+    public struct PointToSegment : Equatable {
         
-        public let closest: Double
-        public let src: Point
-        public let dst: Point
+        public let point: Point
+        public let segment: PointIntoLine
+        public let squaredDistance: Distance.Squared
+        
+        init(
+            point: Point,
+            segment: PointIntoLine
+        ) {
+            self.point = point
+            self.segment = segment
+            self.squaredDistance = point.squaredLength(segment.point)
+        }
         
         @inlinable
         public var distance: Distance {
             return self.squaredDistance.normal
-        }
-        
-        @inlinable
-        public var squaredDistance: Distance.Squared {
-            return self.src.squaredLength(self.dst)
         }
 
     }
@@ -51,9 +55,11 @@ extension Math.Distance2 {
             }
         }
         return .init(
-            closest: rclo,
-            src: point,
-            dst: rpoi
+            point: point,
+            segment: .init(
+                closest: .init(rclo),
+                point: rpoi
+            )
         )
     }
     

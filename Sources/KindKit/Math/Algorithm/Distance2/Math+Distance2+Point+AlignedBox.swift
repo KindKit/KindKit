@@ -6,19 +6,24 @@ import Foundation
 
 extension Math.Distance2 {
     
-    public struct PointToAlignedBox {
+    public struct PointToAlignedBox : Equatable {
         
-        public let src: Point
-        public let dst: Point
+        public let point: Point
+        public let box: Point
+        public let squaredDistance: Distance.Squared
+        
+        init(
+            point: Point,
+            box: Point
+        ) {
+            self.point = point
+            self.box = box
+            self.squaredDistance = point.squaredLength(box)
+        }
         
         @inlinable
         public var distance: Distance {
             return self.squaredDistance.normal
-        }
-        
-        @inlinable
-        public var squaredDistance: Distance.Squared {
-            return self.src.squaredLength(self.dst)
         }
         
     }
@@ -29,8 +34,8 @@ extension Math.Distance2 {
         let rx = o.x.clamp(-size.width, size.width)
         let ry = o.y.clamp(-size.height, size.height)
         return .init(
-            src: point,
-            dst: .init(x: rx, y: ry) + box.center
+            point: point,
+            box: .init(x: rx, y: ry) + box.center
         )
     }
     

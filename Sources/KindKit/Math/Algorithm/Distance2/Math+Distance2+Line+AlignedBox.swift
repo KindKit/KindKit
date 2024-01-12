@@ -6,20 +6,24 @@ import Foundation
 
 extension Math.Distance2 {
     
-    public struct LineToAlignedBox {
+    public struct LineToAlignedBox : Equatable {
         
-        public let closest: Double
-        public let src: Point
-        public let dst: Point
+        public let line: PointIntoLine
+        public let box: Point
+        public let squaredDistance: Distance.Squared
+        
+        init(
+            line: PointIntoLine,
+            box: Point
+        ) {
+            self.line = line
+            self.box = box
+            self.squaredDistance = line.point.squaredLength(box)
+        }
         
         @inlinable
         public var distance: Distance {
             return self.squaredDistance.normal
-        }
-        
-        @inlinable
-        public var squaredDistance: Distance.Squared {
-            return self.src.squaredLength(self.dst)
         }
         
     }
@@ -118,9 +122,11 @@ extension Math.Distance2 {
         ps += cf.center
         pd += cf.center
         return .init(
-            closest: pp,
-            src: ps,
-            dst: pd
+            line: .init(
+                closest: .init(pp),
+                point: ps
+            ),
+            box: pd
         )
     }
     

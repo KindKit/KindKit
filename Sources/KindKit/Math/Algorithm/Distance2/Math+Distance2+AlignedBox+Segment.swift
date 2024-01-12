@@ -7,7 +7,7 @@ import Foundation
 extension Math.Distance2 {
     
     public typealias AlignedBoxToSegment = SegmentToAlignedBox
-        
+    
     @inlinable
     public static func find(_ box: AlignedBox2, _ segment: Segment2) -> AlignedBoxToSegment {
         return Self.find(segment, box)

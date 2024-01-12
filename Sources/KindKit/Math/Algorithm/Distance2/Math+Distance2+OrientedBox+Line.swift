@@ -7,7 +7,7 @@ import Foundation
 extension Math.Distance2 {
     
     public typealias OrientedBoxToLine = LineToOrientedBox
-        
+    
     @inlinable
     public static func find(_ box: OrientedBox2, _ line: Line2) -> OrientedBoxToLine {
         return Self.find(line, box)

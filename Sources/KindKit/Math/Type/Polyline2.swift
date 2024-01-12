@@ -29,6 +29,11 @@ public struct Polyline2 : Hashable {
 public extension Polyline2 {
     
     @inlinable
+    var edgeIndecies: [EdgeIndex] {
+        return (0 ..< self.edges.count).map({ .init($0) })
+    }
+    
+    @inlinable
     var polygon: Polygon2 {
         return Polygon2(countours: [ self ], bbox: self.bbox)
     }

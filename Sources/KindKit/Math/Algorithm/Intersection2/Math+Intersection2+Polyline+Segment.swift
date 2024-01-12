@@ -39,6 +39,7 @@ extension Math.Intersection2 {
         
     public static func possibly(_ polyline: Polyline2, _ segment: Segment2) -> Bool {
         guard polyline.isEmpty == false else { return false }
+        guard polyline.bbox.isIntersects(segment.bbox) == true else { return false }
         for ps in polyline.segments {
             if Self.possibly(ps, segment) == true {
                 return true
@@ -49,6 +50,7 @@ extension Math.Intersection2 {
     
     public static func find(_ polyline: Polyline2, _ segment: Segment2) -> PolylineToSegment? {
         guard polyline.isEmpty == false else { return nil }
+        guard polyline.bbox.isIntersects(segment.bbox) == true else { return nil }
         for edgeIndex in 0 ..< polyline.edges.count {
             let ps = polyline[segment: .init(edgeIndex)]
             guard let intersection = Self.find(ps, segment) else { continue }

@@ -117,7 +117,7 @@ class TestIntersection2 : XCTestCase {
         let s2 = Segment2(start: Point(x: 2, y: 0), end: Point(x: 2, y: 4))
         
         let result = Math.Intersection2.find(s1, s2)
-        if result != .one(Point(x: 2, y: 2)) {
+        if result != .point(Point(x: 2, y: 2)) {
             XCTFail()
         }
     }
