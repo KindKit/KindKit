@@ -1,0 +1,22 @@
+//
+//  KindKit
+//
+
+extension StateLayout {
+    
+    public enum Alignment {
+        
+        case topLeft
+        case top
+        case topRight
+        case left
+        case center
+        case right
+        case bottomLeft
+        case bottom
+        case bottomRight
+        case fill
+        
+    }
+    
+}

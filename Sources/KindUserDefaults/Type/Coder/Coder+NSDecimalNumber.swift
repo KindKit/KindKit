@@ -1,0 +1,28 @@
+//
+//  KindKit
+//
+
+import Foundation
+
+public extension Coder {
+
+    struct NSDecimalNumber : IValueCoder {
+        
+        public static func decode(_ value: IValue) throws -> Foundation.NSDecimalNumber {
+            if let decimalNumber = value as? Foundation.NSDecimalNumber {
+                return decimalNumber
+            } else if let number = value as? Foundation.NSNumber {
+                return .init(string: number.stringValue)
+            } else if let string = value as? Foundation.NSString, let decimalNumber = Foundation.NSDecimalNumber.kk_decimalNumber(from: string) {
+                return decimalNumber
+            }
+            throw Error.cast
+        }
+        
+        public static func encode(_ value: Foundation.NSDecimalNumber) throws -> IValue {
+            return value
+        }
+        
+    }
+
+}

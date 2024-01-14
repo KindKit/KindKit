@@ -1,0 +1,550 @@
+//
+//  KindKit
+//
+
+import KindAnimation
+import KindUI
+
+public extension Container {
+    
+    final class Screen< Screen : IScreen & IScreenViewable > : IScreenContainer, IContainerScreenable {
+        
+        public weak var parent: IContainer? {
+            didSet {
+                guard self.parent !== oldValue else { return }
+                if let parent = self.parent {
+                    if parent.isPresented == true {
+                        self.refreshParentInset()
+#if os(iOS)
+                        self.orientation = parent.orientation
+#endif
+                    }
+                } else {
+                    self.refreshParentInset()
+#if os(iOS)
+                    self.orientation = .unknown
+#endif
+                }
+            }
+        }
+        public var shouldInteractive: Bool {
+            return self.screen.shouldInteractive
+        }
+#if os(iOS)
+        public var statusBar: UIStatusBarStyle {
+            return self.screen.statusBar
+        }
+        public var statusBarAnimation: UIStatusBarAnimation {
+            return self.screen.statusBarAnimation
+        }
+        public var statusBarHidden: Bool {
+            return self.screen.statusBarHidden
+        }
+        public var supportedOrientations: UIInterfaceOrientationMask {
+            return self.screen.supportedOrientations
+        }
+        public var orientation: UIInterfaceOrientation = .unknown {
+            didSet {
+                guard self.orientation != oldValue else { return }
+                self.screen.didChange(orientation: self.orientation)
+            }
+        }
+#endif
+        public private(set) var isPresented: Bool
+        public var view: IView {
+            return self._view
+        }
+        public let screen: Screen
+        
+        private let _layout = Layout()
+        private let _view = CustomView()
+#if os(iOS)
+        private var _virtualKeyboard = VirtualKeyboard()
+        private var _virtualKeyboardHeight: Double = 0 {
+            didSet {
+                guard self._virtualKeyboardHeight != oldValue else { return }
+                self.refreshParentInset()
+            }
+        }
+        private var _virtualKeyboardAnimation: ICancellable? {
+            willSet { self._virtualKeyboardAnimation?.cancel() }
+        }
+#endif
+        
+        public init(
+            _ screen: Screen
+        ) {
+            self.isPresented = false
+            self.screen = screen
+            self._setup()
+        }
+        
+        deinit {
+            self._destroy()
+        }
+        
+        public func apply(contentInset: Container.AccumulateInset) {
+        }
+        
+        public func contentInset() -> Container.AccumulateInset {
+            return self._contentInset()
+        }
+        
+        public func parentInset(for container: IContainer) -> Container.AccumulateInset {
+            return self._parentInset(for: container)
+        }
+        
+        public func refreshParentInset() {
+            return self._refreshParentInset()
+        }
+        
+        public func activate() -> Bool {
+            guard self.isPresented == true else { return false }
+            return self.screen.activate()
+        }
+        
+#if os(iOS)
+        
+        public func snake() -> Bool {
+            guard self.isPresented == true else { return false }
+            return self.screen.snake()
+        }
+        
+#endif
+        
+        public func didChangeAppearance() {
+            self.screen.didChangeAppearance()
+        }
+        
+#if os(iOS)
+        
+        public func didChange(orientation: UIInterfaceOrientation) {
+            self.orientation = orientation
+        }
+        
+#endif
+        
+        public func prepareShow(interactive: Bool) {
+            self.screen.prepareShow(interactive: interactive)
+        }
+        
+        public func finishShow(interactive: Bool) {
+            self.isPresented = true
+            self.screen.finishShow(interactive: interactive)
+        }
+        
+        public func cancelShow(interactive: Bool) {
+            self.screen.cancelShow(interactive: interactive)
+        }
+        
+        public func prepareHide(interactive: Bool) {
+            self.screen.prepareHide(interactive: interactive)
+        }
+        
+        public func finishHide(interactive: Bool) {
+            self.isPresented = false
+            self.screen.finishHide(interactive: interactive)
+        }
+        
+        public func cancelHide(interactive: Bool) {
+            self.screen.cancelHide(interactive: interactive)
+        }
+        
+        public func close(animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+        public func close(container: IContainer, animated: Bool, completion: (() -> Void)?) -> Bool {
+            guard let parent = self.parent else { return false }
+            return parent.close(container: self, animated: animated, completion: completion)
+        }
+        
+    }
+    
+}
+
+private extension Container.Screen {
+    
+    func _setup() {
+#if os(iOS)
+        self._subscribeVirtualKeyboard()
+#endif
+        self.screen.container = self
+        self.screen.setup()
+        
+        self._layout.content = self.screen.view
+        self._layout.bar = self.screen.bar
+        self._view.content = self._layout
+    }
+    
+    func _destroy() {
+#if os(iOS)
+        self._unsubscribeVirtualKeyboard()
+#endif
+        self.screen.container = nil
+        self.screen.destroy()
+    }
+    
+    func _contentInset() -> Container.AccumulateInset {
+#if os(macOS)
+        let contentInset = Container.AccumulateInset(
+            self.screen.additionalContentInset
+        )
+#elseif os(iOS)
+        let contentInset = Container.AccumulateInset(
+            top: self.screen.additionalContentInset.top,
+            left: self.screen.additionalContentInset.left,
+            right: self.screen.additionalContentInset.right,
+            bottom: self.screen.additionalContentInset.bottom + self._virtualKeyboardHeight
+        )
+#endif
+        if let bar = self.screen.bar {
+            switch bar.placement {
+            case .top:
+                let barSize = self._layout.barSize ?? .zero
+                return .init(
+                    natural: .init(
+                        top: contentInset.natural.top + barSize.height,
+                        left: contentInset.natural.left,
+                        right: contentInset.natural.right,
+                        bottom: contentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: contentInset.interactive.top + barSize.height,
+                        left: contentInset.interactive.left,
+                        right: contentInset.interactive.right,
+                        bottom: contentInset.interactive.bottom
+                    )
+                )
+            case .bottom:
+                let barSize = self._layout.barSize ?? .zero
+                return .init(
+                    natural: .init(
+                        top: contentInset.natural.top,
+                        left: contentInset.natural.left,
+                        right: contentInset.natural.right,
+                        bottom: contentInset.natural.bottom + barSize.height
+                    ),
+                    interactive: .init(
+                        top: contentInset.interactive.top,
+                        left: contentInset.interactive.left,
+                        right: contentInset.interactive.right,
+                        bottom: contentInset.interactive.bottom + barSize.height
+                    )
+                )
+            }
+        } else {
+            return contentInset
+        }
+    }
+    
+    func _parentInset(for container: IContainer) -> Container.AccumulateInset {
+#if os(iOS)
+        let baseParentInset = self.parentInset()
+        let parentInset = Container.AccumulateInset(
+            natural: .init(
+                top: baseParentInset.natural.top,
+                left: baseParentInset.natural.left,
+                right: baseParentInset.natural.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom)
+            ),
+            interactive: .init(
+                top: baseParentInset.interactive.top,
+                left: baseParentInset.interactive.left,
+                right: baseParentInset.interactive.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
+            )
+        )
+#else
+        let parentInset = self.parentInset()
+#endif
+        if let bar = self.screen.bar {
+            let barSize = self._layout.barSize ?? .zero
+            switch bar.placement {
+            case .top:
+                return .init(
+                    natural: .init(
+                        top: barSize.height,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: parentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: barSize.height,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: parentInset.interactive.bottom
+                    )
+                )
+            case .bottom:
+                return .init(
+                    natural: .init(
+                        top: parentInset.natural.top,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: barSize.height
+                    ),
+                    interactive: .init(
+                        top: parentInset.interactive.top,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: barSize.height
+                    )
+                )
+            }
+        } else {
+            return parentInset
+        }
+    }
+    
+    func _refreshParentInset() {
+#if os(iOS)
+        let baseParentInset = self.parentInset()
+        let parentInset = Container.AccumulateInset(
+            natural: .init(
+                top: baseParentInset.natural.top,
+                left: baseParentInset.natural.left,
+                right: baseParentInset.natural.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.natural.bottom)
+            ),
+            interactive: .init(
+                top: baseParentInset.interactive.top,
+                left: baseParentInset.interactive.left,
+                right: baseParentInset.interactive.right,
+                bottom: max(self._virtualKeyboardHeight, baseParentInset.interactive.bottom)
+            )
+        )
+#else
+        let parentInset = self.parentInset()
+#endif
+        self.refreshContentInset()
+        if let bar = self.screen.bar {
+            switch bar.placement {
+            case .top:
+                bar.safeArea = .init(
+                    top: parentInset.natural.top,
+                    left: parentInset.natural.left,
+                    right: parentInset.natural.right,
+                    bottom: 0
+                )
+            case .bottom:
+                bar.safeArea = .init(
+                    top: 0,
+                    left: parentInset.natural.left,
+                    right: parentInset.natural.right,
+                    bottom: parentInset.natural.bottom
+                )
+            }
+            self._layout.updateIfNeeded()
+            let barSize = self._layout.barSize ?? .zero
+            switch bar.placement {
+            case .top:
+                self.screen.apply(inset: .init(
+                    natural: .init(
+                        top: barSize.height,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: parentInset.natural.bottom
+                    ),
+                    interactive: .init(
+                        top: barSize.height,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: parentInset.interactive.bottom
+                    )
+                ))
+            case .bottom:
+                self.screen.apply(inset: .init(
+                    natural: .init(
+                        top: parentInset.natural.top,
+                        left: parentInset.natural.left,
+                        right: parentInset.natural.right,
+                        bottom: barSize.height
+                    ),
+                    interactive: .init(
+                        top: parentInset.interactive.top,
+                        left: parentInset.interactive.left,
+                        right: parentInset.interactive.right,
+                        bottom: barSize.height
+                    )
+                ))
+            }
+        } else {
+            self.screen.apply(inset: parentInset)
+        }
+    }
+    
+#if os(iOS)
+    
+    func _subscribeVirtualKeyboard() {
+        self._virtualKeyboard.add(observer: self, priority: .public)
+    }
+    
+    func _unsubscribeVirtualKeyboard() {
+        self._virtualKeyboard.remove(observer: self)
+        self._virtualKeyboardAnimation?.cancel()
+    }
+    
+    func _updateVirtualKeyboardHeight(duration: TimeInterval, height: Double) {
+        guard abs(self._virtualKeyboardHeight - height) > .leastNonzeroMagnitude else { return }
+        self._virtualKeyboardAnimation?.cancel()
+        self._virtualKeyboardAnimation = KindAnimation.default.run(
+            .custom(
+                duration: duration,
+                processing: { [weak self] progress in
+                    guard let self = self else { return }
+                    self._virtualKeyboardHeight = self._virtualKeyboardHeight.lerp(height, progress: progress)
+                },
+                completion: { [weak self] in
+                    guard let self = self else { return }
+                    self._virtualKeyboardAnimation = nil
+                    self._virtualKeyboardHeight = height
+                    self.refreshParentInset()
+                }
+            )
+        )
+    }
+    
+#endif
+    
+}
+
+#if os(iOS)
+
+extension Container.Screen : IVirtualKeyboardObserver {
+    
+    public func willShow(_ virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+        self._updateVirtualKeyboardHeight(duration: info.duration, height: info.endFrame.height)
+    }
+    
+    public func didShow(_ virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+    public func willHide(_ virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+        self._updateVirtualKeyboardHeight(duration: info.duration, height: 0)
+    }
+    
+    public func didHide(_ virtualKeyboard: VirtualKeyboard, info: VirtualKeyboard.Info) {
+    }
+    
+}
+
+#endif
+
+extension Container.Screen : IRootContentContainer {
+}
+
+extension Container.Screen : IStackContentContainer where Screen : IScreenStackable {
+    
+    public var stackBar: StackBarView {
+        return self.screen.stackBar
+    }
+    
+    public var stackBarVisibility: Double {
+        return max(0, min(self.screen.stackBarVisibility, 1))
+    }
+    
+    public var stackBarHidden: Bool {
+        return self.screen.stackBarHidden
+    }
+    
+}
+
+extension Container.Screen : IGroupContentContainer where Screen : IScreenGroupable {
+    
+    public var groupItem: GroupBarView.Item {
+        return self.screen.groupItem
+    }
+    
+}
+
+extension Container.Screen : IPageContentContainer where Screen : IScreenPageable {
+    
+    public var pageItem: PageBarView.Item {
+        return self.screen.pageItem
+    }
+    
+}
+
+extension Container.Screen : IBookContentContainer where Screen : IScreenBookable {
+    
+    public var bookIdentifier: Any {
+        return self.screen.bookIdentifier
+    }
+    
+}
+
+extension Container.Screen : IHamburgerContentContainer {
+}
+
+extension Container.Screen : IHamburgerMenuContainer where Screen : IScreenHamburgerable {
+    
+    public var hamburgerSize: Double {
+        return self.screen.hamburgerSize
+    }
+    
+    public var hamburgerLimit: Double {
+        return self.screen.hamburgerLimit
+    }
+    
+}
+
+extension Container.Screen : IModalContentContainer where Screen : IScreenModalable {
+    
+    public var modalColor: Color {
+        return self.screen.modalColor
+    }
+    
+    public var modalSheet: Modal.Presentation.Sheet? {
+        switch self.screen.modalPresentation {
+        case .simple: return nil
+        case .sheet(let info): return info
+        }
+    }
+    
+    public func modalPressedOutside() {
+        self.screen.modalPressedOutside()
+    }
+    
+}
+
+extension Container.Screen : IDialogContentContainer where Screen : IScreenDialogable {
+    
+    public var dialogInset: Inset {
+        return self.screen.dialogInset
+    }
+    
+    public var dialogSize: Dialog.Size {
+        return self.screen.dialogSize
+    }
+    
+    public var dialogAlignment: Dialog.Alignment {
+        return self.screen.dialogAlignment
+    }
+    
+    public var dialogBackground: (IView & IViewAlphable)? {
+        return self.screen.dialogBackgroundView
+    }
+    
+    public func dialogPressedOutside() {
+        self.screen.dialogPressedOutside()
+    }
+    
+}
+
+extension Container.Screen : IPushContentContainer where Screen : IScreenPushable {
+    
+    public var pushPlacement: Push.Placement {
+        return self.screen.pushPlacement
+    }
+    
+    public var pushOptions: Push.Options {
+        return self.screen.pushOptions
+    }
+    
+    public var pushDuration: TimeInterval? {
+        return self.screen.pushDuration
+    }
+    
+}

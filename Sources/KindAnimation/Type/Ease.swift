@@ -1,0 +1,6 @@
+//
+//  KindKit
+//
+
+public struct Ease {
+}
