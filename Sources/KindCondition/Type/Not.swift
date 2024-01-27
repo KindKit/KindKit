@@ -3,10 +3,14 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Not : IEntity {
     
     public let observer = Observer< IObserver >()
+    
+    @KindMonadicProperty
     public var condition: IEntity {
         willSet {
             self._unsubscribe()
@@ -68,29 +72,6 @@ private extension Not {
         return !condition()
     }
 
-}
-
-public extension Not {
-    
-    @inlinable
-    @discardableResult
-    func condition(_ value: IEntity) -> Self {
-        self.condition = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func condition(_ value: () -> IEntity) -> Self {
-        return self.condition(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func condition(_ value: (Self) -> IEntity) -> Self {
-        return self.condition(value(self))
-    }
-    
 }
 
 extension Not : IObserver {

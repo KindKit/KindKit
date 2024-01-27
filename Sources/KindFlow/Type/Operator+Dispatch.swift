@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindCore
 
 public extension Operator {
     
@@ -77,7 +78,7 @@ private extension Operator.Dispatch {
     
     func _start() {
         guard self._task == nil else { return }
-        self._task = DispatchWorkItem.kk_async(
+        self._task = DispatchWorkItem.async(
             queue: self._queue,
             block: { [weak self] in self?._handle() }
         )

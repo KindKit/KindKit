@@ -4,28 +4,36 @@
 
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
 public extension Field {
     
+    @KindMonadic
     final class Sequence : IField {
         
         public let id: Id
+        
         public weak var parent: IEntity?
+        
         public var mandatory: KindCondition.IEntity {
             set { self._mandatory.condition = newValue }
             get { return self._mandatory }
         }
+        
         public var hidden: KindCondition.IEntity {
             set { self._hidden.condition = newValue }
             get { return self._hidden }
         }
+        
         public var locked: KindCondition.IEntity {
             set { self._locked.condition = newValue }
             get { return self._locked }
         }
+        
         public var valid: KindCondition.IEntity {
             return self._valid
         }
+        
         public var focusable: [IEntity] {
             guard self.hidden() == false || self.locked() == false else {
                 return []
@@ -39,6 +47,7 @@ public extension Field {
             }
             return result
         }
+        
         public var result: [IResult] {
             guard self.hidden() == false else {
                 return []
@@ -54,13 +63,20 @@ public extension Field {
                 Result.Sequence(id: self.id, value: buffer)
             ]
         }
+        
         public var onShouldFocus = Signal< Bool?, Void >()
+        
         public var onFocus = Signal< Void, Void >()
+        
         public var onChanged = Signal< Void, Void >()
+        
+        @KindMonadicProperty
         public var policy: Field.Policy {
             set { self._valid.policy = newValue }
             get { return self._valid.policy  }
         }
+        
+        @KindMonadicProperty
         public var items: [IEntity] {
             set {
                 guard self._valid.items.elementsEqual(newValue, by: { $0 === $1 }) == false else {
@@ -171,49 +187,6 @@ public extension Field.Sequence {
     }
     
 }
-
-public extension Field.Sequence {
-    
-    @inlinable
-    @discardableResult
-    func policy(_ value: Field.Policy) -> Self {
-        self.policy = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func policy(_ value: () -> Field.Policy) -> Self {
-        return self.policy(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func policy(_ value: (Self) -> Field.Policy) -> Self {
-        return self.policy(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func items(_ value: [IEntity]) -> Self {
-        self.items = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func items(_ value: () -> [IEntity]) -> Self {
-        return self.items(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func items(_ value: (Self) -> [IEntity]) -> Self {
-        return self.items(value(self))
-    }
-    
-}
-
 extension Field.Sequence : KindCondition.IObserver {
     
     public func changed(_ condition: KindCondition.IEntity) {

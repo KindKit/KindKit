@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindTime
 
 public struct Request {
     
@@ -11,7 +12,7 @@ public struct Request {
     public let queryParams: [Request.Parameter]
     public let headers: [Request.Header]
     public let body: Request.Body?
-    public let timeout: TimeInterval
+    public let timeout: SecondsInterval
     public let cachePolicy: URLRequest.CachePolicy
     public let redirect: RedirectOption
 
@@ -21,7 +22,7 @@ public struct Request {
         queryParams: [Request.Parameter] = [],
         headers: [Request.Header] = [],
         body: Body? = nil,
-        timeout: TimeInterval = 30,
+        timeout: SecondsInterval = SecondsInterval(30),
         cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy,
         redirect: RedirectOption = [ .enabled, .authorization ]
     ) {
@@ -63,7 +64,7 @@ public struct Request {
         var urlRequest = URLRequest(
             url: url,
             cachePolicy: self.cachePolicy,
-            timeoutInterval: self.timeout
+            timeoutInterval: self.timeout.timeInterval
         )
         urlRequest.httpMethod = self.method.value
         var headers = provider.headers

@@ -25,7 +25,7 @@ public final class Manager {
 public extension Manager {
     
     @inlinable
-    var callToAction: ICallToAction? {
+    var callToAction: ICallToAction? { 
         for module in self.modules {
             if let callToAction = module.activeCallToAction {
                 return callToAction

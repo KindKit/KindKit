@@ -16,7 +16,9 @@ public extension Action {
         public var isPerforming: Bool {
             return self._task != nil
         }
+        
         public private(set) var result: Result?
+        
         public let onFinish = Signal< Void, Result >()
         
         private let _provider: KindNetwork.Provider

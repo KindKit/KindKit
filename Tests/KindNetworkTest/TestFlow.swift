@@ -10,7 +10,7 @@ class TestFlow : XCTestCase {
     func testPipeline() {
         let expectation = self.expectation(description: "Test")
         let provider = Provider()
-        let pipeline = Builder< String, Never >()
+        let pipeline = KindFlow.Builder< String, Never >()
             .map({ input -> Result< URL, Query.Error > in
                 switch input {
                 case .success(let string):

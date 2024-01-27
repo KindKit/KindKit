@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindDebug
 
 public final class Document {

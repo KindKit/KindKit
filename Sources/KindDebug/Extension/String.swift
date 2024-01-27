@@ -2,10 +2,16 @@
 //  KindKit
 //
 
+import KindString
+
 extension String : IEntity {
     
     public func debugInfo() -> Info {
-        return .string("\"\(self.kk_escape([ .tab, .newline, .return, .doubleQuote ]))\"")
+        return .string(builder: {
+            QuoteComponent(.double, content: {
+                LettersComponent(self, escape: [ .tab, .newline, .return, .doubleQuote ])
+            })
+        })
     }
 
 }

@@ -2,12 +2,14 @@
 //  KindKit
 //
 
+import Foundation
 import KindEvent
+import KindTime
 
-public final class Throttle {
+public final class Throttle< UnitType : IUnit > {
     
     public let mode: Mode
-    public private(set) var interval: DispatchTimeInterval
+    public private(set) var interval: Interval< UnitType >
     public private(set) var immediateFire: Bool
     public let queue: DispatchQueue
     
@@ -24,12 +26,12 @@ public final class Throttle {
     
     public init(
         mode: Mode = .fixed,
-        interval: Interval,
+        interval: Interval< UnitType >,
         immediateFire: Bool = false,
         queue: DispatchQueue = .main
     ) {
         self.mode = mode
-        self.interval = interval.asDispatchTimeInterval
+        self.interval = interval
         self.immediateFire = immediateFire
         self.queue = queue
     }
@@ -103,10 +105,11 @@ extension Throttle : IEndable {
 private extension Throttle {
     
     func _resolveDeadline(_ now: DispatchTime) -> DispatchTime {
+        let interval = self.interval.dispatchTimeInterval
         switch self.mode {
         case .fixed:
             if let lastExecutionTime = self._lastExecutionTime {
-                let time = lastExecutionTime + self.interval
+                let time = lastExecutionTime + interval
                 if time > now {
                     return time
                 }
@@ -118,17 +121,17 @@ private extension Throttle {
                     }
                 }
             } else if self.immediateFire == false {
-                return now + self.interval
+                return now + interval
             }
         case .deferred:
             if let lastExecutionTime = self._lastExecutionTime {
-                let time = lastExecutionTime + self.interval
+                let time = lastExecutionTime + interval
                 if time > now {
                     return time
                 }
             }
             if self._waitingForPerform == true && self.immediateFire == false {
-                return now + self.interval
+                return now + interval
             }
         }
         return now

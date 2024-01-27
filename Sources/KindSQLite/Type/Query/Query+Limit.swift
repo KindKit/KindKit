@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query {
     
@@ -18,13 +18,15 @@ public extension Query {
 extension Query.Limit : IExpressable {
     
     public var query: String {
-        let builder = StringBuilder("LIMIT ")
-        builder.append(self.limit)
-        if let offset = self.offset {
-            builder.append(" OFFSET ")
-            builder.append(offset)
-        }
-        return builder.string
+        return .kk_build({
+            LettersComponent("LIMIT")
+            SpaceComponent()
+            LettersComponent(self.limit)
+            if let offset = self.offset {
+                LettersComponent(" OFFSET ")
+                LettersComponent(offset)
+            }
+        })
     }
     
 }

@@ -2,7 +2,9 @@
 //  KindKit
 //
 
+import Foundation
 import KindNetwork
+import KindTime
 
 public final class Loader {
     
@@ -139,7 +141,7 @@ public extension Loader {
         })
     }
     
-    func cleanup(before: TimeInterval) {
+    func cleanup(before: SecondsInterval) {
         self.cache.cleanup(before: before)
     }
     

@@ -3,12 +3,17 @@
 //
 
 import KindGraphics
+import KindMonadicMacro
 
-public extension GradientView.Fill {
+extension GradientView.Fill {
     
-    struct Point : Equatable {
+    @KindMonadic
+    public struct Point : Equatable {
         
+        @KindMonadicProperty
         public let color: Color
+        
+        @KindMonadicProperty
         public let location: Double
         
         public init(

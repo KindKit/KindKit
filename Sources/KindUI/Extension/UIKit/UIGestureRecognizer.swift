@@ -14,20 +14,20 @@ public extension UIGestureRecognizer {
         self.isEnabled = enabled
     }
 
-    func kk_update(cancelsTouchesInView: Bool) {
-        self.cancelsTouchesInView = cancelsTouchesInView
+    func kk_update(cancelsInView: Bool) {
+        self.cancelsTouchesInView = cancelsInView
     }
 
-    func kk_update(delaysTouchesBegan: Bool) {
-        self.delaysTouchesBegan = delaysTouchesBegan
+    func kk_update(delaysBegan: Bool) {
+        self.delaysTouchesBegan = delaysBegan
     }
 
-    func kk_update(delaysTouchesEnded: Bool) {
-        self.delaysTouchesEnded = delaysTouchesEnded
+    func kk_update(delaysEnded: Bool) {
+        self.delaysTouchesEnded = delaysEnded
     }
 
-    func kk_update(requiresExclusiveTouchType: Bool) {
-        self.requiresExclusiveTouchType = requiresExclusiveTouchType
+    func kk_update(requiresExclusive: Bool) {
+        self.requiresExclusiveTouchType = requiresExclusive
     }
 
 }

@@ -3,12 +3,19 @@
 //
 
 import KindMath
+import KindMonadicMacro
 
+@KindMonadic
 public struct Transform : Hashable {
+
+    @KindMonadicProperty
+    public let translation: Point
     
-    public var translation: Point
-    public var rotation: Angle
-    public var scale: Point
+    @KindMonadicProperty
+    public let rotation: Angle
+    
+    @KindMonadicProperty
+    public let scale: Point
     
     public init(
         translation: Point = .zero,

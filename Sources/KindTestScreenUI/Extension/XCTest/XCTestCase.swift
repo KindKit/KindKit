@@ -2,10 +2,10 @@
 //  KindKit
 //
 
-#if os(iOS) && canImport(XCTest)
-
 import XCTest
 import KindScreenUI
+
+#if os(iOS)
 
 public extension XCTestCase {
     
@@ -61,20 +61,9 @@ public extension XCTestCase {
         return window
     }
     
-    func kk_wait(
-        duration: TimeInterval
-    ) {
-        let expectation = XCTestExpectation(description: "Wait")
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + duration,
-            execute: { expectation.fulfill() }
-        )
-        _ = XCTWaiter.wait(for: [expectation], timeout: duration + 0.1)
-    }
-    
     func kk_validation(
         window: UIWindow,
-        delay: TimeInterval,
+        delay: SecondsInterval,
         path: URL,
         screen: String,
         variant: String,
@@ -116,6 +105,17 @@ public extension XCTestCase {
 }
 
 fileprivate extension XCTestCase {
+    
+    func _wait(
+        duration: SecondsInterval
+    ) {
+        let expectation = XCTestExpectation(description: "Wait")
+        DispatchQueue.main.asyncAfter(
+            after: duration,
+            execute: { expectation.fulfill() }
+        )
+        _ = XCTWaiter.wait(for: [expectation], timeout: duration.timeInterval + 0.1)
+    }
     
     func _expectedUrl(
         base: URL,

@@ -2,15 +2,17 @@
 //  KindKit
 //
 
+import Foundation
 import KindEvent
+import KindTime
 
-public final class Debounce {
+public final class Debounce< UnitType : IUnit > {
     
-    private let _timer: Once
+    private let _timer: Once< UnitType >
     
     public init(
-        delay: Interval,
-        tolerance: DispatchTimeInterval = .nanoseconds(0),
+        delay: Interval< UnitType >,
+        tolerance: Interval< UnitType > = .zero,
         queue: DispatchQueue = .main
     ) {
         self._timer = Once(
@@ -24,12 +26,12 @@ public final class Debounce {
 
 public extension Debounce {
     
-    var delay: Interval {
+    var delay: Interval< UnitType > {
         set { self._timer.reset(interval: newValue, restart: self._timer.isRunning) }
         get { self._timer.interval }
     }
     
-    var tolerance: DispatchTimeInterval {
+    var tolerance: Interval< UnitType > {
         return self._timer.tolerance
     }
     

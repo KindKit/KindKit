@@ -2,13 +2,15 @@
 //  KindKit
 //
 
+import Foundation
+
 public enum Value {
     
     case null
     case integer(Int)
     case real(Double)
     case text(String)
-    case blob(Data)
+    case blob(Foundation.Data)
     
 }
 

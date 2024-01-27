@@ -175,7 +175,6 @@ private extension ViewController {
     
     func _free() {
         Container.BarController.shared.remove(observer: self)
-        NotificationCenter.default.removeObserver(self)
     }
     
     func _safeArea() -> Inset {

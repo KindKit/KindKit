@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 public extension Set {
     
     @inlinable

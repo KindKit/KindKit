@@ -2,15 +2,9 @@
 //  KindKit
 //
 
-public protocol IReusable {
+public protocol IReusable : ILazyable {
     
-    associatedtype Owner : AnyObject
-    associatedtype Content
-    
-    static var reuseIdentificator: String { get }
-    
-    static func createReuse(owner: Owner) -> Content
-    static func configureReuse(owner: Owner, content: Content)
-    static func cleanupReuse(content: Content)
+    static func name(owner: Owner) -> String
+    static func configure(owner: Owner, content: Content)
     
 }

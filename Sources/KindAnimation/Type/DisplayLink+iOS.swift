@@ -8,36 +8,29 @@ import UIKit
 
 final class DisplayLink : NSObject {
     
-    weak var delegate: IQueueDelegate?
+    let manager: Manager
+    var prevTime: CFTimeInterval
+    var instance: CADisplayLink!
     
-    var isRunning: Bool {
-        return self._instance != nil
+    init(manager: Manager) {
+        self.manager = manager
+        self.prevTime = CACurrentMediaTime()
+        
+        super.init()
+        
+        self.instance = CADisplayLink(target: self, selector: #selector(self._handle))
+        self.instance.add(to: .main, forMode: .common)
     }
     
-    private var _instance: CADisplayLink?
-    private var _prevTime: CFTimeInterval!
-    
-    func start() {
-        if self._instance == nil {
-            let instance = CADisplayLink(target: self, selector: #selector(self._handle))
-            instance.add(to: .main, forMode: .common)
-            self._instance = instance
-            self._prevTime = CACurrentMediaTime()
-        }
-    }
-    
-    func stop() {
-        if let instance = self._instance {
-            instance.remove(from: .main, forMode: .common)
-            instance.isPaused = true
-            instance.invalidate()
-        }
-        self._instance = nil
+    deinit {
+        self.instance.remove(from: .main, forMode: .common)
+        self.instance.isPaused = true
+        self.instance.invalidate()
     }
     
 }
 
-#if targetEnvironment(simulator)
+#if targetEnvironment(simulator) && swift(<5.10)
 
 @_silgen_name("UIDragCoefficient")
 func UIDragCoefficient() -> Float
@@ -49,13 +42,13 @@ private extension DisplayLink {
     @objc
     func _handle() {
         let now = CACurrentMediaTime()
-#if targetEnvironment(simulator)
-        let delta = (now - self._prevTime) / CFTimeInterval(UIDragCoefficient())
+#if targetEnvironment(simulator) && swift(<5.10)
+        let delta = (now - self.prevTime) / CFTimeInterval(UIDragCoefficient())
 #else
-        let delta = now - self._prevTime
+        let delta = now - self.prevTime
 #endif
-        self._prevTime = now
-        self.delegate?.update(TimeInterval(delta))
+        self.prevTime = now
+        self.manager.update(.init(delta))
     }
     
 }

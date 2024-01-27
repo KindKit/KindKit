@@ -6,45 +6,39 @@ import KindCore
 
 public extension Coder {
     
-    struct Identifier< Coder, Kind : IIdentifierKind > {
+    struct Identifier< CoderType, KindType : IIdentifierKind > {
     }
     
 }
 
-extension Coder.Identifier : IValueDecoder where Coder : IValueDecoder {
+extension Coder.Identifier : IValueDecoder where CoderType : IValueDecoder, CoderType.JsonDecoded : Hashable {
     
-    public typealias JsonDecoded = KindCore.Identifier< Coder.JsonDecoded, Kind >
+    public typealias JsonDecoded = KindCore.Identifier< CoderType.JsonDecoded, KindType >
     
-    public static func decode(
-        _ value: IValue,
-        path: Path
-    ) throws -> JsonDecoded {
-        return Identifier(try Coder.decode(value, path: path))
+    public static func decode(_ value: IValue, path: Path) throws -> JsonDecoded {
+        return .init(try CoderType.decode(value, path: path))
     }
     
 }
 
-extension Coder.Identifier : IValueEncoder where Coder : IValueEncoder {
+extension Coder.Identifier : IValueEncoder where CoderType : IValueEncoder, CoderType.JsonEncoded : Hashable {
     
-    public typealias JsonEncoded = KindCore.Identifier< Coder.JsonEncoded, Kind >
+    public typealias JsonEncoded = KindCore.Identifier< CoderType.JsonEncoded, KindType >
     
-    public static func encode(
-        _ value: JsonEncoded,
-        path: Path
-    ) throws -> IValue {
-        return try Coder.encode(value.raw, path: path)
+    public static func encode(_ value: JsonEncoded, path: Path) throws -> IValue {
+        return try CoderType.encode(value.id, path: path)
     }
     
 }
 
-extension Identifier : IDecoderAlias where Raw : IDecoderAlias {
+extension Identifier : IDecoderAlias where RawType : IDecoderAlias, RawType.JsonDecoder.JsonDecoded : Hashable {
     
-    public typealias JsonDecoder = Coder.Identifier< Raw.JsonDecoder, Kind >
+    public typealias JsonDecoder = Coder.Identifier< RawType.JsonDecoder, KindType >
     
 }
 
-extension Identifier : IEncoderAlias where Raw : IEncoderAlias {
+extension Identifier : IEncoderAlias where RawType : IEncoderAlias, RawType.JsonEncoder.JsonEncoded : Hashable {
     
-    public typealias JsonEncoder = Coder.Identifier< Raw.JsonEncoder, Kind >
+    public typealias JsonEncoder = Coder.Identifier< RawType.JsonEncoder, KindType >
     
 }

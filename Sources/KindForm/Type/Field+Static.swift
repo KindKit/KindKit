@@ -2,28 +2,37 @@
 //  KindKit
 //
 
+import Foundation
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
 public extension Field {
     
+    @KindMonadic
     final class Static< Value : Equatable > : IField {
         
         public let id: Id
+        
         public var parent: IEntity?
+        
         public var mandatory: KindCondition.IEntity {
             set { self._mandatory.condition = newValue }
             get { return self._mandatory }
         }
+        
         public var hidden: KindCondition.IEntity {
             set { self._hidden.condition = newValue }
             get { return self._hidden }
         }
+        
         public var locked: KindCondition.IEntity {
             set { self._locked.condition = newValue }
             get { return self._locked }
         }
+        
         public let valid: KindCondition.IEntity
+        
         public var focusable: [IEntity] {
             guard self.hidden() == false || self.locked() == false else {
                 return []
@@ -33,6 +42,7 @@ public extension Field {
             }
             return []
         }
+        
         public var result: [IResult] {
             guard self.valid() == true else {
                 return []
@@ -41,9 +51,14 @@ public extension Field {
                 Result.Value(id: self.id, value: self.value)
             ]
         }
+        
         public var onShouldFocus = Signal< Bool?, Void >()
+        
         public var onFocus = Signal< Void, Void >()
+        
         public var onChanged = Signal< Void, Void >()
+        
+        @KindMonadicProperty
         public var value: Value {
             didSet {
                 guard self.value != oldValue else { return }
@@ -107,29 +122,6 @@ private extension Field.Static {
         self.hidden.remove(observer: self)
         self.locked.remove(observer: self)
         self.valid.remove(observer: self)
-    }
-    
-}
-
-public extension Field.Static {
-    
-    @inlinable
-    @discardableResult
-    func value(_ value: Value) -> Self {
-        self.value = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func value(_ value: () -> Value) -> Self {
-        return self.value(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func value(_ value: (Self) -> Value) -> Self {
-        return self.value(value(self))
     }
     
 }

@@ -30,170 +30,219 @@ extension Entity {
             switch entity.target {
             case .struct:
                 return .init(itemsBuilder: {
-                    FunctionDeclSyntax(
-                        modifiers: self.variable.modifier.build(),
-                        name: .identifier(self.variable.name),
-                        signature: .init(
-                            parameterClause: .init(parametersBuilder: {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("value"),
-                                    type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
-                                )
-                            }),
-                            returnClause: .init(
-                                type: IdentifierTypeSyntax(name: .keyword(.Self))
-                            )
-                        ),
-                        bodyBuilder: {
-                            ReturnStmtSyntax(
-                                expression: FunctionCallExprSyntax(
-                                    callee: ExprSyntax(".init"),
-                                    argumentList: {
-                                        for variable in entity.variables {
-                                            if variable.isStored == true {
-                                                if variable.name == self.variable.name {
-                                                    LabeledExprSyntax(
-                                                        label: variable.name,
-                                                        expression: DeclReferenceExprSyntax(baseName: .identifier("value"))
-                                                    )
-                                                } else {
-                                                    LabeledExprSyntax(
-                                                        label: variable.name,
-                                                        expression: MemberAccessExprSyntax(
-                                                            base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
-                                                            name: .identifier(variable.name)
-                                                        )
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
+                    if let compileTime = self.variable.compileTime {
+                        IfConfigDeclSyntax(clauses: .init(itemsBuilder: {
+                            IfConfigClauseSyntax(
+                                poundKeyword: .poundIfToken(),
+                                condition: compileTime.condition,
+                                elements: .init(
+                                    MemberBlockItemListSyntax(itemsBuilder: {
+                                        self.valueTypeFunction(by: entity)
+                                    })
                                 )
                             )
-                        }
-                    )
+                        }))
+                    } else {
+                        self.valueTypeFunction(by: entity)
+                    }
                 })
             case .class, .protocol:
                 guard self.variable.isMutable == true else {
                     return nil
                 }
                 return .init(itemsBuilder: {
-                    FunctionDeclSyntax(
-                        attributes: .init(itemsBuilder: {
-                            AttributeSyntax("@discardableResult")
-                        }),
-                        modifiers: self.variable.modifier.build(),
-                        name: .identifier(self.variable.name),
-                        signature: .init(
-                            parameterClause: .init(parametersBuilder: {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("value"),
-                                    type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
+                    if let compileTime = self.variable.compileTime {
+                        IfConfigDeclSyntax(clauses: .init(itemsBuilder: {
+                            IfConfigClauseSyntax(
+                                poundKeyword: .poundIfToken(),
+                                condition: compileTime.condition,
+                                elements: .init(
+                                    self.referenceTypeFunctions(by: entity)
                                 )
-                            }),
-                            returnClause: .init(
-                                type: IdentifierTypeSyntax(name: .keyword(.Self))
                             )
-                        ),
-                        bodyBuilder: {
-                            SequenceExprSyntax(elementsBuilder: {
-                                MemberAccessExprSyntax(
-                                    base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
-                                    name: .identifier(self.variable.name)
-                                )
-                                AssignmentExprSyntax()
-                                DeclReferenceExprSyntax(baseName: .identifier("value"))
-                            })
-                            ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
-                        }
-                    )
-                    FunctionDeclSyntax(
-                        attributes: .init(itemsBuilder: {
-                            AttributeSyntax("@discardableResult")
-                        }),
-                        modifiers: self.variable.modifier.build(),
-                        name: .identifier(self.variable.name),
-                        signature: .init(
-                            parameterClause: .init(parametersBuilder: {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("value"),
-                                    type: FunctionTypeSyntax(
-                                        parameters: [],
-                                        returnClause: ReturnClauseSyntax(
-                                            type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
-                                        )
-                                    )
-                                )
-                            }),
-                            returnClause: .init(
-                                type: IdentifierTypeSyntax(name: .keyword(.Self))
-                            )
-                        ),
-                        bodyBuilder: {
-                            SequenceExprSyntax(elementsBuilder: {
-                                MemberAccessExprSyntax(
-                                    base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
-                                    name: .identifier(self.variable.name)
-                                )
-                                AssignmentExprSyntax()
-                                FunctionCallExprSyntax(
-                                    callee: DeclReferenceExprSyntax(baseName: .identifier("value"))
-                                )
-                            })
-                            ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
-                        }
-                    )
-                    FunctionDeclSyntax(
-                        attributes: .init(itemsBuilder: {
-                            AttributeSyntax("@discardableResult")
-                        }),
-                        modifiers: self.variable.modifier.build(),
-                        name: .identifier(self.variable.name),
-                        signature: .init(
-                            parameterClause: .init(parametersBuilder: {
-                                FunctionParameterSyntax(
-                                    firstName: .wildcardToken(),
-                                    secondName: .identifier("value"),
-                                    type: FunctionTypeSyntax(
-                                        parameters: .init(itemsBuilder: {
-                                            TupleTypeElementSyntax(
-                                                type: IdentifierTypeSyntax(name: .keyword(.Self))
-                                            )
-                                        }),
-                                        returnClause: .init(
-                                            type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
-                                        )
-                                    )
-                                )
-                            }),
-                            returnClause: .init(
-                                type: IdentifierTypeSyntax(name: .keyword(.Self))
-                            )
-                        ),
-                        bodyBuilder: {
-                            SequenceExprSyntax(elementsBuilder: {
-                                MemberAccessExprSyntax(
-                                    base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
-                                    name: .identifier(self.variable.name)
-                                )
-                                AssignmentExprSyntax()
-                                FunctionCallExprSyntax(
-                                    callee: DeclReferenceExprSyntax(baseName: .identifier("value")),
-                                    argumentList: {
-                                        LabeledExprSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
-                                    }
-                                )
-                            })
-                            ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
-                        }
-                    )
+                        }))
+                    } else {
+                        self.referenceTypeFunctions(by: entity)
+                    }
                 })
             }
         }
         
+    }
+    
+}
+
+fileprivate extension Entity.Property {
+    
+    func valueTypeFunction(
+        by entity: Entity
+    ) -> FunctionDeclSyntax {
+        return .init(
+            attributes: .init(itemsBuilder: {
+                AttributeSyntax("@inlinable")
+            }),
+            modifiers: self.variable.modifier.build(),
+            name: .identifier(self.variable.name),
+            signature: .init(
+                parameterClause: .init(parametersBuilder: {
+                    FunctionParameterSyntax(
+                        firstName: .wildcardToken(),
+                        secondName: .identifier("value"),
+                        type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
+                    )
+                }),
+                returnClause: .init(
+                    type: IdentifierTypeSyntax(name: .keyword(.Self))
+                )
+            ),
+            bodyBuilder: {
+                ReturnStmtSyntax(
+                    expression: FunctionCallExprSyntax(
+                        callee: ExprSyntax(".init"),
+                        argumentList: {
+                            for variable in entity.variables {
+                                if variable.isStored == true {
+                                    if variable.name == self.variable.name {
+                                        LabeledExprSyntax(
+                                            label: variable.name,
+                                            expression: DeclReferenceExprSyntax(baseName: .identifier("value"))
+                                        )
+                                    } else {
+                                        LabeledExprSyntax(
+                                            label: variable.name,
+                                            expression: MemberAccessExprSyntax(
+                                                base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
+                                                name: .identifier(variable.name)
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    )
+                )
+            }
+        )
+    }
+    
+    @MemberBlockItemListBuilder
+    func referenceTypeFunctions(
+        by entity: Entity
+    ) -> MemberBlockItemListSyntax {
+        FunctionDeclSyntax(
+            attributes: .init(itemsBuilder: {
+                AttributeSyntax("@inlinable")
+                AttributeSyntax("@discardableResult")
+            }),
+            modifiers: self.variable.modifier.build(),
+            name: .identifier(self.variable.name),
+            signature: .init(
+                parameterClause: .init(parametersBuilder: {
+                    FunctionParameterSyntax(
+                        firstName: .wildcardToken(),
+                        secondName: .identifier("value"),
+                        type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
+                    )
+                }),
+                returnClause: .init(
+                    type: IdentifierTypeSyntax(name: .keyword(.Self))
+                )
+            ),
+            bodyBuilder: {
+                SequenceExprSyntax(elementsBuilder: {
+                    MemberAccessExprSyntax(
+                        base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
+                        name: .identifier(self.variable.name)
+                    )
+                    AssignmentExprSyntax()
+                    DeclReferenceExprSyntax(baseName: .identifier("value"))
+                })
+                ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
+            }
+        )
+        FunctionDeclSyntax(
+            attributes: .init(itemsBuilder: {
+                AttributeSyntax("@inlinable")
+                AttributeSyntax("@discardableResult")
+            }),
+            modifiers: self.variable.modifier.build(),
+            name: .identifier(self.variable.name),
+            signature: .init(
+                parameterClause: .init(parametersBuilder: {
+                    FunctionParameterSyntax(
+                        firstName: .wildcardToken(),
+                        secondName: .identifier("value"),
+                        type: FunctionTypeSyntax(
+                            parameters: [],
+                            returnClause: ReturnClauseSyntax(
+                                type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
+                            )
+                        )
+                    )
+                }),
+                returnClause: .init(
+                    type: IdentifierTypeSyntax(name: .keyword(.Self))
+                )
+            ),
+            bodyBuilder: {
+                SequenceExprSyntax(elementsBuilder: {
+                    MemberAccessExprSyntax(
+                        base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
+                        name: .identifier(self.variable.name)
+                    )
+                    AssignmentExprSyntax()
+                    FunctionCallExprSyntax(
+                        callee: DeclReferenceExprSyntax(baseName: .identifier("value"))
+                    )
+                })
+                ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
+            }
+        )
+        FunctionDeclSyntax(
+            attributes: .init(itemsBuilder: {
+                AttributeSyntax("@inlinable")
+                AttributeSyntax("@discardableResult")
+            }),
+            modifiers: self.variable.modifier.build(),
+            name: .identifier(self.variable.name),
+            signature: .init(
+                parameterClause: .init(parametersBuilder: {
+                    FunctionParameterSyntax(
+                        firstName: .wildcardToken(),
+                        secondName: .identifier("value"),
+                        type: FunctionTypeSyntax(
+                            parameters: .init(itemsBuilder: {
+                                TupleTypeElementSyntax(
+                                    type: IdentifierTypeSyntax(name: .keyword(.Self))
+                                )
+                            }),
+                            returnClause: .init(
+                                type: IdentifierTypeSyntax(name: .identifier(self.variable.type))
+                            )
+                        )
+                    )
+                }),
+                returnClause: .init(
+                    type: IdentifierTypeSyntax(name: .keyword(.Self))
+                )
+            ),
+            bodyBuilder: {
+                SequenceExprSyntax(elementsBuilder: {
+                    MemberAccessExprSyntax(
+                        base: DeclReferenceExprSyntax(baseName: .keyword(.self)),
+                        name: .identifier(self.variable.name)
+                    )
+                    AssignmentExprSyntax()
+                    FunctionCallExprSyntax(
+                        callee: DeclReferenceExprSyntax(baseName: .identifier("value")),
+                        argumentList: {
+                            LabeledExprSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
+                        }
+                    )
+                })
+                ReturnStmtSyntax(expression: DeclReferenceExprSyntax(baseName: .keyword(.self)))
+            }
+        )
     }
     
 }

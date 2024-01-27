@@ -2,9 +2,9 @@
 //  KindKit
 //
 
-public extension PermissionRequest {
+extension PermissionRequest {
     
-    enum When {
+    public enum When {
         
         case always
         case inUse

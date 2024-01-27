@@ -65,7 +65,7 @@ private extension View.List.Content {
     
 }
 
-extension View.List.Content : ILayoutPart {
+extension View.List.Content : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

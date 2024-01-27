@@ -4,8 +4,8 @@
 
 import Foundation
 
-extension Identifier : ITypeAlias where Raw : ITypeAlias {
+extension Identifier : ITypeAlias where RawType : ITypeAlias {
     
-    public typealias SQLiteTypeDeclaration = Raw.SQLiteTypeDeclaration
+    public typealias SQLiteTypeDeclaration = RawType.SQLiteTypeDeclaration
     
 }

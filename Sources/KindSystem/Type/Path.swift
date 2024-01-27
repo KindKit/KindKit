@@ -8,9 +8,8 @@ public struct Path : Hashable {
     
     public let string: String
     
-    @inline(__always)
-    private init(string: String) {
-        self.string = string
+    public init?(_ url: URL) {
+        self.init(url.path)
     }
     
     public init?(_ string: String) {
@@ -35,6 +34,10 @@ public struct Path : Hashable {
         default:
             return nil
         }
+    }
+    
+    private init(string: String) {
+        self.string = string
     }
     
 }
@@ -108,8 +111,22 @@ public extension Path {
         return self.string.components(separatedBy: "/")
     }
     
+    func component(_ position: Int) -> String? {
+        let components = self.components
+        let index: Int
+        if position > 0 {
+            index = components.index(components.startIndex, offsetBy: position)
+        } else {
+            index = components.index(components.endIndex, offsetBy: position)
+        }
+        guard index >= components.startIndex && index < components.endIndex else {
+            return nil
+        }
+        return components[index]
+    }
+    
     func join< Compoment : StringProtocol >(_ component: Compoment) -> Path {
-        return Path(string: Self._join(prefix: self.string, component: component))
+        return .init(string: Self._join(prefix: self.string, component: component))
     }
     
     func relative(to base: Path) -> String {

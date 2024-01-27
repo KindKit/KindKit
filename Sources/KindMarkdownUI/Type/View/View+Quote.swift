@@ -89,7 +89,7 @@ private extension View.Quote {
     
 }
 
-extension View.Quote : ILayoutPart {
+extension View.Quote : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

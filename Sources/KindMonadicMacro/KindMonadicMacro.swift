@@ -2,8 +2,7 @@
 //  KindKit
 //
 
-@attached(member)
-@attached(extension, names: arbitrary)
+@attached(member, names: arbitrary)
 public macro KindMonadic() = #externalMacro(module: "KindMonadicMacroPlugin", type: "ExpansionMacro")
 
 @attached(peer)

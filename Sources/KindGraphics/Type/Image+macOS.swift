@@ -9,6 +9,8 @@ import AppKit
 import ImageIO
 import KindMath
 
+public typealias NativeImage = NSImage
+
 public extension Image {
     
     init(

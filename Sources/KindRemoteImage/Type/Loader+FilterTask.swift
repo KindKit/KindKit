@@ -2,7 +2,9 @@
 //  KindKit
 //
 
+import Dispatch
 import KindGraphics
+import KindTime
 
 extension Loader {
     
@@ -42,7 +44,7 @@ extension Loader.FilterTask : ITarget {
     }
     
     func remoteImage(image: Image) {
-        self.task = DispatchWorkItem.kk_async(queue: self.workQueue, block: {
+        self.task = DispatchWorkItem.async(queue: self.workQueue, block: {
             if let image = self.cache.image(query: self.query, filter: self.filter) {
                 self.finish(image: image)
             } else {

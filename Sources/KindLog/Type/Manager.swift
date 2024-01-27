@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+import Foundation
+
 public final class Manager {
     
     private var _targets: [ITarget]

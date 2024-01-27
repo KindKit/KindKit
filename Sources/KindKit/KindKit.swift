@@ -2,314 +2,267 @@
 //  KindKit
 //
 
-public enum Graphics {
-}
-
-public enum UI {
-}
-
 // MARK: KindAnimation
 
+#if canImport(KindAnimation)
 @_exported import KindAnimation
+#endif
 
 // MARK: KindAppTracking
 
+#if canImport(KindAppTracking)
 @_exported import KindAppTracking
+#endif
 
 // MARK: KindCamera
 
+#if canImport(KindCamera)
 @_exported import KindCamera
+#endif
 
 // MARK: KindCameraUI
 
+#if canImport(KindCameraUI)
 @_exported import KindCameraUI
+#endif
 
 // MARK: KindCondition
 
+#if canImport(KindCondition)
 @_exported import KindCondition
+#endif
 
 // MARK: KindCore
 
+#if canImport(KindCore)
 @_exported import KindCore
-
-@available(*, deprecated, renamed: "KindCore.Formatter")
-public typealias Formatter = KindCore.Formatter
+#endif
 
 // MARK: KindDataSource
 
+#if canImport(KindDataSource)
 @_exported import KindDataSource
+#endif
 
 // MARK: KindDebug
 
+#if canImport(KindDebug)
 @_exported import KindDebug
+#endif
 
 // MARK: KindEmail
 
+#if canImport(KindEmail)
 @_exported import KindEmail
+#endif
 
 // MARK: KindEvent
 
+#if canImport(KindEvent)
 @_exported import KindEvent
+#endif
 
 // MARK: KindFilesLibrary
 
+#if canImport(KindFilesLibrary)
 @_exported import KindFilesLibrary
+#endif
 
 // MARK: KindFlow
 
+#if canImport(KindFlow)
 @_exported import KindFlow
+#endif
 
 // MARK: KindForm
 
+#if canImport(KindForm)
 @_exported import KindForm
+#endif
 
 // MARK: KindGraphics
 
+#if canImport(KindGraphics)
 @_exported import KindGraphics
 
-public extension Graphics {
-    
-    @available(*, deprecated, renamed: "KindGraphics.Context")
-    typealias Context = KindGraphics.Context
-    
-    @available(*, deprecated, renamed: "KindGraphics.DrawMode")
-    typealias DrawMode = KindGraphics.DrawMode
-    
-    @available(*, deprecated, renamed: "KindGraphics.Fill")
-    typealias Fill = KindGraphics.Fill
-    
-    @available(*, deprecated, renamed: "KindGraphics.FillRule")
-    typealias FillRule = KindGraphics.FillRule
-    
-    @available(*, deprecated, renamed: "KindGraphics.Stroke")
-    typealias Stroke = KindGraphics.Stroke
-    
-}
-
-public extension UI {
-    
-    @available(*, deprecated, renamed: "KindGraphics.Border")
-    typealias Border = KindGraphics.Border
-    
-    @available(*, deprecated, renamed: "KindGraphics.Color")
-    typealias Color = KindGraphics.Color
-    
-    @available(*, deprecated, renamed: "KindGraphics.CornerRadius")
-    typealias CornerRadius = KindGraphics.CornerRadius
-    
-    @available(*, deprecated, renamed: "KindGraphics.Font")
-    typealias Font = KindGraphics.Font
-    
-    @available(*, deprecated, renamed: "KindGraphics.Image")
-    typealias Image = KindGraphics.Image
-    
-    @available(*, deprecated, renamed: "KindGraphics.Text")
-    typealias Text = KindGraphics.Text
-    
-    @available(*, deprecated, renamed: "KindGraphics.Shadow")
-    typealias Shadow = KindGraphics.Shadow
-    
-    @available(*, deprecated, renamed: "KindGraphics.Transform")
-    typealias Transform = KindGraphics.Transform
-    
-}
+#endif
 
 // MARK: KindJSON
 
+#if canImport(KindJSON)
 @_exported import KindJSON
+#endif
 
 // MARK: KindKeychain
 
+#if canImport(KindKeychain)
 @_exported import KindKeychain
+#endif
 
 // MARK: KindLocation
 
+#if canImport(KindLocation)
 @_exported import KindLocation
+#endif
 
 // MARK: KindLog
 
+#if canImport(KindLog)
 @_exported import KindLog
+#endif
 
 // MARK: KindLogUI
 
+#if canImport(KindLogUI)
 @_exported import KindLogUI
+#endif
 
 // MARK: KindMarkdown
 
+#if canImport(KindMarkdown)
 @_exported import KindMarkdown
+#endif
 
 // MARK: KindMarkdownUI
 
+#if canImport(KindMarkdownUI)
 @_exported import KindMarkdownUI
+#endif
 
 // MARK: KindMath
 
+#if canImport(KindMath)
 @_exported import KindMath
-
-public extension Graphics {
-    
-    enum Guide {
-        
-        @available(*, deprecated, renamed: "KindMath.AngleGuide")
-        public typealias Angle = KindMath.AngleGuide
-        
-        @available(*, deprecated, renamed: "KindMath.GridGuide")
-        public typealias Grid = KindMath.GridGuide
-        
-        @available(*, deprecated, renamed: "KindMath.LinesGuide")
-        public typealias Lines = KindMath.LinesGuide
-        
-        @available(*, deprecated, renamed: "KindMath.PointGuide")
-        public typealias Point = KindMath.PointGuide
-        
-        @available(*, deprecated, renamed: "KindMath.RuleGuide")
-        public typealias Rule = KindMath.RuleGuide
-        
-    }
-    
-}
-
-@available(*, deprecated, renamed: "KindMath.Point")
-public typealias Point = KindMath.Point
-
-@available(*, deprecated, renamed: "KindMath.Size")
-public typealias Size = KindMath.Size
-
-@available(*, deprecated, renamed: "KindMath.Rect")
-public typealias Rect = KindMath.Rect
+#endif
 
 // MARK: KindModule
 
+#if canImport(KindModule)
 @_exported import KindModule
-
-#if swift(>=5.9)
+#endif
 
 // MARK: KindMonadicMacro
 
+#if canImport(KindMonadicMacro)
 @_exported import KindMonadicMacro
-
 #endif
 
 // MARK: KindNetwork
 
+#if canImport(KindNetwork)
 @_exported import KindNetwork
+#endif
 
 // MARK: KindPermission
 
+#if canImport(KindPermission)
 @_exported import KindPermission
+#endif
 
 // MARK: KindPlayer
 
+#if canImport(KindPlayer)
 @_exported import KindPlayer
+#endif
 
 // MARK: KindQRCode
 
+#if canImport(KindQRCode)
 @_exported import KindQRCode
+#endif
 
 // MARK: KindRemoteImage
 
+#if canImport(KindRemoteImage)
 @_exported import KindRemoteImage
+#endif
 
 // MARK: KindRemoteImageUI
 
+#if canImport(KindRemoteImageUI)
 @_exported import KindRemoteImageUI
+#endif
 
 // MARK: KindScreenUI
 
+#if canImport(KindScreenUI)
 @_exported import KindScreenUI
+#endif
 
 // MARK: KindShell
 
+#if canImport(KindShell)
 @_exported import KindShell
+#endif
 
 // MARK: KindSQLite
 
+#if canImport(KindSQLite)
 @_exported import KindSQLite
+#endif
 
 // MARK: KindSuggestion
 
+#if canImport(KindSuggestion)
 @_exported import KindSuggestion
-
-@available(*, deprecated, renamed: "KindSuggestion.IEntity")
-public typealias IInputSuggestion = KindSuggestion.IEntity
-
-@available(*, deprecated, renamed: "KindSuggestion.IEntityStorable")
-public typealias IInputSuggestionStorable = KindSuggestion.IStorable
-
-public enum InputSuggestion {
-    
-    @available(*, deprecated, renamed: "KindSuggestion.Condition")
-    public typealias Condition = KindSuggestion.Condition
-
-    @available(*, deprecated, renamed: "KindSuggestion.DataSource")
-    public typealias DataSource = KindSuggestion.DataSource
-
-    @available(*, deprecated, renamed: "KindSuggestion.Static")
-    public typealias Static = KindSuggestion.Static
-
-    @available(*, deprecated, renamed: "KindSuggestion.Throttle")
-    public typealias Throttle = KindSuggestion.Throttle
-
-}
+#endif
 
 // MARK: KindSwiftUI
 
+#if canImport(KindSwiftUI)
 @_exported import KindSwiftUI
+#endif
 
 // MARK: KindSystem
 
+#if canImport(KindSystem)
 @_exported import KindSystem
+#endif
 
 // MARK: KindTimer
 
+#if canImport(KindTimer)
 @_exported import KindTimer
-
-public enum Timer {
-    
-    @available(*, deprecated, renamed: "KindTimer.Clock")
-    public typealias Clock = KindTimer.Throttle
-    
-    @available(*, deprecated, renamed: "KindTimer.Debounce")
-    public typealias Debounce = KindTimer.Debounce
-    
-    @available(*, deprecated, renamed: "KindTimer.Every")
-    public typealias Every = KindTimer.Every
-    
-    @available(*, deprecated, renamed: "KindTimer.Interval")
-    public typealias Interval = KindTimer.Interval
-    
-    @available(*, deprecated, renamed: "KindTimer.Once")
-    public typealias Once = KindTimer.Once
-    
-    @available(*, deprecated, renamed: "KindTimer.Throttle")
-    public typealias Throttle = KindTimer.Throttle
-    
-}
+#endif
 
 // MARK: KindUI
 
+#if canImport(KindUI)
 @_exported import KindUI
+#endif
 
 // MARK: KindUIClock
 
+#if canImport(KindUIClock)
 @_exported import KindUIClock
+#endif
 
 // MARK: KindUndoRedo
 
+#if canImport(KindUndoRedo)
 @_exported import KindUndoRedo
+#endif
 
 // MARK: KindUserDefaults
 
+#if canImport(KindUserDefaults)
 @_exported import KindUserDefaults
+#endif
 
 // MARK: KindVideoPlayerUI
 
+#if canImport(KindVideoPlayerUI)
 @_exported import KindVideoPlayerUI
+#endif
 
 // MARK: KindWebUI
 
+#if canImport(KindWebUI)
 @_exported import KindWebUI
+#endif
 
 // MARK: KindXML
 
+#if canImport(KindXML)
 @_exported import KindXML
+#endif

@@ -4,14 +4,23 @@
 
 import KindGraphics
 import KindMath
+import KindMonadicMacro
 
 public extension ShapeView {
     
+    @KindMonadic
     struct Line : Equatable {
-        
+    
+        @KindMonadicProperty
         public let width: Double
+        
+        @KindMonadicProperty
         public let cap: LineCap
+        
+        @KindMonadicProperty
         public let join: LineJoin
+        
+        @KindMonadicProperty
         public let dash: LineDash?
         
         public init(

@@ -2,12 +2,14 @@
 //  KindKit
 //
 
+import Foundation
 import KindEvent
+import KindTime
 
-public final class Every {
+public final class Every< UnitType : IUnit > {
     
-    public private(set) var interval: Interval
-    public let tolerance: DispatchTimeInterval
+    public let tolerance: Interval< UnitType >
+    public private(set) var interval: Interval< UnitType >
     public let queue: DispatchQueue
     public private(set) var iterations: Int
     public private(set) var remainings: Int = 0
@@ -15,39 +17,54 @@ public final class Every {
     public let onTriggered = Signal< Void, Void >()
     public let onFinished = Signal< Void, Void >()
     
+    var timer: DispatchSourceTimer {
+        if let timer = self._timer {
+            return timer
+        }
+        let timer = DispatchSource.makeTimerSource(queue: self.queue)
+        self._timer = timer
+        return timer
+    }
+    
     private var _state: State = .paused
-    private let _timer: DispatchSourceTimer
+    private var _timer: DispatchSourceTimer? {
+        willSet {
+            guard let timer = self._timer else { return }
+            timer.setEventHandler(handler: nil)
+            timer.cancel()
+            switch self._state {
+            case .paused, .finished:
+                timer.resume()
+            case .running, .executing:
+                break
+            }
+        }
+        didSet {
+            guard let timer = self._timer else { return }
+            let interval = self.interval.dispatchTimeInterval
+            timer.setEventHandler(handler: { [weak self] in
+                guard let self = self else { return }
+                self._fired()
+            })
+            timer.schedule(deadline: .now() + interval, repeating: interval, leeway: self.tolerance.dispatchTimeInterval)
+        }
+    }
     
     public init(
-        interval: Interval,
+        tolerance: Interval< UnitType > = .zero,
+        interval: Interval< UnitType >,
         iterations: Int,
-        tolerance: DispatchTimeInterval = .nanoseconds(0),
         queue: DispatchQueue = .main
     ) {
+        self.tolerance = tolerance
         self.interval = interval
         self.iterations = iterations
         self.remainings = iterations
-        self.tolerance = tolerance
         self.queue = queue
-        self._timer = DispatchSource.makeTimerSource(queue: self.queue)
-        self._timer.setEventHandler(handler: { [weak self] in
-            guard let self = self else { return }
-            if self._timer.isCancelled == false {
-                self._fired()
-            }
-        })
-        self._configureTimer()
     }
     
     deinit {
-        self._timer.setEventHandler(handler: nil)
-        self._timer.cancel()
-        switch self._state {
-        case .paused, .finished:
-            self._timer.resume()
-        case .running, .executing:
-            break
-        }
+        self._reset()
     }
     
 }
@@ -67,12 +84,12 @@ public extension Every {
     
     @discardableResult
     func reset(
-        interval: Interval? = nil,
+        interval: Interval< UnitType >? = nil,
         iterations: Int? = nil,
         restart: Bool = true
     ) -> Self {
         if self._state.isRunning == true {
-            self._pause(from: self._state)
+            self._reset()
         }
         if let interval = interval {
             self.interval = interval
@@ -81,10 +98,9 @@ public extension Every {
             self.iterations = iterations
         }
         self.remainings = self.iterations
-        self._reconfigureTimer()
         self._state = .paused
         if restart == true {
-            self._timer.resume()
+            self.timer.resume()
             self._state = .running
             self.onStarted.emit()
         }
@@ -94,7 +110,7 @@ public extension Every {
     @discardableResult
     func start() -> Self {
         if self._state.isRunning == false {
-            self._timer.resume()
+            self.timer.resume()
             self._state = .running
             self.onStarted.emit()
         }
@@ -107,7 +123,8 @@ public extension Every {
         case .paused, .finished:
             break
         case .running, .executing:
-            self._pause(from: self._state)
+            self.timer.suspend()
+            self._state = .paused
         }
         return self
     }
@@ -143,27 +160,8 @@ extension Every : IEndable {
 
 private extension Every {
     
-    func _configureTimer() {
-        let interval = self.interval.asDispatchTimeInterval
-        self._timer.schedule(deadline: .now() + interval, repeating: interval, leeway: self.tolerance)
-    }
-    
-    func _reconfigureTimer() {
-        self._timer.cancel()
-        self._configureTimer()
-    }
-    
-    @discardableResult
-    func _pause(
-        from currentState: State,
-        to newState: State = .paused
-    ) -> Bool {
-        guard self._state == currentState else {
-            return false
-        }
-        self._timer.suspend()
-        self._state = newState
-        return true
+    func _reset() {
+        self._timer = nil
     }
     
     func _fired() {
@@ -171,7 +169,8 @@ private extension Every {
         self.remainings -= 1
         self.onTriggered.emit()
         if self.remainings == 0 {
-            self._pause(from: .executing, to: .finished)
+            self._state = .finished
+            self._reset()
             self.onFinished.emit()
         }
     }

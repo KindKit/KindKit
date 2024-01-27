@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Pragma {
     
@@ -18,11 +18,12 @@ public extension Query.Pragma {
 extension Query.Pragma.Set : IQuery {
     
     public var query: String {
-        let builder = StringBuilder("PRAGMA ")
-        builder.append(self.name)
-        builder.append(" = ")
-        builder.append(self.value)
-        return builder.string
+        return .kk_build({
+            LettersComponent("PRAGMA ")
+            LettersComponent(self.name)
+            LettersComponent(" = ")
+            LettersComponent(self.value)
+        })
     }
     
 }

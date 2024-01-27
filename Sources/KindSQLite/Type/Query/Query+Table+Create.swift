@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Table {
     
@@ -65,21 +65,26 @@ public extension Query.Table.Create {
 extension Query.Table.Create : IQuery {
     
     public var query: String {
-        let builder = StringBuilder("CREATE TABLE")
-        if self.ifNotExists == true {
-            builder.append(" IF NOT EXISTS")
-        }
-        builder.append(" ")
-        builder.append(self.table)
-        if self.columns.isEmpty == false {
-            builder.append(" (")
-            builder.append(self.columns.map({ $0.query }), separator: ", ")
-            builder.append(")")
-        }
-        if self.withoutRowId == true {
-            builder.append(" WITHOUT ROWID")
-        }
-        return builder.string
+        return .kk_build({
+            LettersComponent("CREATE TABLE")
+            if self.ifNotExists == true {
+                LettersComponent(" IF NOT EXISTS")
+            }
+            LettersComponent(" ")
+            LettersComponent(self.table)
+            if self.columns.isEmpty == false {
+                LettersComponent(" (")
+                ForEachComponent(count: self.columns.count, content: { index in
+                    LettersComponent(self.columns[index].query)
+                }, separator: {
+                    LettersComponent(", ")
+                })
+                LettersComponent(")")
+            }
+            if self.withoutRowId == true {
+                LettersComponent(" WITHOUT ROWID")
+            }
+        })
     }
     
 }

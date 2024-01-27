@@ -3,6 +3,7 @@
 //
 
 import KindCore
+import KindString
 
 public indirect enum Info : Hashable, Equatable {
     
@@ -10,6 +11,15 @@ public indirect enum Info : Hashable, Equatable {
     case sequence([Info])
     case pair(key: Info, value: Info)
     case string(String)
+    
+}
+
+public extension Info {
+    
+    @inlinable
+    static func string(@KindString.Builder builder: () -> String) -> Self {
+        return .string(builder())
+    }
     
 }
 
@@ -170,58 +180,47 @@ public extension Info {
     func string(
         options: Options = []
     ) -> String {
-        let buff = StringBuilder()
-        self.processing(
-            buff: buff,
-            options: options
-        )
-        return buff.string
+        return self._builder(options: options)
     }
 
 }
 
-extension Info {
+fileprivate extension Info {
     
-    @inline(__always)
-    func processing(
-        buff: StringBuilder,
+    @KindString.Builder func _builder(
         options: Options,
         head: Int = 0,
         inter: Int = 1,
         tail: Int = 0
-    ) {
+    ) -> String {
         switch self {
         case .object(let type, let value):
             if options.contains(.inline) == false {
-                buff.append("\t", repeating: head)
-                    .append("<")
-                    .append(type)
-                    .append(" ")
-            } else {
-                buff.append("<")
-                    .append(type)
-                    .append(" ")
+                IndentComponent(head)
             }
-            value.processing(
-                buff: buff,
+            LettersComponent("<")
+            LettersComponent(type)
+            SpaceComponent()
+            LettersComponent(
+                info: value,
                 options: options,
                 head: 0,
                 inter: inter,
                 tail: inter - 1
             )
-            buff.append(" >")
+            SpaceComponent()
+            LettersComponent(">")
         case .sequence(let value):
             if options.contains(.inline) == false {
-                buff.append("\t", repeating: head)
-                    .append("[")
-                    .newline()
+                IndentComponent(head)
+                LettersComponent("[")
+                NewLineComponent()
             } else {
-                buff.append("[ ")
+                LettersComponent("[ ")
             }
             for index in value.indices {
-                let item = value[index]
-                item.processing(
-                    buff: buff,
+                LettersComponent(
+                    info: value[index],
                     options: options,
                     head: inter,
                     inter: inter + 1,
@@ -229,35 +228,35 @@ extension Info {
                 )
                 if options.contains(.inline) == true {
                     if index != value.endIndex - 1 {
-                        buff.append(", ")
+                        LettersComponent(", ")
                     }
                 } else {
                     if index != value.endIndex - 1 {
-                        buff.append(",")
+                        LettersComponent(",")
                     }
-                    buff.newline()
+                    NewLineComponent()
                 }
             }
             if options.contains(.inline) == false {
-                buff.append("\t", repeating: tail)
-                    .append("]")
+                IndentComponent(tail)
+                LettersComponent("}")
             } else {
-                buff.append(" ]")
+                LettersComponent(" }")
             }
         case .pair(let key, let value):
             if options.contains(.inline) == false {
-                buff.append("\t", repeating: head)
+                IndentComponent(head)
             }
-            key.processing(
-                buff: buff,
+            LettersComponent(
+                info: key,
                 options: options,
                 head: 0,
                 inter: inter,
                 tail: tail
             )
-            buff.append(": ")
-            value.processing(
-                buff: buff,
+            LettersComponent(": ")
+            LettersComponent(
+                info: value,
                 options: options,
                 head: 0,
                 inter: inter,
@@ -265,10 +264,29 @@ extension Info {
             )
         case .string(let value):
             if options.contains(.inline) == false {
-                buff.append("\t", repeating: head)
+                IndentComponent(head)
             }
-            buff.append(value)
+            LettersComponent(value)
         }
     }
 
+}
+
+fileprivate extension LettersComponent {
+    
+    init(
+        info: Info,
+        options: Options,
+        head: Int,
+        inter: Int,
+        tail: Int
+    ) {
+        self.init(info._builder(
+            options: options,
+            head: head,
+            inter: inter,
+            tail: tail
+        ))
+    }
+    
 }

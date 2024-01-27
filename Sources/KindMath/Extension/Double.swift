@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindCore
 
 public extension Double {
     
@@ -75,9 +76,29 @@ public extension Double {
         return self * 180 / .pi
     }
     
+    @inlinable
+    var normalized: Self {
+        return self.normalized(.zero)
+    }
+    
 }
 
 public extension Double {
+    
+    @inlinable
+    func updating(_ block: (Self) -> Self) -> Self {
+        return self.isInfinite == true ? self : block(self)
+    }
+    
+    @inlinable
+    func normalized(_ value: () -> Self) -> Self {
+        return self.isInfinite == true ? value() : self
+    }
+    
+    @inlinable
+    func normalized(_ value: @autoclosure () -> Self) -> Self {
+        return self.isInfinite == true ? value() : self
+    }
     
     @inlinable
     func clamp(_ lower: Self, _ upper: Self) -> Self {
@@ -89,6 +110,9 @@ public extension Double {
         return self
     }
     
+}
+
+extension Double : IMapable {
 }
 
 extension Double : ILerpable {

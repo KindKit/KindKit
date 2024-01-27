@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query {
     
@@ -44,13 +44,14 @@ public extension Query.Column {
 extension Query.Column : IExpressable {
     
     public var query: String {
-        let builder = StringBuilder(self.columnName)
-        builder.append(" ")
-        builder.append(self.columnType)
-        if self.autoIncrement == true {
-            builder.append(" AUTOINCREMENT")
-        }
-        return builder.string
+        return .kk_build({
+            LettersComponent(self.columnName)
+            SpaceComponent()
+            LettersComponent(self.columnType)
+            if self.autoIncrement == true {
+                LettersComponent(" AUTOINCREMENT")
+            }
+        })
     }
     
 }

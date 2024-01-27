@@ -2,9 +2,11 @@
 //  KindKit
 //
 
+import Foundation
 import KindFlow
 import KindGraphics
 import KindLog
+import KindTime
 
 public final class Flow<
     InputType : IResult,
@@ -19,8 +21,8 @@ public final class Flow<
     private let _loader: Loader
     private let _query: (Input.Success) -> QueryType
     private let _filter: (Input.Success) -> IFilter?
-    private let _validation: (Input.Success, Result< Image, Error >, TimeInterval) -> Validation
-    private let _logging: (Input.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage?
+    private let _validation: (Input.Success, Result< Image, Error >, SecondsInterval) -> Validation
+    private let _logging: (Input.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage?
     private let _map: (Input.Success, Result< Image, Error >) -> Result< SuccessType, FailureType >
     private var _state: State?
     private var _task: ICancellable? {
@@ -34,8 +36,8 @@ public final class Flow<
         _ loader: Loader,
         _ query: @escaping (Input.Success) -> QueryType,
         _ filter: @escaping (Input.Success) -> IFilter?,
-        _ validation: @escaping (Input.Success, Result< Image, Error >, TimeInterval) -> Validation,
-        _ logging: @escaping (Input.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage?,
+        _ validation: @escaping (Input.Success, Result< Image, Error >, SecondsInterval) -> Validation,
+        _ logging: @escaping (Input.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage?,
         _ map: @escaping (Input.Success, Result< Image, Error >) -> Result< SuccessType, FailureType >
     ) {
         self._loader = loader
@@ -56,7 +58,7 @@ public final class Flow<
     
     public func receive(value: Input.Success) {
         self._task?.cancel()
-        self._run(.init(startedAt: Date(), input: value))
+        self._run(.init(startedAt: .now, input: value))
     }
     
     public func receive(error: Input.Failure) {
@@ -79,7 +81,7 @@ private extension Flow {
     
     struct State {
         
-        let startedAt: Date
+        let startedAt: SecondsInterval
         let input: Input.Success
 
     }
@@ -108,10 +110,10 @@ private extension Flow {
         _ state: State,
         _ output: Result< Image, Error >
     ) {
-        let elapsed = Date().timeIntervalSince(state.startedAt)
+        let elapsed = state.startedAt.delta(to: .now)
         switch self._validation(state.input, output, elapsed) {
         case .retry(let delay):
-            self._task = DispatchWorkItem.kk_async(
+            self._task = DispatchWorkItem.async(
                 queue: self._loader.syncQueue,
                 delay: delay,
                 block: { [weak self] in
@@ -163,8 +165,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         map: @escaping (Tail.Output.Success, Result< Image, Error >) -> Result< SuccessType, FailureType >
     ) -> Chain< Head, Flow< Tail.Output, SuccessType, FailureType, QueryType > > {
         return self.append(.init(loader, query, filter, validation, logging, map))
@@ -178,8 +180,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Image) -> SuccessType,
         failure: @escaping (Tail.Output.Success, Error) -> FailureType
     ) -> Chain< Head, Flow< Tail.Output, SuccessType, FailureType, QueryType > > {
@@ -198,8 +200,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Image) -> SuccessType
     ) -> Chain< Head, Flow< Tail.Output, SuccessType, Error, QueryType > > where
         Tail.Output.Failure == Never
@@ -219,8 +221,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Image) -> SuccessType
     ) -> Chain< Head, Flow< Tail.Output, SuccessType, Error, QueryType > > where
         Tail.Output.Failure == Error
@@ -240,8 +242,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         failure: @escaping (Tail.Output.Success, Error) -> FailureType
     ) -> Chain< Head, Flow< Tail.Output, Image, FailureType, QueryType > > {
         return self.append(.init(loader, query, filter, validation, logging, { input, result -> Result< Image, FailureType > in
@@ -258,8 +260,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Image, Error, QueryType > > where
         Tail.Output.Failure == Never
     {
@@ -277,8 +279,8 @@ public extension IBuilder {
         loader: Loader = .shared,
         query: @escaping (Tail.Output.Success) -> QueryType,
         filter: @escaping (Tail.Output.Success) -> IFilter? = { _ in nil },
-        validation: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Result< Image, Error >, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Result< Image, Error >, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Image, Error, QueryType > > where
         Tail.Output.Failure == Error
     {

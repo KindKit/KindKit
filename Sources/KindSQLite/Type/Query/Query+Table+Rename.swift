@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Table {
     
@@ -18,11 +18,12 @@ public extension Query.Table {
 extension Query.Table.Rename : IQuery {
     
     public var query: String {
-        let builder = StringBuilder("ALTER TABLE ")
-        builder.append(self.from)
-        builder.append(" RENAME TO ")
-        builder.append(self.to)
-        return builder.string
+        return .kk_build({
+            LettersComponent("ALTER TABLE ")
+            LettersComponent(self.from)
+            LettersComponent(" RENAME TO ")
+            LettersComponent(self.to)
+        })
     }
     
 }

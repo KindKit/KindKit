@@ -6,26 +6,36 @@
 
 import KindEvent
 import KindUI
+import KindMonadicMacro
 
+@KindMonadic
 public final class ViewController : UIViewController {
     
     public override var preferredStatusBarStyle: UIStatusBarStyle {
         return self.container.statusBar
     }
+    
     public override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         return self.container.statusBarAnimation
     }
+    
     public override var prefersStatusBarHidden: Bool {
         return self.container.statusBarHidden
     }
+    
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return self.container.supportedOrientations
     }
+    
     public override var shouldAutorotate: Bool {
         return true
     }
+    
     public let owner: AnyObject?
+    
     public let container: Container.Root
+    
+    @KindMonadicSignal
     public let onSnake = Signal< Void, Void >()
     
     var kkRootView: KKRootView! {
@@ -139,7 +149,6 @@ public final class ViewController : UIViewController {
         self._updateSafeArea()
     }
     
-    @available(iOS 11.0, *)
     public override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
         self._updateSafeArea()
@@ -209,31 +218,6 @@ extension ViewController {
     
 }
 
-public extension ViewController {
-    
-    @inlinable
-    @discardableResult
-    func onSnake(_ closure: @escaping () -> Void) -> Self {
-        self.onSnake.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onSnake(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onSnake.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onSnake< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onSnake.add(sender, closure)
-        return self
-    }
-    
-}
-
 extension ViewController : IRootContainerDelegate {
     
     public func updateContentInset() {
@@ -283,21 +267,10 @@ private extension ViewController {
     func _setup() {
         self.container.delegate = self
         Container.BarController.shared.add(observer: self)
-        
-        if #available(iOS 13, *) {
-        } else {
-            NotificationCenter.default.addObserver(self, selector: #selector(self._didChangeStatusBarFrame(_:)), name: UIApplication.didChangeStatusBarFrameNotification, object: nil)
-        }
     }
     
     func _free() {
         Container.BarController.shared.remove(observer: self)
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    @objc
-    func _didChangeStatusBarFrame(_ notification: Any) {
-        self._updateStatusBarHeight()
     }
     
     func _updateStatusBarHeight() {
@@ -307,14 +280,8 @@ private extension ViewController {
     }
     
     func _statusBarHeight() -> Double {
-        let height: Double
-        if #available(iOS 13.0, *) {
-            let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-            height = Double(window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
-        } else {
-            height = Double(UIApplication.shared.statusBarFrame.height)
-        }
-        return height
+        let window = UIApplication.shared.kk_keyWindow
+        return Double(window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
     }
     
     func _updateSafeArea() {
@@ -322,28 +289,14 @@ private extension ViewController {
     }
     
     func _safeArea() -> Inset {
-        if #available(iOS 11.0, *) {
-            return Inset(self.view.safeAreaInsets) + Inset(self.additionalSafeAreaInsets)
-        } else {
-            return Inset(
-                top: Double(self.topLayoutGuide.length),
-                left: 0,
-                right: 0,
-                bottom: Double(self.bottomLayoutGuide.length)
-            )
-        }
+        return Inset(self.view.safeAreaInsets) + Inset(self.additionalSafeAreaInsets)
     }
     
     func _updateOrientation() {
-        let application = UIApplication.shared
-        if #available(iOS 13.0, *) {
-            if let windowScene = self.view.window?.windowScene {
-                self.kkOrientation = windowScene.interfaceOrientation
-            } else if let windowScene = application.kk_windowScenes.first {
-                self.kkOrientation = windowScene.interfaceOrientation
-            }
-        } else {
-            self.kkOrientation = application.statusBarOrientation
+        if let windowScene = self.view.window?.windowScene {
+            self.kkOrientation = windowScene.interfaceOrientation
+        } else if let windowScene = UIApplication.shared.kk_windowScenes.first {
+            self.kkOrientation = windowScene.interfaceOrientation
         }
     }
     

@@ -7,6 +7,7 @@ import AppKit
 #elseif os(iOS)
 import UIKit
 #endif
+import KindTime
 
 public final class FileStorage {
     
@@ -169,7 +170,7 @@ public extension FileStorage {
 
 public extension FileStorage {
     
-    func clear(before: TimeInterval? = nil, recursive: Bool = false) {
+    func clear(before: SecondsInterval? = nil, recursive: Bool = false) {
         let urls: [URL]
         if let before = before {
             urls = self._fs.kk_files(at: self.url, olderThan: before, recursive: recursive)

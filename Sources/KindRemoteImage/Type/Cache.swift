@@ -6,6 +6,7 @@ import Foundation
 import KindCore
 import KindGraphics
 import KindSystem
+import KindTime
 
 public final class Cache {
     
@@ -157,7 +158,7 @@ public extension Cache {
 
 public extension Cache {
 
-    func cleanup(before: TimeInterval) {
+    func cleanup(before: SecondsInterval) {
         self.cleanupMemory()
         let urls = self._fileManager.kk_contents(at: self.url, olderThan: before)
         for url in urls {

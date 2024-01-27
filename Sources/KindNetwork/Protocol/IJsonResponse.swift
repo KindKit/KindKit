@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindJSON
 
 public protocol IJsonResponse : IDataResponse {

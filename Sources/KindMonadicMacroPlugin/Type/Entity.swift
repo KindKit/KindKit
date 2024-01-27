@@ -26,40 +26,13 @@ final class Entity {
         self.modifier = .init(syntax.modifiers)
         self.name = name
         
-        let variablesSyntax = syntax.memberBlock.members.compactMap({ $0.decl.as(VariableDeclSyntax.self) })
-        for variableSyntax in variablesSyntax {
-            let attributes = variableSyntax.attributes.compactMap(Attribute.init)
-            for bindingSyntax in variableSyntax.bindings {
-                guard let variable = Variable(variableSyntax: variableSyntax, bindingSyntax: bindingSyntax) else {
-                    continue
-                }
-                self.variables.append(variable)
-                
-                if attributes.isEmpty == false {
-                    var aliases: [Alias] = []
-                    var properties: [Property] = []
-                    var signals: [Signal] = []
-                    for attribute in attributes {
-                        switch attribute {
-                        case .alias(let alias): aliases.append(Alias(alias: alias, variable: variable))
-                        case .property: properties.append(Property(variable: variable))
-                        case .signal: signals.append(Signal(variable: variable))
-                        }
-                    }
-                    self.aliases.append(contentsOf: aliases)
-                    self.properties.append(contentsOf: properties)
-                    self.signals.append(contentsOf: signals)
-                    for alias in aliases {
-                        for origin in properties {
-                            self.properties.append(origin.copy(name: alias.alias))
-                        }
-                        for origin in signals {
-                            self.signals.append(origin.copy(name: alias.alias))
-                        }
-                    }
-                }
-            }
-        }
+        Self.collect(
+            syntax: syntax.memberBlock.members,
+            variables: &self.variables,
+            aliases: &self.aliases,
+            properties: &self.properties,
+            signals: &self.signals
+        )
     }
     
     convenience init(_ syntax: StructDeclSyntax) {
@@ -154,6 +127,86 @@ final class Entity {
                     }
                 }
             )
+        }
+    }
+    
+}
+
+fileprivate extension Entity {
+    
+    static func collect(
+        syntax: MemberBlockItemListSyntax,
+        compileTime: CompileTimeCondition? = nil,
+        variables: inout [Variable],
+        aliases: inout [Alias],
+        properties: inout [Property],
+        signals: inout [Signal]
+    ) {
+        for member in syntax {
+            if let syntax = member.decl.as(VariableDeclSyntax.self) {
+                Self.collect(
+                    syntax: syntax,
+                    compileTime: compileTime,
+                    variables: &variables,
+                    aliases: &aliases,
+                    properties: &properties,
+                    signals: &signals
+                )
+            } else if let syntax = member.decl.as(IfConfigDeclSyntax.self) {
+                for clause in syntax.clauses {
+                    guard let members = clause.elements?.as(MemberBlockItemListSyntax.self) else { continue }
+                    guard let compileTime = CompileTimeCondition(clause) else { continue }
+                    Self.collect(
+                        syntax: members,
+                        compileTime: compileTime,
+                        variables: &variables,
+                        aliases: &aliases,
+                        properties: &properties,
+                        signals: &signals
+                    )
+                }
+            }
+        }
+    }
+    
+    static func collect(
+        syntax: VariableDeclSyntax,
+        compileTime: CompileTimeCondition? = nil,
+        variables: inout [Variable],
+        aliases: inout [Alias],
+        properties: inout [Property],
+        signals: inout [Signal]
+    ) {
+        let attributes = syntax.attributes.compactMap(Attribute.init)
+        for bindingSyntax in syntax.bindings {
+            guard let variable = Variable(compileTime: compileTime, variableSyntax: syntax, bindingSyntax: bindingSyntax) else {
+                continue
+            }
+            variables.append(variable)
+            
+            if attributes.isEmpty == false {
+                var tempAliases: [Alias] = []
+                var tempProperties: [Property] = []
+                var tempSignals: [Signal] = []
+                for attribute in attributes {
+                    switch attribute {
+                    case .alias(let alias): tempAliases.append(Alias(alias: alias, variable: variable))
+                    case .property: tempProperties.append(Property(variable: variable))
+                    case .signal: tempSignals.append(Signal(variable: variable))
+                    }
+                }
+                aliases.append(contentsOf: tempAliases)
+                properties.append(contentsOf: tempProperties)
+                signals.append(contentsOf: tempSignals)
+                for alias in tempAliases {
+                    for origin in tempProperties {
+                        properties.append(origin.copy(name: alias.alias))
+                    }
+                    for origin in signals {
+                        signals.append(origin.copy(name: alias.alias))
+                    }
+                }
+            }
         }
     }
     

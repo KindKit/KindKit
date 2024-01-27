@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindSystem
 
 public enum Location {
     

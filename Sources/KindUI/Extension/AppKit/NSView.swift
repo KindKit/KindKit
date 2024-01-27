@@ -5,10 +5,26 @@
 #if os(macOS)
 
 import AppKit
+import KindMath
 
 public typealias NativeView = NSView
 
 public extension NSView {
+    
+    @inlinable
+    func kk_update(frame: Rect) {
+        self.frame = frame.cgRect
+    }
+    
+    final func kk_snapshot() -> NSImage? {
+        guard let rep = self.bitmapImageRepForCachingDisplay(in: self.bounds) else {
+            return nil
+        }
+        self.cacheDisplay(in: self.bounds, to: rep)
+        let image = NSImage()
+        image.addRepresentation(rep)
+        return image
+    }
     
     func kk_child< View >(of type: View.Type, recursive: Bool) -> View? {
         for subview in self.subviews {

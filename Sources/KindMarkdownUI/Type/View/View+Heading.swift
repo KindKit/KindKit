@@ -65,7 +65,7 @@ private extension View.Heading {
     
 }
 
-extension View.Heading : ILayoutPart {
+extension View.Heading : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

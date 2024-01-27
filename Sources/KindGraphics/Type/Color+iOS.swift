@@ -6,6 +6,8 @@
 
 import UIKit
 
+public typealias NativeColor = UIColor
+
 public extension Color {
     
     init(
@@ -90,7 +92,7 @@ public extension Color {
 public extension Color {
     
     @inlinable
-    var rgba: Rgba {
+    var pixel: Pixel {
         var r: CGFloat = 0
         var g: CGFloat = 0
         var b: CGFloat = 0

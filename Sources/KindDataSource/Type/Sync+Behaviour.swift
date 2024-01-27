@@ -3,13 +3,14 @@
 //
 
 import Foundation
+import KindTime
 
 public extension Sync {
     
     enum Behaviour {
         
         case permanent
-        case periodic(TimeInterval)
+        case periodic(SecondsInterval)
         
     }
         
@@ -24,7 +25,8 @@ public extension Sync.Behaviour {
         case .permanent:
             return false
         case .periodic(let timeout):
-            return Date().timeIntervalSince(syncAt) >= timeout
+            let delta = SecondsInterval(syncAt).delta(from: .now)
+            return delta >= timeout
         }
     }
     

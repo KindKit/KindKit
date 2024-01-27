@@ -6,35 +6,39 @@ import KindCore
 
 public extension Coder {
     
-    struct Identifier< Coder, Kind : IIdentifierKind > {
+    struct Identifier< CoderType, KindType : IIdentifierKind > {
     }
     
 }
 
-extension Coder.Identifier : IValueDecoder where Coder : IValueDecoder {
+extension Coder.Identifier : IValueDecoder where CoderType : IValueDecoder, CoderType.UserDefaultsDecoded : Hashable {
     
-    public static func decode(_ value: IValue) throws -> KindCore.Identifier< Coder.UserDefaultsDecoded, Kind > {
-        return Identifier(try Coder.decode(value))
+    public typealias UserDefaultsDecoded = KindCore.Identifier< CoderType.UserDefaultsDecoded, KindType >
+    
+    public static func decode(_ value: IValue) throws -> UserDefaultsDecoded {
+        return .init(try CoderType.decode(value))
     }
     
 }
 
-extension Coder.Identifier : IValueEncoder where Coder : IValueEncoder {
+extension Coder.Identifier : IValueEncoder where CoderType : IValueEncoder, CoderType.UserDefaultsEncoded : Hashable {
     
-    public static func encode(_ value: KindCore.Identifier< Coder.UserDefaultsEncoded, Kind >) throws -> IValue {
-        return try Coder.encode(value.raw)
+    public typealias UserDefaultsEncoded = KindCore.Identifier< CoderType.UserDefaultsEncoded, KindType >
+    
+    public static func encode(_ value: UserDefaultsEncoded) throws -> IValue {
+        return try CoderType.encode(value.id)
     }
     
 }
 
-extension Identifier : IDecoderAlias where Raw : IDecoderAlias {
+extension Identifier : IDecoderAlias where RawType : IDecoderAlias, RawType.UserDefaultsDecoder.UserDefaultsDecoded : Hashable {
     
-    public typealias UserDefaultsDecoder = Coder.Identifier< Raw.UserDefaultsDecoder, Kind >
+    public typealias UserDefaultsDecoder = Coder.Identifier< RawType.UserDefaultsDecoder, KindType >
     
 }
 
-extension Identifier : IEncoderAlias where Raw : IEncoderAlias {
+extension Identifier : IEncoderAlias where RawType : IEncoderAlias, RawType.UserDefaultsEncoder.UserDefaultsEncoded : Hashable {
     
-    public typealias UserDefaultsEncoder = Coder.Identifier< Raw.UserDefaultsEncoder, Kind >
+    public typealias UserDefaultsEncoder = Coder.Identifier< RawType.UserDefaultsEncoder, KindType >
     
 }

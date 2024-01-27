@@ -12,8 +12,11 @@ import KindEvent
 public final class Session {
     
     public private(set) var isStarting: Bool = false
+    
     public private(set) var isStarted: Bool = false
+    
 #if os(iOS)
+    
     public private(set) var deviceOrientation: Orientation? {
         didSet {
             for recorder in self.activeRecorders {
@@ -21,6 +24,7 @@ public final class Session {
             }
         }
     }
+    
     public private(set) var interfaceOrientation: Orientation? {
         didSet {
             for recorder in self.activeRecorders {
@@ -28,7 +32,9 @@ public final class Session {
             }
         }
     }
+    
 #endif
+    
     public var videoDevices: [Device.Video] {
         return AVCaptureDevice.DiscoverySession(
             deviceTypes: Device.Video.BuiltIn.allCases.compactMap({ $0.raw }),
@@ -38,6 +44,7 @@ public final class Session {
             Device.Video($0)
         })
     }
+    
     public var audioDevices: [Device.Audio] {
         return AVCaptureDevice.DiscoverySession(
             deviceTypes: [ .builtInMicrophone ],
@@ -47,25 +54,33 @@ public final class Session {
             Device.Audio($0)
         })
     }
+    
     public var activeVideoPreset: Device.Video.Preset? {
         return self._activeState?.videoPreset
     }
+    
     public var activeVideoDevice: Device.Video? {
         return self._activeState?.videoDevice
     }
+    
     public var activeAudioDevice: Device.Audio? {
         return self._activeState?.audioDevice
     }
+    
     public var activeOutputs: [IOutput] {
         return self._activeState?.outputs ?? []
     }
+    
     public var activeRecorders: [IRecorder] {
         return self._activeState?.recorders ?? []
     }
 
     public let session = AVCaptureSession()
+    
 #if os(iOS)
+    
     public let motionManager = CMMotionManager()
+    
 #endif
     
     private var _activeState: State?
@@ -141,18 +156,16 @@ private extension Session {
     }
     
     func _currentUnterfaceOrientation() -> Orientation? {
-        if #available(iOS 16.0, *) {
-            for scene in UIApplication.shared.connectedScenes {
-                guard let scene = scene as? UIWindowScene else { continue }
-                return .init(scene.effectiveGeometry.interfaceOrientation)
-            }
-        } else if #available(iOS 13.0, *) {
-            for scene in UIApplication.shared.connectedScenes {
-                guard let scene = scene as? UIWindowScene else { continue }
-                return .init(scene.interfaceOrientation)
-            }
+        var windowScene: UIWindowScene? = nil
+        for scene in UIApplication.shared.connectedScenes {
+            guard let scene = scene as? UIWindowScene else { continue }
+            windowScene = scene
         }
-        return .init(UIApplication.shared.statusBarOrientation)
+        guard let windowScene = windowScene else { return nil }
+        if #available(iOS 16.0, *) {
+            return .init(windowScene.effectiveGeometry.interfaceOrientation)
+        }
+        return .init(windowScene.interfaceOrientation)
     }
     
     func _subscribeDeviceOrientaion() {

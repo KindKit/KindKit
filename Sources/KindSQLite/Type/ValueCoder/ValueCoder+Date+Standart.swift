@@ -19,7 +19,7 @@ public extension ValueCoder.Date {
             case .real(let value):
                 return .kk_date(julianDays: value)
             case .text(let value):
-                let formatter = DateFormatter()
+                let formatter = Foundation.DateFormatter()
                 formatter.locale = Locale(identifier: "en_US_POSIX")
                 formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
                 guard let date = formatter.date(from: value) else {
@@ -32,7 +32,7 @@ public extension ValueCoder.Date {
         }
         
         public static func encode(_ value: SQLiteDecoded) throws -> Value {
-            let formatter = DateFormatter()
+            let formatter = Foundation.DateFormatter()
             formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
             return .text(formatter.string(from: value))

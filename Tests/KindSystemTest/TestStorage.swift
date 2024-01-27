@@ -7,7 +7,7 @@ import KindSystem
 
 class TestStorage : XCTestCase {
     
-    func test1() {
+    func test() {
         guard let rootStorage = FileStorage("RootStorage") else {
             return
         }
@@ -20,8 +20,8 @@ class TestStorage : XCTestCase {
         guard let subFile1 = subStorage.append(name: "SubFile1", extension: "tmp", data: Data()) else {
             return
         }
-        rootStorage.clear(before: .leastNonzeroMagnitude)
-        subStorage.clear(before: .leastNonzeroMagnitude)
+        rootStorage.clear(before: .zero)
+        subStorage.clear(before: .zero)
         rootStorage.delete()
     }
 

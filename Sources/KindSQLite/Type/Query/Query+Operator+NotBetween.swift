@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Operator {
     
@@ -19,14 +19,15 @@ public extension Query.Operator {
 extension Query.Operator.NotBetween : ICondition {
     
     public var query: String {
-        let builder = StringBuilder("(")
-        builder.append(self.origin)
-        builder.append(" NOT BETWEEN ")
-        builder.append(self.from.query)
-        builder.append(" AND ")
-        builder.append(self.to.query)
-        builder.append(")")
-        return builder.string
+        return .kk_build({
+            LettersComponent("(")
+            LettersComponent(self.origin)
+            LettersComponent(" NOT BETWEEN ")
+            LettersComponent(self.from.query)
+            LettersComponent(" AND ")
+            LettersComponent(self.to.query)
+            LettersComponent(")")
+        })
     }
     
 }

@@ -3,10 +3,14 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class And : IEntity {
     
     public let observer = Observer< IObserver >()
+    
+    @KindMonadicProperty
     public var conditions: [IEntity] {
         willSet {
             self._unsubscribe()
@@ -16,6 +20,8 @@ public final class And : IEntity {
             self._refresh()
         }
     }
+    
+    @KindMonadicProperty
     public var isEmpty: Bool {
         didSet {
             guard self.isEmpty != oldValue else { return }
@@ -90,48 +96,6 @@ private extension And {
         return true
     }
 
-}
-
-public extension And {
-    
-    @inlinable
-    @discardableResult
-    func conditions(_ value: [IEntity]) -> Self {
-        self.conditions = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func conditions(_ value: () -> [IEntity]) -> Self {
-        return self.conditions(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func conditions(_ value: (Self) -> [IEntity]) -> Self {
-        return self.conditions(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func isEmpty(_ value: Bool) -> Self {
-        self.isEmpty = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func isEmpty(_ value: () -> Bool) -> Self {
-        return self.isEmpty(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func isEmpty(_ value: (Self) -> Bool) -> Self {
-        return self.isEmpty(value(self))
-    }
-    
 }
 
 extension And : IObserver {

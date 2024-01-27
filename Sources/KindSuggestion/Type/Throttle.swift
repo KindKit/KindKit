@@ -5,7 +5,7 @@
 import KindEvent
 import KindTimer
 
-public final class Throttle< SuggestionType : IEntity & IStorable > : IEntity, IStorable {
+public final class Throttle< SuggestionType : IEntity & IStorable, UnitType : IUnit > : IEntity, IStorable {
     
     public var store: [SuggestionType.StoreType] {
         return self._suggestion.store
@@ -18,20 +18,24 @@ public final class Throttle< SuggestionType : IEntity & IStorable > : IEntity, I
     }
     
     private let _suggestion: SuggestionType
-    private let _timer: KindTimer.Throttle
+    private let _timer: KindTimer.Throttle< UnitType >
     private var _search: String?
     
     public init(
-        timer: KindTimer.Throttle,
+        timer: KindTimer.Throttle< UnitType >,
         suggestion: SuggestionType
     ) {
         self._timer = timer
         self._suggestion = suggestion
         
-        self._timer.onFinished.add(self, {
+        self._timer.onFinished(self, {
             guard let search = $0._search else { return }
             $0._suggestion.variants(search)
         })
+    }
+    
+    deinit {
+        self._timer.onFinished(remove: self)
     }
     
     public func begin() {

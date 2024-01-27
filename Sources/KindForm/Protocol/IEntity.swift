@@ -132,8 +132,15 @@ public extension IEntity {
     
     @inlinable
     @discardableResult
-    func onShouldFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Bool?) -> Self {
-        self.onShouldFocus.add(sender, closure)
+    func onShouldFocus< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Bool?) -> Self {
+        self.onShouldFocus.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onShouldFocus(remove target: AnyObject) -> Self {
+        self.onShouldFocus.remove(target)
         return self
     }
     
@@ -153,8 +160,15 @@ public extension IEntity {
     
     @inlinable
     @discardableResult
-    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onFocus.add(sender, closure)
+    func onFocus< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onFocus.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFocus(remove target: AnyObject) -> Self {
+        self.onFocus.remove(target)
         return self
     }
     
@@ -174,8 +188,15 @@ public extension IEntity {
     
     @inlinable
     @discardableResult
-    func onChanged< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onChanged.add(sender, closure)
+    func onChanged< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onChanged.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onChanged(remove target: AnyObject) -> Self {
+        self.onChanged.remove(target)
         return self
     }
     

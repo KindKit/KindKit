@@ -3,10 +3,14 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Const : IEntity {
     
     public let observer = Observer< IObserver >()
+    
+    @KindMonadicProperty
     public var state: Bool {
         didSet {
             guard self.state != oldValue else { return }
@@ -23,29 +27,6 @@ public final class Const : IEntity {
     
     public func callAsFunction() -> Bool {
         return self.state
-    }
-    
-}
-
-public extension Const {
-    
-    @inlinable
-    @discardableResult
-    func state(_ value: Bool) -> Self {
-        self.state = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func state(_ value: () -> Bool) -> Self {
-        return self.state(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func state(_ value: (Self) -> Bool) -> Self {
-        return self.state(value(self))
     }
     
 }

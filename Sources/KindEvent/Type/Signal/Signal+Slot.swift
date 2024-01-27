@@ -22,7 +22,7 @@ extension Signal {
             fatalError()
         }
         
-        func contains(_ sender: AnyObject) -> Bool {
+        func contains(_ target: AnyObject) -> Bool {
             return false
         }
         

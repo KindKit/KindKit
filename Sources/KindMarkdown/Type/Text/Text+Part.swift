@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+import Foundation
+
 public extension Text {
     
     indirect enum Part : Equatable {

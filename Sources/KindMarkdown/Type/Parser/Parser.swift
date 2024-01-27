@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+import Foundation
+
 public enum Parser {
     
     @inlinable

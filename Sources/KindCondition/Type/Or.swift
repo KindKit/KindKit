@@ -3,10 +3,14 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Or : IEntity {
     
     public let observer = Observer< IObserver >()
+    
+    @KindMonadicProperty
     public var conditions: [IEntity] {
         willSet {
             self._unsubscribe()
@@ -79,29 +83,6 @@ private extension Or {
         return false
     }
 
-}
-
-public extension Or {
-    
-    @inlinable
-    @discardableResult
-    func conditions(_ value: [IEntity]) -> Self {
-        self.conditions = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func conditions(_ value: () -> [IEntity]) -> Self {
-        return self.conditions(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func conditions(_ value: (Self) -> [IEntity]) -> Self {
-        return self.conditions(value(self))
-    }
-    
 }
 
 extension Or : IObserver {

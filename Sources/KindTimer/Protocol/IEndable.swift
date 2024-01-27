@@ -30,8 +30,15 @@ public extension IEndable {
     
     @inlinable
     @discardableResult
-    func onFinished< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onFinished.add(sender, closure)
+    func onFinished< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onFinished.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinished(remove target: AnyObject) -> Self {
+        self.onFinished.remove(target)
         return self
     }
     

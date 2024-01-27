@@ -77,7 +77,7 @@ public extension Date {
     
     @inlinable
     static func kk_date(unixTime: Int) -> Self {
-        return .init(timeIntervalSince1970: TimeInterval(unixTime))
+        return .init(timeIntervalSince1970: .init(unixTime))
     }
     
     @inlinable

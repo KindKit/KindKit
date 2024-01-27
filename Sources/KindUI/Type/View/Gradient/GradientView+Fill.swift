@@ -3,14 +3,23 @@
 //
 
 import KindMath
+import KindMonadicMacro
 
-public extension GradientView {
+extension GradientView {
     
-    struct Fill : Equatable {
+    @KindMonadic
+    public struct Fill : Equatable {
         
+        @KindMonadicProperty
         public let mode: Mode
+        
+        @KindMonadicProperty
         public let points: [GradientView.Fill.Point]
+        
+        @KindMonadicProperty
         public let start: KindMath.Point
+        
+        @KindMonadicProperty
         public let end: KindMath.Point
         
         public init(

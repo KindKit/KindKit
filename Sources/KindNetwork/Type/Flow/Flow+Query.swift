@@ -2,8 +2,10 @@
 //  KindKit
 //
 
+import Foundation
 import KindFlow
 import KindLog
+import KindTime
 
 public final class Flow<
     Input : IResult,
@@ -19,8 +21,8 @@ public final class Flow<
     private let _queue: DispatchQueue
     private let _request: (Input.Success) throws -> Request
     private let _response: (Input.Success) -> Response
-    private let _validation: (Input.Success, Response.Result, TimeInterval) -> KindFlow.Validation
-    private let _logging: (Input.Success, Response.Result, TimeInterval) -> KindLog.IMessage?
+    private let _validation: (Input.Success, Response.Result, SecondsInterval) -> KindFlow.Validation
+    private let _logging: (Input.Success, Response.Result, SecondsInterval) -> KindLog.IMessage?
     private let _map: (Input.Success, Response.Result) -> Result< Success, Failure >
     private var _task: ICancellable? {
         willSet {
@@ -34,8 +36,8 @@ public final class Flow<
         _ queue: DispatchQueue,
         _ request: @escaping (Input.Success) throws -> Request,
         _ response: @escaping (Input.Success) -> Response,
-        _ validation: @escaping (Input.Success, Response.Result, TimeInterval) -> KindFlow.Validation,
-        _ logging: @escaping (Input.Success, Response.Result, TimeInterval) -> KindLog.IMessage?,
+        _ validation: @escaping (Input.Success, Response.Result, SecondsInterval) -> KindFlow.Validation,
+        _ logging: @escaping (Input.Success, Response.Result, SecondsInterval) -> KindLog.IMessage?,
         _ map: @escaping (Input.Success, Response.Result) -> Result< Success, Failure >
     ) {
         self._provider = provider
@@ -57,7 +59,7 @@ public final class Flow<
     
     public func receive(value: Input.Success) {
         self._cancel()
-        self._run(Date(), value)
+        self._run(.now, value)
     }
     
     public func receive(error: Input.Failure) {
@@ -83,7 +85,7 @@ private extension Flow {
     }
     
     func _run(
-        _ startedAt: Date,
+        _ startedAt: SecondsInterval,
         _ input: Input.Success
     ) {
         let provider = self._provider(input)
@@ -96,15 +98,15 @@ private extension Flow {
     }
 
     func _completed(
-        _ startedAt: Date,
+        _ startedAt: SecondsInterval,
         _ input: Input.Success,
         _ output: Response.Result
     ) {
         self._task = nil
-        let elapsed = Date().timeIntervalSince(startedAt)
+        let elapsed = startedAt.delta(to: .now)
         switch self._validation(input, output, elapsed) {
         case .retry(let delay):
-            self._task = DispatchWorkItem.kk_async(
+            self._task = DispatchWorkItem.async(
                 queue: self._queue,
                 delay: delay,
                 block: { [weak self] in
@@ -139,8 +141,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Chain< Head, Flow< Tail.Output, Success, Failure, Response > > {
         return self.append(.init(provider, queue, request, response, validation, logging, map))
@@ -155,8 +157,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         map: @escaping (Tail.Output.Success, Response.Result) -> Result< Success, Failure >
     ) -> Chain< Head, Flow< Tail.Output, Success, Failure, Response > > {
         return self.append(.init({ _ in provider }, queue, request, response, validation, logging, map))
@@ -171,8 +173,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Chain< Head, Flow< Tail.Output, Success, Failure, Response > > {
@@ -193,8 +195,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success,
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Chain< Head, Flow< Tail.Output, Success, Failure, Response > > {
@@ -214,8 +216,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Chain< Head, Flow< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
@@ -236,8 +238,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Chain< Head, Flow< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
@@ -258,8 +260,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Chain< Head, Flow< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
@@ -280,8 +282,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         success: @escaping (Tail.Output.Success, Response.Success) -> Success
     ) -> Chain< Head, Flow< Tail.Output, Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
@@ -302,8 +304,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Failure, Response > > {
         return self.append(.init(provider, queue, request, response, validation, logging, { input, result -> Result< Response.Success, Failure > in
@@ -322,8 +324,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil },
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil },
         failure: @escaping (Tail.Output.Success, Response.Failure) -> Failure
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Failure, Response > > {
         return self.append(.init({ _ in provider }, queue, request, response, validation, logging, { input, result -> Result< Response.Success, Failure > in
@@ -341,8 +343,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
     {
@@ -358,8 +360,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Never
     {
@@ -375,8 +377,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {
@@ -392,8 +394,8 @@ public extension IBuilder {
         queue: DispatchQueue,
         request: @escaping (Tail.Output.Success) throws -> Request,
         response: @escaping (Tail.Output.Success) -> Response,
-        validation: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindFlow.Validation = { _, _, _ in .done },
-        logging: @escaping (Tail.Output.Success, Response.Result, TimeInterval) -> KindLog.IMessage? = { _, _, _ in nil }
+        validation: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindFlow.Validation = { _, _, _ in .done },
+        logging: @escaping (Tail.Output.Success, Response.Result, SecondsInterval) -> KindLog.IMessage? = { _, _, _ in nil }
     ) -> Chain< Head, Flow< Tail.Output, Response.Success, Response.Failure, Response > > where
         Tail.Output.Failure == Response.Failure
     {

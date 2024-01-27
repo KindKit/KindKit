@@ -10,17 +10,19 @@ import KindSystem
 
 public final class Entity< RequestType : IRequest > : IEntity {
     
+    public let request: RequestType
+    
     public var status: Status {
-        return self._request.status
+        return self.request.status
     }
+    
     public let observer = Observer< IObserver >()
     
-    private let _request: RequestType
     private var _resignSource: Any?
     private var _resignState: Status?
     
     public init(_ request: RequestType) {
-        self._request = request
+        self.request = request
         AppState.default.add(observer: self, priority: .internal)
     }
     
@@ -33,10 +35,10 @@ public final class Entity< RequestType : IRequest > : IEntity {
 public extension Entity {
     
     func request(source: Any) -> Bool {
-        switch self._request.status {
+        switch self.request.status {
         case .notDetermined:
             self.observer.emit({ $0.willRequest(self, source: source) })
-            self._request.request({ [weak self] in
+            self.request.request({ [weak self] in
                 guard let self = self else { return }
                 self.observer.emit({ $0.didRequest(self, source: source) })
             })

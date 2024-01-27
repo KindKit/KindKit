@@ -58,7 +58,7 @@ private extension View.Text {
     
 }
 
-extension View.Text : ILayoutPart {
+extension View.Text : ILayout {
 
     func invalidate() {
         self.entity.invalidate()
