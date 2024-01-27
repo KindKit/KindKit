@@ -1,0 +1,6 @@
+//
+//  KindKit
+//
+
+enum Variable {
+}

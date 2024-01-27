@@ -1,0 +1,7 @@
+//
+//  KindKit
+//
+
+extension Bool : MapTrait {
+    
+}

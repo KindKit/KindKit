@@ -1,6 +1,0 @@
-//
-//  KindMacro
-//
-
-enum Variable {
-}

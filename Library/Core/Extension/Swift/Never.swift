@@ -1,0 +1,6 @@
+//
+//  KindKit
+//
+
+extension Never : MapTrait {
+}

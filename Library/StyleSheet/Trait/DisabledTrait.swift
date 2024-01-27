@@ -1,0 +1,6 @@
+//
+//  KindKit
+//
+
+public protocol DisabledTrait {
+}
