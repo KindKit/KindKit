@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindGraphics
 
 protocol ILoaderTaskDelegate : AnyObject {

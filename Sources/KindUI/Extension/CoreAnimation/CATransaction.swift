@@ -18,4 +18,13 @@ public extension CATransaction {
         Self.commit()
     }
     
+    @inlinable
+    class func kk_withoutActions< ResultType >(_ closure: () -> ResultType) -> ResultType {
+        Self.begin()
+        Self.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
+        let result = closure()
+        Self.commit()
+        return result
+    }
+    
 }

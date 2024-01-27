@@ -3,10 +3,14 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Optional : IEntity {
     
     public let observer = Observer< IObserver >()
+    
+    @KindMonadicProperty
     public var condition: IEntity? {
         willSet {
             self._unsubscribe()
@@ -16,6 +20,8 @@ public final class Optional : IEntity {
             self._refresh()
         }
     }
+    
+    @KindMonadicProperty
     public var `default`: Bool {
         didSet {
             guard self.default != oldValue else { return }
@@ -78,48 +84,6 @@ private extension Optional {
         return condition?() ?? `default`
     }
 
-}
-
-public extension Optional {
-    
-    @inlinable
-    @discardableResult
-    func condition(_ value: IEntity?) -> Self {
-        self.condition = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func condition(_ value: () -> IEntity?) -> Self {
-        return self.condition(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func condition(_ value: (Self) -> IEntity?) -> Self {
-        return self.condition(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func `default`(_ value: Bool) -> Self {
-        self.default = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func `default`(_ value: () -> Bool) -> Self {
-        return self.default(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func `default`(_ value: (Self) -> Bool) -> Self {
-        return self.default(value(self))
-    }
-    
 }
 
 extension Optional : IObserver {

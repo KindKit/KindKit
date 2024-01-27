@@ -14,21 +14,21 @@ extension TextView {
         
         typealias Owner = TextView
         typealias Content = KKTextView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "TextView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -37,7 +37,7 @@ extension TextView {
 
 final class KKTextView : NSTextView {
     
-    weak var kkDelegate: KKControlViewDelegate?
+    weak var kkDelegate: KKTextViewDelegate?
     let kkTextStorage: NSTextStorage
     let kkTextContainer: NSTextContainer
     let kkLayoutManager: NSLayoutManager
@@ -45,9 +45,11 @@ final class KKTextView : NSTextView {
     override var isFlipped: Bool {
         return true
     }
+    
     override var alignmentRectInsets: NSEdgeInsets {
         return .init()
     }
+    
     override var textContainerOrigin: NSPoint {
         let bounds = self.bounds
         let textSize = self.kkLayoutManager.usedRect(for: self.kkTextContainer)
@@ -92,59 +94,37 @@ final class KKTextView : NSTextView {
 
 extension KKTextView {
     
-    func update(view: TextView) {
-        self.update(frame: view.frame)
-        self.update(text: view.text)
-        self.update(textFont: view.textFont)
-        self.update(textColor: view.textColor)
-        self.update(alignment: view.alignment)
-        self.update(lineBreak: view.lineBreak)
-        self.update(numberOfLines: view.numberOfLines)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: TextView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(attributed: view.attributed)
+        self.kk_update(numberOfLines: view.numberOfLines)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
+        self.kkDelegate = view
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.integral.cgRect
+    func kk_cleanup(view: TextView) {
+        self.kkDelegate = nil
     }
     
-    func update(text: String) {
-        self.string = text
+}
+
+extension KKTextView {
+    
+    func kk_update(attributed: NSAttributedString) {
+        self.kkTextStorage.setAttributedString(attributed)
     }
     
-    func update(textFont: Font) {
-        self.font = textFont.native
-    }
-    
-    func update(textColor: Color) {
-        self.textColor = textColor.native
-    }
-    
-    func update(alignment: Text.Alignment) {
-        self.alignment = alignment.nsTextAlignment
-    }
-    
-    func update(lineBreak: Text.LineBreak) {
-        self.kkTextContainer.lineBreakMode = lineBreak.nsLineBreakMode
-    }
-    
-    func update(numberOfLines: UInt) {
+    func kk_update(numberOfLines: UInt) {
         self.kkTextContainer.maximumNumberOfLines = Int(numberOfLines)
     }
     
-    func update(color: Color?) {
-        if let color = color {
-            self.backgroundColor = color.native
-        } else {
-            self.backgroundColor = .clear
-        }
+    func kk_update(color: Color) {
+        self.backgroundColor = color.native
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
     }
     
 }

@@ -67,12 +67,12 @@ public final class DataSource : KindDataSource.ISync {
         self.isSyncing = true
         switch self.permission.status {
         case .notSupported:
-            self._task = DispatchWorkItem.kk_async(block: { [weak self] in
+            self._task = DispatchWorkItem.async(block: { [weak self] in
                 guard let self = self else { return }
                 self._completed(.failure(.serviceUnavailable))
             })
         case .denied:
-            self._task = DispatchWorkItem.kk_async(block: { [weak self] in
+            self._task = DispatchWorkItem.async(block: { [weak self] in
                 guard let self = self else { return }
                 self._completed(.failure(.permissionDenied))
             })

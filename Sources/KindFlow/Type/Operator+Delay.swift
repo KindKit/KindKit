@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindTime
 
 public extension Operator {
     
@@ -13,14 +14,14 @@ public extension Operator {
         
         private let _lock = Lock()
         private let _queue: DispatchQueue
-        private let _timeout: (Item) -> TimeInterval
+        private let _timeout: (Item) -> SecondsInterval
         private var _stack: [Item] = []
         private var _task: ICancellable?
         private var _next: IPipe!
         
         init(
             _ queue: DispatchQueue,
-            _ timeout: @escaping (Item) -> TimeInterval
+            _ timeout: @escaping (Item) -> SecondsInterval
         ) {
             self._queue = queue
             self._timeout = timeout
@@ -28,7 +29,7 @@ public extension Operator {
         
         init(
             _ global: DispatchQoS.QoSClass,
-            _ timeout: @escaping (Item) -> TimeInterval
+            _ timeout: @escaping (Item) -> SecondsInterval
         ) {
             self._queue = .global(qos: global)
             self._timeout = timeout
@@ -82,7 +83,7 @@ private extension Operator.Delay {
     
     func _start(_ item: Item) {
         guard self._task == nil else { return }
-        self._task = DispatchWorkItem.kk_async(
+        self._task = DispatchWorkItem.async(
             queue: self._queue,
             delay: self._timeout(item),
             block: { [weak self] in self?._handle() }
@@ -114,14 +115,14 @@ public extension IBuilder {
     
     func delay(
         queue: DispatchQueue,
-        timeout: @escaping (Operator.Delay< Tail.Output >.Item) -> TimeInterval
+        timeout: @escaping (Operator.Delay< Tail.Output >.Item) -> SecondsInterval
     ) -> Chain< Head, Operator.Delay< Tail.Output > > {
         return self.append(.init(queue, timeout))
     }
     
     func delay(
         global: DispatchQoS.QoSClass,
-        timeout: @escaping (Operator.Delay< Tail.Output >.Item) -> TimeInterval
+        timeout: @escaping (Operator.Delay< Tail.Output >.Item) -> SecondsInterval
     ) -> Chain< Head, Operator.Delay< Tail.Output > > {
         return self.append(.init(global, timeout))
     }

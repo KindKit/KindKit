@@ -5,16 +5,17 @@
 #if os(iOS)
 
 import UIKit
+import KindMath
 
 public typealias NativeView = UIView
 
 public extension UIView {
     
-    var kk_firstResponder: UIView? {
+    final var kk_firstResponder: UIView? {
         if self.isFirstResponder == true {
             return self
         }
-        for subview in subviews {
+        for subview in self.subviews {
             if let firstResponder = subview.kk_firstResponder {
                 return firstResponder
             }
@@ -22,21 +23,30 @@ public extension UIView {
         return nil
     }
     
-}
-
-public extension UIView {
+    @inlinable
+    final func kk_update(frame: Rect) {
+        self.frame = frame.cgRect
+    }
     
-    func kk_snapshot(afterScreenUpdates: Bool = true) -> UIImage? {
+    final func kk_snapshot() -> UIImage? {
+        self.layoutIfNeeded()
         let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
-        return renderer.image(actions: {
+        return renderer.image(actions: { context in
+            self.layer.render(in: context.cgContext)
+        })
+    }
+    
+    final func kk_snapshot(afterScreenUpdates: Bool) -> UIImage? {
+        let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
+        return renderer.image(actions: { context in
             self.drawHierarchy(
-                in: CGRect(origin: .zero, size: $0.currentImage.size),
+                in: CGRect(origin: .zero, size: context.currentImage.size),
                 afterScreenUpdates: afterScreenUpdates
             )
         })
     }
     
-    func kk_child< View >(of type: View.Type, recursive: Bool) -> View? {
+    final func kk_child< View >(of type: View.Type, recursive: Bool) -> View? {
         for subview in self.subviews {
             if let view = subview as? View {
                 return view
@@ -50,7 +60,7 @@ public extension UIView {
         return nil
     }
     
-    func kk_isChild(of view: UIView, recursive: Bool) -> Bool {
+    final func kk_isChild(of view: UIView, recursive: Bool) -> Bool {
         if self === view {
             return true
         }

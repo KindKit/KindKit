@@ -2,7 +2,9 @@
 //  KindKit
 //
 
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
 import UIKit
 #endif
 import KindMath

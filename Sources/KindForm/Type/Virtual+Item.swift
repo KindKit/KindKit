@@ -10,19 +10,24 @@ public extension Virtual {
     final class Item : IEntity {
         
         public let id: Id
+        
         public weak var parent: IEntity?
+        
         public var hidden: KindCondition.IEntity {
             set { self._hidden.condition = newValue }
             get { return self._hidden }
         }
+        
         public var locked: KindCondition.IEntity {
             set { self._locked.condition = newValue }
             get { return self._locked }
         }
+        
         public var valid: KindCondition.IEntity {
             set { self._valid.condition = newValue }
             get { return self._valid }
         }
+        
         public var focusable: [IEntity] {
             guard self.hidden() == false || self.locked() == false else {
                 return []
@@ -32,9 +37,11 @@ public extension Virtual {
             }
             return []
         }
+        
         public var result: [IResult] {
             return []
         }
+        
         public var onShouldFocus = Signal< Bool?, Void >()
         public var onFocus = Signal< Void, Void >()
         public var onChanged = Signal< Void, Void >()

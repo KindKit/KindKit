@@ -4,281 +4,227 @@
 
 import KindEvent
 import KindGraphics
-import KindMath
+import KindLayout
+import KindTime
+import KindMonadicMacro
 
 protocol KKControlViewDelegate : AnyObject {
     
-    func isDynamic(_ view: KKControlView) -> Bool
+    func kk_shouldEditing() -> Bool
     
-    func shouldHighlighting(_ view: KKControlView) -> Bool
-    func set(_ view: KKControlView, highlighted: Bool)
+#if os(macOS)
     
-    func shouldPressing(_ view: KKControlView) -> Bool
-    func pressed(_ view: KKControlView)
+    func kk_update(keyboard: Keyboard)
+    
+    func kk_update(mouse: Mouse)
+    
+#elseif os(iOS)
+    
+    func kk_inputIsEmpty() -> Bool
+    
+    func kk_virtualInput(command: VirtualInput.Command)
+    
+    func kk_began(touches: [Touch])
+    
+    func kk_moved(touches: [Touch])
+    
+    func kk_ended(touches: [Touch])
+    
+    func kk_cancelled(touches: [Touch])
+    
+#endif
     
 }
 
-public final class ControlView {
+@KindMonadic
+public final class ControlView< LayoutType : ILayout > : IView, IViewSupportDynamicSize, IViewSupportContent, IViewSupportChange, IViewSupportEdit, IViewSupportEnable, IViewSupportColor, IViewSupportAlpha {
     
-    public private(set) weak var appearedLayout: ILayout?
-    public var frame: Rect = .zero {
-        didSet {
-            guard self.frame != oldValue else { return }
-            if self.isLoaded == true {
-                self._view.update(frame: self.frame)
-            }
-        }
+    public var layout: some ILayoutItem {
+        return self._layout
     }
-#if os(iOS)
-    public var transform: Transform = .init() {
-        didSet {
-            guard self.transform != oldValue else { return }
-            if self.isLoaded == true {
-                self._view.update(transform: self.transform)
-            }
-        }
-    }
-#endif
-    public var size: DynamicSize = .init(.fit, .fit) {
+    
+    public var size: DynamicSize = .fit {
         didSet {
             guard self.size != oldValue else { return }
-            self.setNeedLayout()
+            self._layout.manager.available = self.size
+            self.updateLayout(force: true)
         }
     }
-    public var content: ILayout? {
-        willSet {
-            guard self.content !== newValue else { return }
-            self.content?.appearedView = nil
-        }
+    
+    @KindMonadicProperty(default: EmptyLayout.self)
+    public var content: LayoutType {
         didSet {
             guard self.content !== oldValue else { return }
-            self.content?.appearedView = self
-            if self.isLoaded == true {
-                self._view.update(content: self.content)
-            }
-            self.content?.setNeedUpdate()
-            self.setNeedLayout()
+            self._layout.manager.content = self.content
         }
     }
-    public var contentSize: Size {
-        guard self.isLoaded == true else { return .zero }
-        return self._view.kkContentSize
+    
+    public var shouldEditing: Bool = false
+    
+    public var isEditing: Bool = false {
+        didSet {
+            guard self.isEnabled != oldValue else { return }
+            if self.isLoaded == true {
+                self._layout.view.kk_update(editing: self.isEditing)
+            }
+            self.onChange.emit()
+        }
     }
-    public var color: Color? {
+    
+#if os(iOS)
+    
+    public var virtualInputStyle: VirtualInput.Style? {
+        didSet {
+            guard self.virtualInputStyle != oldValue else { return }
+            if self.isLoaded == true {
+                self._layout.view.kk_update(virtualInputStyle: self.virtualInputStyle)
+            }
+        }
+    }
+    
+#endif
+    
+    public var isEnabled: Bool = true {
+        didSet {
+            guard self.isEnabled != oldValue else { return }
+            if self.isLoaded == true {
+                self._layout.view.kk_update(enabled: self.isEnabled)
+            }
+            self.onChange.emit()
+        }
+    }
+    
+    public var color: Color = .clear {
         didSet {
             guard self.color != oldValue else { return }
             if self.isLoaded == true {
-                self._view.update(color: self.color)
+                self._layout.view.kk_update(color: self.color)
             }
         }
     }
+    
     public var alpha: Double = 1 {
         didSet {
             guard self.alpha != oldValue else { return }
             if self.isLoaded == true {
-                self._view.update(alpha: self.alpha)
+                self._layout.view.kk_update(alpha: self.alpha)
             }
         }
     }
-    public var shouldPressed: Bool = false
-    public var shouldHighlighting: Bool = false {
-        didSet {
-            if self.shouldHighlighting == false {
-                self.isHighlighted = false
-            }
-        }
-    }
-    public var isHighlighted: Bool {
-        set {
-            guard self._isHighlighted != newValue else { return }
-            self._isHighlighted = newValue
-            self.triggeredChangeStyle(false)
-        }
-        get { self._isHighlighted }
-    }
-    public var isLocked: Bool {
-        set {
-            guard self._isLocked != newValue else { return }
-            self._isLocked = newValue
-            if self.isLoaded == true {
-                self._view.update(locked: self._isLocked)
-            }
-            self.triggeredChangeStyle(false)
-        }
-        get { self._isLocked }
-    }
-    public var isHidden: Bool = false {
-        didSet {
-            guard self.isHidden != oldValue else { return }
-            self.setNeedLayout()
-        }
-    }
-    public private(set) var isVisible: Bool = false
-    public let onAppear = Signal< Void, Void >()
-    public let onDisappear = Signal< Void, Void >()
-    public let onVisible = Signal< Void, Void >()
-    public let onInvisible = Signal< Void, Void >()
-    public let onStyle = Signal< Void, Bool >()
-    public let onPressed = Signal< Void, Void >()
     
-    private lazy var _reuse: Reuse.Item< Reusable > = .init(owner: self)
-    @inline(__always) private var _view: Reusable.Content { self._reuse.content }
-    private var _isHighlighted: Bool = false
-    private var _isLocked: Bool = false
+    public let onChange = Signal< Void, Void >()
     
-    public init() {
-    }
+#if os(macOS)
     
-    deinit {
-        self._reuse.destroy()
-    }
+    @KindMonadicSignal
+    public let onKeyboard = Signal< Void, Keyboard >()
     
-}
-
-
-public extension ControlView {
+    @KindMonadicSignal
+    public let onMouse = Signal< Void, Mouse >()
     
-    @inlinable
-    @discardableResult
-    func content(_ value: ILayout) -> Self {
-        self.content = value
-        return self
-    }
+#elseif os(iOS)
     
-    @inlinable
-    @discardableResult
-    func content(_ value: () -> ILayout) -> Self {
-        return self.content(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func content(_ value: (Self) -> ILayout) -> Self {
-        return self.content(value(self))
-    }
+    @KindMonadicSignal
+    public let isEmptyInput = Signal< Bool?, Void >()
     
-}
-
-extension ControlView : IView {
+    @KindMonadicSignal
+    public let onInputCommand = Signal< Void, VirtualInput.Command >()
     
-    public var native: NativeView {
-        return self._view
-    }
+    @KindMonadicSignal
+    public let onBeganTouches = Signal< Void, [Touch] >()
     
-    public var isLoaded: Bool {
-        return self._reuse.isLoaded
-    }
+    @KindMonadicSignal
+    public let onMovedTouches = Signal< Void, [Touch] >()
     
-    public var bounds: Rect {
-        guard self.isLoaded == true else { return .zero }
-        return .init(self._view.bounds)
-    }
+    @KindMonadicSignal
+    public let onEndedTouches = Signal< Void, [Touch] >()
     
-    public func loadIfNeeded() {
-        self._reuse.loadIfNeeded()
-    }
+    @KindMonadicSignal
+    public let onCancelledTouches = Signal< Void, [Touch] >()
     
-    public func size(available: Size) -> Size {
-        guard self.isHidden == false else { return .zero }
-        return self.size.apply(
-            available: available,
-            size: {
-                guard let content = self.content else { return .zero }
-                return content.size(available: $0)
-            }
-        )
-    }
-    
-    public func appear(to layout: ILayout) {
-        self.appearedLayout = layout
-        self.onAppear.emit()
-    }
-    
-    public func disappear() {
-        self._reuse.disappear()
-        self.appearedLayout = nil
-        self.onDisappear.emit()
-    }
-    
-    public func visible() {
-        self.isVisible = true
-        self.onVisible.emit()
-    }
-    
-    public func invisible() {
-        self.isVisible = false
-        self.onInvisible.emit()
-    }
-    
-}
-
-extension ControlView : IViewReusable {
-    
-    public var reuseUnloadBehaviour: Reuse.UnloadBehaviour {
-        set { self._reuse.unloadBehaviour = newValue }
-        get { self._reuse.unloadBehaviour }
-    }
-    
-    public var reuseCache: ReuseCache? {
-        set { self._reuse.cache = newValue }
-        get { self._reuse.cache }
-    }
-    
-    public var reuseName: String? {
-        set { self._reuse.name = newValue }
-        get { self._reuse.name }
-    }
-    
-}
-
-#if os(iOS)
-
-extension ControlView : IViewTransformable {
-}
-
 #endif
-
-extension ControlView :  IViewDynamicSizeable{
-}
-
-extension ControlView : IViewColorable {
-}
-
-extension ControlView : IViewAlphable {
-}
-
-extension ControlView : IViewHighlightable {
-}
-
-extension ControlView : IViewLockable {
-}
-
-extension ControlView : IViewPressable {
+    
+    var holder: IHolder? {
+        set { self._layout.manager.holder = newValue }
+        get { self._layout.manager.holder }
+    }
+    
+    private var _layout: ReuseRootLayoutItem< Reusable, LayoutType >!
+    
+    public init(
+        _ content: ContentType
+    ) {
+        self.content = content
+        self._layout = .init(self)
+        self._layout.manager.content = content
+    }
+    
+    public convenience init< InitType: ILayout >(
+        _ content: InitType
+    ) where ContentType == AnyLayout {
+        self.init(.init(content))
+    }
+    
+    public convenience init(
+        _ view: any IView
+    ) where ContentType == AnyViewLayout {
+        self.init(.init(view))
+    }
+    
+    public convenience init< ViewType: IView >(
+        _ view: ViewType
+    ) where ContentType == ViewLayout< ViewType > {
+        self.init(.init(view))
+    }
+    
+    public func sizeOf(_ request: SizeRequest) -> Size {
+        return self._layout.sizeOf(request)
+    }
+    
 }
 
 extension ControlView : KKControlViewDelegate {
     
-    func isDynamic(_ view: KKControlView) -> Bool {
-        return self.width.isStatic == false || self.height.isStatic == false
+    func kk_shouldEditing() -> Bool {
+        return self.shouldEditing
     }
     
-    func shouldHighlighting(_ view: KKControlView) -> Bool {
-        return self.shouldHighlighting
+#if os(macOS)
+    
+    func kk_update(keyboard: Keyboard) {
+        self.onKeyboard.emit(keyboard)
     }
     
-    func set(_ view: KKControlView, highlighted: Bool) {
-        if self._isHighlighted != highlighted {
-            self._isHighlighted = highlighted
-            self.onStyle.emit(true)
-        }
+    func kk_update(mouse: Mouse) {
+        self.onMouse.emit(mouse)
     }
     
-    func shouldPressing(_ view: KKControlView) -> Bool {
-        return self.shouldPressed
+#elseif os(iOS)
+    
+    func kk_inputIsEmpty() -> Bool {
+        return self.isEmptyInput.emit(default: true)
     }
     
-    func pressed(_ view: KKControlView) {
-        self.onPressed.emit()
+    func kk_virtualInput(command: VirtualInput.Command) {
+        self.onInputCommand.emit(command)
     }
+    
+    func kk_began(touches: [Touch]) {
+        self.onBeganTouches.emit(touches)
+    }
+    
+    func kk_moved(touches: [Touch]) {
+        self.onMovedTouches.emit(touches)
+    }
+    
+    func kk_ended(touches: [Touch]) {
+        self.onEndedTouches.emit(touches)
+    }
+    
+    func kk_cancelled(touches: [Touch]) {
+        self.onCancelledTouches.emit(touches)
+    }
+    
+#endif
     
 }

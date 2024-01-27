@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Dispatch
 import KindGraphics
 import KindNetwork
 
@@ -79,7 +80,7 @@ extension Loader {
 private extension Loader.LoadTask {
     
     func _perform() {
-        self.task = DispatchWorkItem.kk_async(queue: self.workQueue, block: {
+        self.task = DispatchWorkItem.async(queue: self.workQueue, block: {
             if let image = self.cache.image(query: self.query) {
                 self.finish(image: image)
             } else if self.query.isLocal == true {

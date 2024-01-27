@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 public enum LineCap {
     
     case butt

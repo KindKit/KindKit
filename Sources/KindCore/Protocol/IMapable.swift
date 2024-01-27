@@ -10,6 +10,7 @@ public protocol IMapable {
 
 public extension IMapable {
     
+    @inlinable
     func map< Result >(_ block: (Self) -> Result) -> Result {
         return block(self)
     }

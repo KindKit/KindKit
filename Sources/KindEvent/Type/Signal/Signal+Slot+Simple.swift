@@ -16,10 +16,6 @@ extension Signal.Slot {
             super.init(source)
         }
         
-        deinit {
-            self.cancel()
-        }
-        
         override func perform(_ argument: ArgumentType) throws -> ResultType {
             return self.closure(argument)
         }

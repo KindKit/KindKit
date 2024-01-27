@@ -4,18 +4,18 @@
 
 import KindMath
 
-public struct Color : Equatable {
+public struct Color : Equatable, Hashable {
     
     public var native: NativeColor
     
     public init(
-        _ rgba: Rgba
+        _ pixel: Pixel
     ) {
         self.init(
-            r: rgba.r,
-            g: rgba.g,
-            b: rgba.b,
-            a: rgba.a
+            r: pixel.r,
+            g: pixel.g,
+            b: pixel.b,
+            a: pixel.a
         )
     }
     
@@ -49,11 +49,23 @@ public struct Color : Equatable {
     
 }
 
+public extension Color {
+    
+    static func hex(rgb: UInt32) -> Self {
+        return .init(rgb: rgb)
+    }
+    
+    static func hex(rgba: UInt32) -> Self {
+        return .init(rgba: rgba)
+    }
+    
+}
+
 extension Color : ILerpable {
     
     @inlinable
     public func lerp(_ to: Self, progress: Percent) -> Self {
-        return .init(self.rgba.lerp(to.rgba, progress: progress))
+        return .init(self.pixel.lerp(to.pixel, progress: progress))
     }
     
 }

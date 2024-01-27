@@ -3,12 +3,21 @@
 //
 
 import KindMath
+import KindMonadicMacro
 
+@KindMonadic
 public struct Shadow : Equatable {
     
+    @KindMonadicProperty
     public let color: Color
+    
+    @KindMonadicProperty
     public let opacity: Double
+    
+    @KindMonadicProperty
     public let radius: Double
+    
+    @KindMonadicProperty
     public let offset: Point
     
     public init(

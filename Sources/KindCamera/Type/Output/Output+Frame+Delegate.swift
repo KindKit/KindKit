@@ -2,6 +2,11 @@
 //  KindKit
 //
 
+#if os(macOS)
+import AppKit
+#elseif os(iOS)
+import UIKit
+#endif
 import AVFoundation
 import KindGraphics
 

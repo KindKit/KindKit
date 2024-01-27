@@ -4,12 +4,17 @@
 
 import KindGraphics
 import KindMath
+import KindMonadicMacro
 
 public extension ShapeView {
     
+    @KindMonadic
     struct Fill : Equatable {
         
+        @KindMonadicProperty
         public let rule: FillRule
+        
+        @KindMonadicProperty
         public let color: Color
         
         public init(

@@ -48,9 +48,9 @@ public extension Message {
             self._string = string
         }
         
-        public convenience init< SenderType : AnyObject >(
+        public convenience init< TargetTypeType : AnyObject >(
             level: Level,
-            object: SenderType.Type,
+            object: TargetTypeType.Type,
             message: String
         ) {
             self.init(
@@ -60,9 +60,9 @@ public extension Message {
             )
         }
         
-        public convenience init< SenderType : AnyObject >(
+        public convenience init< TargetTypeType : AnyObject >(
             level: Level,
-            object: SenderType,
+            object: TargetTypeType,
             message: String
         ) {
             self.init(

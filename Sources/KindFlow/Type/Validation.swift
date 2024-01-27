@@ -2,11 +2,11 @@
 //  KindKit
 //
 
-import Foundation
+import KindTime
 
 public enum Validation {
     
-    case retry(delay: TimeInterval)
+    case retry(SecondsInterval)
     case done
     
 }

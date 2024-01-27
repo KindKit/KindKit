@@ -32,6 +32,11 @@ public extension UIApplication {
     var kk_keyWindows: [UIWindow] {
         return self.kk_windows.filter({ $0.isKeyWindow })
     }
+    
+    @inlinable
+    var kk_keyWindow: UIWindow? {
+        return self.kk_keyWindows.first
+    }
 
     @inlinable
     func kk_endEditing(_ force: Bool) {

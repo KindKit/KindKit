@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import KindSystem
 
 extension Target.File {
     

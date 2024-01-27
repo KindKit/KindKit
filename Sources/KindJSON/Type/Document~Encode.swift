@@ -430,7 +430,7 @@ public extension Document {
         value: Date,
         path: Path = .root
     ) throws {
-        let formatter = DateFormatter()
+        let formatter = Foundation.DateFormatter()
         formatter.dateFormat = dateFormat
         try self.encode(
             String.self,
@@ -446,7 +446,7 @@ public extension Document {
         path: Path = .root,
         nullable: Bool = false
     ) throws {
-        let formatter = DateFormatter()
+        let formatter = Foundation.DateFormatter()
         formatter.dateFormat = dateFormat
         try self.encode(
             String.self,

@@ -6,8 +6,8 @@ import KindEvent
 
 public protocol IEntity : AnyObject {
     
-    var observer: Observer< IObserver > { get }
     var status: Status { get }
+    var observer: Observer< IObserver > { get }
     
     func request(source: Any) -> Bool
     

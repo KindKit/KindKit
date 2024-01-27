@@ -7,17 +7,17 @@ import Foundation
 public protocol IIdentifierKind {
 }
 
-public struct Identifier< Raw, Kind : IIdentifierKind > {
+public struct Identifier< RawType : Hashable, KindType : IIdentifierKind > : Identifiable {
     
-    public let raw: Raw
+    public let id: RawType
     
-    public init(_ raw: Raw) {
-        self.raw = raw
+    public init(_ id: RawType) {
+        self.id = id
     }
 
 }
 
-extension Identifier where Raw == String {
+extension Identifier where RawType == String {
     
     public init() {
         self.init(UUID().uuidString)
@@ -25,42 +25,42 @@ extension Identifier where Raw == String {
     
 }
 
-extension Identifier : ExpressibleByIntegerLiteral where Raw == Int {
+extension Identifier : ExpressibleByIntegerLiteral where RawType == Int {
     
-    public init(integerLiteral value: Raw) {
+    public init(integerLiteral value: RawType) {
         self.init(value)
     }
     
 }
 
-extension Identifier : ExpressibleByStringLiteral where Raw == String {
+extension Identifier : ExpressibleByStringLiteral where RawType == String {
     
-    public typealias ExtendedGraphemeClusterLiteralType = Raw
-    public typealias UnicodeScalarLiteralType = Raw
+    public typealias ExtendedGraphemeClusterLiteralType = RawType
+    public typealias UnicodeScalarLiteralType = RawType
 
-    public init(stringLiteral value: Raw) {
+    public init(stringLiteral value: RawType) {
         self.init(value)
     }
     
 }
 
-extension Identifier : ExpressibleByExtendedGraphemeClusterLiteral where Raw == String {
+extension Identifier : ExpressibleByExtendedGraphemeClusterLiteral where RawType == String {
 }
 
-extension Identifier : ExpressibleByUnicodeScalarLiteral where Raw == String {
+extension Identifier : ExpressibleByUnicodeScalarLiteral where RawType == String {
 }
 
-extension Identifier : Equatable where Raw : Equatable {
+extension Identifier : Equatable where RawType : Equatable {
 }
 
-extension Identifier : Hashable where Raw : Hashable {
+extension Identifier : Hashable where RawType : Hashable {
     
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(String(describing: Kind.self))
-        hasher.combine(self.raw)
+        hasher.combine(String(describing: KindType.self))
+        hasher.combine(self.id)
     }
     
 }
 
-extension Identifier : Codable where Raw : Codable {
+extension Identifier : Codable where RawType : Codable {
 }

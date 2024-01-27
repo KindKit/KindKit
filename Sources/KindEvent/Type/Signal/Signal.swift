@@ -38,19 +38,19 @@ public extension Signal {
     }
     
     @discardableResult
-    func add< SenderType : AnyObject >(_ sender: SenderType, _ closure: @escaping (SenderType, ArgumentType) -> ResultType) -> ICancellable {
-        let slot = Slot.Sender(self, sender, closure)
+    func add< TargetTypeType : AnyObject >(_ target: TargetTypeType, _ closure: @escaping (TargetTypeType, ArgumentType) -> ResultType) -> ICancellable {
+        let slot = Slot.Target(self, target, closure)
         self.slots.append(slot)
         return slot
     }
     
     @discardableResult
-    func add< SenderType : AnyObject >(_ sender: SenderType, _ closure: @escaping (SenderType) -> ResultType) -> ICancellable {
-        return self.add(sender, { sender, _ in closure(sender) })
+    func add< TargetTypeType : AnyObject >(_ target: TargetTypeType, _ closure: @escaping (TargetTypeType) -> ResultType) -> ICancellable {
+        return self.add(target, { target, _ in closure(target) })
     }
     
-    func remove(sender: AnyObject) {
-        self.slots.removeAll(where: { $0.contains(sender) })
+    func remove(_ target: AnyObject) {
+        self.slots.removeAll(where: { $0.contains(target) })
     }
     
     func clear() {
@@ -73,7 +73,7 @@ public extension Signal where ResultType == Void {
         for slot in slots {
             do {
                 try slot.perform(argument)
-            } catch Slot.Error.notHaveSender {
+            } catch Slot.Error.notHaveTarget {
                 needRemove.append(slot)
             } catch {
             }
@@ -101,7 +101,7 @@ public extension Signal where ResultType : IOptionalConvertible {
                 if let result = try slot.perform(argument).asOptional {
                     return result
                 }
-            } catch Slot.Error.notHaveSender {
+            } catch Slot.Error.notHaveTarget {
                 needRemove.append(slot)
             } catch {
             }

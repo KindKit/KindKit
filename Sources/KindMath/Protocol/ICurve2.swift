@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 public protocol ICurve2 {
     
     var isSimple: Bool { get }

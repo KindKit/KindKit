@@ -3,16 +3,22 @@
 //
 
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Manager {
     
     public weak var delegate: IDelegate?
+    
     public private(set) var isEnabled: Bool = true
+    
     public var isTracking: Bool {
         return self._scope != nil
     }
+    
     public private(set) var isApplies: Bool = false
     
+    @KindMonadicSignal
     public let onRefresh = Signal< Void, Void >()
     
     private var _undoStack: [Scope] = []
@@ -169,31 +175,6 @@ public extension Manager {
         _ closure: (inout IMutatingPermanentContext) -> Void
     ) where Command.RawValue == String {
         self.track(delete: command.rawValue, object: object, closure)
-    }
-    
-}
-
-public extension Manager {
-    
-    @inlinable
-    @discardableResult
-    func onRefresh(_ closure: @escaping () -> Void) -> Self {
-        self.onRefresh.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onRefresh(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onRefresh.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onRefresh< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onRefresh.add(sender, closure)
-        return self
     }
     
 }

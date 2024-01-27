@@ -11,8 +11,10 @@ extension Entity {
     
     enum Attribute {
         
-        case alias(String)
         case property
+        case propertyAlias(String)
+        case propertyBuilder(String)
+        case propertyDefault(String)
         case signal
         
         init?(_ syntax: AttributeListSyntax.Element) {
@@ -21,19 +23,43 @@ extension Entity {
         }
         
         init?(_ syntax: AttributeSyntax) {
-            guard let nameSyntax = syntax.attributeName.as(IdentifierTypeSyntax.self) else { return nil }
+            guard let nameSyntax = syntax.attributeName.as(IdentifierTypeSyntax.self) else { 
+                return nil
+            }
             switch nameSyntax.name.trimmed.text {
             case "KindMonadicProperty":
                 if let argument = syntax.arguments?.as(LabeledExprListSyntax.self)?.first {
                     switch argument.label?.trimmed.text {
                     case "alias":
                         if let expression = argument.expression.as(StringLiteralExprSyntax.self) {
-                            self = .alias(expression.segments.trimmedDescription)
+                            self = .propertyAlias(expression.segments.trimmedDescription)
                         } else {
-                            self = .property
+                            return nil
                         }
+                    case "builder":
+                        guard let memberAccessExpression = argument.expression.as(MemberAccessExprSyntax.self) else {
+                            return nil
+                        }
+                        guard memberAccessExpression.declName.baseName.tokenKind == .keyword(.self) else {
+                            return nil
+                        }
+                        guard let nameExpression = memberAccessExpression.base?.as(DeclReferenceExprSyntax.self) else {
+                            return nil
+                        }
+                        self = .propertyBuilder(nameExpression.trimmedDescription)
+                    case "default":
+                        guard let memberAccessExpression = argument.expression.as(MemberAccessExprSyntax.self) else {
+                            return nil
+                        }
+                        guard memberAccessExpression.declName.baseName.tokenKind == .keyword(.self) else {
+                            return nil
+                        }
+                        guard let nameExpression = memberAccessExpression.base?.as(DeclReferenceExprSyntax.self) else {
+                            return nil
+                        }
+                        self = .propertyDefault(nameExpression.trimmedDescription)
                     default:
-                        self = .property
+                        return nil
                     }
                 } else {
                     self = .property

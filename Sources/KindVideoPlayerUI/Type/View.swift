@@ -7,7 +7,7 @@ import KindUI
 
 public final class View {
 
-    public private(set) weak var appearedLayout: ILayout?
+    public private(set) weak var appearedLayout: Layout?
     public var frame: KindMath.Rect = .zero {
         didSet {
             guard self.frame != oldValue else { return }
@@ -140,11 +140,10 @@ extension View : IView {
     }
     
     public func size(available: Size) -> Size {
-        guard self.isHidden == false else { return .zero }
         return self.size.apply(available: available)
     }
     
-    public func appear(to layout: ILayout) {
+    public func appear(to layout: Layout) {
         self.appearedLayout = layout
         self.onAppear.emit()
     }

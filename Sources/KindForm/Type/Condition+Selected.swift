@@ -4,18 +4,24 @@
 
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
-public extension Condition {
+extension Condition {
 
-    final class Selected : KindCondition.IEntity {
+    @KindMonadic
+    public final class Selected : KindCondition.IEntity {
         
         public let observer = Observer< KindCondition.IObserver >()
+        
+        @KindMonadicProperty
         public var field: Field.Select {
             didSet {
                 self.field.onChanged.add(self, { $0._refresh() })
                 self._refresh()
             }
         }
+        
+        @KindMonadicProperty
         public var item: IEntity {
             didSet {
                 self.item.onChanged.add(self, { $0._refresh() })
@@ -69,46 +75,4 @@ private extension Condition.Selected {
         return field.contains(value: item)
     }
 
-}
-
-public extension Condition.Selected {
-    
-    @inlinable
-    @discardableResult
-    func field(_ value: Field.Select) -> Self {
-        self.field = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func field(_ value: () -> Field.Select) -> Self {
-        return self.field(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func field(_ value: (Self) -> Field.Select) -> Self {
-        return self.field(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func item(_ value: IEntity) -> Self {
-        self.item = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func item(_ value: () -> IEntity) -> Self {
-        return self.item(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func item(_ value: (Self) -> IEntity) -> Self {
-        return self.item(value(self))
-    }
-    
 }

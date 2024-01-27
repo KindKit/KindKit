@@ -65,7 +65,7 @@ private extension View.Paragraph {
     
 }
 
-extension View.Paragraph : ILayoutPart {
+extension View.Paragraph : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

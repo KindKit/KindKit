@@ -21,7 +21,7 @@ protocol KKWebViewDelegate : AnyObject {
 
 public final class View {
     
-    public private(set) weak var appearedLayout: ILayout?
+    public private(set) weak var appearedLayout: Layout?
     public var frame: KindMath.Rect = .zero {
         didSet {
             guard self.frame != oldValue else { return }
@@ -239,8 +239,15 @@ public extension View {
     
     @inlinable
     @discardableResult
-    func onContentSize< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onContentSize.add(sender, closure)
+    func onContentSize< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onContentSize.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onContentSize(remove target: AnyObject) -> Self {
+        self.onContentSize.remove(target)
         return self
     }
     
@@ -260,8 +267,15 @@ public extension View {
     
     @inlinable
     @discardableResult
-    func onBeginLoading< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onBeginLoading.add(sender, closure)
+    func onBeginLoading< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onBeginLoading.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onBeginLoading(remove target: AnyObject) -> Self {
+        self.onBeginLoading.remove(target)
         return self
     }
     
@@ -281,8 +295,15 @@ public extension View {
     
     @inlinable
     @discardableResult
-    func onEndLoading< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onEndLoading.add(sender, closure)
+    func onEndLoading< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onEndLoading.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onEndLoading(remove target: AnyObject) -> Self {
+        self.onEndLoading.remove(target)
         return self
     }
     
@@ -316,8 +337,15 @@ public extension View {
     
     @inlinable
     @discardableResult
-    func onDecideNavigation< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, URLRequest) -> NavigationPolicy?) -> Self {
-        self.onDecideNavigation.add(sender, closure)
+    func onDecideNavigation< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType, URLRequest) -> NavigationPolicy?) -> Self {
+        self.onDecideNavigation.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onDecideNavigation(remove target: AnyObject) -> Self {
+        self.onDecideNavigation.remove(target)
         return self
     }
     
@@ -343,11 +371,10 @@ extension View : IView {
     }
     
     public func size(available: Size) -> Size {
-        guard self.isHidden == false else { return .zero }
         return self.size.apply(available: available)
     }
     
-    public func appear(to layout: ILayout) {
+    public func appear(to layout: Layout) {
         self.appearedLayout = layout
         self.onAppear.emit()
     }
@@ -372,7 +399,7 @@ extension View : IView {
 
 extension View : IViewReusable {
     
-    public var reuseUnloadBehaviour: Reuse.UnloadBehaviour {
+    public var reuseUnloadBehaviour: ReuseUnloadBehaviour {
         set { self._reuse.unloadBehaviour = newValue }
         get { self._reuse.unloadBehaviour }
     }
@@ -391,18 +418,18 @@ extension View : IViewReusable {
 
 #if os(iOS)
 
-extension View : IViewTransformable {
+extension View : IViewSupportTransform {
 }
 
 #endif
 
-extension View : IViewStaticSizeable {
+extension View : IViewSupportStaticSize {
 }
 
-extension View : IViewColorable {
+extension View : IViewSupportColor {
 }
 
-extension View : IViewAlphable {
+extension View : IViewSupportAlpha {
 }
 
 extension View : KKWebViewDelegate {

@@ -4,24 +4,31 @@
 
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
 public extension Virtual {
     
+    @KindMonadic
     final class Group : IEntity {
         
         public let id: Id
+        
         public weak var parent: IEntity?
+        
         public var hidden: KindCondition.IEntity {
             set { self._hidden.condition = newValue }
             get { return self._hidden }
         }
+        
         public var locked: KindCondition.IEntity {
             set { self._locked.condition = newValue }
             get { return self._locked }
         }
+        
         public var valid: KindCondition.IEntity {
             return self._valid
         }
+        
         public var focusable: [IEntity] {
             guard self.hidden() == false || self.locked() == false else {
                 return []
@@ -35,6 +42,7 @@ public extension Virtual {
             }
             return result
         }
+        
         public var result: [IResult] {
             guard self.hidden() == false else {
                 return []
@@ -48,9 +56,14 @@ public extension Virtual {
             }
             return buffer
         }
+        
         public var onShouldFocus = Signal< Bool?, Void >()
+        
         public var onFocus = Signal< Void, Void >()
+        
         public var onChanged = Signal< Void, Void >()
+        
+        @KindMonadicProperty
         public var items: [IEntity] = [] {
             willSet {
                 for item in self.items {
@@ -148,29 +161,6 @@ public extension Virtual.Group {
             self.items.remove(at: index)
         }
         return self
-    }
-    
-}
-
-public extension Virtual.Group {
-    
-    @inlinable
-    @discardableResult
-    func items(_ value: [IEntity]) -> Self {
-        self.items = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func items(_ value: () -> [IEntity]) -> Self {
-        return self.items(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func items(_ value: (Self) -> [IEntity]) -> Self {
-        return self.items(value(self))
     }
     
 }

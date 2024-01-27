@@ -5,34 +5,22 @@
 #if os(macOS)
 
 import AppKit
+import KindTime
 
 final class DisplayLink {
     
-    weak var delegate: IQueueDelegate?
+    let manager: Manager
+    var instance: CVDisplayLink!
     
-    var isRunning: Bool {
-        guard let instance = self._instance else { return false }
-        return CVDisplayLinkIsRunning(instance)
+    init?(manager: Manager) {
+        self.manager = manager
+        guard let instance = self._makeInstance() else { return }
+        self.instance = instance
+        CVDisplayLinkStart(instance)
     }
-    
-    fileprivate var _instance: CVDisplayLink?
     
     deinit {
-        self.stop()
-    }
-    
-    func start() {
-        if self._instance == nil {
-            self._instance = self._makeInstance()
-        }
-        if let instance = self._instance {
-            CVDisplayLinkStart(instance)
-        }
-    }
-    
-    func stop() {
-        guard let instance = self._instance else { return }
-        CVDisplayLinkStop(instance)
+        CVDisplayLinkStop(self.instance)
     }
     
 }
@@ -67,9 +55,9 @@ fileprivate func AnimationDisplayLinkCallback(
     let displayLink = Unmanaged< DisplayLink >.fromOpaque(context).takeUnretainedValue()
     let timeScale = TimeInterval(outputTime.pointee.videoTimeScale)
     let refreshPeriod = TimeInterval(outputTime.pointee.videoRefreshPeriod)
-    let delta = 1 / (timeScale / refreshPeriod)
+    let delta = SecondsInterval(timeInterval: 1 / (timeScale / refreshPeriod))
     DispatchQueue.main.async(execute: {
-        displayLink.delegate?.update(delta)
+        displayLink.manager.update(delta)
     })
     return kCVReturnSuccess
 }

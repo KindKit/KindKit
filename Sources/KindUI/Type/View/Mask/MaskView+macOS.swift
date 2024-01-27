@@ -14,21 +14,21 @@ extension MaskView {
         
         typealias Owner = MaskView
         typealias Content = KKMaskView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "MaskView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -37,7 +37,6 @@ extension MaskView {
 
 final class KKMaskView : NSView {
     
-    weak var kkDelegate: KKMaskViewDelegate?
     var kkBorder: Border {
         set { self.kkClipView.kkBorder = newValue }
         get { self.kkClipView.kkBorder }
@@ -70,7 +69,6 @@ final class KKMaskView : NSView {
             self._updatePath()
         }
     }
-    var kkLayoutManager: LayoutManager!
     var kkClipView: KKClipView
     
     override var isFlipped: Bool {
@@ -85,9 +83,6 @@ final class KKMaskView : NSView {
                     size: frame.size
                 )
                 self._updatePath()
-                if self.window != nil {
-                    self.kkLayoutManager.invalidate()
-                }
             }
         }
     }
@@ -103,30 +98,10 @@ final class KKMaskView : NSView {
         self.wantsLayer = true
         
         self.addSubview(self.kkClipView)
-        
-        self.kkLayoutManager = .init(
-            delegate: self,
-            view: self.kkClipView
-        )
     }
         
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewWillMove(toSuperview superview: NSView?) {
-        super.viewWillMove(toSuperview: superview)
-        
-        if superview == nil {
-            self.kkLayoutManager.clear()
-        }
-    }
-    
-    override func layout() {
-        super.layout()
-        
-        self.kkLayoutManager.visibleFrame = .init(self.bounds)
-        self.kkLayoutManager.updateIfNeeded()
     }
     
     override func hitTest(_ point: NSPoint) -> NSView? {
@@ -203,50 +178,43 @@ extension KKMaskView {
 
 extension KKMaskView {
     
-    func update(view: MaskView) {
-        self.update(frame: view.frame)
-        self.update(layout: view.layout)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(shadow: view.shadow)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
-        self.kkDelegate = view
+    func kk_update< LayoutType : ILayout >(view: MaskView< LayoutType >) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(shadow: view.shadow)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
+        view.holder = LayoutHolder(self.kkClipView)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    func kk_cleanup< LayoutType : ILayout >(view: MaskView< LayoutType >) {
+        view.holder = nil
     }
     
-    func update(layout: ILayout) {
-        self.kkLayoutManager.layout = layout
-        self.needsLayout = true
-    }
+}
+
+extension KKMaskView {
     
-    func update(border: Border) {
+    func kk_update(border: Border) {
         self.kkBorder = border
     }
     
-    func update(cornerRadius: CornerRadius) {
+    func kk_update(cornerRadius: CornerRadius) {
         self.kkCornerRadius = cornerRadius
     }
     
-    func update(shadow: Shadow?) {
+    func kk_update(shadow: Shadow?) {
         self.kkShadow = shadow
     }
     
-    func update(color: Color?) {
+    func kk_update(color: Color) {
         guard let layer = self.kkClipView.layer else { return }
-        layer.backgroundColor = color?.native.cgColor
+        layer.backgroundColor = color.native.cgColor
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
-        self.kkLayoutManager.layout = nil
-        self.kkDelegate = nil
     }
     
 }
@@ -275,27 +243,6 @@ private extension KKMaskView.KKClipView {
             rect: Rect(self.bounds),
             corner: self.kkCornerRadius
         )
-    }
-    
-}
-
-extension KKMaskView : ILayoutDelegate {
-    
-    func setNeedUpdate(_ layout: ILayout) -> Bool {
-        guard let delegate = self.kkDelegate else { return false }
-        defer {
-            self.needsLayout = true
-        }
-        guard delegate.isDynamic(self) == true else {
-            self.kkLayoutManager.setNeed(layout: true)
-            return false
-        }
-        self.kkLayoutManager.setNeed(layout: true)
-        return true
-    }
-    
-    func updateIfNeeded(_ layout: ILayout) {
-        self.layoutSubtreeIfNeeded()
     }
     
 }

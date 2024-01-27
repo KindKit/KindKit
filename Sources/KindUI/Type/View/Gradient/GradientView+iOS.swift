@@ -14,21 +14,21 @@ extension GradientView {
         
         typealias Owner = GradientView
         typealias Content = KKGradientView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "GradientView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -60,47 +60,38 @@ final class KKGradientView : UIView {
 
 extension KKGradientView {
     
-    func update(view: GradientView) {
-        self.update(frame: view.frame)
-        self.update(transform: view.transform)
-        self.update(fill: view.fill)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: GradientView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(fill: view.fill)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    final func kk_cleanup(view: GradientView) {
     }
     
-    func update(transform: Transform) {
-        self.layer.setAffineTransform(transform.matrix.cgAffineTransform)
-    }
+}
+
+extension KKGradientView {
     
-    func update(fill: GradientView.Fill?) {
-        if let fill = fill {
-            switch fill.mode {
-            case .axial: self.kkLayer.type = .axial
-            case .radial: self.kkLayer.type = .radial
-            }
-            self.kkLayer.colors = fill.points.map({ $0.color.cgColor })
-            self.kkLayer.locations = fill.points.map({ NSNumber(value: $0.location) })
-            self.kkLayer.startPoint = fill.start.cgPoint
-            self.kkLayer.endPoint = fill.end.cgPoint
-            self.kkLayer.isHidden = false
-        } else {
-            self.kkLayer.isHidden = true
+    func kk_update(fill: Gradient) {
+        switch fill.mode {
+        case .axial: self.kkLayer.type = .axial
+        case .radial: self.kkLayer.type = .radial
         }
+        self.kkLayer.colors = fill.points.map({ $0.color.cgColor })
+        self.kkLayer.locations = fill.points.map({ NSNumber(value: $0.location) })
+        self.kkLayer.startPoint = fill.start.cgPoint
+        self.kkLayer.endPoint = fill.end.cgPoint
+        self.kkLayer.isHidden = false
     }
     
-    func update(color: Color?) {
-        self.backgroundColor = color?.native
+    func kk_update(color: Color) {
+        self.backgroundColor = color.native
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alpha = CGFloat(alpha)
-    }
-    
-    func cleanup() {
     }
     
 }

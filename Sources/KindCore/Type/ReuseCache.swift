@@ -10,40 +10,30 @@ public final class ReuseCache {
         self._items = [:]
     }
     
-    public func set< Reusable : IReusable >(_ reusable: Reusable.Type, name: String?, content: Reusable.Content) {
-        let identificator: String
-        if let name = name {
-            identificator = "\(reusable.reuseIdentificator)::\(name)"
+    public func set< Reusable : IReusable >(_ reusable: Reusable.Type, owner: Reusable.Owner, content: Reusable.Content) {
+        let name = reusable.name(owner: owner)
+        if let items = self._items[name] {
+            self._items[name] = items + [ content ]
         } else {
-            identificator = reusable.reuseIdentificator
+            self._items[name] = [ content ]
         }
-        if let items = self._items[identificator] {
-            self._items[identificator] = items + [ content ]
-        } else {
-            self._items[identificator] = [ content ]
-        }
-        reusable.cleanupReuse(content: content)
+        reusable.cleanup(owner: owner, content: content)
     }
     
-    public func get< Reusable : IReusable >(_ reusable: Reusable.Type, name: String?, owner: Reusable.Owner) -> Reusable.Content {
-        let identificator: String
-        if let name = name {
-            identificator = "\(reusable.reuseIdentificator)::\(name)"
-        } else {
-            identificator = reusable.reuseIdentificator
-        }
+    public func get< Reusable : IReusable >(_ reusable: Reusable.Type, owner: Reusable.Owner) -> Reusable.Content {
+        let name = reusable.name(owner: owner)
         let item: Reusable.Content
-        if let items = self._items[identificator] {
+        if let items = self._items[name] {
             if let lastItem = items.last as? Reusable.Content {
-                self._items[identificator] = items.dropLast()
+                self._items[name] = items.dropLast()
                 item = lastItem
             } else {
-                item = reusable.createReuse(owner: owner)
+                item = reusable.create(owner: owner)
             }
         } else {
-            item = reusable.createReuse(owner: owner)
+            item = reusable.create(owner: owner)
         }
-        reusable.configureReuse(owner: owner, content: item)
+        reusable.configure(owner: owner, content: item)
         return item
     }
     

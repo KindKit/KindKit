@@ -2,11 +2,15 @@
 //  KindKit
 //
 
-import Foundation
+import KindMonadicMacro
 
+@KindMonadic
 public struct LineDash : Equatable {
     
+    @KindMonadicProperty
     public let phase: Double
+    
+    @KindMonadicProperty
     public let lengths: [Double]
     
     public init(

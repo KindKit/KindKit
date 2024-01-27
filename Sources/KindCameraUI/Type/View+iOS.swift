@@ -191,8 +191,8 @@ extension KKCameraView {
         }
     }
     
-    func kk_update(color: Color?) {
-        self.backgroundColor = color?.native
+    func kk_update(color: Color) {
+        self.backgroundColor = color.native
     }
     
     func kk_update(alpha: Double) {

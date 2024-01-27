@@ -88,7 +88,7 @@ private extension View.Code {
     
 }
 
-extension View.Code : ILayoutPart {
+extension View.Code : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

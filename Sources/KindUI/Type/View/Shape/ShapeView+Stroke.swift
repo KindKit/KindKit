@@ -4,13 +4,20 @@
 
 import KindGraphics
 import KindMath
+import KindMonadicMacro
 
 extension ShapeView {
     
+    @KindMonadic
     public struct Stroke : Equatable {
-        
+    
+        @KindMonadicProperty
         public let color: Color
+        
+        @KindMonadicProperty
         public let start: Double
+        
+        @KindMonadicProperty
         public let end: Double
         
         public init(

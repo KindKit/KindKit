@@ -555,7 +555,7 @@ private extension Container.Dialog {
         let offset = self._layout._offset(dialog: dialogItem, size: dialogSize, delta: deltaLocation)
         let baseProgress = self._layout._progress(dialog: dialogItem, size: dialogSize, delta: deltaLocation)
         if offset > self.interactiveLimit {
-            let viewAlphable = self._layout.dialogItem?.container.view as? IViewAlphable
+            let viewAlphable = self._layout.dialogItem?.container.view as? IViewSupportAlpha
             self._animation = KindAnimation.default.run(
                 .custom(
                     duration: TimeInterval(size / self.animationVelocity),

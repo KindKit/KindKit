@@ -2,6 +2,8 @@
 //  KindKit
 //
 
+import Foundation
+
 public extension Parser {
     
     static func text(
@@ -231,11 +233,11 @@ fileprivate extension Parser {
                         result.append(.plain(options: options, text: buffer))
                         buffer.removeAll(keepingCapacity: true)
                     }
-                    let textOptions = simple._textOptions
-                    if options.contains(textOptions) == true {
-                        options.remove(textOptions)
+                    let textFlags = simple._textFlags
+                    if options.contains(textFlags) == true {
+                        options.remove(textFlags)
                     } else {
-                        options.insert(textOptions)
+                        options.insert(textFlags)
                     }
                 case .openBracket(let bracket):
                     switch bracket {
@@ -384,7 +386,7 @@ fileprivate extension Parser {
 
 fileprivate extension Parser.Simple {
     
-    var _textOptions: Text.Options {
+    var _textFlags: Text.Options {
         switch self {
         case .italic: return .italic
         case .bold: return .bold

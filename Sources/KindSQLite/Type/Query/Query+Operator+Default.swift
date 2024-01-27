@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Operator {
     
@@ -19,12 +19,13 @@ public extension Query.Operator {
 extension Query.Operator.Default : ICondition {
     
     public var query: String {
-        let builder = StringBuilder("(")
-        builder.append(self.lhs)
-        builder.append(self.operator)
-        builder.append(self.rhs)
-        builder.append(")")
-        return builder.string
+        return .kk_build({
+            LettersComponent("(")
+            LettersComponent(self.lhs)
+            LettersComponent(self.operator)
+            LettersComponent(self.rhs)
+            LettersComponent(")")
+        })
     }
     
 }

@@ -476,7 +476,7 @@ public extension Document {
             path: path,
             as: NSString.self,
             decode: { input, path in
-                let formatter = DateFormatter()
+                let formatter = Foundation.DateFormatter()
                 formatter.dateFormat = dateFormat
                 guard let date = formatter.date(from: input as String) else {
                     throw Error.Coding.cast(path)

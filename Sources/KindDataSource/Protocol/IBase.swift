@@ -34,8 +34,15 @@ public extension IBase {
     
     @inlinable
     @discardableResult
-    func onFinish< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Result) -> Void) -> Self {
-        self.onFinish.add(sender, closure)
+    func onFinish< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType, Result) -> Void) -> Self {
+        self.onFinish.add(target, closure)
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func onFinish(remove target: AnyObject) -> Self {
+        self.onFinish.remove(target)
         return self
     }
     

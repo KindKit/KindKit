@@ -2,7 +2,9 @@
 //  KindKit
 //
 
-import KindCore
+import Foundation
+import KindString
+import KindSystem
 
 public extension Target {
     
@@ -15,7 +17,7 @@ public extension Target {
         public let encoding: String.Encoding
         
         private let _queue: DispatchQueue
-        private let _dateFormatter: KindCore.StringFormatter.Date
+        private let _dateFormatter: KindString.DateFormatter
         private var _stream: Stream?
         
         public init(

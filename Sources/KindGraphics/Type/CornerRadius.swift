@@ -22,6 +22,10 @@ public extension CornerRadius {
 
 public extension CornerRadius {
     
+    static func auto(edges: Edge) -> Self {
+        return .auto(percent: .half, edges: edges)
+    }
+    
     static func manual(radius: Double) -> Self {
         return .manual(radius: radius, edges: .all)
     }

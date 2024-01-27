@@ -6,6 +6,15 @@ public extension Array {
     
     @inlinable
     static func kk_make(
+        reserve: Int
+    ) -> Self {
+        var result = Array< Element >()
+        result.reserveCapacity(reserve)
+        return result
+    }
+    
+    @inlinable
+    static func kk_make(
         range: Range< Element >
     ) -> Self where Element : Strideable, Element.Stride : SignedInteger {
         return Array(unsafeUninitializedCapacity: range.count, initializingWith: { buffer, count in
@@ -13,6 +22,19 @@ public extension Array {
                 buffer[index] = value
             }
             count = range.count
+        })
+    }
+    
+    @inlinable
+    static func kk_make(
+        new: () -> Element,
+        count: Int
+    ) -> Self where Element : AnyObject {
+        return Array(unsafeUninitializedCapacity: count, initializingWith: { buffer, bufferCount in
+            for index in 0 ..< count {
+                buffer[index] = new()
+            }
+            bufferCount = count
         })
     }
     
@@ -278,14 +300,35 @@ public extension Array {
         added: [Element]
     ) {
         return (
-            removed: self.filter({ view in
-                other.contains(where: { `where`($0, view) }) == false
+            removed: self.filter({ old in
+                other.contains(where: { `where`($0, old) }) == false
             }),
-            stayed: self.filter({ view in
-                other.contains(where: { `where`($0, view) }) == true
+            stayed: self.filter({ old in
+                other.contains(where: { `where`($0, old) }) == true
             }),
-            added: other.filter({ view in
-                self.contains(where: { `where`($0, view) }) == false
+            added: other.filter({ new in
+                self.contains(where: { `where`($0, new) }) == false
+            })
+        )
+    }
+    
+    @inlinable
+    func kk_difference(
+        _ other: [Element]
+    ) -> (
+        removed: [Element],
+        stayed: [Element],
+        added: [Element]
+    ) where Element : Equatable {
+        return (
+            removed: self.filter({ old in
+                other.contains(old) == false
+            }),
+            stayed: self.filter({ old in
+                other.contains(old) == true
+            }),
+            added: other.filter({ new in
+                self.contains(new) == false
             })
         )
     }

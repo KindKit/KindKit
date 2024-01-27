@@ -7,35 +7,39 @@ import KindCore
 
 public extension Coder {
     
-    struct Identifier< Coder, Kind : IIdentifierKind > {
+    struct Identifier< CoderType, KindType : IIdentifierKind > {
     }
     
 }
 
-extension Coder.Identifier : IValueDecoder where Coder : IValueDecoder {
+extension Coder.Identifier : IValueDecoder where CoderType : IValueDecoder, CoderType.KeychainDecoded : Hashable {
     
-    public static func decode(_ value: Data) throws -> KindCore.Identifier< Coder.KeychainDecoded, Kind > {
-        return Identifier(try Coder.decode(value))
+    public typealias KeychainDecoded = KindCore.Identifier< CoderType.KeychainDecoded, KindType >
+    
+    public static func decode(_ value: Data) throws -> KeychainDecoded {
+        return .init(try CoderType.decode(value))
     }
     
 }
 
-extension Coder.Identifier : IValueEncoder where Coder : IValueEncoder {
+extension Coder.Identifier : IValueEncoder where CoderType : IValueEncoder, CoderType.KeychainEncoded : Hashable {
     
-    public static func encode(_ value: KindCore.Identifier< Coder.KeychainEncoded, Kind >) throws -> Data {
-        return try Coder.encode(value.raw)
+    public typealias KeychainEncoded = KindCore.Identifier< CoderType.KeychainEncoded, KindType >
+    
+    public static func encode(_ value: KeychainEncoded) throws -> Data {
+        return try CoderType.encode(value.id)
     }
     
 }
 
-extension Identifier : IDecoderAlias where Raw : IDecoderAlias {
+extension Identifier : IDecoderAlias where RawType : IDecoderAlias, RawType.KeychainDecoder.KeychainDecoded : Hashable {
     
-    public typealias KeychainDecoder = Coder.Identifier< Raw.KeychainDecoder, Kind >
+    public typealias KeychainDecoder = Coder.Identifier< RawType.KeychainDecoder, KindType >
     
 }
 
-extension Identifier : IEncoderAlias where Raw : IEncoderAlias {
+extension Identifier : IEncoderAlias where RawType : IEncoderAlias, RawType.KeychainEncoder.KeychainEncoded : Hashable {
     
-    public typealias KeychainEncoder = Coder.Identifier< Raw.KeychainEncoder, Kind >
+    public typealias KeychainEncoder = Coder.Identifier< RawType.KeychainEncoder, KindType >
     
 }

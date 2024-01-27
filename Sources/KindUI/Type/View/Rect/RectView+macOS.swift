@@ -14,21 +14,21 @@ extension RectView {
         
         typealias Owner = RectView
         typealias Content = KKRectView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "RectView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -96,29 +96,32 @@ final class KKRectView : NSView {
 
 extension KKRectView {
     
-    func update(view: RectView) {
-        self.update(frame: view.frame)
-        self.update(color: view.color)
-        self.update(fill: view.fill)
-        self.update(border: view.border)
-        self.update(cornerRadius: view.cornerRadius)
-        self.update(alpha: view.alpha)
+    func kk_update(view: RectView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(color: view.color)
+        self.kk_update(fill: view.fill)
+        self.kk_update(border: view.border)
+        self.kk_update(cornerRadius: view.cornerRadius)
+        self.kk_update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    func kk_cleanup(view: RectView) {
     }
     
-    func update(color: Color?) {
+}
+
+extension KKRectView {
+    
+    func kk_update(color: Color) {
         guard let layer = self.layer else { return }
-        layer.backgroundColor = color?.native.cgColor
+        layer.backgroundColor = color.native.cgColor
     }
     
-    func update(fill: Color?) {
-        self.kkShareLayer.fillColor = fill?.cgColor
+    func kk_update(fill: Color) {
+        self.kkShareLayer.fillColor = fill.cgColor
     }
     
-    func update(border: Border) {
+    func kk_update(border: Border) {
         switch border {
         case .none:
             self.kkBorderWidth = 0
@@ -129,15 +132,12 @@ extension KKRectView {
         }
     }
     
-    func update(cornerRadius: CornerRadius) {
+    func kk_update(cornerRadius: CornerRadius) {
         self.kkCornerRadius = cornerRadius
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
     }
     
 }

@@ -14,21 +14,21 @@ extension ShapeView {
         
         typealias Owner = ShapeView
         typealias Content = KKShapeView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "ShapeView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -59,47 +59,38 @@ final class KKShapeView : NSView {
     override func layout() {
         super.layout()
         
-        let bounds = self.bounds
-        if let path = self.kkShapeLayer.path {
-            let shapeSize = path.boundingBoxOfPath.size
-            self.kkShapeLayer.frame = CGRect(
-                origin: CGPoint(
-                    x: bounds.midX - (shapeSize.width / 2),
-                    y: bounds.midY - (shapeSize.height / 2)
-                ),
-                size: shapeSize
-            )
-        } else {
-            self.kkShapeLayer.frame = bounds
-        }
+        self.kkShapeLayer.frame = self.bounds
     }
     
 }
 
 extension KKShapeView {
     
-    func update(view: ShapeView) {
-        self.update(frame: view.frame)
-        self.update(path: view.path)
-        self.update(fill: view.fill)
-        self.update(stroke: view.stroke)
-        self.update(line: view.line)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: ShapeView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(path: view.path)
+        self.kk_update(fill: view.fill)
+        self.kk_update(stroke: view.stroke)
+        self.kk_update(line: view.line)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    func kk_cleanup(view: ShapeView) {
     }
     
-    func update(path: Path2?) {
+}
+
+extension KKShapeView {
+    
+    func kk_update(path: Path2?) {
         CATransaction.kk_withoutActions({
             self.kkShapeLayer.path = path?.cgPath
             self.needsLayout = true
         })
     }
     
-    func update(fill: ShapeView.Fill?) {
+    func kk_update(fill: ShapeView.Fill?) {
         CATransaction.kk_withoutActions({
             if let fill = fill {
                 self.kkShapeLayer.fillColor = fill.color.cgColor
@@ -114,7 +105,7 @@ extension KKShapeView {
         })
     }
     
-    func update(stroke: ShapeView.Stroke?) {
+    func kk_update(stroke: ShapeView.Stroke?) {
         CATransaction.kk_withoutActions({
             if let stroke = stroke {
                 self.kkShapeLayer.strokeColor = stroke.color.cgColor
@@ -128,7 +119,7 @@ extension KKShapeView {
         })
     }
     
-    func update(line: ShapeView.Line) {
+    func kk_update(line: ShapeView.Line) {
         CATransaction.kk_withoutActions({
             self.kkShapeLayer.lineWidth = CGFloat(line.width)
             switch line.cap {
@@ -153,15 +144,12 @@ extension KKShapeView {
         })
     }
     
-    func update(color: Color?) {
-        self.layer!.backgroundColor = color?.cgColor
+    func kk_update(color: Color) {
+        self.layer!.backgroundColor = color.cgColor
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
     }
     
 }

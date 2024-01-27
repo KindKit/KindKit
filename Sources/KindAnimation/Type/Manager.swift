@@ -2,82 +2,68 @@
 //  KindKit
 //
 
-import Foundation
-
-protocol IQueueDelegate : AnyObject {
-    
-    func update(_ delta: TimeInterval)
-    
-}
+import KindCore
+import KindTime
 
 public final class Manager {
     
-    
-    private var _tasks: [ITask]
-    private var _displayLink: DisplayLink
+    private var _actions: [IAction]
+    private var _displayLink: DisplayLink?
     
     init() {
-        self._tasks = []
-        self._displayLink = DisplayLink()
-        self._displayLink.delegate = self
+        self._actions = []
     }
     
     deinit {
-        self._displayLink.stop()
+        self._displayLink = nil
     }
     
 }
 
 public extension Manager {
     
-    func append(task: ITask) {
-        guard self._tasks.contains(where: { $0 === task }) == false else {
-            return
-        }
-        self._tasks.append(task)
-        if self._displayLink.isRunning == false {
-            self._displayLink.start()
-        }
-    }
-    
-    func remove(task: ITask) {
-        guard let index = self._tasks.firstIndex(where: { $0 === task }) else {
-            return
-        }
-        task.cancel()
-        self._tasks.remove(at: index)
-    }
-    
     @inlinable
     @discardableResult
-    func run(
-        _ task: ITask
-    ) -> ICancellable {
-        self.append(task: task)
-        return task
+    func run(_ action: IAction) -> ICancellable {
+        self.append(action)
+        return action
+    }
+    
+    func append(_ action: IAction) {
+        guard self._actions.contains(where: { $0 === action }) == false else { return }
+        self._actions.append(action)
+        if self._displayLink == nil {
+            self._displayLink = .init(manager: self)
+        }
+    }
+    
+    func remove(_ action: IAction) {
+        guard let index = self._actions.firstIndex(where: { $0 === action }) else { return }
+        self._actions.remove(at: index)
+        action.cancel()
     }
     
 }
 
-extension Manager : IQueueDelegate {
+extension Manager {
     
-    func update(_ delta: TimeInterval) {
-        var removingTask: [ITask] = []
-        for task in self._tasks {
-            if task.update(delta) == true {
-                removingTask.append(task)
+    func update(_ interval: SecondsInterval) {
+        var removing: [IAction] = []
+        for action in self._actions {
+            switch action.update(interval) {
+            case .working:
+                break
+            case .completed:
+                removing.append(action)
             }
         }
-        if removingTask.count > 0 {
-            self._tasks.removeAll(where: { task in
-                return removingTask.contains(where: { return task === $0 })
+        if removing.count > 0 {
+            self._actions.removeAll(where: { action in
+                return removing.contains(where: { return action === $0 })
             })
-            for task in removingTask {
-                task.complete()
-            }
         }
-        if self._tasks.count == 0 {
-            self._displayLink.stop()
+        if self._actions.count == 0 {
+            self._displayLink = nil
         }
     }
     

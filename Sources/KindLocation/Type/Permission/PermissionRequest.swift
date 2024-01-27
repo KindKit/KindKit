@@ -8,6 +8,7 @@ import KindPermission
 public final class PermissionRequest : KindPermission.IRequest {
     
     public let preferedWhen: When
+    
     public var status: Status {
         switch self._manager.kk_authorizationStatus {
         case .denied, .restricted: return .denied
@@ -16,6 +17,7 @@ public final class PermissionRequest : KindPermission.IRequest {
         @unknown default: return .denied
         }
     }
+    
     public var when: When? {
         switch self._manager.kk_authorizationStatus {
         case .authorized, .authorizedAlways: return .always

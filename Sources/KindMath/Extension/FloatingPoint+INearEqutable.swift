@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 extension INearEqutable where Self : FloatingPoint {
     
     @inlinable

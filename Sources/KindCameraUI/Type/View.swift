@@ -4,6 +4,7 @@
 
 import KindCamera
 import KindUI
+import KindMonadicMacro
 
 protocol KKCameraViewDelegate : AnyObject {
     
@@ -21,9 +22,11 @@ protocol KKCameraViewDelegate : AnyObject {
     
 }
 
+@KindMonadic
 public final class View {
     
-    public private(set) weak var appearedLayout: ILayout?
+    public private(set) weak var appearedLayout: Layout?
+    
     public var frame: KindMath.Rect = .zero {
         didSet {
             guard self.frame != oldValue else { return }
@@ -32,7 +35,9 @@ public final class View {
             }
         }
     }
+    
 #if os(iOS)
+    
     public var transform: Transform = .init() {
         didSet {
             guard self.transform != oldValue else { return }
@@ -41,13 +46,17 @@ public final class View {
             }
         }
     }
+    
 #endif
+    
     public var size: StaticSize = .init(.fill, .fill) {
         didSet {
             guard self.size != oldValue else { return }
             self.setNeedLayout()
         }
     }
+    
+    @KindMonadicProperty
     public var cameraSession: KindCamera.Session {
         willSet {
             guard self.cameraSession !== newValue else { return }
@@ -64,6 +73,8 @@ public final class View {
             }
         }
     }
+    
+    @KindMonadicProperty
     public var mode: Mode = .aspectFit {
         didSet {
             guard self.mode != oldValue else { return }
@@ -72,10 +83,18 @@ public final class View {
             }
         }
     }
+    
+    @KindMonadicProperty
     public var shouldFocus: Bool = true
+    
 #if os(iOS)
+    
+    @KindMonadicProperty
     public var shouldZoom: Bool = true
+    
     public private(set) var isZooming: Bool = false
+    
+    @KindMonadicProperty
     public var zoom: Double {
         set {
             guard self._zoom != newValue else { return }
@@ -85,7 +104,9 @@ public final class View {
         }
         get { self._zoom }
     }
+    
 #endif
+    
     public var color: KindGraphics.Color? {
         didSet {
             guard self.color != oldValue else { return }
@@ -94,6 +115,7 @@ public final class View {
             }
         }
     }
+    
     public var alpha: Double = 1 {
         didSet {
             guard self.alpha != oldValue else { return }
@@ -102,21 +124,29 @@ public final class View {
             }
         }
     }
+    
     public var isHidden: Bool = false {
         didSet {
             guard self.isHidden != oldValue else { return }
             self.setNeedLayout()
         }
     }
+    
     public private(set) var isVisible: Bool = false
+    
     public let onAppear = Signal< Void, Void >()
     public let onDisappear = Signal< Void, Void >()
     public let onVisible = Signal< Void, Void >()
     public let onInvisible = Signal< Void, Void >()
+    
+    @KindMonadicSignal
     public let onFocus = Signal< Void, Point >()
 #if os(iOS)
+    @KindMonadicSignal
     public let onBeginZooming = Signal< Void, Void >()
+    @KindMonadicSignal
     public let onZooming = Signal< Void, Void >()
+    @KindMonadicSignal
     public let onEndZooming = Signal< Void, Void >()
 #endif
     
@@ -139,222 +169,6 @@ public final class View {
 
 }
 
-public extension View {
-    
-    @inlinable
-    @discardableResult
-    func cameraSession(_ value: KindCamera.Session) -> Self {
-        self.cameraSession = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func cameraSession(_ value: () -> KindCamera.Session) -> Self {
-        return self.cameraSession(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func cameraSession(_ value: (Self) -> KindCamera.Session) -> Self {
-        return self.cameraSession(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func mode(_ value: Mode) -> Self {
-        self.mode = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func mode(_ value: () -> Mode) -> Self {
-        return self.mode(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func mode(_ value: (Self) -> Mode) -> Self {
-        return self.mode(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func shouldFocus(_ value: Bool) -> Self {
-        self.shouldFocus = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func shouldFocus(_ value: () -> Bool) -> Self {
-        return self.shouldFocus(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func shouldFocus(_ value: (Self) -> Bool) -> Self {
-        return self.shouldFocus(value(self))
-    }
-    
-#if os(iOS)
-    
-    @inlinable
-    @discardableResult
-    func shouldZoom(_ value: Bool) -> Self {
-        self.shouldZoom = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func shouldZoom(_ value: () -> Bool) -> Self {
-        return self.shouldZoom(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func shouldZoom(_ value: (Self) -> Bool) -> Self {
-        return self.shouldZoom(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func zoom(_ value: Double) -> Self {
-        self.zoom = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func zoom(_ value: () -> Double) -> Self {
-        return self.zoom(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func zoom(_ value: (Self) -> Double) -> Self {
-        return self.zoom(value(self))
-    }
-    
-#endif
-    
-}
-
-public extension View {
-    
-    @inlinable
-    @discardableResult
-    func onFocus(_ closure: @escaping () -> Void) -> Self {
-        self.onFocus.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFocus(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onFocus.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFocus(_ closure: @escaping (Point) -> Void) -> Self {
-        self.onFocus.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFocus(_ closure: @escaping (Self, Point) -> Void) -> Self {
-        self.onFocus.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onFocus.add(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onFocus< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender, Point) -> Void) -> Self {
-        self.onFocus.add(sender, closure)
-        return self
-    }
-    
-#if os(iOS)
-    
-    @inlinable
-    @discardableResult
-    func onBeginZooming(_ closure: @escaping () -> Void) -> Self {
-        self.onBeginZooming.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginZooming(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onBeginZooming.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onBeginZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onBeginZooming.add(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onZooming(_ closure: @escaping () -> Void) -> Self {
-        self.onZooming.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onZooming(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onZooming.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onZooming.add(sender, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndZooming(_ closure: @escaping () -> Void) -> Self {
-        self.onEndZooming.add(closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndZooming(_ closure: @escaping (Self) -> Void) -> Self {
-        self.onEndZooming.add(self, closure)
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func onEndZooming< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onEndZooming.add(sender, closure)
-        return self
-    }
-    
-#endif
-    
-}
-
 extension View : IView {
     
     public var native: NativeView {
@@ -375,13 +189,12 @@ extension View : IView {
     }
     
     public func size(available: Size) -> Size {
-        guard self.isHidden == false else { return .zero }
         return self.size.apply(
             available: available
         )
     }
     
-    public func appear(to layout: ILayout) {
+    public func appear(to layout: Layout) {
         self.appearedLayout = layout
         self.onAppear.emit()
     }
@@ -406,7 +219,7 @@ extension View : IView {
 
 extension View : IViewReusable {
     
-    public var reuseUnloadBehaviour: Reuse.UnloadBehaviour {
+    public var reuseUnloadBehaviour: ReuseUnloadBehaviour {
         set { self._reuse.unloadBehaviour = newValue }
         get { self._reuse.unloadBehaviour }
     }
@@ -425,7 +238,7 @@ extension View : IViewReusable {
 
 #if os(iOS)
 
-extension View : IViewTransformable {
+extension View : IViewSupportTransform {
 }
 
 #endif

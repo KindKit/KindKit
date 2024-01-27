@@ -11,7 +11,8 @@ extension Entity {
     
     final class Variable {
         
-        let modifier: Modifier
+        let compileTime: CompileTimeCondition?
+        let modifier: Modifier?
         let specifier: KindMonadicMacroPlugin.Variable.Specifier
         let name: String
         let type: String
@@ -41,13 +42,15 @@ extension Entity {
         }
         
         init(
-            modifier: Modifier,
+            compileTime: CompileTimeCondition?,
+            modifier: Modifier?,
             specifier: KindMonadicMacroPlugin.Variable.Specifier,
             name: String,
             type: String,
             genericTypes: [String],
             accessors: KindMonadicMacroPlugin.Variable.Accessors
         ) {
+            self.compileTime = compileTime
             self.modifier = modifier
             self.specifier = specifier
             self.name = name
@@ -57,9 +60,11 @@ extension Entity {
         }
         
         init?(
+            compileTime: CompileTimeCondition?,
             variableSyntax: VariableDeclSyntax,
             bindingSyntax: PatternBindingSyntax
         ) {
+            self.compileTime = compileTime
             self.modifier = .init(variableSyntax)
             
             guard let specifier = KindMonadicMacroPlugin.Variable.Specifier(variableSyntax) else {
@@ -73,7 +78,15 @@ extension Entity {
             if let typeSyntax = bindingSyntax.typeAnnotation {
                 self.name = patternSyntax.identifier.text
                 self.type = typeSyntax.type.trimmed.description
-                if let memberSyntax = typeSyntax.type.as(MemberTypeSyntax.self) {
+                if let identifierSyntax = typeSyntax.type.as(IdentifierTypeSyntax.self) {
+                    if let genericArgumentClause = identifierSyntax.genericArgumentClause {
+                        self.genericTypes = genericArgumentClause.arguments.map({
+                            $0.argument.trimmed.description
+                        })
+                    } else {
+                        self.genericTypes = []
+                    }
+                } else if let memberSyntax = typeSyntax.type.as(MemberTypeSyntax.self) {
                     if let genericArgumentClause = memberSyntax.genericArgumentClause {
                         self.genericTypes = genericArgumentClause.arguments.map({
                             $0.argument.trimmed.description
@@ -103,6 +116,7 @@ extension Entity {
         
         func copy(name: String) -> Variable {
             return .init(
+                compileTime: self.compileTime,
                 modifier: self.modifier,
                 specifier: self.specifier,
                 name: name,

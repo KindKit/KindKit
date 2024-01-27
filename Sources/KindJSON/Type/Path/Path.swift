@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindDebug
 
 public struct Path : Hashable, Equatable {

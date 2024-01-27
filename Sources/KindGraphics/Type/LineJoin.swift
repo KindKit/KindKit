@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 public enum LineJoin : Equatable {
     
     case miter(Double)

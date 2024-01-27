@@ -14,21 +14,21 @@ extension ImageView {
         
         typealias Owner = ImageView
         typealias Content = KKImageView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "ImageView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -61,24 +61,28 @@ final class KKImageView : NSImageView {
 
 extension KKImageView {
     
-    func update(view: ImageView) {
-        self.update(frame: view.frame)
-        self.update(image: view.image)
-        self.update(mode: view.mode)
-        self.update(tintColor: view.tintColor)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    final func kk_update(view: ImageView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(image: view.image)
+        self.kk_update(mode: view.mode)
+        self.kk_update(tintColor: view.tintColor)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    final func kk_cleanup(view: ImageView) {
+        self.image = nil
     }
     
-    func update(image: Image?) {
+}
+
+extension KKImageView {
+    
+    final func kk_update(image: Image?) {
         self.image = image?.native
     }
     
-    func update(mode: ImageView.Mode) {
+    final func kk_update(mode: ImageMode) {
         switch mode {
         case .origin: self.imageScaling = .scaleNone
         case .aspectFit: self.imageScaling = .scaleProportionallyDown
@@ -86,21 +90,17 @@ extension KKImageView {
         }
     }
     
-    func update(tintColor: Color?) {
+    final func kk_update(tintColor: Color?) {
         self.contentTintColor = tintColor?.native
     }
     
-    func update(color: Color?) {
+    final func kk_update(color: Color) {
         guard let layer = self.layer else { return }
-        layer.backgroundColor = color?.native.cgColor
+        layer.backgroundColor = color.native.cgColor
     }
     
-    func update(alpha: Double) {
+    final func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
-        self.image = nil
     }
     
 }

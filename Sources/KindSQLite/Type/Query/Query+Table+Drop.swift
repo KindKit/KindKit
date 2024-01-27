@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Table {
     
@@ -36,13 +36,14 @@ public extension Query.Table.Drop {
 extension Query.Table.Drop : IQuery {
     
     public var query: String {
-        let builder = StringBuilder("DROP TABLE")
-        if self.ifExists == true {
-            builder.append(" IF EXISTS")
-        }
-        builder.append(" ")
-        builder.append(self.table)
-        return builder.string
+        return .kk_build({
+            LettersComponent("DROP TABLE")
+            if self.ifExists == true {
+                LettersComponent(" IF EXISTS")
+            }
+            LettersComponent(" ")
+            LettersComponent(self.table)
+        })
     }
     
 }

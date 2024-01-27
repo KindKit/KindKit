@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindDebug
 import KindLog
 
@@ -96,18 +97,24 @@ extension Query.Fail : KindDebug.IEntity {
         return .object(name: "Query.Fail", sequence: { items in
             items.append(.pair(
                 string: "CreateAt",
-                string: self.createAt.kk_format(
-                    date: .init()
-                        .format("yyyy-MM-dd'T'HH:mm:ssZ")
-                )
+                string: .kk_build({
+                    FormatterComponent(
+                        source: self.createAt,
+                        formatter: DateFormatter()
+                            .format("yyyy-MM-dd'T'HH:mm:ssZ")
+                    )
+                })
             ))
             items.append(.pair(
                 string: "Duration",
-                string: (-self.createAt.timeIntervalSinceNow).kk_format(
-                    dateComponents: .init()
-                        .unitsStyle(.abbreviated)
-                        .allowedUnits([ .second, .nanosecond ])
-                )
+                string: .kk_build({
+                    FormatterComponent(
+                        source: -self.createAt.timeIntervalSinceNow,
+                        formatter: DateComponentsFormatter()
+                            .unitsStyle(.abbreviated)
+                            .allowedUnits([ .second, .nanosecond ])
+                    )
+                })
             ))
         })
     }

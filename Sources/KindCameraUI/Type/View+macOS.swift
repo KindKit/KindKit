@@ -105,8 +105,8 @@ extension KKCameraView {
         }
     }
     
-    func kk_update(color: Color?) {
-        self.kkPreviewLayer.backgroundColor = color?.native.cgColor
+    func kk_update(color: Color) {
+        self.kkPreviewLayer.backgroundColor = color.native.cgColor
     }
     
     func kk_update(alpha: Double) {

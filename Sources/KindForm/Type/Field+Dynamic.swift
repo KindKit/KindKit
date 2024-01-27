@@ -4,30 +4,38 @@
 
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
-public extension Field {
+extension Field {
     
-    final class Dynamic< Value : Equatable > : IField {
+    @KindMonadic
+    public final class Dynamic< Value : Equatable > : IField {
         
         public typealias ValidatorClosure = (Value) -> Bool
         
         public let id: Id
+        
         public weak var parent: IEntity?
+        
         public var mandatory: KindCondition.IEntity {
             set { self._mandatory.condition = newValue }
             get { return self._mandatory }
         }
+        
         public var hidden: KindCondition.IEntity {
             set { self._hidden.condition = newValue }
             get { return self._hidden }
         }
+        
         public var locked: KindCondition.IEntity {
             set { self._locked.condition = newValue }
             get { return self._locked }
         }
+        
         public var valid: KindCondition.IEntity {
             return self._valid
         }
+        
         public var focusable: [IEntity] {
             guard self.hidden() == false || self.locked() == false else {
                 return []
@@ -37,6 +45,7 @@ public extension Field {
             }
             return []
         }
+        
         public var result: [IResult] {
             guard self.hidden() == false else {
                 return []
@@ -45,13 +54,20 @@ public extension Field {
                 Result.Value(id: self.id, value: self.value)
             ]
         }
+        
         public var onShouldFocus = Signal< Bool?, Void >()
+        
         public var onFocus = Signal< Void, Void >()
+        
         public var onChanged = Signal< Void, Void >()
+        
+        @KindMonadicProperty
         public var validator: ValidatorClosure? {
             set { self._valid.validator = newValue }
             get { self._valid.validator }
         }
+        
+        @KindMonadicProperty
         public var value: Value {
             set {
                 guard self._valid.value != newValue else { return }
@@ -112,42 +128,6 @@ private extension Field.Dynamic {
         self.hidden.remove(observer: self)
         self.locked.remove(observer: self)
         self.valid.remove(observer: self)
-    }
-    
-}
-
-public extension Field.Dynamic {
-    
-    @inlinable
-    @discardableResult
-    func validator(_ value: ValidatorClosure?) -> Self {
-        self.validator = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func validator(_ value: () -> ValidatorClosure?) -> Self {
-        return self.validator(value())
-    }
-    
-    @inlinable
-    @discardableResult
-    func value(_ value: Value) -> Self {
-        self.value = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func value(_ value: () -> Value) -> Self {
-        return self.value(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func value(_ value: (Self) -> Value) -> Self {
-        return self.value(value(self))
     }
     
 }

@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Table {
     
@@ -66,27 +66,36 @@ public extension Query.Table.Select {
 extension Query.Table.Select : ISelectQuery {
     
     public var query: String {
-        let builder = StringBuilder("SELECT ")
-        if self.columns.isEmpty == false {
-            builder.append(self.columns, separator: ", ")
-        } else {
-            builder.append("*")
-        }
-        builder.append(" FROM ")
-        builder.append(self.table)
-        if let condition = self.where {
-            builder.append(" WHERE ")
-            builder.append(condition.query)
-        }
-        if self.orderBy.isEmpty == false {
-            builder.append(" ORDER BY ")
-            builder.append(self.orderBy.map({ $0.query }), separator: ", ")
-        }
-        if let limit = self.limit {
-            builder.append(" ")
-            builder.append(limit.query)
-        }
-        return builder.string
+        return .kk_build({
+            LettersComponent("SELECT ")
+            if self.columns.isEmpty == false {
+                ForEachComponent(count: self.columns.count, content: { index in
+                    LettersComponent(self.columns[index])
+                }, separator: {
+                    LettersComponent(", ")
+                })
+            } else {
+                LettersComponent("*")
+            }
+            LettersComponent(" FROM ")
+            LettersComponent(self.table)
+            if let condition = self.where {
+                LettersComponent(" WHERE ")
+                LettersComponent(condition.query)
+            }
+            if self.orderBy.isEmpty == false {
+                LettersComponent(" ORDER BY ")
+                ForEachComponent(count: self.orderBy.count, content: { index in
+                    LettersComponent(self.orderBy[index].query)
+                }, separator: {
+                    LettersComponent(", ")
+                })
+            }
+            if let limit = self.limit {
+                LettersComponent(" ")
+                LettersComponent(limit.query)
+            }
+        })
     }
     
 }

@@ -65,7 +65,7 @@ private extension View.List.Marker {
     
 }
 
-extension View.List.Marker : ILayoutPart {
+extension View.List.Marker : ILayout {
 
     func invalidate() {
         self.entity.invalidate()

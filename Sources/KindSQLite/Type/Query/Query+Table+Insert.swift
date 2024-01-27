@@ -2,7 +2,7 @@
 //  KindKit
 //
 
-import Foundation
+import KindString
 
 public extension Query.Table {
     
@@ -48,14 +48,23 @@ public extension Query.Table.Insert {
 extension Query.Table.Insert : IInsertQuery {
     
     public var query: String {
-        let builder = StringBuilder("INSERT INTO ")
-        builder.append(self.table)
-        builder.append(" (")
-        builder.append(self.columns, separator: ", ")
-        builder.append(") VALUES (")
-        builder.append(self.values.map({ $0.query }), separator: ", ")
-        builder.append(")")
-        return builder.string
+        return .kk_build({
+            LettersComponent("INSERT INTO ")
+            LettersComponent(self.table)
+            LettersComponent(" (")
+            ForEachComponent(count: self.columns.count, content: { index in
+                LettersComponent(self.columns[index])
+            }, separator: {
+                LettersComponent(", ")
+            })
+            LettersComponent(") VALUES (")
+            ForEachComponent(count: self.values.count, content: { index in
+                LettersComponent(self.values[index].query)
+            }, separator: {
+                LettersComponent(", ")
+            })
+            LettersComponent(")")
+        })
     }
     
 }

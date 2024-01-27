@@ -8,6 +8,9 @@
 import UIKit
 import ImageIO
 import KindMath
+import KindTime
+
+public typealias NativeImage = UIImage
 
 public extension Image {
     
@@ -33,10 +36,10 @@ public extension Image {
         names: [String],
         in bundle: Bundle? = nil,
         compatibleWith traitCollection: UITraitCollection? = nil,
-        duration: TimeInterval,
+        duration: SecondsInterval,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
-        guard let image = UIImage.animatedImage(with: names.compactMap({ UIImage(named: $0, in: bundle, compatibleWith: traitCollection) }), duration: duration) else {
+        guard let image = UIImage.animatedImage(with: names.compactMap({ UIImage(named: $0, in: bundle, compatibleWith: traitCollection) }), duration: duration.timeInterval) else {
             fatalError("Not found images with '\(names)'")
         }
         if let renderingMode = renderingMode {
@@ -79,10 +82,10 @@ public extension Image {
     
     init(
         uiImages: [UIImage],
-        duration: TimeInterval,
+        duration: SecondsInterval,
         renderingMode: UIImage.RenderingMode? = nil
     ) {
-        guard let image = UIImage.animatedImage(with: uiImages, duration: duration) else {
+        guard let image = UIImage.animatedImage(with: uiImages, duration: duration.timeInterval) else {
             fatalError("Invalid create animated image")
         }
         if let renderingMode = renderingMode {
@@ -318,26 +321,26 @@ public extension Image {
         let count = CGImageSourceGetCount(source)
         if count > 1 {
             var frameImages: [UIImage] = []
-            var frameDurations: [TimeInterval] = []
+            var frameDurations: [SecondsInterval] = []
             for index in 0 ..< count {
                 guard let frameImage = CGImageSourceCreateImageAtIndex(source, index, nil) else { continue }
                 frameImages.append(UIImage(cgImage: frameImage))
                 
-                var frameDuration: TimeInterval = 0
+                var frameDuration = SecondsInterval.zero
                 if let frameProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [AnyHashable : Any] {
                     if let gifInfo = frameProperties[kCGImagePropertyGIFDictionary] as? [AnyHashable : Any] {
                         if let gifDelayTime = gifInfo[kCGImagePropertyGIFDelayTime] as? NSNumber {
-                            frameDuration = TimeInterval(gifDelayTime.doubleValue)
+                            frameDuration = SecondsInterval(gifDelayTime.doubleValue)
                         }
                     }
                 }
                 frameDurations.append(frameDuration)
             }
-            var totalDuration: TimeInterval = 0
+            var totalDuration = SecondsInterval.zero
             for frameDuration in frameDurations {
                 totalDuration += frameDuration
             }
-            if let animatedImage = UIImage.animatedImage(with: frameImages, duration: totalDuration) {
+            if let animatedImage = UIImage.animatedImage(with: frameImages, duration: totalDuration.timeInterval) {
                 image = animatedImage
             } else {
                 return nil

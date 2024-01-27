@@ -14,15 +14,11 @@ extension Signal {
             self.source = source
         }
         
-        deinit {
-            self.cancel()
-        }
-        
         func perform(_ argument: ArgumentType) throws -> ResultType {
             fatalError()
         }
         
-        func contains(_ sender: AnyObject) -> Bool {
+        func contains(_ target: AnyObject) -> Bool {
             return false
         }
         

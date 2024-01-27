@@ -2,8 +2,6 @@
 //  KindKit
 //
 
-import Foundation
-
 public struct DrawMode : OptionSet {
     
     public var rawValue: UInt

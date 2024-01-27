@@ -4,10 +4,14 @@
 
 import KindCondition
 import KindEvent
+import KindMonadicMacro
 
+@KindMonadic
 public final class Condition : KindCondition.IEntity {
     
     public let observer = Observer< KindCondition.IObserver >()
+    
+    @KindMonadicProperty
     public var permission: IEntity {
         willSet {
             guard self.permission !== newValue else { return }
@@ -19,6 +23,8 @@ public final class Condition : KindCondition.IEntity {
             self._refresh()
         }
     }
+    
+    @KindMonadicProperty
     public var `in`: [Status] {
         didSet {
             guard self.in != oldValue else { return }
@@ -78,48 +84,6 @@ private extension Condition {
         return `in`.contains(permission.status)
     }
 
-}
-
-public extension Condition {
-    
-    @inlinable
-    @discardableResult
-    func permission(_ value: IEntity) -> Self {
-        self.permission = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func permission(_ value: () -> IEntity) -> Self {
-        return self.permission(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func permission(_ value: (Self) -> IEntity) -> Self {
-        return self.permission(value(self))
-    }
-    
-    @inlinable
-    @discardableResult
-    func `in`(_ value: [Status]) -> Self {
-        self.in = value
-        return self
-    }
-    
-    @inlinable
-    @discardableResult
-    func `in`(_ value: () -> [Status]) -> Self {
-        return self.in(value())
-    }
-
-    @inlinable
-    @discardableResult
-    func `in`(_ value: (Self) -> [Status]) -> Self {
-        return self.in(value(self))
-    }
-    
 }
 
 extension Condition : IObserver {

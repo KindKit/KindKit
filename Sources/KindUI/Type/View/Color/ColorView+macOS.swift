@@ -14,21 +14,21 @@ extension ColorView {
         
         typealias Owner = ColorView
         typealias Content = KKColorView
-
-        static var reuseIdentificator: String {
+        
+        static func name(owner: Owner) -> String {
             return "ColorView"
         }
         
-        static func createReuse(owner: Owner) -> Content {
-            return Content(frame: .zero)
+        static func create(owner: Owner) -> Content {
+            return .init(frame: .zero)
         }
         
-        static func configureReuse(owner: Owner, content: Content) {
-            content.update(view: owner)
+        static func configure(owner: Owner, content: Content) {
+            content.kk_update(view: owner)
         }
         
-        static func cleanupReuse(content: Content) {
-            content.cleanup()
+        static func cleanup(owner: Owner, content: Content) {
+            content.kk_cleanup(view: owner)
         }
         
     }
@@ -59,26 +59,26 @@ final class KKColorView : NSView {
 
 extension KKColorView {
     
-    func update(view: ColorView) {
-        self.update(frame: view.frame)
-        self.update(color: view.color)
-        self.update(alpha: view.alpha)
+    func kk_update(view: ColorView) {
+        self.kk_update(frame: view.frame)
+        self.kk_update(color: view.color)
+        self.kk_update(alpha: view.alpha)
     }
     
-    func update(frame: Rect) {
-        self.frame = frame.cgRect
+    final func kk_cleanup(view: ColorView) {
     }
     
-    func update(color: Color?) {
+}
+
+extension KKColorView {
+    
+    func kk_update(color: Color) {
         guard let layer = self.layer else { return }
-        layer.backgroundColor = color?.native.cgColor
+        layer.backgroundColor = color.native.cgColor
     }
     
-    func update(alpha: Double) {
+    func kk_update(alpha: Double) {
         self.alphaValue = CGFloat(alpha)
-    }
-    
-    func cleanup() {
     }
     
 }

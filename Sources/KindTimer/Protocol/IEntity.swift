@@ -2,6 +2,7 @@
 //  KindKit
 //
 
+import Foundation
 import KindEvent
 
 public protocol IEntity : ICancellable {
@@ -11,6 +12,7 @@ public protocol IEntity : ICancellable {
     var isRunning: Bool { get }
     
     var onStarted: Signal< Void, Void > { get }
+    
     var onTriggered: Signal< Void, Void > { get }
     
 }
@@ -33,8 +35,8 @@ public extension IEntity {
     
     @inlinable
     @discardableResult
-    func onStarted< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onStarted.add(sender, closure)
+    func onStarted< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onStarted.add(target, closure)
         return self
     }
     
@@ -54,8 +56,8 @@ public extension IEntity {
     
     @inlinable
     @discardableResult
-    func onTriggered< Sender : AnyObject >(_ sender: Sender, _ closure: @escaping (Sender) -> Void) -> Self {
-        self.onTriggered.add(sender, closure)
+    func onTriggered< TargetType : AnyObject >(_ target: TargetType, _ closure: @escaping (TargetType) -> Void) -> Self {
+        self.onTriggered.add(target, closure)
         return self
     }
     
