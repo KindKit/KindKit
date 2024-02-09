@@ -109,6 +109,7 @@ final class KKPagingView : UIScrollView {
         
         do {
             self.kkLayoutManager.visibleFrame = .init(self.bounds)
+                .inset(self.contentInset)
             if #available(iOS 11.0, *) {
                 self.kkLayoutManager.preloadInsets = .init(self.safeAreaInsets)
             }
@@ -187,7 +188,9 @@ extension KKPagingView {
     }
     
     func update(contentInset: Inset) {
+        self.kkLayoutManager.contentInsets = contentInset
         self.contentInset = contentInset.uiEdgeInsets
+        self.setNeedsLayout()
     }
     
     func update(visibleInset: Inset) {
