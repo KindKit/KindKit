@@ -67,7 +67,7 @@ public extension IUILayout {
     
     @inlinable
     func update() {
-        self.delegate?.setNeedUpdate(self)
+        self.setNeedUpdate()
         self.delegate?.updateIfNeeded(self)
     }
     
