@@ -18,7 +18,7 @@ public extension Graphics {
         public let native: CGContext
         public var size: Size
         
-        init(_ native: CGContext, size: CGSize) {
+        public init(_ native: CGContext, size: CGSize) {
             self.native = native
             self.size = .init(size)
         }
