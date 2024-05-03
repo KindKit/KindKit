@@ -47,6 +47,22 @@ public extension Polyline2 {
     var isEmpty: Bool {
         return self.corners.isEmpty
     }
+    
+    @inlinable
+    var isClockWise: Bool {
+        var result = 0.0
+        if self.edges.count > 2 {
+            var p0 = self[corner: self.edges[self.edges.endIndex - 2].start]
+            var p1 = self[corner: self.edges[self.edges.endIndex - 1].start]
+            for edge in self.edges {
+                let p2 = self[corner: edge.start]
+                result += p1.x * (p2.y - p0.y)
+                p0 = p1
+                p1 = p2
+            }
+        }
+        return result > 0
+    }
 
     @inlinable
     var perimeter: Distance {
