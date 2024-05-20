@@ -48,9 +48,13 @@ final class KKInputMeasurementComplexView : UITextField {
     var kkDefault: [KKItem]?
     var kkSelected: [KKItem]? {
         didSet {
-            guard let selected = self.kkSelected else { return }
-            self._refreshPicker(items: selected, animated: self.isFirstResponder)
-            self._refreshText(items: selected)
+            if let selected = self.kkSelected {
+                self._refreshPicker(items: selected, animated: self.isFirstResponder)
+                self._refreshText(items: selected)
+            } else {
+                self._resetPicker(animated: self.isFirstResponder)
+                self._resetText()
+            }
         }
     }
     var kkTextInset: UIEdgeInsets = .zero {
@@ -370,6 +374,10 @@ private extension KKInputMeasurementComplexView {
         self.text = items.compactMap({ $0.title }).joined(separator: " ")
     }
     
+    func _resetText() {
+        self.text = ""
+    }
+
     func _refreshPicker(items: [KKItem], animated: Bool) {
         for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
             let part = self.kkParts[partIndex]
@@ -377,6 +385,15 @@ private extension KKInputMeasurementComplexView {
             let itemIndex = part.items.firstIndex(where: { $0 == selected }) ?? 0
             if self.kkPicker.selectedRow(inComponent: partIndex) != itemIndex {
                 self.kkPicker.selectRow(itemIndex, inComponent: partIndex, animated: animated)
+            }
+        }
+    }
+    
+    func _resetPicker(animated: Bool) {
+        for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
+            let part = self.kkParts[partIndex]
+            if self.kkPicker.selectedRow(inComponent: partIndex) != 0 {
+                self.kkPicker.selectRow(0, inComponent: partIndex, animated: animated)
             }
         }
     }
