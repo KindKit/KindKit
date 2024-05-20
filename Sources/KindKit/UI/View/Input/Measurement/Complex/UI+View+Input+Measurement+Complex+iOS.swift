@@ -44,17 +44,13 @@ final class KKInputMeasurementComplexView : UITextField {
             self.kkPicker.reloadAllComponents()
         }
     }
-    var kkDefault: [KKItem]? {
-        didSet {
-            guard self.kkDefault != oldValue else { return }
-            self._refreshPicker(animated: self.isFirstResponder)
-        }
-    }
+    var kkMinimal: [KKItem]?
+    var kkDefault: [KKItem]?
     var kkSelected: [KKItem]? {
         didSet {
-            guard self.kkSelected != oldValue else { return }
-            self._refreshPicker(animated: self.isFirstResponder)
-            self._refreshText()
+            guard let selected = self.kkSelected else { return }
+            self._refreshPicker(items: selected, animated: self.isFirstResponder)
+            self._refreshText(items: selected)
         }
     }
     var kkTextInset: UIEdgeInsets = .zero {
@@ -261,7 +257,9 @@ extension KKInputMeasurementComplexView {
         self.update(frame: view.frame)
         self.update(transform: view.transform)
         self.update(parts: view.parts)
-        self.update(default: view.default, value: view.value)
+        self.update(minimal: view.minimal)
+        self.update(default: view.default)
+        self.update(value: view.value)
         self.update(textFont: view.textFont)
         self.update(textColor: view.textColor)
         self.update(textInset: view.textInset)
@@ -296,12 +294,23 @@ extension KKInputMeasurementComplexView {
         })
     }
     
-    func update< UnitType : Dimension >(`default`: Measurement< UnitType >?, value: Measurement< UnitType >?) {
+    func update< UnitType : Dimension >(minimal: Measurement< UnitType >?) {
+        if let value = minimal {
+            self.kkMinimal = self._items(from: value as NSMeasurement)
+        } else {
+            self.kkMinimal = self._items(from: nil)
+        }
+    }
+    
+    func update< UnitType : Dimension >(`default`: Measurement< UnitType >?) {
         if let value = `default` {
             self.kkDefault = self._items(from: value as NSMeasurement)
         } else {
             self.kkDefault = self._items(from: nil)
         }
+    }
+    
+    func update< UnitType : Dimension >(value: Measurement< UnitType >?) {
         if let value = value {
             self.kkSelected = self._items(from: value as NSMeasurement)
         } else {
@@ -357,29 +366,18 @@ extension KKInputMeasurementComplexView {
 
 private extension KKInputMeasurementComplexView {
     
-    func _refreshPicker(animated: Bool) {
-        if let selected = self.kkSelected {
-            for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
-                let part = self.kkParts[partIndex]
-                let selected = selected[partIndex]
-                if let itemIndex = part.items.firstIndex(where: { $0 == selected }) {
-                    self.kkPicker.selectRow(itemIndex, inComponent: partIndex, animated: animated)
-                } else {
-                    self.kkPicker.selectRow(0, inComponent: partIndex, animated: animated)
-                }
-            }
-        } else {
-            for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
-                self.kkPicker.selectRow(0, inComponent: partIndex, animated: animated)
-            }
-        }
+    func _refreshText(items: [KKItem]) {
+        self.text = items.compactMap({ $0.title }).joined(separator: " ")
     }
     
-    func _refreshText() {
-        if let selected = self.kkSelected {
-            self.text = selected.compactMap({ $0.title }).joined(separator: " ")
-        } else {
-            self.text = ""
+    func _refreshPicker(items: [KKItem], animated: Bool) {
+        for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
+            let part = self.kkParts[partIndex]
+            let selected = items[partIndex]
+            let itemIndex = part.items.firstIndex(where: { $0 == selected }) ?? 0
+            if self.kkPicker.selectedRow(inComponent: partIndex) != itemIndex {
+                self.kkPicker.selectRow(itemIndex, inComponent: partIndex, animated: animated)
+            }
         }
     }
     
@@ -569,13 +567,24 @@ extension KKInputMeasurementComplexView : UIPickerViewDelegate {
         guard let delegate = self.kkDelegate else {
             return
         }
+        guard let unit = self.kkUnit else {
+            return
+        }
         guard let selected = self.kkSelected else {
             return
         }
         let oldSelected = selected[component]
         let newSelected = self.kkParts[component].items[row]
+        var candidateItems = selected.kk_replacing(at: component, to: newSelected)
+        let cancidateMeasurement = self._value(unit: unit, items: candidateItems)
+        if let minimalItems = self.kkMinimal {
+            let minimalMeasurement = self._value(unit: unit, items: minimalItems)
+            if cancidateMeasurement.doubleValue < minimalMeasurement.doubleValue {
+                candidateItems = minimalItems
+            }
+        }
+        self.kkSelected = candidateItems
         if oldSelected != newSelected {
-            self.kkSelected = selected.kk_replacing(at: component, to: newSelected)
             delegate.editing(self, value: self._value())
         }
     }

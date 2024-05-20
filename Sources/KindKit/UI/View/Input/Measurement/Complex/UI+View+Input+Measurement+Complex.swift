@@ -54,11 +54,19 @@ public extension UI.View.Input.Measurement {
                 }
             }
         }
+        public var minimal: Foundation.Measurement< UnitType >? {
+            didSet {
+                guard self.minimal != oldValue else { return }
+                if self.isLoaded == true {
+                    self._view.update(minimal: self.minimal)
+                }
+            }
+        }
         public var `default`: Foundation.Measurement< UnitType >? {
             didSet {
                 guard self.default != oldValue else { return }
                 if self.isLoaded == true {
-                    self._view.update(default: self.default, value: self._value)
+                    self._view.update(default: self.default)
                 }
             }
         }
@@ -67,7 +75,7 @@ public extension UI.View.Input.Measurement {
                 guard self.value != newValue else { return }
                 self._value = newValue
                 if self.isLoaded == true {
-                    self._view.update(default: self.default, value: self._value)
+                    self._view.update(value: self._value)
                 }
             }
             get { self._value }
@@ -196,6 +204,25 @@ public extension UI.View.Input.Measurement.Complex {
     @discardableResult
     func parts(_ value: (Self) -> [Part]) -> Self {
         return self.parts(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func minimal(_ value: Foundation.Measurement< UnitType >?) -> Self {
+        self.minimal = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func minimal(_ value: () -> Foundation.Measurement< UnitType >?) -> Self {
+        return self.minimal(value())
+    }
+
+    @inlinable
+    @discardableResult
+    func minimal(_ value: (Self) -> Foundation.Measurement< UnitType >?) -> Self {
+        return self.minimal(value(self))
     }
     
     @inlinable
