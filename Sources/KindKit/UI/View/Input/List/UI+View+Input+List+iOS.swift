@@ -389,6 +389,7 @@ extension KKInputListView : UIPickerViewDelegate {
         }
         let value = self.kkItems[row]
         if self.kkValue !== value {
+            self.kkValue = value
             delegate.editing(self, value: value)
         }
     }
