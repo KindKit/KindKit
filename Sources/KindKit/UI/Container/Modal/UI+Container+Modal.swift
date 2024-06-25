@@ -442,6 +442,9 @@ private extension UI.Container.Modal {
     
     func _present(modal: UI.Container.ModalItem, animated: Bool, completion: (() -> Void)?) {
         self._current = modal
+        if self.isPresented == true {
+            modal.container.prepareShow(interactive: false)
+        }
         if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 .custom(
@@ -452,7 +455,6 @@ private extension UI.Container.Modal {
                         self._view.locked = true
                         self._layout.state = .present(modal: modal, progress: .zero)
                         modal.container.refreshParentInset()
-                        modal.container.prepareShow(interactive: false)
                     },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -480,7 +482,6 @@ private extension UI.Container.Modal {
             self.refreshContentInset()
             if self.isPresented == true {
                 modal.container.refreshParentInset()
-                modal.container.prepareShow(interactive: false)
                 modal.container.finishShow(interactive: false)
 #if os(iOS)
                 self.refreshOrientations()
@@ -517,6 +518,7 @@ private extension UI.Container.Modal {
                     preparing: { [weak self] in
                         guard let self = self else { return }
                         self._view.locked = true
+                        modal.container.refreshParentInset()
                     },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -542,6 +544,7 @@ private extension UI.Container.Modal {
         } else {
             self._layout.state = .empty
             if self.isPresented == true {
+                modal.container.refreshParentInset()
                 modal.container.finishHide(interactive: false)
 #if os(iOS)
                 self.refreshOrientations()

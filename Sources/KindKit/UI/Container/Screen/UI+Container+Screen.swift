@@ -64,6 +64,7 @@ public extension UI.Container {
         private let _view = UI.View.Custom()
 #if os(iOS)
         private var _virtualKeyboard = VirtualKeyboard()
+        private var _virtualKeyboardAnchor: Double = 0
         private var _virtualKeyboardHeight: Double = 0 {
             didSet {
                 guard self._virtualKeyboardHeight != oldValue else { return }
@@ -129,6 +130,10 @@ public extension UI.Container {
 #endif
         
         public func prepareShow(interactive: Bool) {
+#if os(iOS)
+            UIApplication.shared.kk_endEditing(false)
+            self._subscribeVirtualKeyboard()
+#endif
             self.screen.prepareShow(interactive: interactive)
         }
         
@@ -147,6 +152,9 @@ public extension UI.Container {
         
         public func finishHide(interactive: Bool) {
             self.isPresented = false
+#if os(iOS)
+            self._unsubscribeVirtualKeyboard()
+#endif
             self.screen.finishHide(interactive: interactive)
         }
         
@@ -171,9 +179,6 @@ public extension UI.Container {
 private extension UI.Container.Screen {
     
     func _setup() {
-#if os(iOS)
-        self._subscribeVirtualKeyboard()
-#endif
         self.screen.container = self
         self.screen.setup()
         
@@ -183,9 +188,6 @@ private extension UI.Container.Screen {
     }
     
     func _destroy() {
-#if os(iOS)
-        self._unsubscribeVirtualKeyboard()
-#endif
         self.screen.container = nil
         self.screen.destroy()
     }
@@ -391,14 +393,15 @@ private extension UI.Container.Screen {
     }
     
     func _updateVirtualKeyboardHeight(duration: TimeInterval, height: Double) {
-        guard abs(self._virtualKeyboardHeight - height) > .leastNonzeroMagnitude else { return }
+        guard abs(self._virtualKeyboardAnchor - height) > .leastNonzeroMagnitude else { return }
+        self._virtualKeyboardAnchor = height
         self._virtualKeyboardAnimation?.cancel()
         self._virtualKeyboardAnimation = Animation.default.run(
             .custom(
                 duration: duration,
                 processing: { [weak self] progress in
                     guard let self = self else { return }
-                    self._virtualKeyboardHeight = self._virtualKeyboardHeight.lerp(height, progress: progress)
+                    self._virtualKeyboardHeight = self._virtualKeyboardAnchor.lerp(height, progress: progress)
                 },
                 completion: { [weak self] in
                     guard let self = self else { return }

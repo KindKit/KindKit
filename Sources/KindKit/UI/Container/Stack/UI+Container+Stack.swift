@@ -574,6 +574,10 @@ private extension UI.Container.Stack {
         } else {
             hideBar = false
         }
+        if self.isPresented == true {
+            current.container.prepareHide(interactive: false)
+            forward.container.prepareShow(interactive: false)
+        }
         if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 .custom(
@@ -584,8 +588,6 @@ private extension UI.Container.Stack {
                         self._view.locked = true
                         self._layout.state = .push(current: current, forward: forward, progress: .zero)
                         forward.container.refreshParentInset()
-                        current.container.prepareHide(interactive: false)
-                        forward.container.prepareShow(interactive: false)
                     },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -621,8 +623,6 @@ private extension UI.Container.Stack {
             self._layout.state = .idle(current: forward)
             if self.isPresented == true {
                 forward.container.refreshParentInset()
-                current.container.prepareHide(interactive: false)
-                forward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 forward.container.finishShow(interactive: false)
             }
@@ -653,6 +653,10 @@ private extension UI.Container.Stack {
         } else {
             hideBar = false
         }
+        if self.isPresented == true {
+            current.container.prepareHide(interactive: false)
+            backward.container.prepareShow(interactive: false)
+        }
         if self.isPresented == true && animated == true {
             self._animation = Animation.default.run(
                 .custom(
@@ -663,8 +667,6 @@ private extension UI.Container.Stack {
                         self._view.locked = true
                         self._layout.state = .pop(backward: backward, current: current, progress: .zero)
                         backward.container.refreshParentInset()
-                        current.container.prepareHide(interactive: false)
-                        backward.container.prepareShow(interactive: false)
                     },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -700,8 +702,6 @@ private extension UI.Container.Stack {
             self._layout.state = .idle(current: backward)
             if self.isPresented == true {
                 backward.container.refreshParentInset()
-                current.container.prepareHide(interactive: false)
-                backward.container.prepareShow(interactive: false)
                 current.container.finishHide(interactive: false)
                 backward.container.finishShow(interactive: false)
             }

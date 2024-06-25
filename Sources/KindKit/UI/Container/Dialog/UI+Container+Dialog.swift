@@ -391,7 +391,6 @@ extension UI.Container.Dialog {
         self._layout.dialogItem = dialog
         if self.isPresented == true {
             self._layout.state = .present(progress: .zero)
-            dialog.container.refreshParentInset()
             dialog.container.prepareShow(interactive: false)
             if animated == true {
                 let duration: TimeInterval
@@ -408,6 +407,7 @@ extension UI.Container.Dialog {
                         preparing: { [weak self] in
                             guard let self = self else { return }
                             self._view.locked = true
+                            dialog.container.refreshParentInset()
                         },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
@@ -433,6 +433,7 @@ extension UI.Container.Dialog {
             } else {
                 self._layout.state = .idle
                 self._layout.updateIfNeeded()
+                dialog.container.refreshParentInset()
                 dialog.container.finishShow(interactive: false)
                 self.refreshContentInset()
 #if os(iOS)
@@ -466,7 +467,6 @@ extension UI.Container.Dialog {
         if self.isPresented == true {
             self._layout.dialogItem = dialog
             self._layout.state = .dismiss(progress: .zero)
-            dialog.container.refreshParentInset()
             dialog.container.prepareHide(interactive: false)
             if animated == true {
                 let duration: TimeInterval
@@ -483,6 +483,7 @@ extension UI.Container.Dialog {
                         preparing: { [weak self] in
                             guard let self = self else { return }
                             self._view.locked = true
+                            dialog.container.refreshParentInset()
                         },
                         processing: { [weak self] progress in
                             guard let self = self else { return }
@@ -510,6 +511,7 @@ extension UI.Container.Dialog {
                 self._layout.dialogItem = nil
                 self._layout.state = .idle
                 self._layout.updateIfNeeded()
+                dialog.container.refreshParentInset()
                 dialog.container.finishHide(interactive: false)
                 self.refreshContentInset()
 #if os(iOS)
