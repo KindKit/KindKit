@@ -140,6 +140,8 @@ extension KKMaskView {
         override var frame: CGRect {
             didSet {
                 guard self.frame != oldValue else { return }
+                self.kkBorderLayer.frame = self.bounds
+                self.kkMaskLayer.frame = self.bounds
                 if self.frame.size != oldValue.size {
                     self._updatePath()
                 }

@@ -160,6 +160,10 @@ public extension UI.Image {
         return .init(self.native.withRenderingMode(renderingMode))
     }
     
+    func resizable(inset: Inset, mode: UIImage.ResizingMode) -> UI.Image {
+        return .init(self.native.resizableImage(withCapInsets: inset.uiEdgeInsets, resizingMode: mode))
+    }
+    
     func unrotate() -> UI.Image {
         return self.unrotate(maxResolution: max(self.size.width, self.size.height))
     }

@@ -71,7 +71,7 @@ public extension UI.View {
             }
             get { self._gestures }
         }
-        public var dragDestination: IUIDragAndDropDestination? {
+        public var dragDestination: UI.DragAndDrop.Destination? {
             didSet {
                 guard self.dragDestination !== oldValue else { return }
                 if self.isLoaded == true {
@@ -79,7 +79,7 @@ public extension UI.View {
                 }
             }
         }
-        public var dragSource: IUIDragAndDropSource? {
+        public var dragSource: UI.DragAndDrop.Source? {
             didSet {
                 guard self.dragSource !== oldValue else { return }
                 if self.isLoaded == true {
