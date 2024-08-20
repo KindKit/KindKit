@@ -391,7 +391,6 @@ private extension KKInputMeasurementComplexView {
     
     func _resetPicker(animated: Bool) {
         for partIndex in self.kkParts.startIndex..<self.kkParts.endIndex {
-            let part = self.kkParts[partIndex]
             if self.kkPicker.selectedRow(inComponent: partIndex) != 0 {
                 self.kkPicker.selectRow(0, inComponent: partIndex, animated: animated)
             }

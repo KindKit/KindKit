@@ -168,6 +168,13 @@ extension UI.View.Image : IUIView {
         switch self.mode {
         case .origin:
             return image.size
+        case .fill:
+            return self.size.apply(
+                available: available,
+                size: { available in
+                    return available
+                }
+            )
         case .aspectFit, .aspectFill:
             return self.size.apply(
                 available: available,

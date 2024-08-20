@@ -75,6 +75,7 @@ extension KKImageView {
     func update(mode: UI.View.Image.Mode) {
         switch mode {
         case .origin: self.contentMode = .center
+        case .fill: self.contentMode = .scaleToFill
         case .aspectFit: self.contentMode = .scaleAspectFit
         case .aspectFill: self.contentMode = .scaleAspectFill
         }

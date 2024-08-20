@@ -52,7 +52,7 @@ final class KKCustomView : UIView {
             }
         }
     }
-    var kkDragDestination: IUIDragAndDropDestination? {
+    var kkDragDestination: UI.DragAndDrop.Destination? {
         didSet {
             guard self.kkDragDestination !== oldValue else { return }
             if self.kkDragDestination != nil {
@@ -76,7 +76,7 @@ final class KKCustomView : UIView {
             }
         }
     }
-    var kkDragSource: IUIDragAndDropSource? {
+    var kkDragSource: UI.DragAndDrop.Source? {
         didSet {
             guard self.kkDragSource !== oldValue else { return }
             if self.kkDragSource != nil {
@@ -102,6 +102,8 @@ final class KKCustomView : UIView {
             }
         }
     }
+    
+    var kkDragSession: UI.DragAndDrop.DragSession?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -204,11 +206,11 @@ extension KKCustomView {
         }
     }
     
-    func update(dragDestination: IUIDragAndDropDestination?) {
+    func update(dragDestination: UI.DragAndDrop.Destination?) {
         self.kkDragDestination = dragDestination
     }
     
-    func update(dragSource: IUIDragAndDropSource?) {
+    func update(dragSource: UI.DragAndDrop.Source?) {
         self.kkDragSource = dragSource
     }
     
@@ -251,55 +253,72 @@ extension KKCustomView {
 
 extension KKCustomView : UIDragInteractionDelegate {
     
+    func dragInteraction(_ interaction: UIDragInteraction, sessionWillBegin session: UIDragSession) {
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return }
+        return dragSource.onBegin.emit(dragSession)
+    }
+    
+    func dragInteraction(_ interaction: UIDragInteraction, session: UIDragSession, didEndWith operation: UIDropOperation) {
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return }
+        guard let operation = UI.DragAndDrop.Operation(operation) else { return }
+        self.kkDragSession = nil
+        dragSource.onEnd.emit(.init(dragSession, operation))
+    }
+    
     func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
         guard let dragSource = self.kkDragSource else { return [] }
-        return dragSource.onItems.emit(default: []).compactMap({
+        guard self.kkDragSession == nil else { return [] }
+        let dragSession = UI.DragAndDrop.DragSession(session, self)
+        self.kkDragSession = dragSession
+        return dragSource.onItems.emit(dragSession, default: []).compactMap({
             return UIDragItem(itemProvider: $0)
         })
     }
     
     func dragInteraction(_ interaction: UIDragInteraction, sessionAllowsMoveOperation session: UIDragSession) -> Bool {
-        guard let dragSource = self.kkDragSource else { return false }
-        return dragSource.onAllow.emit(.move, default: false)
-    }
-    
-    func dragInteraction(_ interaction: UIDragInteraction, sessionWillBegin session: UIDragSession) {
-        guard let dragSource = self.kkDragSource else { return }
-        return dragSource.onBegin.emit()
-    }
-    
-    func dragInteraction(_ interaction: UIDragInteraction, session: UIDragSession, didEndWith operation: UIDropOperation) {
-        guard let dragSource = self.kkDragSource else { return }
-        if let operation = UI.DragAndDrop.Operation(operation) {
-            dragSource.onEnd.emit(operation)
-        }
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return false }
+        let dragOperation = UI.DragAndDrop.DragOperation(dragSession, .move)
+        return dragSource.onAllow.emit(dragOperation, default: false)
     }
     
     func dragInteraction(_ interaction: UIDragInteraction, previewForLifting item: UIDragItem, session: UIDragSession) -> UITargetedDragPreview? {
-        guard let dragSource = self.kkDragSource else { return nil }
-        let view = dragSource.onPreview.emit(item.itemProvider, default: {
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return nil }
+        let dragItem = UI.DragAndDrop.DragItem(dragSession, item)
+        return dragSource.onPreview.emit(dragItem, default: {
             let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
             let image = renderer.image(actions: { context in
                 self.layer.render(in: context.cgContext)
             })
             let view = UIImageView(image: image)
             view.frame = self.bounds
-            self.addSubview(view)
-            return view
-        })
-        item.localObject = view
-        let parameters = dragSource.onPreviewParameters.emit(item.itemProvider, default: {
+            
             let parameters = UIDragPreviewParameters()
             parameters.backgroundColor = .clear
-            return parameters
+            
+            if #available(iOS 13.0, *) {
+                return UITargetedDragPreview(
+                    view: view,
+                    parameters: parameters,
+                    target: UIPreviewTarget(
+                        container: self,
+                        center: session.location(in: self)
+                    )
+                )
+            } else {
+                item.localObject = view
+                return UITargetedDragPreview(
+                    view: view,
+                    parameters: parameters
+                )
+            }
         })
-        return UITargetedDragPreview(view: view, parameters: parameters)
     }
     
     func dragInteraction(_ interaction: UIDragInteraction, willAnimateLiftWith animator: UIDragAnimating, session: UIDragSession) {
-        guard let dragSource = self.kkDragSource else { return }
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return }
         for item in session.items {
-            dragSource.onBeginPreview.emit(item.itemProvider)
+            let dragItem = UI.DragAndDrop.DragItem(dragSession, item)
+            dragSource.onBeginPreview.emit(dragItem)
             if let view = item.localObject as? UIView {
                 view.removeFromSuperview()
             }
@@ -307,8 +326,9 @@ extension KKCustomView : UIDragInteractionDelegate {
     }
     
     func dragInteraction(_ interaction: UIDragInteraction, item: UIDragItem, willAnimateCancelWith animator: UIDragAnimating) {
-        guard let dragSource = self.kkDragSource else { return }
-        dragSource.onEndPreview.emit(item.itemProvider)
+        guard let dragSession = self.kkDragSession, let dragSource = self.kkDragSource else { return }
+        let dragItem = UI.DragAndDrop.DragItem(dragSession, item)
+        dragSource.onEndPreview.emit(dragItem)
     }
     
 }
@@ -317,32 +337,32 @@ extension KKCustomView : UIDropInteractionDelegate {
     
     func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
         guard let dragDestination = self.kkDragDestination else { return false }
-        let dragSession = UI.DragAndDrop.Session(session, self)
+        let dragSession = UI.DragAndDrop.DropSession(session, self)
         return dragDestination.onCanHandle.emit(dragSession, default: false)
     }
     
     func dropInteraction(_ interaction: UIDropInteraction, sessionDidEnter session: UIDropSession) {
         guard let dragDestination = self.kkDragDestination else { return }
-        let dragSession = UI.DragAndDrop.Session(session, self)
+        let dragSession = UI.DragAndDrop.DropSession(session, self)
         dragDestination.onEnter.emit(dragSession)
     }
     
     func dropInteraction(_ interaction: UIDropInteraction, sessionDidExit session: UIDropSession) {
         guard let dragDestination = self.kkDragDestination else { return }
-        let dragSession = UI.DragAndDrop.Session(session, self)
+        let dragSession = UI.DragAndDrop.DropSession(session, self)
         dragDestination.onExit.emit(dragSession)
     }
     
     func dropInteraction(_ interaction: UIDropInteraction, sessionDidUpdate session: UIDropSession) -> UIDropProposal {
         guard let dragDestination = self.kkDragDestination else { return UIDropProposal(operation: .cancel) }
-        let dragSession = UI.DragAndDrop.Session(session, self)
-        let operation = dragDestination.onProposal.emit(dragSession, default: .cancel)
-        return UIDropProposal(operation: operation.uiDropOperation)
+        let dragSession = UI.DragAndDrop.DropSession(session, self)
+        let dragOperation = dragDestination.onProposal.emit(dragSession, default: .cancel)
+        return UIDropProposal(operation: dragOperation.uiDropOperation)
     }
     
     func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
         guard let dragDestination = self.kkDragDestination else { return }
-        let dragSession = UI.DragAndDrop.Session(session, self)
+        let dragSession = UI.DragAndDrop.DropSession(session, self)
         dragDestination.onHandle.emit(dragSession)
     }
     

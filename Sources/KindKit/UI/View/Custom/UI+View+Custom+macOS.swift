@@ -38,8 +38,8 @@ final class KKCustomView : NSView {
     weak var kkDelegate: KKCustomViewDelegate?
     var kkLayoutManager: UI.Layout.Manager!
     var kkGestures: [IUIGesture] = []
-    var kkDragDestination: IUIDragAndDropDestination?
-    var kkDragSource: IUIDragAndDropSource? {
+    var kkDragDestination: UI.DragAndDrop.Destination?
+    var kkDragSource: UI.DragAndDrop.Source? {
         willSet {
             guard self.kkDragSource !== newValue else { return }
             self.unregisterDraggedTypes()
@@ -162,11 +162,11 @@ extension KKCustomView {
         self.needsLayout = true
     }
     
-    func update(dragDestination: IUIDragAndDropDestination?) {
+    func update(dragDestination: UI.DragAndDrop.Destination?) {
         self.kkDragDestination = dragDestination
     }
     
-    func update(dragSource: IUIDragAndDropSource?) {
+    func update(dragSource: UI.DragAndDrop.Source?) {
         self.kkDragSource = dragSource
     }
     
