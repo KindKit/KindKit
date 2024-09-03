@@ -16,12 +16,15 @@ extension UI.View {
         
         public var settings: ClockSettings {
             didSet {
+                let isStarted = self._timer != nil
                 self.stop()
                 self.body.content = .init(
                     duration: self.settings.duration,
                     elapsed: 0
                 )
-                self.start()
+                if isStarted == true {
+                    self.start()
+                }
             }
         }
         public var applier: ApplierType {
@@ -45,6 +48,10 @@ extension UI.View {
                 } else {
                     self._startedTime = nil
                 }
+                self.body.content = .init(
+                    duration: self.body.content.duration,
+                    elapsed: 0
+                )
             }
         }
         
@@ -94,24 +101,18 @@ public extension UI.View.Clock {
     
     @discardableResult
     func start() -> Self {
-        self._startedTime = .now()
-        let timer = Timer.Every(
+        self._timer = Timer.Every(
             interval: self.settings.interval,
             iterations: self.settings.iterations,
             tolerance: self.settings.tolerance,
             queue: .main
         )
-        self._timer = timer
         return self
     }
     
     @discardableResult
     func stop() -> Self {
         self._timer = nil
-        self.body.content = .init(
-            duration: self.body.content.duration,
-            elapsed: 0
-        )
         return self
     }
     
