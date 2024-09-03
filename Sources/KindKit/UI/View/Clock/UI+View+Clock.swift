@@ -16,15 +16,12 @@ extension UI.View {
         
         public var settings: ClockSettings {
             didSet {
+                self.stop()
                 self.body.content = .init(
                     duration: self.settings.duration,
                     elapsed: 0
                 )
-                self._timer.reset(
-                    interval: self.settings.interval,
-                    iterations: self.settings.iterations,
-                    restart: self._timer.isRunning
-                )
+                self.start()
             }
         }
         public var applier: ApplierType {
@@ -35,7 +32,21 @@ extension UI.View {
         public let onFinish = Signal.Empty< Void >()
         
         private var _startedTime: DispatchTime?
-        private let _timer: Timer.Every
+        private var _timer: Timer.Every? {
+            didSet {
+                if let timer = self._timer {
+                    self._startedTime = .now()
+                    timer.onTriggered(self, { $0.onTriggeredTimer() })
+                    timer.onFinished(self, { $0.onFinishedTimer() })
+                    timer.start()
+                } else if let timer = oldValue {
+                    timer.pause()
+                    self._startedTime = nil
+                } else {
+                    self._startedTime = nil
+                }
+            }
+        }
         
         public init(
             settings: ClockSettings,
@@ -51,15 +62,6 @@ extension UI.View {
                 applier: applier,
                 body: body
             )
-            self._timer = .init(
-                interval: settings.interval,
-                iterations: settings.iterations,
-                tolerance: settings.tolerance,
-                queue: .main
-            )
-            
-            self._timer.onTriggered(self, { $0.onTriggeredTimer() })
-            self._timer.onFinished(self, { $0.onFinishedTimer() })
         }
         
     }
@@ -76,7 +78,7 @@ public extension UI.View.Clock {
                 tolerance: self.settings.tolerance
             )
         }
-        get { self._timer.interval }
+        get { self.settings.interval }
     }
     
     var iterations: Int {
@@ -87,20 +89,25 @@ public extension UI.View.Clock {
                 tolerance: self.settings.tolerance
             )
         }
-        get { self._timer.iterations }
+        get { self.settings.iterations }
     }
     
     @discardableResult
     func start() -> Self {
         self._startedTime = .now()
-        self._timer.start()
+        let timer = Timer.Every(
+            interval: self.settings.interval,
+            iterations: self.settings.iterations,
+            tolerance: self.settings.tolerance,
+            queue: .main
+        )
+        self._timer = timer
         return self
     }
     
     @discardableResult
     func stop() -> Self {
-        self._timer.pause()
-        self._startedTime = nil
+        self._timer = nil
         self.body.content = .init(
             duration: self.body.content.duration,
             elapsed: 0
