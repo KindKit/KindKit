@@ -53,6 +53,34 @@ final class KKRectView : UIView {
             self.setNeedsLayout()
         }
     }
+    var kkBorderJoin: Graphics.LineJoin = .bevel {
+        didSet {
+            guard self.kkBorderJoin != oldValue else { return }
+            CATransaction.kk_withoutActions({
+                switch self.kkBorderJoin {
+                case .miter: self.kkShareLayer.lineJoin = .miter
+                case .bevel: self.kkShareLayer.lineJoin = .bevel
+                case .round: self.kkShareLayer.lineJoin = .round
+                }
+            })
+            self.setNeedsLayout()
+        }
+    }
+    var kkBorderDash: Graphics.LineDash? {
+        didSet {
+            guard self.kkBorderDash != oldValue else { return }
+            CATransaction.kk_withoutActions({
+                if let dash = self.kkBorderDash {
+                    self.kkShareLayer.lineDashPhase = dash.phase
+                    self.kkShareLayer.lineDashPattern = dash.lengths.map(NSNumber.init(value:))
+                } else {
+                    self.kkShareLayer.lineDashPhase = 0
+                    self.kkShareLayer.lineDashPattern = nil
+                }
+            })
+            self.setNeedsLayout()
+        }
+    }
     var kkCornerRadius: UI.CornerRadius = .none {
         didSet {
             guard self.kkCornerRadius != oldValue else { return }
@@ -122,9 +150,11 @@ extension KKRectView {
         case .none:
             self.kkBorderWidth = 0
             self.kkBorderColor = nil
-        case .manual(let width, let color):
+        case .manual(let width, let color, let join, let dash):
             self.kkBorderWidth = CGFloat(width)
             self.kkBorderColor = color.cgColor
+            self.kkBorderJoin = join
+            self.kkBorderDash = dash
         }
     }
     

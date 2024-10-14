@@ -155,9 +155,25 @@ extension KKMaskView {
                 case .none:
                     self.kkBorderLayer.lineWidth = 0
                     self.kkBorderLayer.strokeColor = nil
-                case .manual(let width, let color):
+                case .manual(let width, let color, let join, let dash):
                     self.kkBorderLayer.lineWidth = CGFloat(width)
                     self.kkBorderLayer.strokeColor = color.cgColor
+                    switch join {
+                    case .miter(let limit):
+                        self.kkBorderLayer.lineJoin = .miter
+                        self.kkBorderLayer.miterLimit = CGFloat(limit)
+                    case .bevel:
+                        self.kkBorderLayer.lineJoin = .bevel
+                    case .round:
+                        self.kkBorderLayer.lineJoin = .round
+                    }
+                    if let dash = dash {
+                        self.kkBorderLayer.lineDashPhase = dash.phase
+                        self.kkBorderLayer.lineDashPattern = dash.lengths.map(NSNumber.init(value:))
+                    } else {
+                        self.kkBorderLayer.lineDashPhase = 0
+                        self.kkBorderLayer.lineDashPattern = nil
+                    }
                 }
                 self._updatePath()
             }

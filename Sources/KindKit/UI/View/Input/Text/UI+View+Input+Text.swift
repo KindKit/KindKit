@@ -49,6 +49,18 @@ public extension UI.View.Input {
                 self.setNeedLayout()
             }
         }
+        public var minHeight: Double? {
+            didSet {
+                guard self.minHeight != oldValue else { return }
+                self.setNeedLayout()
+            }
+        }
+        public var maxHeight: Double? {
+            didSet {
+                guard self.maxHeight != oldValue else { return }
+                self.setNeedLayout()
+            }
+        }
         public var value: Swift.String {
             set {
                 guard self._value != newValue else { return }
@@ -182,6 +194,44 @@ public extension UI.View.Input {
 }
 
 public extension UI.View.Input.Text {
+    
+    @inlinable
+    @discardableResult
+    func minHeight(_ value: Double) -> Self {
+        self.minHeight = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func minHeight(_ value: () -> Double) -> Self {
+        return self.minHeight(value())
+    }
+    
+    @inlinable
+    @discardableResult
+    func minHeight(_ value: (Self) -> Double) -> Self {
+        return self.minHeight(value(self))
+    }
+    
+    @inlinable
+    @discardableResult
+    func maxHeight(_ value: Double) -> Self {
+        self.maxHeight = value
+        return self
+    }
+    
+    @inlinable
+    @discardableResult
+    func maxHeight(_ value: () -> Double) -> Self {
+        return self.maxHeight(value())
+    }
+    
+    @inlinable
+    @discardableResult
+    func maxHeight(_ value: (Self) -> Double) -> Self {
+        return self.maxHeight(value(self))
+    }
     
     @inlinable
     @discardableResult
@@ -539,11 +589,30 @@ extension UI.View.Input.Text : IUIView {
         return self.size.apply(
             available: available,
             size: {
-                return self._value.kk_size(
+                let size = self._value.kk_size(
                     font: self.textFont,
                     numberOfLines: 0,
                     available: $0.inset(self.textInset)
                 )
+                switch (self.minHeight, self.maxHeight) {
+                case (.some(let minHeight), .some(let maxHeight)):
+                    return .init(
+                        width: size.width,
+                        height: max(minHeight, min(size.height, maxHeight))
+                    )
+                case (.some(let minHeight), .none):
+                    return .init(
+                        width: size.width,
+                        height: max(minHeight, size.height)
+                    )
+                case (.none, .some(let maxHeight)):
+                    return .init(
+                        width: size.width,
+                        height: min(size.height, maxHeight)
+                    )
+                case (.none, .none):
+                    return size
+                }
             }
         )
     }
