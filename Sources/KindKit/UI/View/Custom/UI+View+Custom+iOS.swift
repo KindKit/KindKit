@@ -267,7 +267,6 @@ extension KKCustomView : UIDragInteractionDelegate {
     
     func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
         guard let dragSource = self.kkDragSource else { return [] }
-        guard self.kkDragSession == nil else { return [] }
         let dragSession = UI.DragAndDrop.DragSession(session, self)
         self.kkDragSession = dragSession
         return dragSource.onItems.emit(dragSession, default: []).compactMap({
@@ -330,6 +329,42 @@ extension KKCustomView : UIDragInteractionDelegate {
         let dragItem = UI.DragAndDrop.DragItem(dragSession, item)
         dragSource.onEndPreview.emit(dragItem)
     }
+
+//    func dragInteraction(_ interaction: UIDragInteraction, sessionIsRestrictedToDraggingApplication session: any UIDragSession) -> Bool {
+//        fatalError()
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, prefersFullSizePreviewsFor session: any UIDragSession) -> Bool {
+//        fatalError()
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, sessionDidMove session: any UIDragSession) {
+//        print("p")
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, session: any UIDragSession, willEndWith operation: UIDropOperation) {
+//        print("p")
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, sessionDidTransferItems session: any UIDragSession) {
+//        print("p")
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, itemsForAddingTo session: any UIDragSession, withTouchAt point: CGPoint) -> [UIDragItem] {
+//        fatalError()
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, sessionForAddingItems sessions: [any UIDragSession], withTouchAt point: CGPoint) -> (any UIDragSession)? {
+//        fatalError()
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, session: any UIDragSession, willAdd items: [UIDragItem], for addingInteraction: UIDragInteraction) {
+//        print("p")
+//    }
+//
+//    func dragInteraction(_ interaction: UIDragInteraction, previewForCancelling item: UIDragItem, withDefault defaultPreview: UITargetedDragPreview) -> UITargetedDragPreview? {
+//        fatalError()
+//    }
     
 }
 
@@ -365,6 +400,22 @@ extension KKCustomView : UIDropInteractionDelegate {
         let dragSession = UI.DragAndDrop.DropSession(session, self)
         dragDestination.onHandle.emit(dragSession)
     }
+    
+//    func dropInteraction(_ interaction: UIDropInteraction, concludeDrop session: any UIDropSession) {
+//        print("")
+//    }
+//
+//    func dropInteraction(_ interaction: UIDropInteraction, sessionDidEnd session: any UIDropSession) {
+//        print("")
+//    }
+//
+//    func dropInteraction(_ interaction: UIDropInteraction, previewForDropping item: UIDragItem, withDefault defaultPreview: UITargetedDragPreview) -> UITargetedDragPreview? {
+//        fatalError()
+//    }
+//
+//    func dropInteraction(_ interaction: UIDropInteraction, item: UIDragItem, willAnimateDropWith animator: any UIDragAnimating) {
+//        print("")
+//    }
     
 }
 
