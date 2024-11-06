@@ -267,7 +267,6 @@ extension KKCustomView : UIDragInteractionDelegate {
     
     func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
         guard let dragSource = self.kkDragSource else { return [] }
-        guard self.kkDragSession == nil else { return [] }
         let dragSession = UI.DragAndDrop.DragSession(session, self)
         self.kkDragSession = dragSession
         return dragSource.onItems.emit(dragSession, default: []).compactMap({
