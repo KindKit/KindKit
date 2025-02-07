@@ -21,5 +21,6 @@ public extension Log.Message {
 public extension Log.Message.Options {
     
     static let pretty = Self(rawValue: 1 << 0)
+    static let allowSecureInfo = Self(rawValue: 1 << 1)
     
 }

@@ -16,7 +16,16 @@ extension URLRequest : IDebug {
             }
             if let value = self.allHTTPHeaderFields {
                 if value.isEmpty == false {
-                    items.append(.pair(string: "Headers", cast: value))
+                    let headers = Debug.Info.cast(value)
+                    items.append(.pair(
+                        key: .string("Headers"),
+                        value: headers.visit { key, value in
+                            guard key == .string("\"Authorization\"") else {
+                                return .pair(key: key, value:value)
+                            }
+                            return .pair(key: key, value: .secure(value))
+                        }
+                    ))
                 }
             }
             switch self.cachePolicy {

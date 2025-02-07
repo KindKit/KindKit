@@ -12,7 +12,26 @@ public extension Debug {
         case sequence([Debug.Info])
         case pair(key: Debug.Info, value: Debug.Info)
         case string(String)
+        case secure(Debug.Info)
         
+    }
+    
+}
+
+public extension Debug.Info {
+    
+    func visit(sequence block: ([Debug.Info]) -> [Debug.Info]) -> Self {
+        guard case .sequence(let sequence) = self else { return self }
+        return .sequence(block(sequence))
+    }
+    
+    func visit(sequencePair block: (Debug.Info, Debug.Info) -> Debug.Info?) -> Self {
+        return self.visit(sequence: { sequence in
+            return sequence.compactMap({
+                guard case .pair(let key, let value) = $0 else { return $0 }
+                return block(key, value)
+            })
+        })
     }
     
 }
@@ -272,6 +291,15 @@ extension Debug.Info {
                 buff.append("\t", repeating: head)
             }
             buff.append(value)
+        case .secure(let value):
+            if options.contains(.allowSecureInfo) == true {
+                value.processing(buff: buff, options: options, head: head, inter: inter, tail: tail)
+            } else {
+                if options.contains(.inline) == false {
+                    buff.append("\t", repeating: head)
+                }
+                buff.append("*****")
+            }
         }
     }
 

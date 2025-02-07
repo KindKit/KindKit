@@ -22,7 +22,7 @@ extension Log.Target.Default : ILogTarget {
     }
     
     public func log(message: ILogMessage) {
-        print("[\(message.category)]: \(message.string(options: .pretty))")
+        print("[\(message.category)]: \(message.string(options: [.pretty, .allowSecureInfo]))")
     }
     
 }

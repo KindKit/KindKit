@@ -35,8 +35,6 @@ public extension Log.Message {
         private let _level: Log.Level
         private let _category: String
         private let _info: KindKit.Debug.Info
-        private var _prettyString: String?
-        private var _inlineString: String?
         
         public init(
             level: Log.Level,
@@ -52,23 +50,7 @@ public extension Log.Message {
         
         public func string(options: Log.Message.Options) -> String {
             return self._lock.perform({
-                let string: String
-                if options.contains(.pretty) == false {
-                    if let cache = self._inlineString {
-                        string = cache
-                    } else {
-                        string = self._info.string(options: .inline)
-                        self._inlineString = string
-                    }
-                } else {
-                    if let cache = self._prettyString {
-                        string = cache
-                    } else {
-                        string = self._info.string()
-                        self._prettyString = string
-                    }
-                }
-                return string
+                return self._info.string(options: options.cast())
             })
         }
         
@@ -102,6 +84,21 @@ public extension ILogMessage where Self == Log.Message.Debug {
             category: category,
             info: info.debugInfo()
         )
+    }
+    
+}
+
+fileprivate extension Log.Message.Options {
+    
+    func cast() -> Debug.Options {
+        var result : Debug.Options = []
+        if self.contains(.pretty) == false {
+            result.insert(.inline)
+        }
+        if self.contains(.allowSecureInfo) {
+            result.insert(.allowSecureInfo)
+        }
+        return result
     }
     
 }
