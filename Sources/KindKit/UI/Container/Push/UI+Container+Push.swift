@@ -429,7 +429,7 @@ private extension UI.Container.Push {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.locked = true
+                        self._interactiveGesture.isEnabled = false
                         self._layout.state = .present(push: push, progress: .zero)
                         if self.isPresented == true {
                             push.container.refreshParentInset()
@@ -444,7 +444,7 @@ private extension UI.Container.Push {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
-                        self._view.locked = false
+                        self._interactiveGesture.isEnabled = true
                         self._layout.state = .idle(push: push)
                         self._didPresent(push: push)
                         if self.isPresented == true {
@@ -506,7 +506,7 @@ private extension UI.Container.Push {
                     ease: Animation.Ease.QuadraticInOut(),
                     preparing: { [weak self] in
                         guard let self = self else { return }
-                        self._view.locked = true
+                        self._interactiveGesture.isEnabled = false
                     },
                     processing: { [weak self] progress in
                         guard let self = self else { return }
@@ -516,7 +516,7 @@ private extension UI.Container.Push {
                     completion: { [weak self] in
                         guard let self = self else { return }
                         self._animation = nil
-                        self._view.locked = false
+                        self._interactiveGesture.isEnabled = true
                         self._layout.state = .empty
                         push.container.finishHide(interactive: false)
 #if os(iOS)
