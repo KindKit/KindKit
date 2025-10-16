@@ -15,10 +15,8 @@ public extension CameraSession.Device.Video {
         case standard
         case cinematic
         case cinematicExtended
-        case cinematicExtendedEnhanced
         case previewOptimized
-        case lowLatency
-
+        
     }
     
 }
@@ -37,24 +35,16 @@ extension CameraSession.Device.Video.StabilizationMode {
             } else {
                 return .cinematic
             }
-        case .cinematicExtendedEnhanced:
-            if #available(iOS 18.0, *) {
-                return .cinematicExtendedEnhanced
-            } else {
-                return .cinematic
-            }
         case .previewOptimized:
+#if swift(>=5.9)
             if #available(iOS 17.0, *) {
                 return .previewOptimized
             } else {
                 return .standard
             }
-        case .lowLatency:
-            if #available(iOS 26.0, *) {
-                return .lowLatency
-            } else {
-                return .standard
-            }
+#else
+            return .standard
+#endif
         }
     }
     
@@ -65,9 +55,9 @@ extension CameraSession.Device.Video.StabilizationMode {
         case .standard: self = .standard
         case .cinematic: self = .cinematic
         case .cinematicExtended: self = .cinematicExtended
-        case .cinematicExtendedEnhanced: self = .cinematicExtendedEnhanced
+#if swift(>=5.9)
         case .previewOptimized: self = .previewOptimized
-        case .lowLatency: self = .lowLatency
+#endif
         @unknown default: return nil
         }
     }
