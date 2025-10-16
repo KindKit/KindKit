@@ -136,21 +136,21 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             self.content.apply(contentInset: contentInset)
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
-            if self.content === container {
-                return .init(self.safeArea)
-            }
-            return .zero
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
+            return .init(
+                device: self.safeArea,
+                virtualKeyboard: .zero,
+                content: .zero
+            )
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
-            let baseInset = UI.Container.AccumulateInset(self.safeArea)
+        public func contentInset() -> Inset {
             let contentInset = self.content.contentInset()
-            return baseInset + contentInset
+            return self.safeArea + contentInset
         }
         
         public func refreshParentInset() {

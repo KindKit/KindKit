@@ -140,14 +140,14 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             for item in self._items.reversed() {
                 item.container.apply(contentInset: contentInset)
             }
             self._root.container.apply(contentInset: contentInset)
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             let parentInset = self.parentInset()
             let item: UI.Container.StackItem?
             if self._root.container === container {
@@ -157,17 +157,26 @@ public extension UI.Container {
             }
             if let item = item {
                 if item.barHidden == false && UI.Container.BarController.shared.hidden(.stack) == false {
-                    return parentInset + .init(top: item.barSize, visibility: item.barVisibility)
+                    return .init(
+                        device: parentInset.device,
+                        virtualKeyboard: parentInset.virtualKeyboard,
+                        content: parentInset.content.appending(top: item.barSize, visibility: item.barVisibility)
+                    )
                 }
             }
             return parentInset
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
-            func _inset_(item: UI.Container.StackItem) -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
+            func _inset_(item: UI.Container.StackItem) -> Inset {
                 let contentInset = item.container.contentInset()
                 if item.barHidden == false && UI.Container.BarController.shared.hidden(.stack) == false {
-                    return contentInset + .init(top: item.barSize, visibility: item.barVisibility)
+                    return .init(
+                        top: contentInset.top + item.barSize * item.barVisibility,
+                        left: contentInset.left,
+                        right: contentInset.right,
+                        bottom: contentInset.bottom
+                    )
                 }
                 return contentInset
             }

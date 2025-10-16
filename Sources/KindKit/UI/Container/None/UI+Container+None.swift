@@ -55,7 +55,7 @@ public extension UI.Container {
         }
         
         private var _view: UI.View.Rect
-        private var _parentInset: UI.Container.AccumulateInset = .zero {
+        private var _parentInset: UI.Container.InheritedInset = .zero {
             didSet {
                 guard self._parentInset != oldValue else { return }
                 self.refreshContentInset()
@@ -70,14 +70,14 @@ public extension UI.Container {
                 .fill(color)
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             return self.parentInset()
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             return .zero
         }
         

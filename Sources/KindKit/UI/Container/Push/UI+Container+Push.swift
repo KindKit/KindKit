@@ -178,8 +178,8 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
-            self._layout.contentInset = contentInset.interactive
+        public func apply(contentInset: Inset) {
+            self._layout.contentInset = contentInset
             for item in self._items {
                 item.update(
                     self._view.bounds.size,
@@ -195,11 +195,11 @@ public extension UI.Container {
             }
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             return self.parentInset()
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             guard let content = self.content else { return .zero }
             return content.contentInset()
         }

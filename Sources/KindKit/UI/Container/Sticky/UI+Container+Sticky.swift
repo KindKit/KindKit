@@ -129,27 +129,36 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             self._content.apply(contentInset: contentInset)
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             let parentInset = self.parentInset()
             if self._content === container, let stickySize = self._layout.stickySize {
                 if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
-                    return parentInset + .init(bottom: stickySize.height, visibility: self.stickyVisibility)
+                    return .init(
+                        device: parentInset.device,
+                        virtualKeyboard: parentInset.virtualKeyboard,
+                        content: parentInset.content.appending(bottom: stickySize.height, visibility: self.stickyVisibility)
+                    )
                 }
             }
             return parentInset
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             let contentInset = self._content.contentInset()
             guard let stickySize = self._layout.stickySize else {
                 return contentInset
             }
             if self.stickyHidden == false && UI.Container.BarController.shared.hidden(.sticky) == false {
-                return contentInset + .init(bottom: stickySize.height, visibility: self.stickyVisibility)
+                return .init(
+                    top: contentInset.top,
+                    left: contentInset.left,
+                    right: contentInset.right,
+                    bottom: contentInset.bottom + (stickySize.height * self.stickyVisibility)
+                )
             }
             return contentInset
         }
@@ -163,11 +172,11 @@ public extension UI.Container {
             }
             self._sticky.safeArea(.init(
                 top: 0,
-                left: contentInset.interactive.left,
-                right: contentInset.interactive.right,
+                left: contentInset.left,
+                right: contentInset.right,
                 bottom: 0
             ))
-            self._layout.stickyInset = contentInset.interactive.bottom
+            self._layout.stickyInset = contentInset.bottom
             self._content.refreshParentInset()
         }
         

@@ -15,7 +15,7 @@ public protocol IScreenViewable : AnyObject {
     var view: AssociatedView { get }
     var additionalContentInset: Inset { get }
     
-    func apply(inset: UI.Container.AccumulateInset)
+    func apply(inset: UI.Container.InheritedInset)
     
 }
 
@@ -29,14 +29,14 @@ public extension IScreenViewable {
         return .zero
     }
     
-    func apply(inset: UI.Container.AccumulateInset) {
+    func apply(inset: UI.Container.InheritedInset) {
     }
     
 }
 
 public extension IScreenViewable where Self : IScreen, AssociatedView == UI.View.Scroll {
     
-    func apply(inset: UI.Container.AccumulateInset, in view: UI.View.Scroll) {
+    func apply(inset: UI.Container.InheritedInset, in view: UI.View.Scroll) {
         view.contentInset = inset.natural
     }
     

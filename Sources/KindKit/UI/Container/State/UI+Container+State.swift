@@ -115,15 +115,15 @@ public extension UI.Container {
             self.init(UI.Container.Screen(screen))
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             self.content?.apply(contentInset: contentInset)
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             return self.parentInset()
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             guard let content = self._content else { return .zero }
             return content.contentInset()
         }

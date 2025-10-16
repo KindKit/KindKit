@@ -158,7 +158,7 @@ extension LogUI {
             return true
         }
         
-        func apply(inset: UI.Container.AccumulateInset) {
+        func apply(inset: UI.Container.InheritedInset) {
             self.view.contentInset = inset.natural
             self._scrollToBottom()
         }

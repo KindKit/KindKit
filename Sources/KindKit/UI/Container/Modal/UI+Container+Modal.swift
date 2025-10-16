@@ -155,7 +155,7 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             for container in self.containers {
                 container.apply(contentInset: contentInset)
             }
@@ -164,31 +164,27 @@ public extension UI.Container {
             }
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             let parentInset = self.parentInset()
             if self._current?.container === container {
                 let current = self._current!.container
                 if current.modalSheet != nil {
                     return .init(
-                        natural: .init(
+                        device: .init(
                             top: 0,
-                            left: parentInset.natural.left,
-                            right: parentInset.natural.right,
-                            bottom: parentInset.natural.bottom
+                            left: parentInset.device.left,
+                            right: parentInset.device.right,
+                            bottom: parentInset.device.bottom
                         ),
-                        interactive: .init(
-                            top: 0,
-                            left: parentInset.interactive.left,
-                            right: parentInset.interactive.right,
-                            bottom: parentInset.interactive.bottom
-                        )
+                        virtualKeyboard: parentInset.virtualKeyboard,
+                        content: parentInset.content
                     )
                 }
             }
             return parentInset
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             guard let content = self.content else { return .zero }
             let contentInset = content.contentInset()
             switch self._layout.state {
@@ -201,13 +197,12 @@ public extension UI.Container {
                 guard contentInset != modalInset else {
                     return modalInset
                 }
-                let finalInset: UI.Container.AccumulateInset
-                switch (from, to) {
-                case (.some, .none):
+                let finalInset: Inset
+                if from != nil && to == nil {
                     finalInset = modalInset.lerp(contentInset, progress: progress)
-                case (.none, .some):
+                } else if from == nil && to != nil {
                     finalInset = contentInset.lerp(modalInset, progress: progress)
-                default:
+                } else {
                     finalInset = modalInset
                 }
                 return finalInset

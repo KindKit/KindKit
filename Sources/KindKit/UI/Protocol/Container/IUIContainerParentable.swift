@@ -31,7 +31,7 @@ public extension IUIContainerParentable where Self : IUIContainer {
     
 #endif
     
-    func parentInset() -> UI.Container.AccumulateInset {
+    func parentInset() -> UI.Container.InheritedInset {
         guard let parent = self.parent else { return .zero }
         self.view.layoutIfNeeded()
         return parent.parentInset(for: self)

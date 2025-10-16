@@ -25,11 +25,11 @@ public protocol IUIContainer : AnyObject {
     var isPresented: Bool { get }
     var view: IUIView { get }
     
-    func apply(contentInset: UI.Container.AccumulateInset)
+    func apply(contentInset: Inset)
     
-    func parentInset() -> UI.Container.AccumulateInset
-    func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset
-    func contentInset() -> UI.Container.AccumulateInset
+    func parentInset() -> UI.Container.InheritedInset
+    func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset
+    func contentInset() -> Inset
 
     func refreshParentInset()
     func refreshContentInset()
@@ -63,7 +63,7 @@ public protocol IUIContainer : AnyObject {
 
 public extension IUIContainer {
     
-    func parentInset() -> UI.Container.AccumulateInset {
+    func parentInset() -> UI.Container.InheritedInset {
         return .zero
     }
     

@@ -5,200 +5,83 @@
 import Foundation
 
 public extension UI.Container {
+    
+    @available(*, deprecated, renamed: "UI.Container.InheritedInset")
+    typealias AccumulateInset = InheritedInset
 
-    struct AccumulateInset : Equatable {
+    struct InheritedInset : Equatable {
         
-        public var natural: Inset
-        public var interactive: Inset
-        
-        public init(
-            top: Double,
-            left: Double,
-            right: Double,
-            bottom: Double
-        ) {
-            self.natural = .init(top: top, left: left, right: right, bottom: bottom)
-            self.interactive = .init(top: top, left: left, right: right, bottom: bottom)
-        }
+        public var device: Inset
+        public var virtualKeyboard: Inset
+        public var content: Content
         
         public init(
-            horizontal: Double,
-            vertical: Double
+            device: Inset,
+            virtualKeyboard: Inset,
+            content: Content
         ) {
-            self.natural = .init(horizontal: horizontal, vertical: vertical)
-            self.interactive = .init(horizontal: horizontal, vertical: vertical)
-        }
-        
-        public init(
-            _ base: Inset
-        ) {
-            self.natural = base
-            self.interactive = base
-        }
-        
-        public init(
-            natural: Inset,
-            interactive: Inset
-        ) {
-            self.natural = natural
-            self.interactive = interactive
-        }
-        
-        public init(
-            top: Double,
-            visibility: Double
-        ) {
-            self.natural = .init(top: top, left: 0, right: 0, bottom: 0)
-            self.interactive = .init(top: top * visibility, left: 0, right: 0, bottom: 0)
-        }
-        
-        public init(
-            left: Double,
-            visibility: Double
-        ) {
-            self.natural = .init(top: 0, left: left, right: 0, bottom: 0)
-            self.interactive = .init(top: 0, left: left * visibility, right: 0, bottom: 0)
-        }
-        
-        public init(
-            right: Double,
-            visibility: Double
-        ) {
-            self.natural = .init(top: 0, left: 0, right: right, bottom: 0)
-            self.interactive = .init(top: 0, left: 0, right: right * visibility, bottom: 0)
-        }
-        
-        public init(
-            bottom: Double,
-            visibility: Double
-        ) {
-            self.natural = .init(top: 0, left: 0, right: 0, bottom: bottom)
-            self.interactive = .init(top: 0, left: 0, right: 0, bottom: bottom * visibility)
+            self.device = device
+            self.virtualKeyboard = virtualKeyboard
+            self.content = content
         }
         
     }
 
 }
 
-public extension UI.Container.AccumulateInset {
+public extension UI.Container.InheritedInset {
     
     static var zero: Self {
-        return .init(natural: .zero, interactive: .zero)
+        return .init(device: .zero, virtualKeyboard: .zero, content: .zero)
     }
     
 }
 
-public extension UI.Container.AccumulateInset {
+public extension UI.Container.InheritedInset {
     
-    @inlinable
-    func min(_ other: Self) -> Self {
-        return .init(
-            natural: .init(
-                top: Swift.min(self.natural.top, other.natural.top),
-                left: Swift.min(self.natural.left, other.natural.left),
-                right: Swift.min(self.natural.right, other.natural.right),
-                bottom: Swift.min(self.natural.bottom, other.natural.bottom)
-            ),
-            interactive: .init(
-                top: Swift.min(self.interactive.top, other.interactive.top),
-                left: Swift.min(self.interactive.left, other.interactive.left),
-                right: Swift.min(self.interactive.right, other.interactive.right),
-                bottom: Swift.min(self.interactive.bottom, other.interactive.bottom)
+    var natural: Inset {
+        return self.get([ .device, .virtualKeyboard, .contentStatic ])
+    }
+    
+    var interactive: Inset {
+        return self.get([ .device, .virtualKeyboard, .contentInteractive ])
+    }
+    
+}
+
+public extension UI.Container.InheritedInset {
+    
+    func get(_ options: Options) -> Inset {
+        var result = Inset.zero
+        if options.contains(.device) {
+            result += self.device
+        }
+        if options.contains(.contentInteractive) {
+            result += self.content.interactive
+        } else if options.contains(.contentStatic) {
+            result += self.content.static
+        }
+        if options.contains(.virtualKeyboard) {
+            result = .init(
+                top: max(result.top, self.virtualKeyboard.top),
+                left: max(result.left, self.virtualKeyboard.left),
+                right: max(result.right, self.virtualKeyboard.right),
+                bottom: max(result.bottom, self.virtualKeyboard.bottom)
             )
-        )
-    }
-    
-    @inlinable
-    func max(_ other: Self) -> Self {
-        return .init(
-            natural: .init(
-                top: Swift.max(self.natural.top, other.natural.top),
-                left: Swift.max(self.natural.left, other.natural.left),
-                right: Swift.max(self.natural.right, other.natural.right),
-                bottom: Swift.max(self.natural.bottom, other.natural.bottom)
-            ),
-            interactive: .init(
-                top: Swift.max(self.interactive.top, other.interactive.top),
-                left: Swift.max(self.interactive.left, other.interactive.left),
-                right: Swift.max(self.interactive.right, other.interactive.right),
-                bottom: Swift.max(self.interactive.bottom, other.interactive.bottom)
-            )
-        )
+        }
+        return result
     }
     
 }
 
-public extension UI.Container.AccumulateInset {
-    
-    @inlinable
-    static prefix func - (arg: Self) -> Self {
-        return .init(
-            natural: -arg.natural,
-            interactive: -arg.interactive
-        )
-    }
-    
-    @inlinable
-    static func + (lhs: Self, rhs: Self) -> Self {
-        return .init(
-            natural: lhs.natural + rhs.natural,
-            interactive: lhs.interactive + rhs.interactive
-        )
-    }
-    
-    @inlinable
-    static func += (lhs: inout Self, rhs: Self) {
-        lhs = lhs + rhs
-    }
-    
-    @inlinable
-    static func - (lhs: Self, rhs: Self) -> Self {
-        return .init(
-            natural: lhs.natural - rhs.natural,
-            interactive: lhs.interactive - rhs.interactive
-        )
-    }
-    
-    @inlinable
-    static func -= (lhs: inout Self, rhs: Self) {
-        lhs = lhs - rhs
-    }
-    
-    @inlinable
-    static func * (lhs: Self, rhs: Self) -> Self {
-        return .init(
-            natural: lhs.natural * rhs.natural,
-            interactive: lhs.interactive * rhs.interactive
-        )
-    }
-    
-    @inlinable
-    static func *= (lhs: inout Self, rhs: Self) {
-        lhs = lhs * rhs
-    }
-    
-    @inlinable
-    static func / (lhs: Self, rhs: Self) -> Self {
-        return .init(
-            natural: lhs.natural / rhs.natural,
-            interactive: lhs.interactive / rhs.interactive
-        )
-    }
-    
-    @inlinable
-    static func /= (lhs: inout Self, rhs: Self) {
-        lhs = lhs / rhs
-    }
-    
-}
-
-extension UI.Container.AccumulateInset : ILerpable {
+extension UI.Container.InheritedInset : ILerpable {
     
     @inlinable
     public func lerp(_ to: Self, progress: Percent) -> Self {
         return .init(
-            natural: self.natural.lerp(to.natural, progress: progress),
-            interactive: self.interactive.lerp(to.interactive, progress: progress)
+            device: self.device.lerp(to.device, progress: progress),
+            virtualKeyboard: self.virtualKeyboard.lerp(to.virtualKeyboard, progress: progress),
+            content: self.content.lerp(to.content, progress: progress)
         )
     }
     

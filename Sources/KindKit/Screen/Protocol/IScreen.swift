@@ -83,7 +83,7 @@ public extension IScreen {
     
 #endif
     
-    var inset: UI.Container.AccumulateInset {
+    var inset: UI.Container.InheritedInset {
         guard let parentInset = self.container?.parentInset() else {
             return .zero
         }

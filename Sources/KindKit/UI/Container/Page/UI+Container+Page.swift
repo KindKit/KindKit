@@ -162,24 +162,28 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             for item in self._items {
                 item.container.apply(contentInset: contentInset)
             }
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             let parentInset = self.parentInset()
             if self._items.contains(where: { $0.container === container }) == true {
                 if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
-                    return parentInset + .init(top: self.barSize, visibility: self.barVisibility)
+                    return .init(
+                        device: parentInset.device,
+                        virtualKeyboard: parentInset.virtualKeyboard,
+                        content: parentInset.content.appending(top: self.barSize, visibility: self.barVisibility)
+                    )
                 }
             }
             return parentInset
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
-            let contentInset: UI.Container.AccumulateInset
+        public func contentInset() -> Inset {
+            let contentInset: Inset
             switch self._layout.state {
             case .empty:
                 contentInset = .zero
@@ -195,7 +199,12 @@ public extension UI.Container {
                 contentInset = currentInset.lerp(nextInset, progress: progress)
             }
             if self.barHidden == false && UI.Container.BarController.shared.hidden(.page) == false {
-                return contentInset + .init(top: self.barSize, visibility: self.barVisibility)
+                return .init(
+                    top: contentInset.top + (self.barSize * self.barVisibility),
+                    left: contentInset.left,
+                    right: contentInset.right,
+                    bottom: contentInset.bottom
+                )
             }
             return contentInset
         }

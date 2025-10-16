@@ -116,7 +116,7 @@ public extension UI.Container {
             self._destroy()
         }
         
-        public func apply(contentInset: UI.Container.AccumulateInset) {
+        public func apply(contentInset: Inset) {
             if let item = self._backward {
                 item.container.apply(contentInset: contentInset)
             }
@@ -128,11 +128,11 @@ public extension UI.Container {
             }
         }
         
-        public func parentInset(for container: IUIContainer) -> UI.Container.AccumulateInset {
+        public func parentInset(for container: IUIContainer) -> UI.Container.InheritedInset {
             return self.parentInset()
         }
         
-        public func contentInset() -> UI.Container.AccumulateInset {
+        public func contentInset() -> Inset {
             switch self._layout.state {
             case .empty:
                 return .zero
